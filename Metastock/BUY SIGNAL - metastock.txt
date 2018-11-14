@@ -1,0 +1,62 @@
+{buy signal}
+x:= StochMomentum( 5,3 ,5 ); 
+y:= Mov(x,8,T);
+ma:= Mov(C,6,T);
+inflectup:= Ref(y, -1) < Min(y, Ref(y,-2));
+inflectdn:= Ref(y, -1) > Max(y, Ref(y,-2));
+bullish:= ma >= Ref(ma,-5)*1.004;
+bearish:= ma <= Ref(ma,-5)*0.996;
+{Long trade setups}
+Ltarget:= ValueWhen(1, inflectdn, Ref(MP(),-1));
+Lmin:= ValueWhen(2, inflectup, Ref(C,-1));
+Lsetup:= inflectup AND Ref(C,-1) < Lmin;
+Ltrigger:= If(PREV <=0, If(Lsetup, 1, 0),
+If(inflectup OR inflectdn, -1,
+If((PREV>=2) AND (C>ma) AND bullish, -2, PREV+1)));
+el:= Ltrigger=-2;
+{Short trade setups}
+Starget:= ValueWhen(1, inflectup, Ref(MP(),-1));
+Smax:= ValueWhen(2, inflectdn, Ref(C,-1));
+Ssetup:= inflectdn AND Ref(C,-1) > Smax;
+Strigger:= If(PREV <=0, If(Ssetup, 1, 0),
+If(inflectup OR inflectdn, -1,
+If((PREV>=2) AND (C<ma) AND bearish, -2, PREV+1)));
+es:= Strigger=-2;
+{tracking Long trade}
+stop:= LLV( L, 5) - 0.05;
+trade:= If(PREV<=0, If( el, stop, 0),
+If(L <= PREV, -1, If(es, -2,
+If(Mod(BarsSince(PREV<=0),5)=0, Max(stop,PREV),PREV))));
+trade > 0 AND Ref(trade<=0, -1)
+
+{sell short signal}
+x:= StochMomentum( 5,3 ,5 ); 
+y:= Mov(x,8,T);
+ma:= Mov(C,6,T);
+inflectup:= Ref(y, -1) < Min(y, Ref(y,-2));
+inflectdn:= Ref(y, -1) > Max(y, Ref(y,-2));
+bullish:= ma >= Ref(ma,-5)*1.004;
+bearish:= ma <= Ref(ma,-5)*0.996;
+{Long trade setups}
+Ltarget:= ValueWhen(1, inflectdn, Ref(MP(),-1));
+Lmin:= ValueWhen(2, inflectup, Ref(C,-1));
+Lsetup:= inflectup AND Ref(C,-1) < Lmin;
+Ltrigger:= If(PREV <=0, If(Lsetup, 1, 0),
+If(inflectup OR inflectdn, -1,
+If((PREV>=2) AND (C>ma) AND bullish, -2, PREV+1)));
+el:= Ltrigger=-2;
+{Short trade setups}
+Starget:= ValueWhen(1, inflectup, Ref(MP(),-1));
+Smax:= ValueWhen(2, inflectdn, Ref(C,-1));
+Ssetup:= inflectdn AND Ref(C,-1) > Smax;
+Strigger:= If(PREV <=0, If(Ssetup, 1, 0),
+If(inflectup OR inflectdn, -1,
+If((PREV>=2) AND (C<ma) AND bearish, -2, PREV+1)));
+es:= Strigger=-2;
+{tracking Short trade}
+stop:= HHV( H, 5) + 0.05;
+trade:= If(PREV<=0, If( es, stop, 0),
+If(H >= PREV, -1, If(el, -2,
+If(Mod(BarsSince(PREV<=0),5)=0, Min(stop,PREV),PREV))));
+trade > 0 AND Ref(trade <= 0, -1)
+

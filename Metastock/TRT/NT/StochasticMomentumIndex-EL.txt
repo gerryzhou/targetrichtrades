@@ -1,0 +1,48 @@
+Stochastic Momentum Indicator
+
+Hello,
+
+This is below the Easy Language code for the SMI, it would be so kind if someone could translate it in NT code. Sincerely, adding the SMI in our trading arsenal would be an edge !!!
+
+Thanks for your careful attention,
+
+Happy trading,
+
+Cheers
+
+Angel
+
+.................................................. .................................................. ....
+
+Type : Function, Name : SMI 
+
+input:
+length1(NumericSimple),
+length2(NumericSimple),
+length3(NumericSimple);
+
+var:
+HH(0),
+LL(0);
+
+HH = Highest(H,length1);
+LL = Lowest (L,length1);
+
+SMI = 100 * (XAverage(XAverage(C-(0.5*(HH+LL)),length2),length3) /
+(0.5 * XAverage(XAverage(HH-LL,length2),length3)));
+
+.................................................. .................................................. ... 
+
+Type : Indicator, Name : SMI 
+
+input:length1(13),length2(25),length3(2),alertLeve l(40);
+
+plot1( smi(length1,length2,length3), "SMI" );
+plot2( alertLevel, "sell line" );
+plot3(-alertLevel, "buy line" );
+
+if plot1 crosses above -alertLevel then
+alert("SMI crosses above buy line");
+
+if plot1 crosses below alertLevel then
+alert("SMI crosses below sell line");

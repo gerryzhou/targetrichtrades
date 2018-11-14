@@ -1,0 +1,165 @@
+==================[Trend]====================================
+Bull:
+ma:= Mov(C,6,T);
+ma >= Ref(ma,-5)*1.004;
+
+Bear:
+ma:= Mov(C,6,T);
+ma <= Ref(ma,-5)*0.996
+
+===================[Buy signal]==============================
+{buy signal}
+x:= StochMomentum( 5,3 ,5 ); 
+y:= Mov(x,8,T);
+ma:= Mov(C,6,T);
+inflectup:= Ref(y, -1) < Min(y, Ref(y,-2));
+inflectdn:= Ref(y, -1) > Max(y, Ref(y,-2));
+bullish:= ma >= Ref(ma,-5)*1.004;
+bearish:= ma <= Ref(ma,-5)*0.996;
+{Long trade setups}
+Ltarget:= ValueWhen(1, inflectdn, Ref(MP(),-1));
+Lmin:= ValueWhen(2, inflectup, Ref(C,-1));
+Lsetup:= inflectup AND Ref(C,-1) < Lmin;
+Ltrigger:= If(PREV <=0, If(Lsetup, 1, 0),
+If(inflectup OR inflectdn, -1,
+If((PREV>=2) AND (C>ma) AND bullish, -2, PREV+1)));
+el:= Ltrigger=-2;
+{Short trade setups}
+Starget:= ValueWhen(1, inflectup, Ref(MP(),-1));
+Smax:= ValueWhen(2, inflectdn, Ref(C,-1));
+Ssetup:= inflectdn AND Ref(C,-1) > Smax;
+Strigger:= If(PREV <=0, If(Ssetup, 1, 0),
+If(inflectup OR inflectdn, -1,
+If((PREV>=2) AND (C<ma) AND bearish, -2, PREV+1)));
+es:= Strigger=-2;
+{tracking Long trade}
+stop:= LLV( L, 5) - 0.05;
+trade:= If(PREV<=0, If( el, stop, 0),
+If(L <= PREV, -1, If(es, -2,
+If(Mod(BarsSince(PREV<=0),5)=0, Max(stop,PREV),PREV))));
+trade > 0 AND Ref(trade<=0, -1)
+
+====================[Sell signal]==============================================
+
+====================[Exit Long Stop]============================================
+{buy signal}
+x:= StochMomentum( 5,3 ,5 ); 
+y:= Mov(x,8,T);
+ma:= Mov(C,6,T);
+inflectup:= Ref(y, -1) < Min(y, Ref(y,-2));
+inflectdn:= Ref(y, -1) > Max(y, Ref(y,-2));
+bullish:= ma >= Ref(ma,-5)*1.004;
+bearish:= ma <= Ref(ma,-5)*0.996;
+{Long trade setups}
+Ltarget:= ValueWhen(1, inflectdn, Ref(MP(),-1));
+Lmin:= ValueWhen(2, inflectup, Ref(C,-1));
+Lsetup:= inflectup AND Ref(C,-1) < Lmin;
+Ltrigger:= If(PREV <=0, If(Lsetup, 1, 0),
+If(inflectup OR inflectdn, -1,
+If((PREV>=2) AND (C>ma) AND bullish, -2, PREV+1)));
+el:= Ltrigger=-2;
+{Short trade setups}
+Starget:= ValueWhen(1, inflectup, Ref(MP(),-1));
+Smax:= ValueWhen(2, inflectdn, Ref(C,-1));
+Ssetup:= inflectdn AND Ref(C,-1) > Smax;
+Strigger:= If(PREV <=0, If(Ssetup, 1, 0),
+If(inflectup OR inflectdn, -1,
+If((PREV>=2) AND (C<ma) AND bearish, -2, PREV+1)));
+es:= Strigger=-2;
+{tracking Long trade}
+stop:= LLV( L, 5) - 0.05;
+trade:= If(PREV<=0, If( el, stop, 0),
+If(L <= PREV, -1, If(es, -2,
+If(Mod(BarsSince(PREV<=0),5)=0, Max(stop,PREV),PREV))));
+trade < 0
+
+=====================[Exit Short Stop]======================================
+{sell short signal}
+x:= StochMomentum( 5,3 ,5 ); 
+y:= Mov(x,8,T);
+ma:= Mov(C,6,T);
+inflectup:= Ref(y, -1) < Min(y, Ref(y,-2));
+inflectdn:= Ref(y, -1) > Max(y, Ref(y,-2));
+bullish:= ma >= Ref(ma,-5)*1.004;
+bearish:= ma <= Ref(ma,-5)*0.996;
+{Long trade setups}
+Ltarget:= ValueWhen(1, inflectdn, Ref(MP(),-1));
+Lmin:= ValueWhen(2, inflectup, Ref(C,-1));
+Lsetup:= inflectup AND Ref(C,-1) < Lmin;
+Ltrigger:= If(PREV <=0, If(Lsetup, 1, 0),
+If(inflectup OR inflectdn, -1,
+If((PREV>=2) AND (C>ma) AND bullish, -2, PREV+1)));
+el:= Ltrigger=-2;
+{Short trade setups}
+Starget:= ValueWhen(1, inflectup, Ref(MP(),-1));
+Smax:= ValueWhen(2, inflectdn, Ref(C,-1));
+Ssetup:= inflectdn AND Ref(C,-1) > Smax;
+Strigger:= If(PREV <=0, If(Ssetup, 1, 0),
+If(inflectup OR inflectdn, -1,
+If((PREV>=2) AND (C<ma) AND bearish, -2, PREV+1)));
+es:= Strigger=-2;
+{tracking Short trade}
+stop:= HHV( H, 5) + 0.05;
+trade:= If(PREV<=0, If( es, stop, 0),
+If(H >= PREV, -1, If(el, -2,
+If(Mod(BarsSince(PREV<=0),5)=0, Min(stop,PREV),PREV))));
+trade < 0
+
+=====================[Re-entry long]===============================
+{buy re-entry signal}
+el:= FmlVar("# AM helper","el");
+es:= FmlVar("# AM helper","es");
+Ltarget:= FmlVar("# AM helper","Ltarget");
+inflectup:= FmlVar("# AM helper","inflectup");
+ma:= Mov(C,6,T);
+bullish:= ma >= Ref(ma,-5)*1.004;
+stop:= LLV( L, 5) - 0.05;
+{main trade}
+trade:= If(PREV<=0, If( el, stop, 0),
+If(L <= PREV, -1, If(es, -2,
+If(Mod(BarsSince(PREV<=0),5)=0, Max(stop,PREV),PREV))));
+{1st re-entry}
+re1:= ValueWhen(1, trade<0, trade=-1) AND  trade=0 AND bullish AND
+H>Ltarget AND Alert(inflectup, 5);
+reentry:= If(PREV<=0, If( re1, stop, 0),
+If(L <= PREV, -1, If(es, -2,
+If(Mod(BarsSince(PREV<=0),5)=0, Max(stop,PREV),PREV))));
+reentry>0 AND Ref(reentry<=0, -1)
+
+
+============================[Re-entry short]========================
+
+
+============================[Support]===============================
+x:= StochMomentum( 5,3 ,5 ); 
+y:= Mov(x,8,T);
+inflect:= Ref(y, -1) < Min(y, Ref(y,-2));
+Ref(inflect, +1)
+
+============================[Resistance]============================
+x:= StochMomentum( 5,3 ,5 ); 
+y:= Mov(x,8,T);
+inflect:= Ref(y, -1) > Max(y, Ref(y,-2));
+Ref(inflect, +1)
+
+=======================[Long Re-entry Signal]=============================
+{buy re-entry signal}
+el:= FmlVar("# AM helper","el");
+es:= FmlVar("# AM helper","es");
+Ltarget:= FmlVar("# AM helper","Ltarget");
+inflectup:= FmlVar("# AM helper","inflectup");
+ma:= Mov(C,6,T);
+bullish:= ma >= Ref(ma,-5)*1.004;
+stop:= LLV( L, 5) - 0.05;
+{main trade}
+trade:= If(PREV<=0, If( el, stop, 0),
+If(L <= PREV, -1, If(es, -2,
+If(Mod(BarsSince(PREV<=0),5)=0, Max(stop,PREV),PREV))));
+{1st re-entry}
+re1:= ValueWhen(1, trade<0, trade=-1) AND  trade=0 AND bullish AND
+H>Ltarget AND Alert(inflectup, 5);
+reentry:= If(PREV<=0, If( re1, stop, 0),
+If(L <= PREV, -1, If(es, -2,
+If(Mod(BarsSince(PREV<=0),5)=0, Max(stop,PREV),PREV))));
+reentry>0 AND Ref(reentry<=0, -1)
+
