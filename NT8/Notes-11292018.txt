@@ -1,0 +1,10 @@
+AWO: sma - > EMA, or sma -> 20, 5,(34, 5), TMA, Triangular MA;
+
+Target: cross over 0 of AWO, high/low of the bar as TG; inflection sign need to exit;
+
+entry: TMA 3, 15, inflection and over or below the TMA then entry, 
+the last inflection is the first target, the next inflection is next target;
+or the 0 cross before of AWO could be the target;
+
+AWO: (34,5), plot on the chart when the color changed, 
+
