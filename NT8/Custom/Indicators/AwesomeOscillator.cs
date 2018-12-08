@@ -22,6 +22,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 //This namespace holds indicators in this folder and is required. Do not change it.
@@ -31,18 +32,24 @@ namespace NinjaTrader.NinjaScript.Indicators
 	/// </summary>
 	public class AwesomeOscillator : Indicator
 	{
-            private int fastPeriod 			= 5; 
-            private int slowPeriod 			= 34; 
-			private int smooth		 		= 5; 
-			private int barWidth			= 5;
-			private int lineWidth			= 2;
-			private double oscillatorValue 	= 0;
-			private SolidColorBrush upColor 			= Brushes.LimeGreen;
-			private SolidColorBrush downColor 		= Brushes.Red;
-			private SolidColorBrush signalColor		= Brushes.LightSteelBlue;
-			private bool showLines			= false;
-			private SMA fastSMA;
-			private SMA slowSMA;
+        private int fastPeriod 			= 5;
+        private int slowPeriod 			= 34;
+		private int smooth		 		= 5;
+		private int barWidth			= 5;
+		private int lineWidth			= 2;
+		private double oscillatorValue 	= 0;
+		private bool isRising			= false;
+		private SolidColorBrush upColor 		= Brushes.LimeGreen;
+		private SolidColorBrush downColor 		= Brushes.Red;
+		private SolidColorBrush signalColor		= Brushes.LightSteelBlue;
+		private bool showLines			= false;
+		private SMA fastSMA;
+		private SMA slowSMA;
+		private EMA fastEMA;
+		private EMA slowEMA;
+		private TMA fastTMA;
+		private TMA slowTMA;
+		private MovingAvgType movAvgType = MovingAvgType.SMA;
 
 		protected override void OnStateChange()
 		{
@@ -58,7 +65,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			else if (State == State.Configure)
 			{
-								
 	            //CalculateOnBarClose	= false;
 	            //Overlay				= false;
 				//PlotsConfigurable	= false;
@@ -69,8 +75,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 //			Plots[0].Pen.Width = lineWidth;
 //			Plots[1].Pen.Width = lineWidth;
 //			Plots[2].Pen.Width = barWidth;
-			fastSMA = SMA(Median, fastPeriod);
-			slowSMA = SMA(Median, slowPeriod);
+				switch(movAvgType) {
+					case MovingAvgType.SMA:
+						fastSMA = SMA(Median, fastPeriod);
+						slowSMA = SMA(Median, slowPeriod);
+						break;
+					case MovingAvgType.EMA:
+						fastEMA = EMA(Median, fastPeriod);
+						slowEMA = EMA(Median, slowPeriod);
+						break;
+					case MovingAvgType.TMA:
+						fastTMA = TMA(Median, fastPeriod);
+						slowTMA = TMA(Median, slowPeriod);
+						break;
+				}
 			}
 		}
 
@@ -84,11 +102,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 				return;
 			}
 			
-			oscillatorValue = fastSMA[0]-slowSMA[0];
+			oscillatorValue = GetOscillatorValue();//fastSMA[0]-slowSMA[0];
 			if (ShowLines)
 			{
 				OscillatorLine[0] = oscillatorValue;
-				SignalLine[0] = SMA(OscillatorLine,Smooth)[0];
+				SignalLine[0] = GetSignalLine();//SMA(OscillatorLine,Smooth)[0];
 			}
 			else
 			{
@@ -96,10 +114,22 @@ namespace NinjaTrader.NinjaScript.Indicators
 				SignalLine.Reset();
 			}
 			Oscillator[0] = oscillatorValue;
-			if (IsRising(Oscillator))
+			Brush draw_color = new SolidColorBrush(Color.FromRgb(0, 0, 0));//Color.Black;
+			if(isRising && !IsRising(Oscillator)) {
+				Draw.Text(this, CurrentBar.ToString(), "O", 1, High[1]+10, draw_color);
+			} 
+			if(!isRising && IsRising(Oscillator)) {
+				Draw.Text(this, CurrentBar.ToString(), "B", 1, Low[1]-10, draw_color);
+				//Draw.Text(this, CurrentBar.ToString(), Time[0]+"\r\nB", 1, Low[0]-10, draw_color);
+			}
+			
+			isRising = IsRising(Oscillator);				
+			if (isRising)
 			{
 				PlotBrushes[0][0] = UpColor;
 				PlotBrushes[2][0] = UpColor;
+				//Draw.Text(this, tag+barNo.ToString(), GetTimeDate(Time[bars_ago], 1)+"\r\n#"+barNo+"\r\nZ:"+zzGap, bars_ago, y, draw_color)
+				
 //				PlotColors[0][0] = UpColor;
 //				PlotColors[2][0] = UpColor;
 			}
@@ -108,6 +138,38 @@ namespace NinjaTrader.NinjaScript.Indicators
 				PlotBrushes[0][0] = DownColor;
 				PlotBrushes[2][0] = DownColor;
 			}
+		}
+		
+		private double GetOscillatorValue() {
+			double val = 0;
+			switch(movAvgType) {
+				case MovingAvgType.SMA:
+					val = fastSMA[0]-slowSMA[0];
+					break;
+				case MovingAvgType.EMA:
+					val = fastEMA[0]-slowEMA[0];
+					break;
+				case MovingAvgType.TMA:
+					val = fastTMA[0]-slowTMA[0];
+					break;
+			}			
+			return val;
+		}
+		
+		private double GetSignalLine() {
+			double val = 0;
+			switch(movAvgType) {
+				case MovingAvgType.SMA:
+					val = SMA(OscillatorLine,Smooth)[0];
+					break;
+				case MovingAvgType.EMA:
+					val = EMA(OscillatorLine,Smooth)[0];
+					break;
+				case MovingAvgType.TMA:
+					val = TMA(OscillatorLine,Smooth)[0];
+					break;
+			}
+			return val;
 		}
 
         #region Properties
@@ -144,7 +206,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		//[Description("Show Oscillator and Signalline")]
 		//[Gui.Design.DisplayName("Display Lines")]
 		//[Category("Parameters")]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ShowLines", Description = "Set true to display on chart the lines", GroupName = "NinjaScriptGeneral", Order = 3)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ShowLines", Description = "Set true to display on chart the lines", GroupName = "NinjaScriptGeneral", Order = 5)]
 		public bool ShowLines
 		{
 			get { return showLines; }
@@ -156,7 +218,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		//[Description("Period for fast EMA")]
 		//[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "FastPeriod", GroupName = "NinjaScriptParameters", Order = 1)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "FastPeriod", GroupName = "AOParameters", Order = 2)]		
 		public int FastPeriod
 		{
 			//get;set;
@@ -169,7 +231,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		//[Description("Period for slow EMA")]
 		//[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "SlowPeriod", GroupName = "NinjaScriptParameters", Order = 0)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SlowPeriod", GroupName = "AOParameters", Order = 3)]
 		public int SlowPeriod
 		{
 			get { return slowPeriod; }
@@ -181,13 +243,21 @@ namespace NinjaTrader.NinjaScript.Indicators
 //		[Description("Period for Smoothing of Signal Line")]
 //		[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "Smooth", GroupName = "NinjaScriptParameters", Order = 0)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "Smooth", GroupName = "AOParameters", Order = 4)]		
 		public int Smooth
 		{
 			get { return smooth; }
 			set { smooth = Math.Max(1, value); }
 		}
 
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MovingAvgType", GroupName = "AOParameters", Order = 1)]		
+		public MovingAvgType MovingAverageType
+		{
+			get { return movAvgType; }
+			set { movAvgType = value; }
+		}
+		
 		/// <summary>
 		/// </summary>
 		[Description("Width of bars")]
@@ -297,18 +367,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private AwesomeOscillator[] cacheAwesomeOscillator;
-		public AwesomeOscillator AwesomeOscillator(int fastPeriod, int slowPeriod, int smooth)
+		public AwesomeOscillator AwesomeOscillator(int fastPeriod, int slowPeriod, int smooth, MovingAvgType movingAverageType)
 		{
-			return AwesomeOscillator(Input, fastPeriod, slowPeriod, smooth);
+			return AwesomeOscillator(Input, fastPeriod, slowPeriod, smooth, movingAverageType);
 		}
 
-		public AwesomeOscillator AwesomeOscillator(ISeries<double> input, int fastPeriod, int slowPeriod, int smooth)
+		public AwesomeOscillator AwesomeOscillator(ISeries<double> input, int fastPeriod, int slowPeriod, int smooth, MovingAvgType movingAverageType)
 		{
 			if (cacheAwesomeOscillator != null)
 				for (int idx = 0; idx < cacheAwesomeOscillator.Length; idx++)
-					if (cacheAwesomeOscillator[idx] != null && cacheAwesomeOscillator[idx].FastPeriod == fastPeriod && cacheAwesomeOscillator[idx].SlowPeriod == slowPeriod && cacheAwesomeOscillator[idx].Smooth == smooth && cacheAwesomeOscillator[idx].EqualsInput(input))
+					if (cacheAwesomeOscillator[idx] != null && cacheAwesomeOscillator[idx].FastPeriod == fastPeriod && cacheAwesomeOscillator[idx].SlowPeriod == slowPeriod && cacheAwesomeOscillator[idx].Smooth == smooth && cacheAwesomeOscillator[idx].MovingAverageType == movingAverageType && cacheAwesomeOscillator[idx].EqualsInput(input))
 						return cacheAwesomeOscillator[idx];
-			return CacheIndicator<AwesomeOscillator>(new AwesomeOscillator(){ FastPeriod = fastPeriod, SlowPeriod = slowPeriod, Smooth = smooth }, input, ref cacheAwesomeOscillator);
+			return CacheIndicator<AwesomeOscillator>(new AwesomeOscillator(){ FastPeriod = fastPeriod, SlowPeriod = slowPeriod, Smooth = smooth, MovingAverageType = movingAverageType }, input, ref cacheAwesomeOscillator);
 		}
 	}
 }
@@ -317,14 +387,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.AwesomeOscillator AwesomeOscillator(int fastPeriod, int slowPeriod, int smooth)
+		public Indicators.AwesomeOscillator AwesomeOscillator(int fastPeriod, int slowPeriod, int smooth, MovingAvgType movingAverageType)
 		{
-			return indicator.AwesomeOscillator(Input, fastPeriod, slowPeriod, smooth);
+			return indicator.AwesomeOscillator(Input, fastPeriod, slowPeriod, smooth, movingAverageType);
 		}
 
-		public Indicators.AwesomeOscillator AwesomeOscillator(ISeries<double> input , int fastPeriod, int slowPeriod, int smooth)
+		public Indicators.AwesomeOscillator AwesomeOscillator(ISeries<double> input , int fastPeriod, int slowPeriod, int smooth, MovingAvgType movingAverageType)
 		{
-			return indicator.AwesomeOscillator(input, fastPeriod, slowPeriod, smooth);
+			return indicator.AwesomeOscillator(input, fastPeriod, slowPeriod, smooth, movingAverageType);
 		}
 	}
 }
@@ -333,14 +403,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.AwesomeOscillator AwesomeOscillator(int fastPeriod, int slowPeriod, int smooth)
+		public Indicators.AwesomeOscillator AwesomeOscillator(int fastPeriod, int slowPeriod, int smooth, MovingAvgType movingAverageType)
 		{
-			return indicator.AwesomeOscillator(Input, fastPeriod, slowPeriod, smooth);
+			return indicator.AwesomeOscillator(Input, fastPeriod, slowPeriod, smooth, movingAverageType);
 		}
 
-		public Indicators.AwesomeOscillator AwesomeOscillator(ISeries<double> input , int fastPeriod, int slowPeriod, int smooth)
+		public Indicators.AwesomeOscillator AwesomeOscillator(ISeries<double> input , int fastPeriod, int slowPeriod, int smooth, MovingAvgType movingAverageType)
 		{
-			return indicator.AwesomeOscillator(input, fastPeriod, slowPeriod, smooth);
+			return indicator.AwesomeOscillator(input, fastPeriod, slowPeriod, smooth, movingAverageType);
 		}
 	}
 }

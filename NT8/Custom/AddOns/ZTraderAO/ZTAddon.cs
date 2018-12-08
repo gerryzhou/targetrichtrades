@@ -22,18 +22,16 @@ using NinjaTrader.Gui.Tools;
 #endregion
 
 //This namespace holds Add ons in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.AddOns
+namespace NinjaTrader.NinjaScript.AddOns.ZTraderAO
 {
-	public class GZTraderAddOn : NinjaTrader.NinjaScript.AddOnBase
+	public class ZTAddon : NinjaTrader.NinjaScript.AddOnBase
 	{
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
 			{
-				Description									= @"Enter the description for your new custom Add on here.";
-				Name										= "GZTraderAddOn";
-				GA_ProfitTarget					= 1;
-				GA_StopLoss					= 1;
+				Description									= @"Enumes for ZTrader";
+				Name										= "Enums";
 			}
 			else if (State == State.Configure)
 			{
@@ -49,21 +47,6 @@ namespace NinjaTrader.NinjaScript.AddOns
 		{
 			
 		}
-
-
-		#region Properties
-		[NinjaScriptProperty]
-		[Range(1, int.MaxValue)]
-		[Display(Name="GA_ProfitTarget", Description="ProfitTarget", Order=1, GroupName="Parameters")]
-		public int GA_ProfitTarget
-		{ get; set; }
-
-		[NinjaScriptProperty]
-		[Range(1, double.MaxValue)]
-		[Display(Name="GA_StopLoss", Description="Stop loss", Order=2, GroupName="Parameters")]
-		public double GA_StopLoss
-		{ get; set; }
-		#endregion
 
 	}
 }
