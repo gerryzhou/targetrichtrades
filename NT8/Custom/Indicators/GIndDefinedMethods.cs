@@ -20,20 +20,21 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.NinjaScript.Universal;
 using NinjaTrader.NinjaScript.Indicators;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
+namespace NinjaTrader.NinjaScript.Indicators
 {
     /// <summary>
     /// This file holds all user defined indicator methods.
     /// </summary>
-    partial class GIndicatorBase : Indicator
-    {		
+    partial class Indicator
+    {
 		protected string symbol = "";
-		protected int printOut = 1;		
+		protected int printOut = 1;
 		protected string logFile = ""; //Log file full path		
 		private bool drawTxt = false; // Draw the text on chart
 		protected Text it_gap = null; // The Text object drawn for bar
@@ -85,8 +86,8 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		
 		public int IsLastBarOnChart() {
 			try{
-				if(Input.Count - Bars.CurrentBar <= 2) {
-					return Input.Count;
+				if(Inputs[0].Count - Bars.CurrentBar <= 2) {
+					return Inputs[0].Count;
 				} else {
 					return -1;
 				}
@@ -700,32 +701,3 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		#endregion		
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

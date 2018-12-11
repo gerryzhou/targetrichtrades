@@ -30,10 +30,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			if (State == State.SetDefaults)
 			{
-				Description									= @"The base class for indicators";
+				Description									= @"Base indicator for GI;";
 				Name										= "GIndicatorBase";
 				Calculate									= Calculate.OnBarClose;
-				IsOverlay									= true;
+				IsOverlay									= false;
 				DisplayInDataBox							= true;
 				DrawOnPricePanel							= true;
 				DrawHorizontalGridLines						= true;
@@ -45,28 +45,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				IsSuspendedWhileInactive					= true;
 			}
 			else if (State == State.Configure)
-			{				
+			{
 			}
-		}
-
-		protected override void OnConnectionStatusUpdate(ConnectionStatusEventArgs connectionStatusUpdate)
-		{
-			
-		}
-
-		protected override void OnFundamentalData(FundamentalDataEventArgs fundamentalDataUpdate)
-		{
-			
-		}
-
-		protected override void OnMarketData(MarketDataEventArgs marketDataUpdate)
-		{
-			
-		}
-
-		protected override void OnMarketDepth(MarketDepthEventArgs marketDepthUpdate)
-		{
-			
 		}
 
 		protected override void OnBarUpdate()

@@ -20,10 +20,11 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
+namespace NinjaTrader.NinjaScript.Indicators
 {
     /// <summary>
     /// This file holds supervised pattern recognition class.
@@ -45,7 +46,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		}
 	}
 	
-	partial class GIndicatorBase {
+	partial class Indicator {
 		#region SpvPR Vars
 		/// <summary>
 		/// Loaded from supervised file;
@@ -194,11 +195,5 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		#endregion
     }
 }
-
-
-
-
-
-
 
 
