@@ -30,35 +30,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 	{
 		protected GIndicatorProxy indicatorProxy;
 		
+		protected string accName = "";
+		protected int algoMode = 1;
+		protected bool backTest = true; //if it runs for backtesting;
+		protected int printOut = 1; // Default setting for PrintOut
+		
 		private Series<double> CustomDatsSeries1;
 
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
 			{
-				Description									= @"GS Z-Trader base;";
-				Name										= "GSZTraderBase";
-				Calculate									= Calculate.OnPriceChange;
-				EntriesPerDirection							= 1;
-				EntryHandling								= EntryHandling.AllEntries;
-				IsExitOnSessionCloseStrategy				= true;
-				ExitOnSessionCloseSeconds					= 30;
-				IsFillLimitOnTouch							= true;
-				MaximumBarsLookBack							= MaximumBarsLookBack.TwoHundredFiftySix;
-				OrderFillResolution							= OrderFillResolution.Standard;
-				Slippage									= 0;
-				StartBehavior								= StartBehavior.WaitUntilFlatSynchronizeAccount;
-				TimeInForce									= TimeInForce.Day;
-				TraceOrders									= true;
-				RealtimeErrorHandling						= RealtimeErrorHandling.StopCancelClose;
-				StopTargetHandling							= StopTargetHandling.ByStrategyPosition;
-				BarsRequiredToTrade							= 100;
-				// Disable this property for performance gains in Strategy Analyzer optimizations
-				// See the Help Guide for additional information
-				IsInstantiatedOnEachOptimizationIteration	= true;
-				CustomColor1					= Brushes.Orange;
-				StartH						= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
-				CustomPrc1					= 1;
+				SetInitParams();
 				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.TriangleRight, "CustomPlot1");
 				AddLine(Brushes.Orange, 1, "CustomLine1");
 				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.HLine, "CustomPlot2");
@@ -72,7 +55,43 @@ namespace NinjaTrader.NinjaScript.Strategies
 				CustomDatsSeries1 = new Series<double>(this);
 			}
 		}
-
+		
+		public void SetInitParams() {
+			//CalculateOnBarClose = true;
+			// Triggers the exit on close function 30 seconds prior to session end
+			//ExitOnClose = true;
+			//ExitOnCloseSeconds = 30;
+			
+			//SyncAccountPosition = true;
+			Description									= @"GS Z-Trader base;";
+			Name										= "GSZTraderBase";
+			Calculate									= Calculate.OnPriceChange;
+			EntriesPerDirection							= 1;
+			EntryHandling								= EntryHandling.AllEntries;
+			IsExitOnSessionCloseStrategy				= true;
+			ExitOnSessionCloseSeconds					= 30;
+			IsFillLimitOnTouch							= true;
+			MaximumBarsLookBack							= MaximumBarsLookBack.TwoHundredFiftySix;
+			OrderFillResolution							= OrderFillResolution.Standard;
+			Slippage									= 0;
+			StartBehavior								= StartBehavior.WaitUntilFlatSynchronizeAccount;
+			TimeInForce									= TimeInForce.Day;
+			TraceOrders									= true;
+			RealtimeErrorHandling						= RealtimeErrorHandling.StopCancelClose;
+			StopTargetHandling							= StopTargetHandling.ByStrategyPosition;
+			BarsRequiredToTrade							= 100;
+			// Disable this property for performance gains in Strategy Analyzer optimizations
+			// See the Help Guide for additional information
+			IsInstantiatedOnEachOptimizationIteration	= true;
+			CustomColor1					= Brushes.Orange;
+			StartH						= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
+			CustomPrc1					= 1;
+			
+			//QuantityType = QuantityType.DefaultQuantity;
+			SetOrderQuantity = SetOrderQuantity.DefaultQuantity;
+			DefaultQuantity = 1;
+		}
+		
 		protected override void OnAccountItemUpdate(Cbi.Account account, Cbi.AccountItem accountItem, double value)
 		{
 			
@@ -118,6 +137,50 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 
 		#region Properties
+		[Description("Account Name")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AccName", GroupName = "ZTraderBase", Order = 0)]		
+        public string AccName
+        {
+            get { return accName; }
+            set { accName = value; }
+        }
+		
+		/// <summary>
+		/// AlgoMode: 0=liquidate; 
+		/// 1=trading; 
+		/// 2=semi-algo(manual entry, algo exit);
+		/// -1=stop trading(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
+		/// -2=stop trading(no entry/exit, liquidate positions and cancel all entry/exit orders);
+		/// </summary>
+		/// <returns></returns>
+        [Description("Algo mode")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AlgoMode", GroupName = "ZTraderBase", Order = 1)]			
+        public int AlgoMode
+        {
+            get { return algoMode; }
+            set { algoMode = value; }
+        }
+
+        [Description("BackTesting mode or not")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BackTest", GroupName = "ZTraderBase", Order = 2)]		
+        public bool BackTest
+        {
+            get { return backTest; }
+            set { backTest = value; }
+        }
+		
+        [Description("Print out level: large # print out more")]
+		[Range(-5, 5), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PrintOut", GroupName = "ZTraderBase", Order = 3)]		
+        public int PrintOut
+        {
+            get { return printOut; }
+            set { printOut = Math.Max(-5, value); }
+        }
+		
 		[NinjaScriptProperty]
 		[XmlIgnore]
 		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName="Parameters")]

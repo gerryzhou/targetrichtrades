@@ -35,11 +35,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 	
 	public partial class GSZTraderBase : Strategy
 	{
-		protected string accName = "";
-		protected int algoMode = 1;
-		protected bool backTest = true; //if it runs for backtesting;
-		protected int printOut = 1; // Default setting for PrintOut
-		
 		protected int tradeDirection = 0; // -1=short; 0-both; 1=long;
 		protected int tradeStyle = 0; // -1=counter trend; 1=trend following;
 		
@@ -96,8 +91,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public bool IsTradingTime(int session_start) {
 			//Bars.Session.GetNextBeginEnd(DateTime time, out DateTime sessionBegin, out DateTime sessionEnd)
-			int time_start = indicatorProxy.GetTimeByHM(TG_TimeStartH, TG_TimeStartM);
-			int time_end = indicatorProxy.GetTimeByHM(TG_TimeEndH, TG_TimeEndM);
+			int time_start = indicatorProxy.ZT_TimeFunc.GetTimeByHM(TG_TimeStartH, TG_TimeStartM);
+			int time_end = indicatorProxy.ZT_TimeFunc.GetTimeByHM(TG_TimeEndH, TG_TimeEndM);
 			int time_now = ToTime(Time[0]);
 			bool isTime= false;
 			if(time_start >= session_start) {
@@ -117,9 +112,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="timeM">time min</param>
 		/// <returns></returns>
 		public bool IsLiquidateTime(int timeH, int timeM) {
-			int time_now = indicatorProxy.GetTimeByHM(Time[0].Hour, Time[0].Minute);
-			int time_lastBar = indicatorProxy.GetTimeByHM(Time[1].Hour, Time[1].Minute);
-			int time_liq = indicatorProxy.GetTimeByHM(timeH, timeM);
+			int time_now = indicatorProxy.ZT_TimeFunc.GetTimeByHM(Time[0].Hour, Time[0].Minute);
+			int time_lastBar = indicatorProxy.ZT_TimeFunc.GetTimeByHM(Time[1].Hour, Time[1].Minute);
+			int time_liq = indicatorProxy.ZT_TimeFunc.GetTimeByHM(timeH, timeM);
 			bool isTime= false;
 			
 			if(time_now == time_liq || (time_liq > time_lastBar && time_liq <= time_now)) {
@@ -165,7 +160,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bse = BarsSinceEntryExecution();
 			double timeSinceEn = -1;
 			if(bse > 0) {
-				timeSinceEn = indicatorProxy.GetMinutesDiff(Time[0], Time[bse]);
+				timeSinceEn = indicatorProxy.ZT_TimeFunc.GetMinutesDiff(Time[0], Time[bse]);
 			}
 			return timeSinceEn;
 		}
@@ -240,48 +235,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
         #region TG Properties
-		[Description("Account Name")]
-        //[GridCategory("Parameters")]
-        public string TG_AccName
-        {
-            get { return accName; }
-            set { accName = value; }
-        }
-		
-		/// <summary>
-		/// AlgoMode: 0=liquidate; 
-		/// 1=trading; 
-		/// 2=semi-algo(manual entry, algo exit);
-		/// -1=stop trading(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
-		/// -2=stop trading(no entry/exit, liquidate positions and cancel all entry/exit orders);
-		/// </summary>
-		/// <returns></returns>
-		[Description("Algo mode")]
-        //[GridCategory("Parameters")]
-        public int TG_AlgoMode
-        {
-            get { return algoMode; }
-            set { algoMode = value; }
-        }
-
-        [Description("BackTesting mode or not")]
-		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_BackTest", GroupName = "ZTraderBase", Order = 0)]		
-        public bool TG_BackTest
-        {
-            get { return backTest; }
-            set { backTest = value; }
-        }
-		
-        [Description("Print out level: large # print out more")]
-		[Range(-5, 5), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_PrintOut", GroupName = "ZTraderBase", Order = 0)]		
-        public int TG_PrintOut
-        {
-            get { return printOut; }
-            set { printOut = Math.Max(-5, value); }
-        }		
-		
         [Description("Short, Long or both direction for entry")]
         //[GridCategory("Parameters")]
         public int TG_TradeDirection

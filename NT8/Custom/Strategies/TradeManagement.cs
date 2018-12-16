@@ -79,7 +79,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				pnl = tc.TradesPerformance.Currency.CumProfit;
 			}
 			
-			if(TG_PrintOut > -1) {
+			if(PrintOut > -1) {
 				//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":(RealizedProfitLoss,RealtimeTrades.CumProfit)=(" + pnl + "," + plrt + ")--" + Get24HDateTime(Time[0]));	
 				if(SystemPerformance.AllTrades.ByDay.Count == 2) {
 					//giParabSAR.PrintLog(true, !backTest, log_file, "Performance.AllTrades.TradesPerformance.Currency.CumProfit is: " + Performance.AllTrades.TradesPerformance.Currency.CumProfit);
@@ -92,13 +92,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			if(!backTest && (plrt <= MM_DailyLossLmt || pnl <= MM_DailyLossLmt))
 			{
-				if(TG_PrintOut > -1) {
+				if(PrintOut > -1) {
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ": dailyLossLmt reached = " + pnl + "," + plrt);
 				}
 				return false;
 			}
 			if (backTest && pnl <= MM_DailyLossLmt) {
-				if(TG_PrintOut > 3) {
+				if(PrintOut > 3) {
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ": backTest dailyLossLmt reached = " + pnl);
 				}
 				return false;				
@@ -288,7 +288,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             if (tradeObj.entryOrder != null && tradeObj.entryOrder.OrderState == OrderState.Working)
             {
-                min_en = indicatorProxy.GetMinutesDiff(tradeObj.entryOrder.Time, Time[0]);// DateTime.Now);
+                min_en = indicatorProxy.ZT_TimeFunc.GetMinutesDiff(tradeObj.entryOrder.Time, Time[0]);// DateTime.Now);
                 //if ( IsTwoBarReversal(cur_gap, TickSize, enCounterPBBars) || (barsHoldEnOrd > 0 && barsSinceEnOrd >= barsHoldEnOrd) || ( minutesChkEnOrder > 0 &&  min_en >= minutesChkEnOrder))
 				if ( (TM_BarsHoldEnOrd > 0 && tradeObj.barsSinceEnOrd >= TM_BarsHoldEnOrd) || ( TM_MinutesChkEnOrder > 0 &&  min_en >= TM_MinutesChkEnOrder))	
                 {
