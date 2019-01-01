@@ -76,7 +76,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					CheckEntryTrade(indSignal);
 				}
 			}
-		}		
+		}
 		
 		public virtual IndicatorSignal GetSignal() {
 			return null;

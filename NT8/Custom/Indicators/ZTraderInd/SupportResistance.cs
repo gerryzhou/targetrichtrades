@@ -45,7 +45,8 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		
 		public SupportResistance GetResistance() {
 			return null;
-		}		
+		}
 	}
 }
+
 

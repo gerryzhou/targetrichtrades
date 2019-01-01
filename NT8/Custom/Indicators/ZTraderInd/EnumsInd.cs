@@ -36,5 +36,18 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 
     public enum PriceActionType { UpTight, UpWide, DnTight, DnWide, RngTight, RngWide, UnKnown };
 	
+	public enum MarketCycleType {
+		W1Early, W1Middle, W1End,
+		W2Early, W2Middle, W2End,
+		W3Early, W3Middle, W3End, 
+		W4Early, W4Middle, W4End,
+		W5Early, W5Middle, W5End,
+		WAEarly, WAMiddle, WAEnd,
+		WBEarly, WBMiddle, WBEnd,
+		WCEarly, WCMiddle, WCEnd };
+	
 	public enum MovingAvgType {SMA, EMA, TMA};
 }
+
+
+

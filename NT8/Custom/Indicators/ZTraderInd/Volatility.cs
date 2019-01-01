@@ -24,19 +24,9 @@ using NinjaTrader.NinjaScript.DrawingTools;
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 {
-	/// <summary>
-	/// This object carry the signal that can trigger a trade (entry or exit)
-	/// </summary>
-	public class IndicatorSignal
+	public class Volatility
 	{
-		public TrendDirection TrendDir = TrendDirection.UnKnown; //1=up, -1=down, 0=flat/unknown
-		public Breakout BreakoutDir = Breakout.UnKnown; //1=bk up, -1=bk down, 0=no bk/unknown
-		public Reversal ReversalDir = Reversal.UnKnown; //1=rev up, -1=rev down, 0=no rev/unknown
+
 	}
 }
-
-
-
-
-
 

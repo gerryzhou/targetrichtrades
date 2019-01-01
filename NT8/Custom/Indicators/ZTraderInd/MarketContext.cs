@@ -26,6 +26,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 {
 	public class MarketContext
 	{
+		
 	/*
 		#region SpvPR Vars
 		/// <summary>
@@ -49,4 +50,11 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	*/		
 	}
 }
+
+
+
+
+
+
+
 
