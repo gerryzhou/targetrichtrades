@@ -288,7 +288,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             if (tradeObj.entryOrder != null && tradeObj.entryOrder.OrderState == OrderState.Working)
             {
-                min_en = indicatorProxy.ZT_TimeFunc.GetMinutesDiff(tradeObj.entryOrder.Time, Time[0]);// DateTime.Now);
+                min_en = indicatorProxy.GetMinutesDiff(tradeObj.entryOrder.Time, Time[0]);// DateTime.Now);
                 //if ( IsTwoBarReversal(cur_gap, TickSize, enCounterPBBars) || (barsHoldEnOrd > 0 && barsSinceEnOrd >= barsHoldEnOrd) || ( minutesChkEnOrder > 0 &&  min_en >= minutesChkEnOrder))
 				if ( (TM_BarsHoldEnOrd > 0 && tradeObj.barsSinceEnOrd >= TM_BarsHoldEnOrd) || ( TM_MinutesChkEnOrder > 0 &&  min_en >= TM_MinutesChkEnOrder))	
                 {

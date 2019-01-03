@@ -53,7 +53,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Direction is to tell up/down, buy or sell;
 		/// </summary>
 		/// <returns></returns>
-		public Direction GetDirection() {return null;}
+		public virtual Direction GetDirection() {return null;}
 		
 		/// <summary>
 		/// Support and resistance is to define entry/exit level, target and stop loss
@@ -155,16 +155,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 //		public double CustomPrc1
 //		{ get; set; }
 
-		[NinjaScriptProperty]
-		[Display(Name="CustomStr1", Description="CustomStr-1", Order=3, GroupName="Parameters")]
-		public string CustomStr1
-		{ get; set; }
+//		[NinjaScriptProperty]
+//		[Display(Name="CustomStr1", Description="CustomStr-1", Order=3, GroupName="Parameters")]
+//		public string CustomStr1
+//		{ get; set; }
 
-		[NinjaScriptProperty]
-		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
-		[Display(Name="CustomTime1", Description="CustomTime-1", Order=4, GroupName="Parameters")]
-		public DateTime CustomTime1
-		{ get; set; }		
+//		[NinjaScriptProperty]
+//		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
+//		[Display(Name="CustomTime1", Description="CustomTime-1", Order=4, GroupName="Parameters")]
+//		public DateTime CustomTime1
+//		{ get; set; }		
         #endregion		
 	}
 }

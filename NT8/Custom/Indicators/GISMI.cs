@@ -24,7 +24,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators
 {
-	public class GISMI : Indicator
+	public class GISMI : GIndicatorBase
 	{
 		private int	range		= 5;
 		private int	emaperiod1	= 3;
@@ -41,6 +41,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			if (State == State.SetDefaults)
 			{
+				Print("GISMI set defaults called....");
 				Description									= @"SMI.";
 				Name										= "GISMI";
 				Calculate					= Calculate.OnBarClose;
@@ -74,6 +75,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
+			Print(CurrentBar.ToString() + " -- GISMI OnBarUpdate called");
 			if (( CurrentBar < emaperiod2) || ( CurrentBar < emaperiod1)) 
 			{
 				return;
@@ -107,7 +109,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 				else if (GetInflection(SMITMA) < 0) {
 					 DrawDiamond(1, "spt"+CurrentBar, (3*Low[1]-High[1])/2, 0, Brushes.Aqua);	
 				}
-			}			
+				if(CrossAbove(SMITMA, smi, 1)) {
+					Draw.Text(this, CurrentBar.ToString(), "X", 0, High[0]+5, Brushes.Black);
+				} else if (CrossBelow(SMITMA, smi, 1)) {
+					Draw.Text(this, CurrentBar.ToString(), "X", 0, Low[0]-5, Brushes.Black);
+				}
+			}
 		}
 		
 		/**

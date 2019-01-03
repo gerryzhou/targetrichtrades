@@ -28,7 +28,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class GSZTraderBase : Strategy
 	{
-		protected GIndicatorProxy indicatorProxy;
+		protected GIndicatorBase indicatorProxy;
 		
 		protected string accName = "";
 		protected int algoMode = 1;
@@ -57,6 +57,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public void SetInitParams() {
+			Print("GSZTraderBase Set initParams called....");
 			//CalculateOnBarClose = true;
 			// Triggers the exit on close function 30 seconds prior to session end
 			//ExitOnClose = true;
@@ -83,9 +84,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			// Disable this property for performance gains in Strategy Analyzer optimizations
 			// See the Help Guide for additional information
 			IsInstantiatedOnEachOptimizationIteration	= true;
-			CustomColor1					= Brushes.Orange;
+			//CustomColor1					= Brushes.Orange;
 			StartH						= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
-			CustomPrc1					= 1;
+			//CustomPrc1					= 1;
 			
 			//QuantityType = QuantityType.DefaultQuantity;
 			SetOrderQuantity = SetOrderQuantity.DefaultQuantity;
@@ -133,7 +134,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		protected override void OnBarUpdate()
 		{
-			//Add your custom strategy logic here.
+			Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
 		}
 
 		#region Properties
@@ -181,18 +182,18 @@ namespace NinjaTrader.NinjaScript.Strategies
             set { printOut = Math.Max(-5, value); }
         }
 		
-		[NinjaScriptProperty]
-		[XmlIgnore]
-		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName="Parameters")]
-		public Brush CustomColor1
-		{ get; set; }
+//		[NinjaScriptProperty]
+//		[XmlIgnore]
+//		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName="Parameters")]
+//		public Brush CustomColor1
+//		{ get; set; }
 
-		[Browsable(false)]
-		public string CustomColor1Serializable
-		{
-			get { return Serialize.BrushToString(CustomColor1); }
-			set { CustomColor1 = Serialize.StringToBrush(value); }
-		}			
+//		[Browsable(false)]
+//		public string CustomColor1Serializable
+//		{
+//			get { return Serialize.BrushToString(CustomColor1); }
+//			set { CustomColor1 = Serialize.StringToBrush(value); }
+//		}			
 
 		[NinjaScriptProperty]
 		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
@@ -200,11 +201,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public DateTime StartH
 		{ get; set; }
 
-		[NinjaScriptProperty]
-		[Range(1, double.MaxValue)]
-		[Display(Name="CustomPrc1", Description="prc-1", Order=3, GroupName="Parameters")]
-		public double CustomPrc1
-		{ get; set; }
+//		[NinjaScriptProperty]
+//		[Range(1, double.MaxValue)]
+//		[Display(Name="CustomPrc1", Description="prc-1", Order=3, GroupName="Parameters")]
+//		public double CustomPrc1
+//		{ get; set; }
 
 		[Browsable(false)]
 		[XmlIgnore]

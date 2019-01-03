@@ -46,7 +46,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 	}
 	
-	partial class Indicator {
+	public partial class GIndicatorBase : Indicator
+	{
 		#region SpvPR Vars
 		/// <summary>
 		/// Loaded from supervised file;

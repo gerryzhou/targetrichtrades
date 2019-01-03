@@ -55,6 +55,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			if (State == State.SetDefaults)
 			{
+				Print("AwesomeOscillator set defaults called....");
 				//AddPlot(Brushes.DodgerBlue,		NinjaTrader.Custom.Resource.NinjaScriptIndicatorNameUltimateOscillator);
 				AddPlot(new Stroke(Brushes.Gray,2), PlotStyle.Bar, "OscillatorLine");
 				AddPlot(new Stroke(SignalColor,2), PlotStyle.Bar, "SignalLine");
@@ -94,6 +95,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
+			Print(CurrentBar.ToString() + " -- AwesomeOscillator OnBarUpdate called");
 	        if (CurrentBar < 1)
 			{
 				OscillatorLine[0] = 0;

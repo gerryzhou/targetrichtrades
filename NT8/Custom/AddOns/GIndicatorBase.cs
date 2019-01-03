@@ -1,5 +1,6 @@
 #region Using declarations
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +11,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using System.IO;
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Chart;
@@ -18,24 +18,29 @@ using NinjaTrader.Gui.SuperDom;
 using NinjaTrader.Gui.Tools;
 using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
-using NinjaTrader.NinjaScript.Universal;
-using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
-using NinjaTrader.NinjaScript.AddOns.ZTraderAO;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators
 {
-    /// <summary>
-    /// This file holds all user defined indicator methods.
-    /// </summary>
-    partial class Indicator
-    {
-		protected ZTTimeFunc ztTimeFunc = new ZTTimeFunc();
-		
+	/// <summary>
+	/// It defined a set of interfaces to talk with strategy;
+	/// The derived indicators should override the methods to be able be combined with other indicators; 
+	/// </summary>
+	public partial class GIndicatorBase : Indicator
+	{
+		private Series<double> CustomDataSeries1;
+				
+		#region Variables
+        // User defined variables (add any user defined variables below)
+            private int startH = 9; // Default setting for StartH
+            private int startM = 5; // Default setting for StartM
+            private int endH = 11; // Default setting for EndH
+            private int endM = 5; // Default setting for EndM
+			private string accName = ""; //account name from strategy, extracting simply string for print/log;
 		protected string symbol = "";
 		protected int printOut = 1;
 		protected string logFile = ""; //Log file full path		
@@ -43,6 +48,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 		protected Text it_gap = null; // The Text object drawn for bar
 		
 		protected bool backTest = true; //if it runs for backtesting;private bool backTest = true; //if it runs for backtesting;
+		protected double Day_Count = 0;
+		protected double Week_Count = 0;
+		
+		#endregion
 		
 		#region ZZ Vars
 		/// <summary>
@@ -84,8 +93,32 @@ namespace NinjaTrader.NinjaScript.Indicators
 //		protected double ZZ_Avg_Weekly_Sum;
 		#endregion
 		
-		protected double Day_Count = 0;
-		protected double Week_Count = 0;
+        /// <summary>
+        /// This method is used to configure the indicator and is called once before any bar data is loaded.
+        /// </summary>
+//        protected void Initialize()
+//        {
+            //Add(new Plot(Color.FromKnownColor(KnownColor.Black), PlotStyle.Block, "StartHM"));
+            //Add(new Plot(Color.FromKnownColor(KnownColor.DarkBlue), PlotStyle.Block, "EndHM"));
+            //Overlay				= true;
+//			accName = "";//GetTsTAccName(Strategy.Account.Name);
+//			IndicatorSignal indicatorSignal = new IndicatorSignal();
+//        }
+
+        /// <summary>
+        /// Called on each bar update event (incoming tick)
+        /// </summary>
+//        protected void OnBarUpdate()
+//        {
+            // Use this method for calculating your indicator values. Assign a value to each
+            // plot below by replacing 'Close[0]' with your own formula.
+//			if(CurrentBar >= BarsRequired) {
+//				if(GetTimeDiffByHM(StartH, StartM, Time[1]) > 0 && GetTimeDiffByHM(StartH, StartM, Time[0]) <= 0)
+//            		StartHM.Set(High[0]+0.25);
+//				if(GetTimeDiffByHM(EndH, EndM, Time[1]) > 0 && GetTimeDiffByHM(EndH, EndM, Time[0]) <= 0)
+//            		EndHM.Set(Low[0]-0.25);
+//			}
+//        }
 		
 		public int IsLastBarOnChart() {
 			try{
@@ -110,197 +143,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			
 		}
-		
-		#region Time Functions
-		
-//		public string GetTimeDate(String str_timedate, int time_date) {
-//			char[] delimiterChars = { ' '};
-//			string[] str_arr = str_timedate.Split(delimiterChars);
-//			return str_arr[time_date];
-//		}
-		
-//		public string GetTimeDate(DateTime dt, int time_date) {
-//			string str_dt = dt.ToString("MMddyyyy HH:mm:ss");
-//			char[] delimiterChars = {' '};
-//			string[] str_arr = str_dt.Split(delimiterChars);
-//			return str_arr[time_date];
-//		}
-		
-//		public double GetTimeDiff(DateTime dt_st, DateTime dt_en) {
-//			double diff = -1;
-//			//if(diff < 0 ) return 100; 
-//			try {
-			
-//			if((int)dt_st.DayOfWeek==(int)dt_en.DayOfWeek) { //Same day
-//				if(CompareTimeWithSessionBreak(dt_st, SessionBreak.AfternoonClose)*CompareTimeWithSessionBreak(dt_en, SessionBreak.AfternoonClose) > 0) {
-//					diff = dt_en.Subtract(dt_st).TotalMinutes;
-//				}
-//				else if(CompareTimeWithSessionBreak(dt_st, SessionBreak.AfternoonClose) < 0 && CompareTimeWithSessionBreak(dt_en, SessionBreak.AfternoonClose) > 0) {
-//					diff = GetTimeDiffSession(dt_st, SessionBreak.AfternoonClose) + GetTimeDiffSession(dt_en, SessionBreak.EveningOpen);
-//				}
-//			}
-//			else if((dt_st.DayOfWeek==DayOfWeek.Friday && dt_en.DayOfWeek==DayOfWeek.Sunday) || ((int)dt_st.DayOfWeek>(int)dt_en.DayOfWeek) || ((int)dt_st.DayOfWeek<(int)dt_en.DayOfWeek-1)) { // Fiday - Sunday or Cross to next Week or have day off trade
-//				diff = GetTimeDiffSession(dt_st, SessionBreak.AfternoonClose) + GetTimeDiffSession(dt_en, SessionBreak.EveningOpen);
-//			}
-//			else if((int)dt_st.DayOfWeek==(int)dt_en.DayOfWeek-1) { //Same day or next day
-//				if(CompareTimeWithSessionBreak(dt_st, SessionBreak.AfternoonClose) < 0) {
-//					diff = GetTimeDiffSession(dt_st, SessionBreak.AfternoonClose) + GetTimeDiffSession(dt_en, SessionBreak.NextDay);
-//				}
-//				else if(CompareTimeWithSessionBreak(dt_st, SessionBreak.AfternoonClose) > 0) { // dt_st passed evening open, no need to adjust
-//					diff = diff = dt_en.Subtract(dt_st).TotalMinutes;
-//				}
-//			}
-//			else {
-//				diff = dt_en.Subtract(dt_st).TotalMinutes;
-//			}
-//			} catch(Exception ex) {
-//				Print("GetTimeDiff ex:" + dt_st.ToString() + "--" + dt_en.ToString() + "--" + ex.Message);
-//				diff = 100;
-//			}
-//			return Math.Round(diff, 2);
-//		}
-
-//		public double GetMinutesDiff(DateTime dt_st, DateTime dt_en) {
-//			double diff = -1;
-//			TimeSpan ts = dt_en.Subtract(dt_st);
-//			diff = ts.TotalMinutes;
-//			return Math.Round(diff, 2);
-//		}
-		
-//		public int CompareTimeWithSessionBreak(DateTime dt_st, SessionBreak sb) {
-//			DateTime dt = DateTime.Now;
-//			try {
-//			switch(sb) {
-//				case SessionBreak.AfternoonClose:
-//					dt = GetNewDateTime(dt_st.Year,dt_st.Month,dt_st.Day,16,0,0);
-//					break;
-//				case SessionBreak.EveningOpen:
-//					if(dt_st.Hour < 16)
-//						dt = GetNewDateTime(dt_st.Year,dt_st.Month,dt_st.Day-1,17,0,0);
-//					//if(dt_st.Hour >= 17)
-//					else dt = GetNewDateTime(dt_st.Year,dt_st.Month,dt_st.Day,16,0,0);
-//					break;
-//				default:
-//					dt = GetNewDateTime(dt_st.Year,dt_st.Month,dt_st.Day,16,0,0);
-//					break;
-//			}
-//			} catch(Exception ex) {
-//				Print("CompareTimeWithSessionBreak ex:" + dt_st.ToString() + "--" + sb.ToString() + "--" + ex.Message);
-//			}
-//			return dt_st.CompareTo(dt);
-//		}
-
-//		public double GetTimeDiffSession(DateTime dt_st, SessionBreak sb) {			
-//			DateTime dt_session = DateTime.Now;
-//			TimeSpan ts = dt_session.Subtract(dt_st);
-//			double diff = 100;
-//			try{
-//			switch(sb) {
-//				case SessionBreak.AfternoonClose:
-//					dt_session = GetNewDateTime(dt_st.Year, dt_st.Month, dt_st.Day, 16, 0, 0);
-//					ts = dt_session.Subtract(dt_st);
-//					break;
-//				case SessionBreak.EveningOpen:
-//					if(dt_st.Hour < 16)
-//						dt_session = GetNewDateTime(dt_st.Year,dt_st.Month,dt_st.Day-1,17,0,0);
-//					else 
-//						dt_session = GetNewDateTime(dt_st.Year, dt_st.Month, dt_st.Day, 17, 0, 0);
-//					ts = dt_st.Subtract(dt_session);
-//					break;
-//				case SessionBreak.NextDay:
-//					dt_session = GetNewDateTime(dt_st.Year, dt_st.Month, dt_st.Day-1, 17, 0, 0);
-//					ts = dt_st.Subtract(dt_session);
-//					break;
-//				default:
-//					dt_session = GetNewDateTime(dt_st.Year, dt_st.Month, dt_st.Day-1, 17, 0, 0);
-//					ts = dt_st.Subtract(dt_session);
-//					break;
-//			}
-//			diff = ts.TotalMinutes;
-//			} catch(Exception ex) {
-//				Print("GetTimeDiffSession ex:" + dt_st.ToString() + "--" + sb.ToString() + "--" + ex.Message);
-//			}
-			
-//			return Math.Round(diff, 2);
-//		}
-		
-//		public DateTime GetNewDateTime(int year, int month, int day, int hr, int min, int sec) {
-//			//DateTime(dt_st.Year,dt_st.Month,dt_st.Day,16,0,0);
-//			if(day == 0) {
-//				if(month == 1) {
-//					year = year-1;
-//					month = 12;
-//					day = 31;
-//				}
-//				else if (month == 3) {
-//					month = 2;
-//					day = 28;
-//				}
-//				else {
-//					month--;
-//					if(month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10)
-//						day = 31;
-//					else day = 30;
-//				}
-//			}
-//			return new DateTime(year, month, day, hr, min, sec);
-//		}
-		
-//		public string Get24HDateTime(DateTime dt) {
-//			return dt.ToString("MM/dd/yyyy HH:mm:ss");
-//		}
-
-//		public int GetDateByDateTime(DateTime dt) {
-//			int date = dt.Year*10000 + dt.Month*100 + dt.Day;
-//			return date;
-//		}
-		
-//		//time=10000*H + 100*M + S
-//		public int GetTimeByHM(int hour, int min) {
-//			return 10000*hour + 100*min;
-//		}
-				
-//		public bool IsTimeInSpan(DateTime dt, int start, int end) {
-//			int t = 100*dt.Hour + dt.Minute;
-//			if(start <= t && t <= end) return true;
-//			else return false;
-//		}
-
-//		public int GetTimeDiffByHM(int hour, int min, DateTime dt) {
-//			int t = GetTimeByHM(hour, min);
-//			int t0 = GetTimeByHM(dt.Hour, dt.Minute);
-//			Print("[hour,min]=[" + hour + "," + min + "], [dt.Hour,dt.Minute]=[" + dt.Hour + "," + dt.Minute + "]," + dt.TimeOfDay);
-//			return t-t0;
-//		}
-		
-//		public int GetTimeDiffByHM(int start_hour, int start_min, int end_hour, int end_min) {
-//			int t = GetTimeByHM(end_hour, end_min);
-//			int t0 = GetTimeByHM(start_hour, start_min);
-//			Print("[start_hour,start_min]=[" + start_hour + "," + start_min + "], [end_hour,end_min]=[" + end_hour + "," + end_min + "]");
-//			return t-t0;
-//		}
-		
-		/// <summary>
-		/// Check if now is the time allowed to put trade
-		/// </summary>
-		/// <param name="time_start">start time</param>
-		/// <param name="time_end">end time</param>
-		/// <param name="session_start">the overnight session start time: 170000 for ES</param>
-		/// <returns></returns>
-		public bool IsTradingTime(int time_start, int time_end, int session_start) {
-			int time_now = ToTime(Time[0]);
-			bool isTime= false;
-			if(time_start >= session_start) {
-				if(time_now >= time_start || time_now <= time_end)
-					isTime = true;
-			}
-			else if (time_now >= time_start && time_now <= time_end) {
-				isTime = true;
-			}
-			return isTime;
-		}
-
-		#endregion
 		
 		#region Pattern Functions
 		/// <summary>
@@ -511,7 +353,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			
 			PriceAction pa = new PriceAction(PriceActionType.UnKnown, -1, -1, -1, -1);
 			
-			int key_date = ztTimeFunc.GetDateByDateTime(dt);
+			int key_date = GetDateByDateTime(dt);
 			int t = dt.Hour*100 + dt.Minute;
 			
 			Dictionary<int,PriceAction> mkt_ctxs = null;
@@ -600,7 +442,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				y = y_base+y_offset ;
 			}
 			Print(barNo + "-" + Time[bars_ago] + ": y=" + y + ", zzGap=" + zzGap);
-			gapText = Draw.Text(this, tag+barNo.ToString(), ztTimeFunc.GetTimeDate(Time[bars_ago], 1)+"\r\n#"+barNo+"\r\nZ:"+zzGap, bars_ago, y, draw_color);
+			gapText = Draw.Text(this, tag+barNo.ToString(), GetTimeDate(Time[bars_ago], 1)+"\r\n#"+barNo+"\r\nZ:"+zzGap, bars_ago, y, draw_color);
 			//DrawText(tag+barNo.ToString(), GetTimeDate(Time[bars_ago], 1)+"\r\n#"+barNo+"\r\nZ:"+zzGap, bars_ago, y, draw_color);
 //			}
 			if(gapText != null) gapText.IsLocked = false;
@@ -621,30 +463,85 @@ namespace NinjaTrader.NinjaScript.Indicators
 				}
 			}
 		}
+				
 		
-		#region Properties
-		
-//		[Description("If it runs for backtesting")]
-//        [GridCategory("Parameters")]
-//		[Gui.Design.DisplayNameAttribute("Back Testing")]
-//	[NinjaScriptProperty]
-//	[XmlIgnore]
-//	[Display(Name="BackTest", Description="Back Testing", Order=1, GroupName="Parameters")]		
-//    public bool BackTest
-//    {
-//        get { return backTest; }
-//        set { backTest = value; }
-//    }
+        #region Properties
+        [Browsable(false)]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+        [XmlIgnore()]		// this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+        public Series<double> StartHM
+        {
+            get { return Values[0]; }
+        }
+
+        [Browsable(false)]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+        [XmlIgnore()]		// this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+        public Series<double> EndHM
+        {
+            get { return Values[1]; }
+        }
+
+        [Description("Hour of start trading")]
+        //[GridCategory("Parameters")]
+        public int StartH
+        {
+            get { return startH; }
+            set { startH = Math.Max(0, value); }
+        }
+
+        [Description("Min of start trading")]
+        //[GridCategory("Parameters")]
+        public int StartM
+        {
+            get { return startM; }
+            set { startM = Math.Max(0, value); }
+        }
+
+        [Description("Hour of end trading")]
+        //[GridCategory("Parameters")]
+        public int EndH
+        {
+            get { return endH; }
+            set { endH = Math.Max(0, value); }
+        }
+
+        [Description("Min of end trading")]
+        //[GridCategory("Parameters")]
+        public int EndM
+        {
+            get { return endM; }
+            set { endM = Math.Max(0, value); }
+        }
+
 		[NinjaScriptProperty]
 		[XmlIgnore]
-		[Display(Name="ZTTimeFunc")]		
-	    public ZTTimeFunc ZT_TimeFunc
-	    {
-	        get { return ztTimeFunc; }
-	        set { ztTimeFunc = value; }
-	    }		
+		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName="Parameters")]
+		public Brush CustomColor1
+		{ get; set; }
+
+		[Browsable(false)]
+		public string CustomColor1Serializable
+		{
+			get { return Serialize.BrushToString(CustomColor1); }
+			set { CustomColor1 = Serialize.StringToBrush(value); }
+		}			
+
+		[NinjaScriptProperty]
+		[Range(0, double.MaxValue)]
+		[Display(Name="CustomPrc1", Description="CustomPrc-1", Order=2, GroupName="Parameters")]
+		public double CustomPrc1
+		{ get; set; }
+
+		[NinjaScriptProperty]
+		[Display(Name="CustomStr1", Description="CustomStr-1", Order=3, GroupName="Parameters")]
+		public string CustomStr1
+		{ get; set; }
+
+		[NinjaScriptProperty]
+		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
+		[Display(Name="CustomTime1", Description="CustomTime-1", Order=4, GroupName="Parameters")]
+		public DateTime CustomTime1
+		{ get; set; }
 		#endregion
-		
 		#region Other Properties
 		/// <summary>
 		/// The symbol of the instument
@@ -709,5 +606,8 @@ namespace NinjaTrader.NinjaScript.Indicators
            drawTxt = draw_txt;
         }
 		#endregion		
-    }
+	}
 }
+
+
+

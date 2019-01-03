@@ -25,21 +25,10 @@ using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 //This namespace holds Add ons in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.AddOns.ZTraderAO
+namespace NinjaTrader.NinjaScript.Indicators
 {
-	public class ZTTimeFunc : NinjaTrader.NinjaScript.AddOnBase
+	public partial class GIndicatorBase : Indicator
 	{
-		protected override void OnStateChange()
-		{
-			if (State == State.SetDefaults)
-			{
-				Description									= @"Time function for ZTrader";
-				Name										= "ZTTimeFunc";
-			}
-			else if (State == State.Configure)
-			{
-			}
-		}
 		#region Time Functions
 		
 		public string GetTimeDate(String str_timedate, int time_date) {
@@ -208,8 +197,85 @@ namespace NinjaTrader.NinjaScript.AddOns.ZTraderAO
 			Print("[start_hour,start_min]=[" + start_hour + "," + start_min + "], [end_hour,end_min]=[" + end_hour + "," + end_min + "]");
 			return t-t0;
 		}
+
+		/// <summary>
+		/// Check if now is the time allowed to put trade
+		/// </summary>
+		/// <param name="time_start">start time</param>
+		/// <param name="time_end">end time</param>
+		/// <param name="session_start">the overnight session start time: 170000 for ES</param>
+		/// <returns></returns>
+		public bool IsTradingTime(int time_start, int time_end, int session_start) {
+			int time_now = ToTime(Time[0]);
+			bool isTime= false;
+			if(time_start >= session_start) {
+				if(time_now >= time_start || time_now <= time_end)
+					isTime = true;
+			}
+			else if (time_now >= time_start && time_now <= time_end) {
+				isTime = true;
+			}
+			return isTime;
+		}
 		
 		#endregion
 				
 	}
 }
+
+#region NinjaScript generated code. Neither change nor remove.
+
+namespace NinjaTrader.NinjaScript.Indicators
+{
+	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
+	{
+		private GIndicatorBase[] cacheGIndicatorBase;
+		public GIndicatorBase GIndicatorBase()
+		{
+			return GIndicatorBase(Input);
+		}
+
+		public GIndicatorBase GIndicatorBase(ISeries<double> input)
+		{
+			if (cacheGIndicatorBase != null)
+				for (int idx = 0; idx < cacheGIndicatorBase.Length; idx++)
+					if (cacheGIndicatorBase[idx] != null &&  cacheGIndicatorBase[idx].EqualsInput(input))
+						return cacheGIndicatorBase[idx];
+			return CacheIndicator<GIndicatorBase>(new GIndicatorBase(), input, ref cacheGIndicatorBase);
+		}
+	}
+}
+
+namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
+{
+	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
+	{
+		public Indicators.GIndicatorBase GIndicatorBase()
+		{
+			return indicator.GIndicatorBase(Input);
+		}
+
+		public Indicators.GIndicatorBase GIndicatorBase(ISeries<double> input )
+		{
+			return indicator.GIndicatorBase(input);
+		}
+	}
+}
+
+namespace NinjaTrader.NinjaScript.Strategies
+{
+	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
+	{
+		public Indicators.GIndicatorBase GIndicatorBase()
+		{
+			return indicator.GIndicatorBase(Input);
+		}
+
+		public Indicators.GIndicatorBase GIndicatorBase(ISeries<double> input )
+		{
+			return indicator.GIndicatorBase(input);
+		}
+	}
+}
+
+#endregion
