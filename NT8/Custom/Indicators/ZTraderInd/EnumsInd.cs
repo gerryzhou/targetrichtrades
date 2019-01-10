@@ -31,10 +31,12 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
     public enum SessionBreak { AfternoonClose, EveningOpen, MorningOpen, NextDay };
 
     public enum TrendDirection { Up = 1, Down = -1, Flat = 0, UnKnown = 9 };
-    public enum Breakout { Up = 1, Down = -1, UnKnown = 9 };
-    public enum Reversal { Up = 1, Down = -1, UnKnown = 9 };
+    public enum Breakout { Up = 1, Down = -1, UnKnown = 0 };
+    public enum Reversal { Up = 1, Down = -1, UnKnown = 0 };
+	public enum SupportResistanceType {Support = 1, Resistance = -1, Unknown = 0};
 
     public enum PriceActionType { UpTight, UpWide, DnTight, DnWide, RngTight, RngWide, UnKnown };
+	public enum PriceSubtype {Close, Open, High, Low, Median};
 	
 	public enum MarketCycleType {
 		W1Early, W1Middle, W1End,
@@ -48,6 +50,8 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	
 	public enum MovingAvgType {SMA, EMA, TMA};
 }
+
+
 
 
 

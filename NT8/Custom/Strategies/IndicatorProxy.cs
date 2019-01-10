@@ -53,7 +53,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Direction is to tell up/down, buy or sell;
 		/// </summary>
 		/// <returns></returns>
-		public virtual Direction GetDirection() {return null;}
+		public virtual Direction GetDirection(GIndicatorBase indicator) {return null;}
 		
 		/// <summary>
 		/// Support and resistance is to define entry/exit level, target and stop loss
@@ -61,13 +61,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public SupportResistance GetSupport(){return null;}
 		public SupportResistance GetResistance(){return null;}
-
+		public virtual SupportResistance GetSptRest(int barNo) {return null;}
+		
 		/// <summary>
 		/// The indicator signal is to trigger entry/exit, 
 		/// or modify existing orders for extry/exit;
 		/// </summary>
 		/// <returns></returns>
-		public IndicatorSignal CheckIndicatorSignal() {return null;}
+		public virtual IndicatorSignal GetIndicatorSignal() {return null;}
 		
 		#region Variables
         // User defined variables (add any user defined variables below)

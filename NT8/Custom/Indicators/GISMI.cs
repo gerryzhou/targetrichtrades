@@ -17,6 +17,7 @@ using NinjaTrader.Gui.SuperDom;
 using NinjaTrader.Gui.Tools;
 using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
@@ -36,6 +37,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private Series<double>	hls;
 		private Series<double>	smis;
 		private Series<double>	tma;
+		
+		private Series<int> inflection;
+		private Series<int> crossover;
 				
 		protected override void OnStateChange()
 		{
@@ -69,7 +73,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 				smis	= new Series<double>(this);
 				
 				//Time series MA for trend indentification
-				tma	= new Series<double>(this);				
+				tma	= new Series<double>(this);
+				
+				//Save the inflection bar;
+				inflection = new Series<int>(this);
+				
+				//Save the crossover bar;
+				crossover = new Series<int>(this);
 			}
 		}
 
@@ -98,21 +108,36 @@ namespace NinjaTrader.NinjaScript.Indicators
 			//SMIEMA[0] = (EMA(smis, smiemaperiod)[0]);
 			SMITMA[0] = TSF(smis, 3, smitmaperiod)[0];
 			tma[0] = TSF(Close, 3, tmaperiod)[0];
-			if (CurrentBar > 20) {//BarsRequiredToPlot) {		
+			inflection[0] = 0;
+			crossover[0] = 0;
+			if (CurrentBar > BarsRequiredToPlot) {//BarsRequiredToPlot) {		
 				int tr = GetTrendByMA();
+				int inft = GetInflection(SMITMA);
 				
 				if(tr > 0)  PlotBrushes[1][0] = Brushes.Green;
 				else if(tr < 0)  PlotBrushes[1][0] = Brushes.Red;
-				if(GetInflection(SMITMA) > 0) {
+				if(inft > 0) {
+					inflection[1] = 1;
+					if(CurrentBar < 140) Print((CurrentBar-1).ToString() + " inflect=1");
 					DrawDiamond(1, "res"+CurrentBar, (3*High[1]-Low[1])/2, 0, Brushes.Red);
 				} 
-				else if (GetInflection(SMITMA) < 0) {
-					 DrawDiamond(1, "spt"+CurrentBar, (3*Low[1]-High[1])/2, 0, Brushes.Aqua);	
+				else if (inft < 0) {
+					inflection[1] = -1;
+					if(CurrentBar < 140) Print((CurrentBar-1).ToString() + " inflect=-1");
+					DrawDiamond(1, "spt"+CurrentBar, (3*Low[1]-High[1])/2, 0, Brushes.Aqua);	
 				}
 				if(CrossAbove(SMITMA, smi, 1)) {
-					Draw.Text(this, CurrentBar.ToString(), "X", 0, High[0]+5, Brushes.Black);
+					crossover[0] = 1;
+					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + "\r\nX", 0, High[0]+5, Brushes.Black);
 				} else if (CrossBelow(SMITMA, smi, 1)) {
-					Draw.Text(this, CurrentBar.ToString(), "X", 0, Low[0]-5, Brushes.Black);
+					crossover[0] = -1;
+					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + "\r\nX", 0, Low[0]-5, Brushes.Black);
+				}
+			}
+			if(CurrentBar > BarsRequiredToPlot && IsLastBarOnChart() > 0) {
+				Print("BarsRequiredToPlot=" + BarsRequiredToPlot);
+				for(int i=0; i<inflection.Count; i++){
+					Print("Inflection[" + i + "]=" + inflection.GetValueAt(i) + " -- Crossover[" + i + "]=" + crossover.GetValueAt(i));
 				}
 			}
 		}
@@ -134,14 +159,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		private int GetInflection(ISeries<double> d){
-			int inflect = 0;
+			int inft = 0;//inflection[0] = 0;
 
-			if(d[1].ApproxCompare(d[0]) > 0 && d[1].ApproxCompare(d[2]) > 0)
-				inflect = 1;
+			if(d[1].ApproxCompare(d[0]) > 0 && d[1].ApproxCompare(d[2]) > 0) 
+				inft = 1;//inflection[1] = 1;
 			else if(d[1].ApproxCompare(d[0]) < 0 && d[1].ApproxCompare(d[2]) < 0)
-				inflect = -1;
-			return inflect;
+				inft = -1;//inflection[1] = -1;
+			Print("inft=" + (CurrentBar-1).ToString() + "," + inft);
+			return inft;//inflection[1];
 		}
+		
+		public Series<int> GetInflection() {
+			return inflection;
+		}
+		
 		
 		private void DrawDiamond(int barsBack, string tag, double prc, double offset, SolidColorBrush brush) {				
 			// Instantiates a red diamond on the current bar 1 tick below the low
@@ -149,6 +180,17 @@ namespace NinjaTrader.NinjaScript.Indicators
 			 
 			// Set the area fill color to Red
 			myDiamond.AreaBrush = brush;//Brushes.Red;
+		}
+		
+		public override Direction GetDirection() {
+			//Update();
+			Print(CurrentBar.ToString() + " -- GISMI GetDirection called");
+			
+			Direction dir = new Direction();
+			if(GetTrendByMA() > 0) dir.TrendDir = TrendDirection.Up;
+			else if (GetTrendByMA() < 0) dir.TrendDir = TrendDirection.Down;
+			Print(CurrentBar.ToString() + " -- GISMI GetTrendByMA(), GetDirection=" + GetTrendByMA() + "," + dir.TrendDir.ToString());
+			return dir;
 		}
 
 		#region Properties

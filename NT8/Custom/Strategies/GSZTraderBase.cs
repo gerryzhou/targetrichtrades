@@ -91,6 +91,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//QuantityType = QuantityType.DefaultQuantity;
 			SetOrderQuantity = SetOrderQuantity.DefaultQuantity;
 			DefaultQuantity = 1;
+			
+			indicatorProxy = new GIndicatorBase();
 		}
 		
 		protected override void OnAccountItemUpdate(Cbi.Account account, Cbi.AccountItem accountItem, double value)
@@ -135,6 +137,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnBarUpdate()
 		{
 			Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
+			indicatorProxy.Update();
 		}
 
 		#region Properties

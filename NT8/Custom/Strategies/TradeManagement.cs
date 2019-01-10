@@ -35,7 +35,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		protected TradeObj tradeObj = null;
 		
-		#region Trigger Functions
+		#region Trigger Trade Functions
 		
 		public virtual void InitTradeMgmt() {
 			SetProfitTarget(CalculationMode.Currency, MM_ProfitTargetAmt);

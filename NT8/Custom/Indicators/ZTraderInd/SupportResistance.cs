@@ -28,6 +28,10 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	{
 		public int Count;
 		private List<KeyValuePair<int, double>> sptRstBars;
+		private double sptRstValue;
+		
+		
+		private SupportResistanceType sptRestType;
 		
 		public SupportResistance() {
 		}
@@ -46,7 +50,32 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		public SupportResistance GetResistance() {
 			return null;
 		}
+		
+		public double GetSptRstValue() {
+			return sptRstValue;
+		}
+		
+		public void SetSptRstValue(double val) {
+			sptRstValue = val;
+		}
+		
+		#region Properties
+		public SupportResistanceType GetSupportResistanceType() {
+			return sptRestType;
+		}
+		public SupportResistanceType SetSupportResistanceType(SupportResistanceType value) {
+			return sptRestType = value;
+		}		
+		#endregion
+
 	}
 }
+
+
+
+
+
+
+
 
 

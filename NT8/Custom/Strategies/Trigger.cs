@@ -78,9 +78,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		
-		public virtual IndicatorSignal GetSignal() {
-			return null;
-		}
+		//public virtual IndicatorSignal GetSignal() {return null;}
 		
 		/// <summary>
 		/// Check if now is the time allowed to put trade

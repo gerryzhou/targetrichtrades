@@ -122,11 +122,17 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		public int IsLastBarOnChart() {
 			try{
-				if(Inputs[0].Count - Bars.CurrentBar <= 2) {
-					return Inputs[0].Count;
+				Print("IsLastBarOnChart called:(CurBar,Count)=" + CurrentBar + "," + Count);
+//				if(CurrentBar < Count - 1)
+//					return -1;
+				if(CurrentBar < Count - 2)
+				//if(Inputs[0].Count - Bars.CurrentBar <= 2) 
+				{
+					return -1;					
 				} else {
-					return -1;
+					return Count;//Inputs[0].Count;
 				}
+		
 			} catch(Exception ex){
 				//Print("IsLastBarOnChart:" + ex.Message);
 				return -1;
@@ -143,6 +149,33 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			
 		}
+		
+		#region Search Functions
+		public int GetLastBar4Inflection(Series<int> inflection, int curBar) {
+			int n = 0;
+			for(int i=1; i>curBar-BarsRequiredToPlot; i--) {
+				if (inflection[i] != 0)
+					n = curBar - i;
+			}
+			return n;
+		}
+		
+		/// <summary>
+		/// Get the last inflection for the given barNo
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <returns></returns>
+		public int GetLastInflection(Series<int> inflection, int barNo, TrendDirection dir) {
+			int inft = -1;
+			for(int i = 1; i<barNo-BarsRequiredToPlot; i++) {
+				if((inflection[i]>0 && dir == TrendDirection.Down) ||
+					(inflection[i]<0 && dir == TrendDirection.Up))
+					inft = i;
+			}
+			return inft;
+		}
+		
+		#endregion
 		
 		#region Pattern Functions
 		/// <summary>

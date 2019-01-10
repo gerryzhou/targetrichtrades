@@ -26,7 +26,28 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 {
 	public class Direction
 	{
+		private TrendDirection trendDir = TrendDirection.UnKnown;
 		
+		#region Properties		
+		/// <summary>
+		/// </summary>
+		[Browsable(false)]
+		[XmlIgnore()]
+		[DefaultValueAttribute(TrendDirection.UnKnown)]
+		public TrendDirection TrendDir
+		{
+			get { return trendDir; }
+			set { trendDir = value; }
+		}		
+		#endregion
 	}
 }
+
+
+
+
+
+
+
+
 

@@ -30,7 +30,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	public class StgTRT : GSZTraderBase //Strategy
 	{
 		private GISMI giSMI;
-		private AwesomeOscillator awOscillator;
+		private GIAwesomeOscillator awOscillator;
 		
 		protected override void OnStateChange()
 		{
@@ -61,8 +61,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
+				indicatorProxy = new GIndicatorBase();
 				giSMI = GISMI(3, 5, 5, 8);
-				awOscillator = AwesomeOscillator(5, 34, 5, MovingAvgType.SMA);
+				awOscillator = GIAwesomeOscillator(5, 34, 5, MovingAvgType.SMA);
 				//smaSlow = SMA(Slow);
 
 				//giSMI.Plots[0].Brush = Brushes.Blue;
@@ -84,11 +85,35 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			base.OnBarUpdate();
 			Print(CurrentBar.ToString() + " -- StgTRT - Add your custom strategy logic here.");
-			GetDirection();
+			indicatorProxy.Update();
+			GetIndicatorSignal();
 		}
 		
-		public override Direction GetDirection(){
-			Print(CurrentBar.ToString() + " -- override Direction GetDirection called...");
+		public override Direction GetDirection(GIndicatorBase ind){
+			Print(CurrentBar.ToString() + " -- StgTRT override GetDirection: " + ind.GetType().Name + " called...");
+			//ind.Update();
+			return ind.GetDirection();
+//			Direction dir_gismi = giSMI.GetDirection();
+//			Direction dir_awo = awOscillator.GetDirection();
+//			return null;
+		}
+		
+		public override IndicatorSignal GetIndicatorSignal() {
+			giSMI.Update();
+			awOscillator.Update();
+			//isolate the last inflection
+			int inft = giSMI.GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down);
+			
+			//lookback to the crossover and if that candle is bearish we isolate the open as resistance;
+			// if that candlestick is bullish we isolate the close as resistance
+			
+			
+			//SMI below the moving average or not
+			Direction dir_gismi = GetDirection(giSMI);
+			
+			//awesome oscillator below zero or not
+			Direction dir_awo = GetDirection(awOscillator);
+			
 			return null;
 		}
 	}
