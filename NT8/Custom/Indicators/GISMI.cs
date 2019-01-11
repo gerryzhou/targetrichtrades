@@ -57,6 +57,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				PaintPriceMarkers			= true;
 				ScaleJustification			= NinjaTrader.Gui.Chart.ScaleJustification.Right;
 				IsSuspendedWhileInactive	= true;
+				MaximumBarsLookBack = MaximumBarsLookBack.Infinite;
 
 				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.Line, "SMI");
 				AddPlot(new Stroke(Brushes.Yellow, 4), PlotStyle.Line, "SMITMA");
