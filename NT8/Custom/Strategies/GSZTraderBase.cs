@@ -21,14 +21,20 @@ using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies
 {
+	[Gui.CategoryOrder("GStrategy", 1)] // display "GStrategy" first
+	[Gui.CategoryOrder("MoneyMgmt", 2)] // then "MM"
+	[Gui.CategoryOrder("TradeMgmt", 3)] // and finally "TM"
 	public partial class GSZTraderBase : Strategy
 	{
 		protected GIndicatorBase indicatorProxy;
+		protected IndicatorSignal indicatorSignal;
+		protected TradeObj tradeObj;
 		
 		protected string accName = "";
 		protected int algoMode = 1;
@@ -42,17 +48,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (State == State.SetDefaults)
 			{
 				SetInitParams();
-				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.TriangleRight, "CustomPlot1");
-				AddLine(Brushes.Orange, 1, "CustomLine1");
-				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.HLine, "CustomPlot2");
+//				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.TriangleRight, "CustomPlot1");
+//				AddLine(Brushes.Orange, 1, "CustomLine1");
+//				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.HLine, "CustomPlot2");
 			}
 			else if (State == State.Configure)
 			{
-				AddDataSeries("@SPX500", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
+				InitTradeMgmt();
+				//AddDataSeries("@SPX500", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
 			}
 			else if (State == State.DataLoaded)
-			{				
-				CustomDatsSeries1 = new Series<double>(this);
+			{
+				indicatorSignal = new IndicatorSignal();
+				indicatorProxy = new GIndicatorBase();
+				//CustomDatsSeries1 = new Series<double>(this);
 			}
 		}
 		
@@ -72,7 +81,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IsExitOnSessionCloseStrategy				= true;
 			ExitOnSessionCloseSeconds					= 30;
 			IsFillLimitOnTouch							= true;
-			MaximumBarsLookBack							= MaximumBarsLookBack.TwoHundredFiftySix;
+			MaximumBarsLookBack							= MaximumBarsLookBack.Infinite;
 			OrderFillResolution							= OrderFillResolution.Standard;
 			Slippage									= 0;
 			StartBehavior								= StartBehavior.WaitUntilFlatSynchronizeAccount;
@@ -91,8 +100,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//QuantityType = QuantityType.DefaultQuantity;
 			SetOrderQuantity = SetOrderQuantity.DefaultQuantity;
 			DefaultQuantity = 1;
-			
-			indicatorProxy = new GIndicatorBase();
+			WaitForOcoClosingBracket = false;
 		}
 		
 		protected override void OnAccountItemUpdate(Cbi.Account account, Cbi.AccountItem accountItem, double value)

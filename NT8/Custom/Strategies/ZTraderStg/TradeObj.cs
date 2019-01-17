@@ -28,8 +28,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	public class TradeObj {
 		private Strategy instStrategy = null;
 		private TradeType tradeType = TradeType.NoTrade;
-		public int tradeDirection;
-		public int tradeStyle;
+		public TradingDirection tradeDirection = TradingDirection.Both;
+		public TradingStyle tradeStyle = TradingStyle.TrendFollowing;
 		
 		#region Money Mgmt variables
 		public double profitTargetAmt = 350; //36 Default(450-650 USD) setting for MM_ProfitTargetAmt

@@ -33,7 +33,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		//private bool backTest = true;
 		//private int printOut = -5;
 		
-		protected TradeObj tradeObj = null;
+		//protected TradeObj tradeObj = null;
 		
 		#region Trigger Trade Functions
 		
@@ -42,10 +42,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             SetStopLoss(CalculationMode.Currency, MM_StopLossAmt);
 		}
 		
-		protected virtual void PutTrade() {
+		public virtual void PutTrade() {
 		}
 		
-		protected virtual TradeObj CheckExitTrade(IndicatorSignal signal) {
+		public virtual TradeObj CheckExitTrade(IndicatorSignal signal) {
 			if((signal.ReversalDir == Reversal.Up && Position.MarketPosition == MarketPosition.Short) ||
 				(signal.ReversalDir == Reversal.Down && Position.MarketPosition == MarketPosition.Long)) {
 				CloseAllPositions();
@@ -59,7 +59,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return tradeObj;
 		}
 		
-		protected virtual TradeObj CheckEntryTrade(IndicatorSignal signal) {			
+		protected virtual TradeObj CheckEntryTrade() {
 			if(NewOrderAllowed()) {
 
 			}
@@ -73,12 +73,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 			double pnl = CheckAccPnL();//GetAccountValue(AccountItem.RealizedProfitLoss);
 			double plrt = CheckAccCumProfit();
 			DateTime dayKey = new DateTime(Time[0].Year,Time[0].Month,Time[0].Day);
+			Print("SystemPerformance.AllTrades dayKey=" + dayKey);
+			Print("SystemPerformance.AllTrades ByDay.Count=" + SystemPerformance.AllTrades.ByDay.Count);
 			//SystemPerformance.AllTrades.TradesPerformance.
-			TradeCollection tc = (TradeCollection)SystemPerformance.AllTrades.ByDay[dayKey];//Performance.AllTrades.ByDay[dayKey]; 
-			if(backTest && tc != null) {
-				pnl = tc.TradesPerformance.Currency.CumProfit;
+//			foreach(var item in SystemPerformance.AllTrades.ByDay.Keys)
+//			{
+//				if(SystemPerformance.AllTrades.ByDay.Keys.Contains(dayKey))
+//					Print("SystemPerformance.AllTrades ByDay.Keys=" + item);
+//			}
+
+			if(SystemPerformance.AllTrades.ByDay.Keys.Contains(dayKey)) {
+				TradeCollection tc = (TradeCollection)SystemPerformance.AllTrades.ByDay[dayKey];//Performance.AllTrades.ByDay[dayKey]; 
+				if(backTest && tc != null) {
+					pnl = tc.TradesPerformance.Currency.CumProfit;
+					Print("pnl, plrt=" + pnl + "," + plrt);
+				}
 			}
 			
+			if(bsx < 3) return true;			
 			if(PrintOut > -1) {
 				//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":(RealizedProfitLoss,RealtimeTrades.CumProfit)=(" + pnl + "," + plrt + ")--" + Get24HDateTime(Time[0]));	
 				if(SystemPerformance.AllTrades.ByDay.Count == 2) {
@@ -107,7 +119,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (IsTradingTime(170000) && Position.Quantity == 0)
 			{
 				if (tradeObj.entryOrder == null || tradeObj.entryOrder.OrderState != OrderState.Working || MM_EnTrailing)
-				{
+				{ Print("bsx,bse,tradeObj.barsSincePtSl=" + bsx + "," + bse + "," + tradeObj.barsSincePtSl);
 					if(bsx == -1 || bsx > tradeObj.barsSincePtSl)
 					{
 						//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + "- NewOrderAllowed=true - " + Get24HDateTime(Time[0]));
@@ -396,6 +408,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnPositionUpdate(Cbi.Position position, double averagePrice, 
 			int quantity, Cbi.MarketPosition marketPosition)
 		{
+			Print("Position.MarketPosition, Position.Quantity=" + Position.MarketPosition + "," + Position.Quantity);
 			//Print(position.ToString() + "--MarketPosition=" + position.MarketPosition);
 			if (position.MarketPosition == MarketPosition.Flat)
 			{
@@ -409,7 +422,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region TM Properties
         [Description("Offeset points for limit price entry")]
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_EnOffsetPnts", GroupName = "TradeManagement", Order = 0)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_EnOffsetPnts", GroupName = "TradeMgmt", Order = 0)]		
         public double TM_EnOffsetPnts
         {
             get { return tradeObj==null? 0 : tradeObj.enOffsetPnts; }
@@ -417,7 +430,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
         [Description("How long to check entry order filled or not")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_MinutesChkEnOrder", GroupName = "TradeManagement", Order = 1)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_MinutesChkEnOrder", GroupName = "TradeMgmt", Order = 1)]	
         public int TM_MinutesChkEnOrder
         {
             get { return tradeObj==null? 0 : tradeObj.minutesChkEnOrder; }
@@ -426,7 +439,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("How long to check P&L")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_MinutesChkEnOrder", GroupName = "TradeManagement", Order = 2)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_MinutesChkPnL", GroupName = "TradeMgmt", Order = 2)]	
         public int TM_MinutesChkPnL
         {
             get { return tradeObj==null? 0 : tradeObj.minutesChkPnL; }
@@ -435,7 +448,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Bar count since en order issued")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_MinutesChkEnOrder", GroupName = "TradeManagement", Order = 3)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_BarsHoldEnOrd", GroupName = "TradeMgmt", Order = 3)]	
         public int TM_BarsHoldEnOrd
         {
             get { return tradeObj==null? 0 : tradeObj.barsHoldEnOrd; }
@@ -444,7 +457,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Bar count for en order counter pullback")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_MinutesChkEnOrder", GroupName = "TradeManagement", Order = 4)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_EnCounterPBBars", GroupName = "TradeMgmt", Order = 4)]	
         public int TM_EnCounterPBBars
         {
             get { return tradeObj==null? 0 : tradeObj.enCounterPBBars; }
@@ -453,16 +466,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 				
 		[Description("Bar count since last filled PT or SL")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_MinutesChkEnOrder", GroupName = "TradeManagement", Order = 5)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_BarsSincePtSl", GroupName = "TradeMgmt", Order = 5)]	
         public int TM_BarsSincePtSl
         {
-            get { return tradeObj==null? 0 : tradeObj.barsSincePtSl; }
-            set { if(tradeObj!=null) tradeObj.barsSincePtSl = Math.Max(1, value); }
+            get;// { return tradeObj==null? 1 : tradeObj.barsSincePtSl; }
+            set;// { if(tradeObj!=null) tradeObj.barsSincePtSl = Math.Max(1, value); }
         }
 		
 		[Description("Bar count before checking P&L")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_MinutesChkEnOrder", GroupName = "TradeManagement", Order = 6)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_BarsToCheckPL", GroupName = "TradeMgmt", Order = 6)]	
         public int TM_BarsToCheckPL
         {
             get { return tradeObj==null? 0 : tradeObj.barsToCheckPL; }
@@ -474,16 +487,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region MM Properties
         [Description("Money amount of profit target")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_MinutesChkEnOrder", GroupName = "MoneyManagement", Order = 0)]	
+		[DefaultValueAttribute(300)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_ProfitTgtAmt", GroupName = "MoneyMgmt", Order = 0)]	
         public double MM_ProfitTargetAmt
         {
-            get { return tradeObj==null? 0 : tradeObj.profitTargetAmt; }
+            get { return tradeObj==null? 30 : tradeObj.profitTargetAmt; }
             set { if(tradeObj!=null) tradeObj.profitTargetAmt = Math.Max(0, value); }
         }
 
         [Description("Money amount for profit target increasement")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_ProfitTgtIncTic", GroupName = "MoneyManagement", Order = 1)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_ProfitTgtIncTic", GroupName = "MoneyMgmt", Order = 1)]	
         public double MM_ProfitTgtIncTic
         {
             get { return tradeObj==null? 0 : tradeObj.profitTgtIncTic; }
@@ -492,7 +506,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Tick amount for min profit locking")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_ProfitLockMinTic", GroupName = "MoneyManagement", Order = 2)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_ProfitLockMinTic", GroupName = "MoneyMgmt", Order = 2)]	
         public double MM_ProfitLockMinTic
         {
             get { return tradeObj==null? 0 : tradeObj.profitLockMinTic; }
@@ -501,7 +515,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Description("Tick amount for max profit locking")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_ProfitLockMaxTic", GroupName = "MoneyManagement", Order = 3)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_ProfitLockMaxTic", GroupName = "MoneyMgmt", Order = 3)]	
         public double MM_ProfitLockMaxTic
         {
             get { return tradeObj==null? 0 : tradeObj.profitLockMaxTic; }
@@ -510,16 +524,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Money amount of stop loss")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_StopLossAmt", GroupName = "MoneyManagement", Order = 4)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_StopLossAmt", GroupName = "MoneyMgmt", Order = 4)]	
         public double MM_StopLossAmt
         {
-            get { return tradeObj==null? 0 : tradeObj.stopLossAmt; }
+            get { return tradeObj==null? 15 : tradeObj.stopLossAmt; }
             set { if(tradeObj!=null) tradeObj.stopLossAmt = Math.Max(0, value); }
         }
 		
         [Description("Money amount of trailing stop loss")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_TrailingStopLossAmt", GroupName = "MoneyManagement", Order = 5)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_TrailingStopLossAmt", GroupName = "MoneyMgmt", Order = 5)]	
         public double MM_TrailingStopLossAmt
         {
             get { return tradeObj==null? 0 : tradeObj.trailingSLAmt; }
@@ -528,7 +542,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Money amount for stop loss increasement")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_StopLossIncTic", GroupName = "MoneyManagement", Order = 6)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_StopLossIncTic", GroupName = "MoneyMgmt", Order = 6)]	
         public double MM_StopLossIncTic
         {
             get { return tradeObj==null? 0 : tradeObj.stopLossIncTic; }
@@ -537,7 +551,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Break Even amount")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_BreakEvenAmt", GroupName = "MoneyManagement", Order = 7)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_BreakEvenAmt", GroupName = "MoneyMgmt", Order = 7)]	
         public double MM_BreakEvenAmt
         {
             get { return tradeObj==null? 0 : tradeObj.breakEvenAmt; }
@@ -545,8 +559,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
 		[Description("Daily Loss Limit amount")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_DailyLossLmt", GroupName = "MoneyManagement", Order = 8)]	
+ 		[Range(int.MinValue, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_DailyLossLmt", GroupName = "MoneyMgmt", Order = 8)]	
         public double MM_DailyLossLmt
         {
             get { return tradeObj==null? 0 : tradeObj.dailyLossLmt; }
@@ -554,7 +568,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 		[Description("Use trailing entry every bar")]
  		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_EnTrailing", GroupName = "MoneyManagement", Order = 9)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_EnTrailing", GroupName = "MoneyMgmt", Order = 9)]	
         public bool MM_EnTrailing
         {
             get { return tradeObj==null? false : tradeObj.enTrailing; }
@@ -563,7 +577,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Use trailing profit target every bar")]
  		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_PTTrailing", GroupName = "MoneyManagement", Order = 10)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_PTTrailing", GroupName = "MoneyMgmt", Order = 10)]	
         public bool MM_PTTrailing
         {
             get { return tradeObj==null? false : tradeObj.ptTrailing; }
@@ -572,7 +586,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Use trailing stop loss every bar")]
  		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_SLTrailing", GroupName = "MoneyManagement", Order = 11)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_SLTrailing", GroupName = "MoneyMgmt", Order = 11)]	
         public bool MM_SLTrailing
         {
             get { return tradeObj==null? false : tradeObj.slTrailing; }

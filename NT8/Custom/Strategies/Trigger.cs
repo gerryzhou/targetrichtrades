@@ -73,7 +73,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					CheckExitTrade(indSignal);
 				}
 				else { // no positions
-					CheckEntryTrade(indSignal);
+					CheckEntryTrade();
 				}
 			}
 		}

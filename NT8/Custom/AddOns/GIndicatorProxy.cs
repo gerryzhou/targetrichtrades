@@ -32,7 +32,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class GIndicatorBase : Indicator
 	{
 		private List<Indicator> listIndicator = new List<Indicator>();
-		private IndicatorSignal indSignal;		
+		private IndicatorSignal indSignal;
 	
 		#region Methods
 		public string GetAccName() {
@@ -45,8 +45,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		public virtual Direction GetDirection() {return null;}
 		
-		public SupportResistance GetSupport(){return null;}
-		public SupportResistance GetResistance(){return null;}
+		public virtual SupportResistance GetSupport(){return null;}
+		public virtual SupportResistance GetResistance(){return null;}
+		public virtual SupportResistance GetSupportResistance(SupportResistanceType srType){return null;}
 
 		public IndicatorSignal CheckIndicatorSignal() {
 			return null;

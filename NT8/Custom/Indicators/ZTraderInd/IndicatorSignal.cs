@@ -29,11 +29,55 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	/// </summary>
 	public class IndicatorSignal
 	{
-		public TrendDirection TrendDir = TrendDirection.UnKnown; //1=up, -1=down, 0=flat/unknown
-		public Breakout BreakoutDir = Breakout.UnKnown; //1=bk up, -1=bk down, 0=no bk/unknown
-		public Reversal ReversalDir = Reversal.UnKnown; //1=rev up, -1=rev down, 0=no rev/unknown
+		private Direction trendDir = null;//TrendDirection.UnKnown; //1=up, -1=down, 0=flat/unknown
+		private Breakout breakoutDir = Breakout.UnKnown; //1=bk up, -1=bk down, 0=no bk/unknown
+		private Reversal reversalDir = Reversal.UnKnown; //1=rev up, -1=rev down, 0=no rev/unknown
+		private SupportResistance sptRst;
+		
+		#region Protperies
+		[Browsable(false)]
+		[XmlIgnore]
+		//[DefaultValueAttribute(TrendDirection.UnKnown)]
+		public Direction TrendDir {
+			get { return trendDir;}
+			set { trendDir = value;}
+		}
+
+		[Browsable(false)]
+		[XmlIgnore]
+		[DefaultValueAttribute(Breakout.UnKnown)]
+		public Breakout BreakoutDir {
+			get { return breakoutDir;}
+			set { breakoutDir = value;}
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		[DefaultValueAttribute(Reversal.UnKnown)]
+		public Reversal ReversalDir {
+			get { return reversalDir;}
+			set { reversalDir = value;}
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public SupportResistance SnR {
+			get { return sptRst;}
+			set { sptRst = value;}
+		}		
+		#endregion
 	}
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

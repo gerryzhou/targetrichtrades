@@ -21,6 +21,7 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.AddOns;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -164,15 +165,38 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// Get the last inflection for the given barNo
 		/// </summary>
 		/// <param name="barNo"></param>
-		/// <returns></returns>
-		public int GetLastInflection(Series<int> inflection, int barNo, TrendDirection dir) {
+		/// <returns>the number of bars ago/barNo for last inflection</returns>
+		public int GetLastInflection(Series<int> inflection, int barNo, TrendDirection dir, BarIndexType barIdxType) {
 			int inft = -1;
-			for(int i = 1; i<barNo-BarsRequiredToPlot; i++) {
-				if((inflection[i]>0 && dir == TrendDirection.Down) ||
-					(inflection[i]<0 && dir == TrendDirection.Up))
+			for(int i = 1; i<barNo-BarsRequiredToPlot-1; i++) {				
+				if((inflection[i]<0 && dir == TrendDirection.Down) ||
+					(inflection[i]>0 && dir == TrendDirection.Up))
 					inft = i;
+				if(barNo > 6065)
+					Print("inflection[" + i + "]=" + inflection[i] + ", inft=" + inft);
 			}
+			if(inft > 0 && barIdxType == BarIndexType.BarNO)
+				inft = CurrentBar - inft;
+			Print("GetLastInflection barNo, currentBar, inft=" + barNo + "," + CurrentBar + "," + inft);
 			return inft;
+		}
+
+		/// <summary>
+		/// Get the last crossover for the given barNo
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <returns>the number of bars ago for last crossover</returns>
+		public int GetLastCrossover(Series<int> crossover, int barNo, CrossoverType crsType, BarIndexType barIdxType) {
+			int crsov = -1;
+			for(int i = 1; i<barNo-BarsRequiredToPlot-1; i++) {
+				if((crossover[i]>0 && crsType == CrossoverType.Above) ||
+					(crossover[i]<0 && crsType == CrossoverType.Below) ||
+					(crossover[i] != 0 && crsType == CrossoverType.Both))
+					crsov = i;
+			}
+			if(barIdxType == BarIndexType.BarNO)
+				crsov = CurrentBar - crsov;
+			return crsov;
 		}
 		
 		#endregion
@@ -575,6 +599,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public DateTime CustomTime1
 		{ get; set; }
 		#endregion
+		
 		#region Other Properties
 		/// <summary>
 		/// The symbol of the instument

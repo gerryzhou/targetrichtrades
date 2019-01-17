@@ -20,6 +20,7 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.AddOns;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -38,8 +39,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private Series<double>	smis;
 		private Series<double>	tma;
 		
+		private GLastIndexRecorder inflectionRecorder;
+		private GLastIndexRecorder crossoverRecorder;
 		private Series<int> inflection;
 		private Series<int> crossover;
+		//The barNo of last inflection
+		private int lastInflection = -1;
+		private int lastCrossover = -1;
 				
 		protected override void OnStateChange()
 		{
@@ -76,11 +82,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//Time series MA for trend indentification
 				tma	= new Series<double>(this);
 				
+			} else if(State == State.DataLoaded)
+			{
 				//Save the inflection bar;
-				inflection = new Series<int>(this);
+				inflection = new Series<int>(this, MaximumBarsLookBack.Infinite);
+				inflectionRecorder = new GLastIndexRecorder(this);
 				
 				//Save the crossover bar;
-				crossover = new Series<int>(this);
+				crossover = new Series<int>(this, MaximumBarsLookBack.Infinite);
 			}
 		}
 
@@ -91,7 +100,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 			{
 				return;
 			}
-						
+			
+			inflectionRecorder.PrintRecords();
 			//Stochastic Momentum = SM {distance of close - midpoint}
 		 	sms[0] = (Close[0] - 0.5 * ((MAX(High, range)[0] + MIN(Low, range)[0])));
 			
@@ -111,27 +121,33 @@ namespace NinjaTrader.NinjaScript.Indicators
 			tma[0] = TSF(Close, 3, tmaperiod)[0];
 			inflection[0] = 0;
 			crossover[0] = 0;
-			if (CurrentBar > BarsRequiredToPlot) {//BarsRequiredToPlot) {		
+			if (CurrentBar > BarsRequiredToPlot) {//BarsRequiredToPlot) {
 				int tr = GetTrendByMA();
-				int inft = GetInflection(SMITMA);
+				int infl = GetInflection(SMITMA);
 				
-				if(tr > 0)  PlotBrushes[1][0] = Brushes.Green;
-				else if(tr < 0)  PlotBrushes[1][0] = Brushes.Red;
-				if(inft > 0) {
+				if(tr > 0) PlotBrushes[1][0] = Brushes.Green;
+				else if(tr < 0) PlotBrushes[1][0] = Brushes.Red;
+				
+				if(infl > 0) {
 					inflection[1] = 1;
-					if(CurrentBar < 140) Print((CurrentBar-1).ToString() + " inflect=1");
+					LastInflection = CurrentBar - 1;
+					inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord(LastInflection, LookbackBarType.Up));
 					DrawDiamond(1, "res"+CurrentBar, (3*High[1]-Low[1])/2, 0, Brushes.Red);
-				} 
-				else if (inft < 0) {
-					inflection[1] = -1;
-					if(CurrentBar < 140) Print((CurrentBar-1).ToString() + " inflect=-1");
-					DrawDiamond(1, "spt"+CurrentBar, (3*Low[1]-High[1])/2, 0, Brushes.Aqua);	
 				}
+				else if (infl < 0) {
+					inflection[1] = -1;
+					LastInflection = CurrentBar - 1;
+					inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord(LastInflection, LookbackBarType.Down));
+					DrawDiamond(1, "spt"+CurrentBar, (3*Low[1]-High[1])/2, 0, Brushes.Aqua);
+				}
+				
 				if(CrossAbove(SMITMA, smi, 1)) {
 					crossover[0] = 1;
+					LastCrossover = CurrentBar;
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + "\r\nX", 0, High[0]+5, Brushes.Black);
 				} else if (CrossBelow(SMITMA, smi, 1)) {
 					crossover[0] = -1;
+					LastCrossover = CurrentBar;
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + "\r\nX", 0, Low[0]-5, Brushes.Black);
 				}
 			}
@@ -174,6 +190,42 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return inflection;
 		}
 		
+		public bool IsNewInflection(TrendDirection trendDir) {
+			return LastInflection == GetLastInflection(GetInflection(), CurrentBar, trendDir, BarIndexType.BarNO);
+		}
+		
+		public Series<int> GetCrossover() {
+			return crossover;
+		}
+		
+		public override Direction GetDirection() {			
+			Print(CurrentBar.ToString() + " -- GISMI GetDirection called");			
+			Direction dir = new Direction();
+			if(GetTrendByMA() > 0) dir.TrendDir = TrendDirection.Up;
+			else if (GetTrendByMA() < 0) dir.TrendDir = TrendDirection.Down;
+			Print(CurrentBar.ToString() + " -- GISMI GetTrendByMA(), GetDirection=" + GetTrendByMA() + "," + dir.TrendDir.ToString());
+			return dir;
+		}
+		
+		public override SupportResistance GetSupportResistance(SupportResistanceType srType) {
+			SupportResistance snr = new SupportResistance();
+			
+			if(srType == SupportResistanceType.Resistance) {
+			//isolate the last inflection
+				//LastInflection = GetLastInflection(GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarNO);
+			
+			//lookback to the crossover and if that candle is bearish we isolate the open as resistance;
+			// if that candlestick is bullish we isolate the close as resistance
+				//LastCrossover = GetLastCrossover(GetCrossover(), LastInflection, CrossoverType.Both, BarIndexType.BarsAgo);
+				if(LastCrossover > 0) {
+					double open_lcrs = Open[LastCrossover];
+					double close_lcrs = Close[LastCrossover];
+					snr.SetSptRstValue(Math.Max(open_lcrs,close_lcrs));
+				}
+			}
+			return snr;
+		}
+
 		
 		private void DrawDiamond(int barsBack, string tag, double prc, double offset, SolidColorBrush brush) {				
 			// Instantiates a red diamond on the current bar 1 tick below the low
@@ -183,25 +235,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 			myDiamond.AreaBrush = brush;//Brushes.Red;
 		}
 		
-		public override Direction GetDirection() {
-			//Update();
-			Print(CurrentBar.ToString() + " -- GISMI GetDirection called");
-			
-			Direction dir = new Direction();
-			if(GetTrendByMA() > 0) dir.TrendDir = TrendDirection.Up;
-			else if (GetTrendByMA() < 0) dir.TrendDir = TrendDirection.Down;
-			Print(CurrentBar.ToString() + " -- GISMI GetTrendByMA(), GetDirection=" + GetTrendByMA() + "," + dir.TrendDir.ToString());
-			return dir;
-		}
-
 		#region Properties
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
 		[Display(Name="EMAPeriod1", Description="1st ema smothing period. ( R )", Order=1, GroupName="Parameters")]
 		public int EMAPeriod1
 		{
-			get { return emaperiod1; }
-			set { emaperiod1 = Math.Max(1, value); }
+			get { return emaperiod1;}
+			set { emaperiod1 = Math.Max(1, value);}
 		}
 
 		[Range(1, int.MaxValue)]
@@ -209,8 +250,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[Display(Name="EMAPeriod2", Description="2nd ema smoothing period. ( S )", Order=2, GroupName="Parameters")]
 		public int EMAPeriod2
 		{
-			get { return emaperiod2; }
-			set { emaperiod2 = Math.Max(1, value); }
+			get { return emaperiod2;}
+			set { emaperiod2 = Math.Max(1, value);}
 		}
 		
 		[Range(1, int.MaxValue)]
@@ -218,8 +259,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[Display(Name="Range", Description="Range for momentum Calculation ( Q )", Order=3, GroupName="Parameters")]
 		public int Range
 		{
-			get { return range; }
-			set { range = Math.Max(1, value); }
+			get { return range;}
+			set { range = Math.Max(1, value);}
 		}		
 
 		[Range(1, int.MaxValue)]
@@ -227,10 +268,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[Display(Name="SMITMAPeriod", Description="SMI TMA smoothing period", Order=4, GroupName="Parameters")]
 		public int SMITMAPeriod
 		{
-			get { return smitmaperiod; }
-			set { smitmaperiod = Math.Max(1, value); }
+			get { return smitmaperiod;}
+			set { smitmaperiod = Math.Max(1, value);}
 		}
-
 
 		[Browsable(false)]
 		[XmlIgnore]
@@ -243,9 +283,27 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[XmlIgnore]
 		public Series<double> SMITMA
 		{
-			get { return Values[1]; }
+			get { return Values[1];}
 		}
-
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public int LastInflection
+		{
+			get { return lastInflection;}
+			
+			set {lastInflection = value;}
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public int LastCrossover
+		{
+			get { return lastCrossover;}
+			
+			set {lastCrossover = value;}
+		}
+		
 		#endregion		
 	}
 }
