@@ -1,0 +1,41 @@
+Ninjatrader license: $300 OFF
+
+AWO: sma - > EMA, or sma -> 20, 5,(34, 5), TMA, Triangular MA;
+Done;
+
+Target: cross over 0 of AWO, high/low of the bar as TG; inflection sign need to exit;
+
+entry: TMA 3, 15, inflection and over or below the TMA then entry, 
+the last inflection is the first target, the next inflection is next target;
+or the 0 cross before of AWO could be the target;
+
+looking for short: inflection zone neg, look back to the cross over if the bar is bearish, 
+the open set as resistance, if the bar is bullish, the close set as resistance; if we below 
+MA, AW is <0, then entry: the bar after inflection bar;
+From Anne-Marie:
+Mechanics for negative cross -so far looks like this - isolate the last inflection - 
+if that last inflection is negative, we do a lookback to the crossover 
+and if that candle is bearish we isolate the open as resistance; 
+if that candlestick is bullish we isolate the close as resistance
+Then we identify yes/no for 1) are we below the moving average and 
+2) is the awesome oscillator below zero/
+If both gates are yes, we now can stage the entry
+We take the trade at the open of the next candlestick after the inflection zone
+
+
+
+AWO: (34,5), plot on the chart when the color changed:
+Done;
+
+SMI: cross over markup;
+
+---------------------------
+
+
+
+
+
+
+
+
+
