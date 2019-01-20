@@ -25,6 +25,13 @@ using NinjaTrader.NinjaScript.DrawingTools;
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 {
+
+	/// AlgoMode: 0=liquidate; 
+	/// 1=trading; 
+	/// 2=semi-algo(manual entry, algo exit);
+	/// -1=stop trading(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
+	/// -2=stop trading(no entry/exit, liquidate positions and cancel all entry/exit orders);
+	public enum AlgoModeType {Trading=1, Liquidate=0, SemiAlgo=2, ExitOnly=-1, StopTrading=-2};
 	//public enum SessionBreak {AfternoonClose, EveningOpen, MorningOpen, NextDay};
 	public enum TradingDirection {Up=1, Down=-1, Both=0};
 	

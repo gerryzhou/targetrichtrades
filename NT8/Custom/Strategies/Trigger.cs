@@ -21,6 +21,7 @@ using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -34,25 +35,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	}
 	
 	public partial class GSZTraderBase : Strategy
-	{
-		protected int tradeDirection = 0; // -1=short; 0-both; 1=long;
-		protected int tradeStyle = 0; // -1=counter trend; 1=trend following;
-		
-		//time=H*10000+M*100+S, S is skipped here;
-        protected int timeStartH = 1; //10100 Default setting for timeStart hour
-		protected int timeStartM = 1; //10100 Default setting for timeStart minute
-		//protected int timeStart = -1; //10100 Default setting for timeStart
-        protected int timeEndH = 14; // Default setting for timeEnd hour
-		protected int timeEndM = 59; // Default setting for timeEnd minute
-		//protected int timeEnd = -1; // Default setting for timeEnd
-		protected int timeLiqH = 15; //Time H to liquidate
-		protected int timeLiqM = 8; //Time M to liquidate
-		
-        protected double enSwingMinPnts = 10; //10 Default setting for EnSwingMinPnts
-        protected double enSwingMaxPnts = 35; //16 Default setting for EnSwingMaxPnts
-		protected double enPullbackMinPnts = 1; //6 Default setting for EnPullbackMinPnts
-        protected double enPullbackMaxPnts = 8; //10 Default setting for EnPullbackMaxPnts
-		
+	{	
 		public virtual void InitTrigger() {
 			
 		}
@@ -64,7 +47,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// 4) if there is signal fired for entry
 		/// </summary>
 		public virtual void CheckTrigger() {
-			if(IsLiquidateTime(timeLiqH, timeLiqM)) {
+			if(IsLiquidateTime(TG_TimeLiqH, TG_TimeLiqM)) {
 				CloseAllPositions();
 			}
 			else {
@@ -124,32 +107,32 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected virtual void SetTradeContext(PriceAction pa) {
 			switch(pa.paType) {
 				case PriceActionType.UpTight: //
-					tradeStyle = 1;
-					tradeDirection = 1;
+					TM_TradeStyle = TradingStyle.TrendFollowing;
+					TM_TradeDirection = 1;
 					break;
 				case PriceActionType.UpWide: //wide up channel
-					tradeStyle = 2;
-					tradeDirection = 1;
+					TM_TradeStyle = TradingStyle.CounterTrend;
+					TM_TradeDirection = 1;
 					break;
 				case PriceActionType.DnTight: //
-					tradeStyle = 1;
-					tradeDirection = -1;
+					TM_TradeStyle = TradingStyle.TrendFollowing;
+					TM_TradeDirection = -1;
 					break;
 				case PriceActionType.DnWide: //wide dn channel
-					tradeStyle = 2;
-					tradeDirection = -1;
+					TM_TradeStyle = TradingStyle.CounterTrend;
+					TM_TradeDirection = -1;
 					break;
 				case PriceActionType.RngTight: //
-					tradeStyle = -1;
-					tradeDirection = 0;
+					TM_TradeStyle = TradingStyle.Ranging;//-1;
+					TM_TradeDirection = 0;
 					break;
 				case PriceActionType.RngWide: //
-					tradeStyle = 2;
-					tradeDirection = 1;
+					TM_TradeStyle = TradingStyle.CounterTrend;
+					TM_TradeDirection = 1;
 					break;
 				default:
-					tradeStyle = 1;
-					tradeDirection = 0;
+					TM_TradeStyle = TradingStyle.TrendFollowing;
+					TM_TradeDirection = 0;
 					break;
 			}
 		}
@@ -232,87 +215,117 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return tbr_count;
 		}
 		
-        #region TG Properties
-        [Description("Short, Long or both direction for entry")]
-        //[GridCategory("Parameters")]
-        public int TG_TradeDirection
-        {
-            get { return tradeDirection; }
-            set { tradeDirection = value; }
-        }		
-
-        [Description("Trade style: trend following, counter trend, scalp")]
-        //[GridCategory("Parameters")]
-        public int TG_TradeStyle
-        {
-            get { return tradeStyle; }
-            set { tradeStyle = value; }
-        }
+        #region Trigger Properties
 		
         [Description("Min swing size for entry")]
-        //[GridCategory("Parameters")]
+ 		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_EnSwingMinPnts", GroupName = "Trigger", Order = 2)]
         public double TG_EnSwingMinPnts
         {
-            get { return enSwingMinPnts; }
-            set { enSwingMinPnts = Math.Max(1, value); }
+            get { return tg_EnSwingMinPnts; }
+            set { tg_EnSwingMinPnts = Math.Max(1, value); }
         }
 
         [Description("Max swing size for entry")]
-        //[GridCategory("Parameters")]
+ 		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_EnSwingMaxPnts", GroupName = "Trigger", Order = 3)]
         public double TG_EnSwingMaxPnts
         {
-            get { return enSwingMaxPnts; }
-            set { enSwingMaxPnts = Math.Max(4, value); }
+            get { return tg_EnSwingMaxPnts; }
+            set { tg_EnSwingMaxPnts = Math.Max(4, value); }
         }
 
 		[Description("Min pullback size for entry")]
-        //[GridCategory("Parameters")]
+ 		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_EnPullbackMinPnts", GroupName = "Trigger", Order = 4)]
         public double TG_EnPullbackMinPnts
         {
-            get { return enPullbackMinPnts; }
-            set { enPullbackMinPnts = Math.Max(1, value); }
+            get { return tg_EnPullbackMinPnts; }
+            set { tg_EnPullbackMinPnts = Math.Max(1, value); }
         }
 
         [Description("Max pullback size for entry")]
-        //[GridCategory("Parameters")]
+ 		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_EnPullbackMaxPnts", GroupName = "Trigger", Order = 5)]
         public double TG_EnPullbackMaxPnts
         {
-            get { return enPullbackMaxPnts; }
-            set { enPullbackMaxPnts = Math.Max(2, value); }
+            get { return tg_EnPullbackMaxPnts; }
+            set { tg_EnPullbackMaxPnts = Math.Max(2, value); }
         }
 
         [Description("Time start hour")]
-        //[GridCategory("Parameters")]
+ 		[Range(0, 23), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeStartH", GroupName = "Trigger", Order = 6)]
         public int TG_TimeStartH
         {
-            get { return timeStartH; }
-            set { timeStartH = Math.Max(0, value); }
+            get { return tg_TimeStartH; }
+            set { tg_TimeStartH = Math.Max(0, value); }
         }
 		
         [Description("Time start minute")]
-        //[GridCategory("Parameters")]
+ 		[Range(0, 59), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeStartM", GroupName = "Trigger", Order = 7)]
         public int TG_TimeStartM
         {
-            get { return timeStartM; }
-            set { timeStartM = Math.Max(0, value); }
+            get { return tg_TimeStartM; }
+            set { tg_TimeStartM = Math.Max(0, value); }
         }
 		
         [Description("Time end hour")]
-        //[GridCategory("Parameters")]
+ 		[Range(0, 23), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeEndH", GroupName = "Trigger", Order = 8)]
         public int TG_TimeEndH
         {
-            get { return timeEndH; }
-            set { timeEndH = Math.Max(0, value); }
+            get { return tg_TimeEndH; }
+            set { tg_TimeEndH = Math.Max(0, value); }
         }
 
         [Description("Time end minute")]
-        //[GridCategory("Parameters")]
+ 		[Range(0, 59), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeEndM", GroupName = "Trigger", Order = 9)]
         public int TG_TimeEndM
         {
-            get { return timeEndM; }
-            set { timeEndM = Math.Max(0, value); }
+            get { return tg_TimeEndM; }
+            set { tg_TimeEndM = Math.Max(0, value); }
         }
 		
-        #endregion		
+        [Description("Liquidate hour")]
+ 		[Range(0, 23), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeLiqH", GroupName = "Trigger", Order = 10)]
+        public int TG_TimeLiqH
+        {
+            get { return tg_TimeLiqH; }
+            set { tg_TimeLiqH = Math.Max(0, value); }
+        }
+
+        [Description("Liquidate minute")]
+ 		[Range(0, 59), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeLiqM", GroupName = "Trigger", Order = 11)]
+        public int TG_TimeLiqM
+        {
+            get { return tg_TimeLiqM; }
+            set { tg_TimeLiqM = Math.Max(0, value); }
+        }
+		
+        #endregion
+		
+		#region Variables for Properties
+
+		//time=H*10000+M*100+S, S is skipped here;
+        private int tg_TimeStartH = 1; //10100 Default setting for timeStart hour
+		private int tg_TimeStartM = 1; //10100 Default setting for timeStart minute
+		//private int timeStart = -1; //10100 Default setting for timeStart
+        private int tg_TimeEndH = 14; // Default setting for timeEnd hour
+		private int tg_TimeEndM = 59; // Default setting for timeEnd minute
+		//private int timeEnd = -1; // Default setting for timeEnd
+		private int tg_TimeLiqH = 15; //Time H to liquidate
+		private int tg_TimeLiqM = 8; //Time M to liquidate
+		
+        private double tg_EnSwingMinPnts = 10; //10 Default setting for EnSwingMinPnts
+        private double tg_EnSwingMaxPnts = 35; //16 Default setting for EnSwingMaxPnts
+		private double tg_EnPullbackMinPnts = 1; //6 Default setting for EnPullbackMinPnts
+        private double tg_EnPullbackMaxPnts = 8; //10 Default setting for EnPullbackMaxPnts
+		
+		#endregion
 	}
 }

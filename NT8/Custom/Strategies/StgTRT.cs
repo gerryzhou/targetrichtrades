@@ -81,7 +81,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (State == State.Configure)
 			{								
 				tradeObj = new TradeObj(this);
-				tradeObj.barsSincePtSl = TM_BarsSincePtSl;
+				tradeObj.barsSincePTSL = TM_BarsSincePTSL;
 			}
 		}
 
@@ -146,11 +146,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 					tradeObj.tradeDirection = TradingDirection.Down;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 					tradeObj.SetTradeType(TradeType.Entry);
-					tradeObj.profitTargetAmt = 30;
-					tradeObj.stopLossAmt = 15;
+					tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
+					tradeObj.stopLossAmt = MM_StopLossAmt;
+					tradeObj.barsSincePTSL = TM_BarsSincePTSL;
 				}
+			} else {
+				tradeObj.SetTradeType(TradeType.NoTrade);
 			}
-			return null;
+			return tradeObj;
 		}
 		
 		public override void PutTrade() {

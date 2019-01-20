@@ -14,4 +14,4 @@ Mechanics for negative cross -so far looks like this -
  Then we identify yes/no for 1) are we below the moving average 
  and 2) is the awesome oscillator below zero/
  If both gates are yes, we now can stage the entry
- We take the trade at the open of the next candlestick after the inflection zone
+ We take the trade at the open of the next candlestick (after the inflection zone???)

@@ -26,7 +26,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 {
 	public class TradeObj {
-		private Strategy instStrategy = null;
+		private GSZTraderBase instStrategy = null;
 		private TradeType tradeType = TradeType.NoTrade;
 		public TradingDirection tradeDirection = TradingDirection.Both;
 		public TradingStyle tradeStyle = TradingStyle.TrendFollowing;
@@ -48,15 +48,15 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		#endregion
 		
 		#region Trade Mgmt variables
-		public double enOffsetPnts = 1.25;//Price offset for entry
+		public double enOffsetPnts = 1.25;//instStrategy.TM_EnOffsetPnts;//Price offset for entry
 		public int enCounterPBBars = 1;//Bar count of pullback for breakout entry setup
 		
 		public int minutesChkEnOrder = 20; //how long before checking an entry order filled or not
 		public int minutesChkPnL = 30; //how long before checking P&L
 		
 		public int barsHoldEnOrd = 10; // Bars count since en order was issued
-        public int barsSincePtSl = 1; // Bar count since last P&L was filled
-		public int barsToCheckPL = 2; // Bar count to check P&L since the entry		
+        public int barsSincePTSL = 1;//instStrategy.TM_BarsSincePTSL; // Bar count since last P&L was filled
+		public int barsToCheckPnL = 2; // Bar count to check P&L since the entry		
 		#endregion
 		
 		#region Order Objects
@@ -69,8 +69,22 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		#endregion
 		
-		public TradeObj(Strategy inst_strategy) {
+		public TradeObj(GSZTraderBase inst_strategy) {
 			this.instStrategy = inst_strategy;
+			InitParams();
+		}
+		
+		private void InitParams() {
+			enOffsetPnts = instStrategy.TM_EnOffsetPnts;
+			enCounterPBBars = instStrategy.TM_EnCounterPBBars;
+			
+			minutesChkEnOrder = instStrategy.TM_MinutesChkEnOrder;
+			minutesChkPnL = instStrategy.TM_MinutesChkPnL;
+			
+			barsHoldEnOrd = instStrategy.TM_BarsHoldEnOrd;
+	        barsSincePTSL = instStrategy.TM_BarsSincePTSL;
+			barsToCheckPnL = instStrategy.TM_BarsToCheckPnL;
+			
 		}
 		
 		#region Other Properties

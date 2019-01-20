@@ -29,20 +29,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	[Gui.CategoryOrder("GStrategy", 1)] // display "GStrategy" first
 	[Gui.CategoryOrder("MoneyMgmt", 2)] // then "MM"
-	[Gui.CategoryOrder("TradeMgmt", 3)] // and finally "TM"
+	[Gui.CategoryOrder("TradeMgmt", 3)] // and then "TM"
+	[Gui.CategoryOrder("Trigger", 4)] // and finally "TG"
 	public partial class GSZTraderBase : Strategy
 	{
 		protected GIndicatorBase indicatorProxy;
 		protected IndicatorSignal indicatorSignal;
 		protected TradeObj tradeObj;
 		
-		protected string accName = "";
-		protected int algoMode = 1;
-		protected bool backTest = true; //if it runs for backtesting;
-		protected int printOut = 1; // Default setting for PrintOut
-		
 		private Series<double> CustomDatsSeries1;
-
+		
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
@@ -92,15 +88,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 			BarsRequiredToTrade							= 100;
 			// Disable this property for performance gains in Strategy Analyzer optimizations
 			// See the Help Guide for additional information
-			IsInstantiatedOnEachOptimizationIteration	= true;
-			//CustomColor1					= Brushes.Orange;
-			StartH						= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
-			//CustomPrc1					= 1;
-			
+			IsInstantiatedOnEachOptimizationIteration	= true;			
 			//QuantityType = QuantityType.DefaultQuantity;
 			SetOrderQuantity = SetOrderQuantity.DefaultQuantity;
 			DefaultQuantity = 1;
 			WaitForOcoClosingBracket = false;
+			
+			//CustomColor1					= Brushes.Orange;
+			StartH						= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
+			//CustomPrc1					= 1;		
+			AlgoMode = AlgoModeType.Trading;
 		}
 		
 		protected override void OnAccountItemUpdate(Cbi.Account account, Cbi.AccountItem accountItem, double value)
@@ -145,13 +142,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnBarUpdate()
 		{
 			Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
+			int bsx = BarsSinceExitExecution();
+			int bse = BarsSinceEntryExecution();
+			
+			Print(CurrentBar + ":" + this.Name + " OnBarUpdate, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
+			
 			indicatorProxy.Update();
 		}
 
 		#region Properties
+		
 		[Description("Account Name")]
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "AccName", GroupName = "ZTraderBase", Order = 0)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AccName", GroupName = "GStrategy", Order = 0)]		
         public string AccName
         {
             get { return accName; }
@@ -167,9 +170,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
         [Description("Algo mode")]
-		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "AlgoMode", GroupName = "ZTraderBase", Order = 1)]			
-        public int AlgoMode
+//		[NinjaScriptProperty]
+		[XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AlgoMode", GroupName = "GStrategy", Order = 1)]			
+		public AlgoModeType AlgoMode
         {
             get { return algoMode; }
             set { algoMode = value; }
@@ -177,7 +181,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("BackTesting mode or not")]
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BackTest", GroupName = "ZTraderBase", Order = 2)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BackTest", GroupName = "GStrategy", Order = 2)]		
         public bool BackTest
         {
             get { return backTest; }
@@ -186,7 +190,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Print out level: large # print out more")]
 		[Range(-5, 5), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "PrintOut", GroupName = "ZTraderBase", Order = 3)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PrintOut", GroupName = "GStrategy", Order = 3)]		
         public int PrintOut
         {
             get { return printOut; }
@@ -208,7 +212,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[NinjaScriptProperty]
 		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
-		[Display(Name="StartH", Description="StartH", Order=2, GroupName="Parameters")]
+		[Display(Name="StartH", Description="StartH", Order=4, GroupName="GStrategy")]
 		public DateTime StartH
 		{ get; set; }
 
@@ -225,13 +229,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 			get { return Values[0]; }
 		}
 
-
 		[Browsable(false)]
 		[XmlIgnore]
 		public Series<double> CustomPlot2
 		{
 			get { return Values[1]; }
 		}
+		#endregion
+		
+		#region Variables for Properties
+		
+		private string accName = "Sim101";
+		private AlgoModeType algoMode = AlgoModeType.Trading;
+		private bool backTest = true; //if it runs for backtesting;
+		private int printOut = 1; // Default setting for PrintOut
+		
 		#endregion
 
 	}

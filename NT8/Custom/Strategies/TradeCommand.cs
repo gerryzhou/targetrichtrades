@@ -22,6 +22,7 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -29,12 +30,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public class CmdObject {
 		private Strategy instStrategy = null;
-		
-        #region Properties
+
 		public Strategy GetStrategy() {
 			return this.instStrategy;
 		}
-        #endregion
 	}
 	
 	public partial class GSZTraderBase : Strategy
@@ -51,10 +50,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public virtual void ExecuteCommand() {
 			switch(AlgoMode) {
-				case 0: // 0=liquidate; 
+				case AlgoModeType.Liquidate: // 0=liquidate; 
 					CloseAllPositions();
 					break;
-				case 1:	// 1=trading; 
+				case AlgoModeType.Trading:	// 1=trading; 
 					//CheckPositions();
 					CheckTrigger();
 					ChangeSLPT();
@@ -66,13 +65,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 						//PutTrade(zz_gap, cur_gap, isReversalBar);
 					}
 					break;
-				case 2:	// 2=semi-algo(manual entry, algo exit);
+				case AlgoModeType.SemiAlgo:	// 2=semi-algo(manual entry, algo exit);
 					ChangeSLPT();
 					break;
-				case -1: // -1=stop trading(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
+				case AlgoModeType.ExitOnly: // -1=stop trading(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
 					CancelEntryOrders();
 					break;
-				case -2: // -2=stop trading(no entry/exit, liquidate positions and cancel all entry/exit orders);
+				case AlgoModeType.StopTrading: // -2=stop trading(no entry/exit, liquidate positions and cancel all entry/exit orders);
 					CancelAllOrders();
 					break;
 				default:

@@ -57,3 +57,5 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 
 
 
+
+
