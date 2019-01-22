@@ -27,10 +27,12 @@ using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	[Gui.CategoryOrder("GStrategy", 1)] // display "GStrategy" first
-	[Gui.CategoryOrder("MoneyMgmt", 2)] // then "MM"
-	[Gui.CategoryOrder("TradeMgmt", 3)] // and then "TM"
-	[Gui.CategoryOrder("Trigger", 4)] // and finally "TG"
+	[Gui.CategoryOrder("CustomParams", 1)] // display "CP" first
+	[Gui.CategoryOrder("GStrategy", 2)] // then "GStrategy"
+	[Gui.CategoryOrder("MoneyMgmt", 3)] // then "MM"
+	[Gui.CategoryOrder("TradeMgmt", 4)] // and then "TM"
+	[Gui.CategoryOrder("Trigger", 5)] // and finally "TG"
+	
 	public partial class GSZTraderBase : Strategy
 	{
 		protected GIndicatorBase indicatorProxy;
@@ -98,6 +100,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			StartH						= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
 			//CustomPrc1					= 1;		
 			AlgoMode = AlgoModeType.Trading;
+		}
+		
+		public bool IsLiveTrading() {
+			if(State == State.Realtime)
+				return true;
+			else return false;
 		}
 		
 		protected override void OnAccountItemUpdate(Cbi.Account account, Cbi.AccountItem accountItem, double value)

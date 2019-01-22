@@ -79,7 +79,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//AddChartIndicator(smaSlow);
 			}			
 			else if (State == State.Configure)
-			{								
+			{
+				//IncludeCommission = true;
 				tradeObj = new TradeObj(this);
 				tradeObj.barsSincePTSL = TM_BarsSincePTSL;
 			}
@@ -91,6 +92,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Print(CurrentBar.ToString() + " -- StgTRT - Add your custom strategy logic here.");
 			indicatorProxy.Update();
 			indicatorSignal = GetIndicatorSignal();
+			//CheckExitTrade();
 			CheckEntryTrade();
 			PutTrade();
 		}
@@ -108,11 +110,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			giSMI.Update();
 			awOscillator.Update();
 			IndicatorSignal indSignal = null; //= new IndicatorSignal();
-			int infl = giSMI.LastInflection;//GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarsAgo);
-			Print("GetIndicatorSignal giSMI.LastInflection=" + infl);
-//			if(infl > 0 && infl < 3) {
+			int infl = giSMI.InflectionRecorder.GetLastIndex(CurrentBar, LookbackBarType.Down);//GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarsAgo);
+			Print(CurrentBar + ": GetIndicatorSignal giSMI.InflectionRecorder.GetLastIndex=" + infl);
+			if(infl > 0 && CurrentBar-infl < CP_EnBarsBeforeInflection) {
 			indSignal = new IndicatorSignal();
-				try{
+			try{
 				//isolate the last inflection
 				//int inft = giSMI.GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down);
 				
@@ -120,7 +122,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				// if that candlestick is bullish we isolate the close as resistance
 				//giSMI.LastCrossover = giSMI.GetLastCrossover(giSMI.GetCrossover(), CurrentBar-inft, CrossoverType.Both);
 				indSignal.SnR = giSMI.GetSupportResistance(SupportResistanceType.Resistance);
-			} catch(Exception ex){
+			} catch(Exception ex) {
 				Print("GetIndicatorSignal ex=" + ex.Message);
 			}
 			//SMI below the moving average or not
@@ -135,7 +137,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				dir.TrendDir = TrendDirection.Down;
 			
 			indSignal.TrendDir = dir;
-//			}
+			}
 			
 			return indSignal;
 		}
@@ -162,5 +164,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 					EnterShort();
 			}
 		}
+		
+        #region Custom Properties
+		
+        [Description("Bars count before inflection for entry")]
+ 		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnBarsBeforeInflection", GroupName = "CustomParams", Order = 0)]
+        public int CP_EnBarsBeforeInflection
+        {
+            get { return cp_EnBarsBeforeInflection; }
+            set { cp_EnBarsBeforeInflection = Math.Max(1, value); }
+        }
+		
+		private int cp_EnBarsBeforeInflection = 2;
+		
+		#endregion
 	}
 }

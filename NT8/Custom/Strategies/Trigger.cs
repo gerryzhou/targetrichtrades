@@ -35,11 +35,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 	}
 	
 	public partial class GSZTraderBase : Strategy
-	{	
-		public virtual void InitTrigger() {
-			
-		}
+	{
+		#region Trigger Trade Functions
 		
+		public virtual void InitTrigger() {}
+			
 		/// <summary>
 		/// Check: 1) if it's time to liquidate
 		/// 2) if it's time to put entry order
@@ -51,17 +51,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 				CloseAllPositions();
 			}
 			else {
-				IndicatorSignal indSignal = indicatorProxy.CheckIndicatorSignal();
+				indicatorSignal = indicatorProxy.CheckIndicatorSignal();
 				if (Position.MarketPosition != MarketPosition.Flat) { //There are positions
-					CheckExitTrade(indSignal);
+					CheckExitTrade();
 				}
 				else { // no positions
 					CheckEntryTrade();
 				}
 			}
-		}
-		
-		//public virtual IndicatorSignal GetSignal() {return null;}
+		}		
 		
 		/// <summary>
 		/// Check if now is the time allowed to put trade
@@ -107,32 +105,32 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected virtual void SetTradeContext(PriceAction pa) {
 			switch(pa.paType) {
 				case PriceActionType.UpTight: //
-					TM_TradeStyle = TradingStyle.TrendFollowing;
-					TM_TradeDirection = 1;
+					TM_TradingStyle = TradingStyle.TrendFollowing;
+					TM_TradingDirection = TradingDirection.Up;
 					break;
 				case PriceActionType.UpWide: //wide up channel
-					TM_TradeStyle = TradingStyle.CounterTrend;
-					TM_TradeDirection = 1;
+					TM_TradingStyle = TradingStyle.CounterTrend;
+					TM_TradingDirection = TradingDirection.Up;
 					break;
 				case PriceActionType.DnTight: //
-					TM_TradeStyle = TradingStyle.TrendFollowing;
-					TM_TradeDirection = -1;
+					TM_TradingStyle = TradingStyle.TrendFollowing;
+					TM_TradingDirection = TradingDirection.Down;
 					break;
 				case PriceActionType.DnWide: //wide dn channel
-					TM_TradeStyle = TradingStyle.CounterTrend;
-					TM_TradeDirection = -1;
+					TM_TradingStyle = TradingStyle.CounterTrend;
+					TM_TradingDirection = TradingDirection.Down;
 					break;
 				case PriceActionType.RngTight: //
-					TM_TradeStyle = TradingStyle.Ranging;//-1;
-					TM_TradeDirection = 0;
+					TM_TradingStyle = TradingStyle.Ranging;//-1;
+					TM_TradingDirection = TradingDirection.Both;
 					break;
 				case PriceActionType.RngWide: //
-					TM_TradeStyle = TradingStyle.CounterTrend;
-					TM_TradeDirection = 1;
+					TM_TradingStyle = TradingStyle.CounterTrend;
+					TM_TradingDirection = TradingDirection.Both;
 					break;
 				default:
-					TM_TradeStyle = TradingStyle.TrendFollowing;
-					TM_TradeDirection = 0;
+					TM_TradingStyle = TradingStyle.TrendFollowing;
+					TM_TradingDirection = TradingDirection.Both;
 					break;
 			}
 		}
@@ -145,6 +143,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			return timeSinceEn;
 		}
+		
+		#endregion Trigger Functions
 		
 		protected virtual bool PatternMatched()
 		{
@@ -219,7 +219,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Min swing size for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_EnSwingMinPnts", GroupName = "Trigger", Order = 2)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnSwingMinPnts", GroupName = "Trigger", Order = 2)]
         public double TG_EnSwingMinPnts
         {
             get { return tg_EnSwingMinPnts; }
@@ -228,7 +228,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Max swing size for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_EnSwingMaxPnts", GroupName = "Trigger", Order = 3)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnSwingMaxPnts", GroupName = "Trigger", Order = 3)]
         public double TG_EnSwingMaxPnts
         {
             get { return tg_EnSwingMaxPnts; }
@@ -237,7 +237,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Description("Min pullback size for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_EnPullbackMinPnts", GroupName = "Trigger", Order = 4)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnPullbackMinPnts", GroupName = "Trigger", Order = 4)]
         public double TG_EnPullbackMinPnts
         {
             get { return tg_EnPullbackMinPnts; }
@@ -246,7 +246,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Max pullback size for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_EnPullbackMaxPnts", GroupName = "Trigger", Order = 5)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnPullbackMaxPnts", GroupName = "Trigger", Order = 5)]
         public double TG_EnPullbackMaxPnts
         {
             get { return tg_EnPullbackMaxPnts; }
@@ -255,7 +255,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Time start hour")]
  		[Range(0, 23), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeStartH", GroupName = "Trigger", Order = 6)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeStartH", GroupName = "Trigger", Order = 6)]
         public int TG_TimeStartH
         {
             get { return tg_TimeStartH; }
@@ -264,7 +264,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Time start minute")]
  		[Range(0, 59), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeStartM", GroupName = "Trigger", Order = 7)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeStartM", GroupName = "Trigger", Order = 7)]
         public int TG_TimeStartM
         {
             get { return tg_TimeStartM; }
@@ -273,7 +273,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Time end hour")]
  		[Range(0, 23), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeEndH", GroupName = "Trigger", Order = 8)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeEndH", GroupName = "Trigger", Order = 8)]
         public int TG_TimeEndH
         {
             get { return tg_TimeEndH; }
@@ -282,7 +282,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Time end minute")]
  		[Range(0, 59), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeEndM", GroupName = "Trigger", Order = 9)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeEndM", GroupName = "Trigger", Order = 9)]
         public int TG_TimeEndM
         {
             get { return tg_TimeEndM; }
@@ -291,7 +291,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Liquidate hour")]
  		[Range(0, 23), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeLiqH", GroupName = "Trigger", Order = 10)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeLiqH", GroupName = "Trigger", Order = 10)]
         public int TG_TimeLiqH
         {
             get { return tg_TimeLiqH; }
@@ -300,7 +300,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Liquidate minute")]
  		[Range(0, 59), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TG_TimeLiqM", GroupName = "Trigger", Order = 11)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeLiqM", GroupName = "Trigger", Order = 11)]
         public int TG_TimeLiqM
         {
             get { return tg_TimeLiqM; }

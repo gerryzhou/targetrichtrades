@@ -67,6 +67,24 @@ namespace NinjaTrader.NinjaScript.AddOns
 			} else
 				return null;
 		}
+
+		public GLastIndexRecord GetLastIndexRecord(int barNo, LookbackBarType lbBarType) {		
+			if(lastIndexRecords.Count > 0) {
+				GLastIndexRecord r = null;
+				for(int i=lastIndexRecords.Count-1; i>=0; i--) {
+					r = lastIndexRecords[i];
+					if(r.BarNumber <= barNo && r.BarType == lbBarType)
+						return r;
+				}
+			}
+			return null;
+		}
+	
+		public int GetLastIndex(int barNo, LookbackBarType lbBarType) {
+			GLastIndexRecord r = GetLastIndexRecord(barNo, lbBarType);
+			if(r == null) return -1;
+			else return r.BarNumber;
+		}
 		
 		public void AddLastIndexRecord(GLastIndexRecord r) {
 			lastIndexRecords.Add(r);

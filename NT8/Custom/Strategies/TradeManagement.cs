@@ -29,24 +29,20 @@ using NinjaTrader.NinjaScript.DrawingTools;
 namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class GSZTraderBase : Strategy
-	{
-		//private bool backTest = true;
-		//private int printOut = -5;
-		
-		//protected TradeObj tradeObj = null;	
-		#region Trigger Trade Functions
+	{		
+		#region Trade Mgmt Functions
 		
 		public virtual void InitTradeMgmt() {
 			SetProfitTarget(CalculationMode.Currency, MM_ProfitTargetAmt);
             SetStopLoss(CalculationMode.Currency, MM_StopLossAmt);
 		}
 		
-		public virtual void PutTrade() {
-		}
+		public virtual void PutTrade() {}
 		
-		public virtual TradeObj CheckExitTrade(IndicatorSignal signal) {
-			if((signal.ReversalDir == Reversal.Up && Position.MarketPosition == MarketPosition.Short) ||
-				(signal.ReversalDir == Reversal.Down && Position.MarketPosition == MarketPosition.Long)) {
+		public virtual TradeObj CheckExitTrade() {
+			if(Position.MarketPosition == MarketPosition.Flat) return null;
+			else if((indicatorSignal.ReversalDir == Reversal.Up && Position.MarketPosition == MarketPosition.Short) ||
+				(indicatorSignal.ReversalDir == Reversal.Down && Position.MarketPosition == MarketPosition.Long)) {
 				CloseAllPositions();
 				CancelExitOrders();
 				tradeObj.SetTradeType(TradeType.Exit);
@@ -74,7 +70,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			double pnl = CheckAccPnL();//GetAccountValue(AccountItem.RealizedProfitLoss);
 			double plrt = CheckAccCumProfit();
 			//DateTime dayKey = new DateTime(Time[0].Year,Time[0].Month,Time[0].Day);
-			double pnl_daily = CheckPnlByDay(Time[0].Year,Time[0].Month,Time[0].Day);
+			double pnl_daily = CheckPnlByDay(Time[0].Year, Time[0].Month, Time[0].Day);
 			
 			if(PrintOut > -1) {
 				//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":(RealizedProfitLoss,RealtimeTrades.CumProfit)=(" + pnl + "," + plrt + ")--" + Get24HDateTime(Time[0]));	
@@ -84,7 +80,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 			}
 			
-			if((backTest && State == State.Realtime) || (!backTest && State != State.Realtime)) {
+			if((backTest && IsLiveTrading()) || (!backTest && !IsLiveTrading())) {
 				//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + "[backTest,Historical]=" + backTest + "," + Historical + "- NewOrderAllowed=false - " + Get24HDateTime(Time[0]));
 				return false;
 			}
@@ -92,13 +88,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if(!backTest && (plrt <= MM_DailyLossLmt || pnl_daily <= MM_DailyLossLmt))
 			{
 				if(PrintOut > -1) {
-					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ": dailyLossLmt reached = " + pnl + "," + plrt);
+					Print(CurrentBar + "-" + AccName + ": dailyLossLmt reached = " + pnl_daily + "," + plrt);
 				}
 				return false;
 			}
 			
 			if (backTest && pnl_daily <= MM_DailyLossLmt) {
-				if(PrintOut > 3) {
+				if(PrintOut > -3) {
+					Print(CurrentBar + "-" + AccName + ": dailyLossLmt reached = " + pnl_daily + "," + plrt);
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ": backTest dailyLossLmt reached = " + pnl);
 				}
 				return false;				
@@ -122,133 +119,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return false;
 		}
 		
-		#endregion Trigger Functions
-		
-		#region Money Mgmt Functions
-		protected bool ChangeSLPT()
-		{
-//			int bse = BarsSinceEntry();
-//			double timeSinceEn = -1;
-//			if(bse > 0) {
-//				timeSinceEn = indicatorProxy.GetMinutesDiff(Time[0], Time[bse]);
-//			}
-			
-			double pl = Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);//.GetProfitLoss(Close[0], PerformanceUnit.Currency);
-			 // If not flat print out unrealized PnL
-    		if (Position.MarketPosition != MarketPosition.Flat) 
-			{
-         		//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- Open PnL: " + pl);
-				//int nChkPnL = (int)(timeSinceEn/minutesChkPnL);
-				double curPTTics = -1;
-				double slPrc = tradeObj.stopLossOrder == null ? Position.AveragePrice : tradeObj.stopLossOrder.StopPrice;
-				
-				if(MM_PTTrailing && pl >= 12.5*(tradeObj.trailingPTTic - 2*MM_ProfitTgtIncTic))
-				{
-					tradeObj.trailingPTTic = tradeObj.trailingPTTic + MM_ProfitTgtIncTic;
-					if(tradeObj.profitTargetOrder != null) {
-						curPTTics = Math.Abs(tradeObj.profitTargetOrder.LimitPrice - Position.AveragePrice)/TickSize;
-					}
-					//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- update PT: PnL=" + pl + ",(trailingPTTic, curPTTics, $Amt, $Amt_cur)=(" + trailingPTTic + "," + curPTTics + "," + 12.5*trailingPTTic + "," + 12.5*curPTTics + ")");
-					if(tradeObj.profitTargetOrder == null || tradeObj.trailingPTTic > curPTTics)
-						SetProfitTarget(CalculationMode.Ticks, tradeObj.trailingPTTic);
-				}
-				
-				if(pl >= MM_BreakEvenAmt) { //setup breakeven order
-					//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- setup SL Breakeven: (PnL, posAvgPrc)=(" + pl + "," + Position.AvgPrice + ")");
-					slPrc = Position.AveragePrice;
-					//SetStopLoss(0);
-				}
-				
-				if(MM_SLTrailing) { // trailing max and min profits then converted to trailing stop after over the max
-//					if(trailingSLTic > profitLockMaxTic && pl >= 12.5*(trailingSLTic + 2*profitTgtIncTic)) {
-//						trailingSLTic = trailingSLTic + profitTgtIncTic;
-//						if(Position.MarketPosition == MarketPosition.Long)
-//							slPrc = Position.AvgPrice+TickSize*trailingSLTic;
-//						if(Position.MarketPosition == MarketPosition.Short)
-//							slPrc = Position.AvgPrice-TickSize*trailingSLTic;
-//						Print(AccName + "- update SL over Max: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= (" + slTrailing + "," + trailingSLTic + "," + slPrc + ")");						
-//					}
-					if(tradeObj.trailingSLTic > MM_ProfitLockMaxTic && pl >= 12.5*(tradeObj.trailingSLTic + 2*MM_ProfitTgtIncTic)) {
-						tradeObj.trailingSLTic = tradeObj.trailingSLTic + MM_ProfitTgtIncTic;
-						if(tradeObj.stopLossOrder != null)
-							CancelOrder(tradeObj.stopLossOrder);
-						if(tradeObj.profitTargetOrder != null)
-							CancelOrder(tradeObj.profitTargetOrder);
-						SetTrailStop(CalculationMode.Currency, MM_TrailingStopLossAmt);
-						//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- SetTrailStop over SL Max: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= (" + slTrailing + "," + trailingSLTic + "," + slPrc + ")");						
-					}
-					else if(pl >= 12.5*(MM_ProfitLockMaxTic + 2*MM_ProfitTgtIncTic)) { // lock max profits
-						tradeObj.trailingSLTic = tradeObj.trailingSLTic + MM_ProfitTgtIncTic;
-						if(Position.MarketPosition == MarketPosition.Long)
-							slPrc = tradeObj.trailingSLTic > MM_ProfitLockMaxTic ? Position.AveragePrice+TickSize*tradeObj.trailingSLTic : Position.AveragePrice+TickSize*MM_ProfitLockMaxTic;
-						if(Position.MarketPosition == MarketPosition.Short)
-							slPrc = tradeObj.trailingSLTic > MM_ProfitLockMaxTic ? Position.AveragePrice-TickSize*tradeObj.trailingSLTic :  Position.AveragePrice-TickSize*MM_ProfitLockMaxTic;
-						//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- update SL Max: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= (" + slTrailing + "," + trailingSLTic + "," + slPrc + ")");
-						//SetStopLoss(CalculationMode.Price, slPrc);
-					}
-					else if(pl >= 12.5*(MM_ProfitLockMinTic + 2*MM_ProfitTgtIncTic)) { //lock min profits
-						tradeObj.trailingSLTic = tradeObj.trailingSLTic + MM_ProfitTgtIncTic;
-						if(Position.MarketPosition == MarketPosition.Long)
-							slPrc = Position.AveragePrice+TickSize*MM_ProfitLockMinTic;
-						if(Position.MarketPosition == MarketPosition.Short)
-							slPrc = Position.AveragePrice-TickSize*MM_ProfitLockMinTic;
-						//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- update SL Min: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= (" + slTrailing + "," + trailingSLTic + "," + slPrc + ")");
-						//SetStopLoss(CalculationMode.Price, slPrc);
-					}
-				}
-				if(tradeObj.stopLossOrder == null || 
-					(Position.MarketPosition == MarketPosition.Long && slPrc > tradeObj.stopLossOrder.StopPrice) ||
-					(Position.MarketPosition == MarketPosition.Short && slPrc < tradeObj.stopLossOrder.StopPrice)) 
-				{
-					SetStopLoss(CalculationMode.Price, slPrc);
-				}
-			} else {
-				SetStopLoss(CalculationMode.Currency, MM_StopLossAmt);
-				SetProfitTarget(CalculationMode.Currency, MM_ProfitTargetAmt);
-			}
-
-			return false;
-		}
-		
-		public double CheckAccPnL() {
-			double pnl = 0;//GetAccountValue(AccountItem.RealizedProfitLoss);
-			//Print(CurrentBar + "-" + AccName + ": GetAccountValue(AccountItem.RealizedProfitLoss)= " + pnl + " -- " + Time[0].ToString());
-			return pnl;
-		}
-		
-		public double CheckAccCumProfit() {
-			double plrt = SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit;//Performance.RealtimeTrades.TradesPerformance.Currency.CumProfit;
-			//Print(CurrentBar + "-" + AccName + ": Cum runtime PnL= " + plrt);
-			return plrt;
-		}
-		
-		public double CheckPerformance()
-		{
-			double pl = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;//Performance.AllTrades.TradesPerformance.Currency.CumProfit;
-			double plrt = SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit;//Performance.RealtimeTrades.TradesPerformance.Currency.CumProfit;
-			//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ": Cum all PnL= " + pl + ", Cum runtime PnL= " + plrt);
-			return plrt;
-		}
-		
-		public double CheckPnlByDay(int year, int month, int day) {
-			double pnl = 0;
-			DateTime dayKey = new DateTime(year, month, day);//(Time[0].Year,Time[0].Month,Time[0].Day);
-			Print("CheckPnlByDay SystemPerformance.AllTrades dayKey=" + dayKey);
-			Print("CheckPnlByDay SystemPerformance.AllTrades ByDay.Count=" + SystemPerformance.AllTrades.ByDay.Count);
-			
-			if(SystemPerformance.AllTrades.ByDay.Keys.Contains(dayKey)) {
-				TradeCollection tc = (TradeCollection)SystemPerformance.AllTrades.ByDay[dayKey];//Performance.AllTrades.ByDay[dayKey]; 
-				if(backTest && tc != null) {
-					pnl = tc.TradesPerformance.Currency.CumProfit;
-					Print("CheckPnlByDay pnl=" + pnl);
-				}
-			}
-			return pnl;
-		}
-		
-		#endregion
-		
-		#region Trade Mgmt Functions
 		protected void NewShortLimitOrder(string msg, double zzGap, double curGap)
 		{
 			double prc = (MM_EnTrailing && TM_EnCounterPBBars>0) ? Close[0]+TM_EnOffsetPnts : High[0]+TM_EnOffsetPnts;
@@ -418,51 +288,35 @@ namespace NinjaTrader.NinjaScript.Strategies
 					tradeObj.profitTargetOrder = null;
 			}
 		}
-
-		protected override void OnPositionUpdate(Cbi.Position position, double averagePrice, 
-			int quantity, Cbi.MarketPosition marketPosition)
-		{
-			int bsx = BarsSinceExitExecution();
-			int bse = BarsSinceEntryExecution();
-			
-			Print(CurrentBar + ":OnPositionUpdate called, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
-			
-			Print(CurrentBar + ":OnPositionUpdate MarketPosition, Quantity=" + Position.MarketPosition + "," + Position.Quantity);
-			//Print(position.ToString() + "--MarketPosition=" + position.MarketPosition);
-			if (position.MarketPosition == MarketPosition.Flat)
-			{
-				tradeObj.trailingPTTic = MM_ProfitTargetAmt/12.5;
-				tradeObj.trailingSLTic = MM_StopLossAmt/12.5;
-			}
-		}
 		
 		#endregion
 
 		#region TM Properties
 		
-        [Description("Short, Long or both direction for entry")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_TradeDirection", GroupName = "TradeMgmt", Order = 0)]		
+        [Description("Short, Long or both directions for entry")]
+ 		//[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TradingDirection", GroupName = "TradeMgmt", Order = 0)]		
         //[GridCategory("Parameters")]
-        public int TM_TradeDirection
+		[XmlIgnore]
+        public TradingDirection TM_TradingDirection
         {
-            get { return tm_TradeDirection; }
-            set { tm_TradeDirection = value; }
+            get { return tm_TradingDirection; }
+            set { tm_TradingDirection = value; }
         }		
 
-        [Description("Trade style: trend following, counter trend, scalp")]
+        [Description("Trading style: trend following, counter trend, scalp")]
  		//[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_TradeStyle", GroupName = "TradeMgmt", Order = 1)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TradingStyle", GroupName = "TradeMgmt", Order = 1)]
 		[XmlIgnore]
-        public TradingStyle TM_TradeStyle
+        public TradingStyle TM_TradingStyle
         {
-            get { return tm_TradeStyle; }
-            set { tm_TradeStyle = value; }
+            get { return tm_TradingStyle; }
+            set { tm_TradingStyle = value; }
         }
 		
         [Description("Offeset points for limit price entry")]
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_EnOffsetPnts", GroupName = "TradeMgmt", Order = 0)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnOffsetPnts", GroupName = "TradeMgmt", Order = 2)]		
         public double TM_EnOffsetPnts
         {
             get{return tm_EnOffsetPnts;}// { return tradeObj==null? 0 : tradeObj.enOffsetPnts; }
@@ -471,7 +325,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("How long to check entry order filled or not")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_MinutesChkEnOrder", GroupName = "TradeMgmt", Order = 1)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkEnOrder", GroupName = "TradeMgmt", Order = 3)]	
         public int TM_MinutesChkEnOrder
         {
             get{return tm_MinutesChkEnOrder;}// { return tradeObj==null? 0 : tradeObj.minutesChkEnOrder; }
@@ -480,7 +334,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("How long to check P&L")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_MinutesChkPnL", GroupName = "TradeMgmt", Order = 2)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkPnL", GroupName = "TradeMgmt", Order = 4)]	
         public int TM_MinutesChkPnL
         {
             get{return tm_MinutesChkPnL;}// { return tradeObj==null? 0 : tradeObj.minutesChkPnL; }
@@ -489,7 +343,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Bar count before checking P&L")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_BarsToCheckPL", GroupName = "TradeMgmt", Order = 6)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsToCheckPL", GroupName = "TradeMgmt", Order = 5)]	
         public int TM_BarsToCheckPnL
         {
             get{return tm_BarsToCheckPnL;}// { return tradeObj==null? 0 : tradeObj.barsToCheckPL; }
@@ -498,7 +352,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Bar count since en order issued")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_BarsHoldEnOrd", GroupName = "TradeMgmt", Order = 3)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsHoldEnOrd", GroupName = "TradeMgmt", Order = 6)]	
         public int TM_BarsHoldEnOrd
         {
             get{return tm_BarsHoldEnOrd;}// { return tradeObj==null? 0 : tradeObj.barsHoldEnOrd; }
@@ -507,7 +361,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Bar count for en order counter pullback")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_EnCounterPBBars", GroupName = "TradeMgmt", Order = 4)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnCounterPBBars", GroupName = "TradeMgmt", Order = 7)]	
         public int TM_EnCounterPBBars
         {
             get{return tm_EnCounterPBBars;}// { return tradeObj==null? 0 : tradeObj.enCounterPBBars; }
@@ -516,7 +370,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				
 		[Description("Bar count since last filled PT or SL")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TM_BarsSincePtSl", GroupName = "TradeMgmt", Order = 5)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsSincePTSL", GroupName = "TradeMgmt", Order = 8)]	
         public int TM_BarsSincePTSL
         {
             get{return tm_BarsSincePtSl;}// { return tradeObj==null? 1 : tradeObj.barsSincePtSl; }
@@ -524,123 +378,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 		
 		#endregion
-		
-		#region MM Properties
-        [Description("Money amount of profit target")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		//[DefaultValueAttribute(300)]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_ProfitTgtAmt", GroupName = "MoneyMgmt", Order = 0)]	
-        public double MM_ProfitTargetAmt
-        {
-            get{return mm_ProfitTargetAmt;}// { return tradeObj==null? 50 : tradeObj.profitTargetAmt; }
-            set{mm_ProfitTargetAmt = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.profitTargetAmt = Math.Max(0, value); }
-        }
 
-        [Description("Money amount for profit target increasement")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_ProfitTgtIncTic", GroupName = "MoneyMgmt", Order = 1)]	
-        public double MM_ProfitTgtIncTic
-        {
-            get{return mm_ProfitTgtIncTic;}// { return tradeObj==null? 0 : tradeObj.profitTgtIncTic; }
-            set{mm_ProfitTgtIncTic = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.profitTgtIncTic = Math.Max(0, value); }
-        }
-		
-        [Description("Tick amount for min profit locking")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_ProfitLockMinTic", GroupName = "MoneyMgmt", Order = 2)]	
-        public double MM_ProfitLockMinTic
-        {
-            get{return mm_ProfitLockMinTic;}// { return tradeObj==null? 0 : tradeObj.profitLockMinTic; }
-            set{mm_ProfitLockMinTic = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.profitLockMinTic = Math.Max(0, value); }
-        }
-
-		[Description("Tick amount for max profit locking")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_ProfitLockMaxTic", GroupName = "MoneyMgmt", Order = 3)]	
-        public double MM_ProfitLockMaxTic
-        {
-            get{return mm_ProfitLockMaxTic;}// { return tradeObj==null? 0 : tradeObj.profitLockMaxTic; }
-            set{mm_ProfitLockMaxTic = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.profitLockMaxTic = Math.Max(0, value); }
-        }
-		
-        [Description("Money amount of stop loss")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_StopLossAmt", GroupName = "MoneyMgmt", Order = 4)]	
-        public double MM_StopLossAmt
-        {
-            get{return mm_StopLossAmt;}// { return tradeObj==null? 30 : tradeObj.stopLossAmt; }
-            set{mm_StopLossAmt = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.stopLossAmt = Math.Max(0, value); }
-        }
-		
-        [Description("Money amount of trailing stop loss")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_TrailingStopLossAmt", GroupName = "MoneyMgmt", Order = 5)]	
-        public double MM_TrailingStopLossAmt
-        {
-            get{return mm_TrailingStopLossAmt;}// { return tradeObj==null? 0 : tradeObj.trailingSLAmt; }
-            set{mm_TrailingStopLossAmt = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.trailingSLAmt = Math.Max(0, value); }
-        }
-		
-		[Description("Money amount for stop loss increasement")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_StopLossIncTic", GroupName = "MoneyMgmt", Order = 6)]	
-        public double MM_StopLossIncTic
-        {
-            get{return mm_StopLossIncTic;}// { return tradeObj==null? 0 : tradeObj.stopLossIncTic; }
-            set{mm_StopLossIncTic = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.stopLossIncTic = Math.Max(0, value); }
-        }
-		
-        [Description("Break Even amount")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_BreakEvenAmt", GroupName = "MoneyMgmt", Order = 7)]	
-        public double MM_BreakEvenAmt
-        {
-            get{return mm_BreakEvenAmt;}// { return tradeObj==null? 0 : tradeObj.breakEvenAmt; }
-            set{mm_BreakEvenAmt = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.breakEvenAmt = Math.Max(0, value); }
-        }
-
-		[Description("Daily Loss Limit amount")]
- 		[Range(int.MinValue, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_DailyLossLmt", GroupName = "MoneyMgmt", Order = 8)]	
-        public double MM_DailyLossLmt
-        {
-            get{return mm_DailyLossLmt;}// { return tradeObj==null? 0 : tradeObj.dailyLossLmt; }
-            set{mm_DailyLossLmt = Math.Min(-100, value);}// { if(tradeObj!=null) tradeObj.dailyLossLmt = Math.Min(-100, value); }
-        }
-		
-		[Description("Use trailing entry every bar")]
- 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_EnTrailing", GroupName = "MoneyMgmt", Order = 9)]	
-        public bool MM_EnTrailing
-        {
-            get{return mm_EnTrailing;}// { return tradeObj==null? false : tradeObj.enTrailing; }
-            set{mm_EnTrailing = value;}// { if(tradeObj!=null) tradeObj.enTrailing = value; }
-        }
-		
-		[Description("Use trailing profit target every bar")]
- 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_PTTrailing", GroupName = "MoneyMgmt", Order = 10)]	
-        public bool MM_PTTrailing
-        {
-            get{return mm_PTTrailing;}// { return tradeObj==null? false : tradeObj.ptTrailing; }
-            set{mm_PTTrailing = value;}// { if(tradeObj!=null) tradeObj.ptTrailing = value; }
-        }
-		
-		[Description("Use trailing stop loss every bar")]
- 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MM_SLTrailing", GroupName = "MoneyMgmt", Order = 11)]	
-        public bool MM_SLTrailing
-        {
-            get{return mm_SLTrailing;}// { return tradeObj==null? false : tradeObj.slTrailing; }
-            set{mm_SLTrailing = value;}// { if(tradeObj!=null) tradeObj.slTrailing = value; }
-        }
-		
-		#endregion
-		
 		#region Variables for Properties
 		
-		private int tm_TradeDirection = 0; // -1=short; 0-both; 1=long;
-		private TradingStyle tm_TradeStyle = TradingStyle.TrendFollowing; // -1=counter trend; 1=trend following;				
+		private TradingDirection tm_TradingDirection = TradingDirection.Both; // -1=short; 0-both; 1=long;
+		private TradingStyle tm_TradingStyle = TradingStyle.TrendFollowing; // -1=counter trend; 1=trend following;				
 		private double tm_EnOffsetPnts = 1;
 		private int tm_MinutesChkEnOrder = 10;
 		private int tm_MinutesChkPnL = 30;
@@ -648,19 +390,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private int tm_BarsHoldEnOrd = 3;
 		private int tm_EnCounterPBBars = 2;
 		private int tm_BarsSincePtSl = 1;
-		
-		private double mm_ProfitTargetAmt = 500;
-		private double mm_ProfitTgtIncTic = 8;
-		private double mm_ProfitLockMinTic = 16;
-		private double mm_ProfitLockMaxTic = 40;
-		private double mm_StopLossAmt = 300;
-		private double mm_TrailingStopLossAmt = 16;
-		private double mm_StopLossIncTic = 8;
-		private double mm_BreakEvenAmt = 20;
-		private double mm_DailyLossLmt = -200;
-		private bool mm_EnTrailing = true;
-		private bool mm_PTTrailing = false;
-		private bool mm_SLTrailing = false;
 		
 		#endregion
 	}

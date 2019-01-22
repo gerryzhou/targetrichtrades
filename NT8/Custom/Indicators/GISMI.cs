@@ -90,6 +90,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				
 				//Save the crossover bar;
 				crossover = new Series<int>(this, MaximumBarsLookBack.Infinite);
+				crossoverRecorder = new GLastIndexRecorder(this);
 			}
 		}
 
@@ -101,7 +102,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				return;
 			}
 			
-			inflectionRecorder.PrintRecords();
+			//inflectionRecorder.PrintRecords();
 			//Stochastic Momentum = SM {distance of close - midpoint}
 		 	sms[0] = (Close[0] - 0.5 * ((MAX(High, range)[0] + MIN(Low, range)[0])));
 			
@@ -144,10 +145,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 				if(CrossAbove(SMITMA, smi, 1)) {
 					crossover[0] = 1;
 					LastCrossover = CurrentBar;
+					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord(LastCrossover, LookbackBarType.Up));
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + "\r\nX", 0, High[0]+5, Brushes.Black);
 				} else if (CrossBelow(SMITMA, smi, 1)) {
 					crossover[0] = -1;
 					LastCrossover = CurrentBar;
+					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord(LastCrossover, LookbackBarType.Down));
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + "\r\nX", 0, Low[0]-5, Brushes.Black);
 				}
 			}
@@ -293,6 +296,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 			get { return lastInflection;}
 			
 			set {lastInflection = value;}
+		}
+
+		[Browsable(false)]
+		[XmlIgnore]
+		public GLastIndexRecorder InflectionRecorder
+		{
+			get { return inflectionRecorder;}
+			
+			set {inflectionRecorder = value;}
 		}
 		
 		[Browsable(false)]

@@ -199,6 +199,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return crsov;
 		}
 		
+		public int GetLastIndexRecord(GLastIndexRecorder rec, int barNo, BarIndexType barIdxType, LookbackBarType lbBarType) {
+			int idx = -1;
+			
+			return idx;
+		}
+		
 		#endregion
 		
 		#region Pattern Functions
