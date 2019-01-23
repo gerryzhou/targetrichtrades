@@ -210,19 +210,23 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return dir;
 		}
 		
-		public override SupportResistance GetSupportResistance(SupportResistanceType srType) {
+		public override SupportResistance GetSupportResistance(int barNo, SupportResistanceType srType) {
 			SupportResistance snr = new SupportResistance();
 			
 			if(srType == SupportResistanceType.Resistance) {
+				GLastIndexRecord rec = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Unknown);
+				int lcrs = -1;
+				if(rec != null)
+					lcrs = rec.BarNumber;				
 			//isolate the last inflection
 				//LastInflection = GetLastInflection(GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarNO);
 			
 			//lookback to the crossover and if that candle is bearish we isolate the open as resistance;
 			// if that candlestick is bullish we isolate the close as resistance
 				//LastCrossover = GetLastCrossover(GetCrossover(), LastInflection, CrossoverType.Both, BarIndexType.BarsAgo);
-				if(LastCrossover > 0) {
-					double open_lcrs = Open[LastCrossover];
-					double close_lcrs = Close[LastCrossover];
+				if(lcrs > 0) {
+					double open_lcrs = Open[lcrs];
+					double close_lcrs = Close[lcrs];
 					snr.SetSptRstValue(Math.Max(open_lcrs,close_lcrs));
 				}
 			}

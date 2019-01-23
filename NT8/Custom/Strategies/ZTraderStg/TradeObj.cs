@@ -49,6 +49,10 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public bool ptTrailing = true; //use trailing profit target every bar
 		public bool slTrailing = true; //use trailing stop loss every bar
 		
+		public CalculationMode PTCalculationMode = CalculationMode.Currency;
+		public CalculationMode SLCalculationMode = CalculationMode.Currency;	
+		public CalculationMode BECalculationMode = CalculationMode.Currency;
+		
 		#endregion
 		
 		#region Trade Mgmt variables

@@ -113,30 +113,30 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int infl = giSMI.InflectionRecorder.GetLastIndex(CurrentBar, LookbackBarType.Down);//GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarsAgo);
 			Print(CurrentBar + ": GetIndicatorSignal giSMI.InflectionRecorder.GetLastIndex=" + infl);
 			if(infl > 0 && CurrentBar-infl < CP_EnBarsBeforeInflection) {
-			indSignal = new IndicatorSignal();
-			try{
-				//isolate the last inflection
-				//int inft = giSMI.GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down);
+				indSignal = new IndicatorSignal();
+				try{
+					//isolate the last inflection
+					//int inft = giSMI.GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down);
+					
+					//lookback to the crossover and if that candle is bearish we isolate the open as resistance;
+					// if that candlestick is bullish we isolate the close as resistance
+					//giSMI.LastCrossover = giSMI.GetLastCrossover(giSMI.GetCrossover(), CurrentBar-inft, CrossoverType.Both);
+					indSignal.SnR = giSMI.GetSupportResistance(infl, SupportResistanceType.Resistance);
+				} catch(Exception ex) {
+					Print("GetIndicatorSignal ex=" + ex.Message);
+				}
+				//SMI below the moving average or not
+				Direction dir_gismi = GetDirection(giSMI);
 				
-				//lookback to the crossover and if that candle is bearish we isolate the open as resistance;
-				// if that candlestick is bullish we isolate the close as resistance
-				//giSMI.LastCrossover = giSMI.GetLastCrossover(giSMI.GetCrossover(), CurrentBar-inft, CrossoverType.Both);
-				indSignal.SnR = giSMI.GetSupportResistance(SupportResistanceType.Resistance);
-			} catch(Exception ex) {
-				Print("GetIndicatorSignal ex=" + ex.Message);
-			}
-			//SMI below the moving average or not
-			Direction dir_gismi = GetDirection(giSMI);
-			
-			//awesome oscillator below zero or not
-			Direction dir_awo = GetDirection(awOscillator);
-			
-			Direction dir = new Direction();
-			
-			if(dir_gismi.TrendDir == TrendDirection.Down && dir_awo.TrendDir == TrendDirection.Down)
-				dir.TrendDir = TrendDirection.Down;
-			
-			indSignal.TrendDir = dir;
+				//awesome oscillator below zero or not
+				Direction dir_awo = GetDirection(awOscillator);
+				
+				Direction dir = new Direction();
+				
+				if(dir_gismi.TrendDir == TrendDirection.Down && dir_awo.TrendDir == TrendDirection.Down)
+					dir.TrendDir = TrendDirection.Down;
+				
+				indSignal.TrendDir = dir;
 			}
 			
 			return indSignal;
@@ -144,7 +144,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public TradeObj CheckEntryTrade() {			
 			if(NewOrderAllowed()) { //|| Position.Quantity == 0 giSMI.IsNewInflection(TrendDirection.Down) && 
-				if(indicatorSignal != null && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down) {
+				if(indicatorSignal != null && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down
+					&& indicatorSignal.SnR.GetSptRstValue() > High[0]) {
 					tradeObj.tradeDirection = TradingDirection.Down;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 					tradeObj.SetTradeType(TradeType.Entry);

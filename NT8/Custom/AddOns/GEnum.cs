@@ -25,5 +25,5 @@ using NinjaTrader.Gui.Tools;
 namespace NinjaTrader.NinjaScript.AddOns
 {
 	public enum BarIndexType { BarNO=0, BarsAgo=1 };
-	public enum LookbackBarType {Up=1, Down=-1, Flat=0};
+	public enum LookbackBarType {Up=1, Down=-1, Flat=0, Unknown=2};
 }

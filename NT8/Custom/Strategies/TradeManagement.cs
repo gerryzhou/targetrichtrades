@@ -302,7 +302,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             get { return tm_TradingDirection; }
             set { tm_TradingDirection = value; }
-        }		
+        }
 
         [Description("Trading style: trend following, counter trend, scalp")]
  		//[Range(0, int.MaxValue), NinjaScriptProperty]
@@ -339,7 +339,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             get{return tm_MinutesChkPnL;}// { return tradeObj==null? 0 : tradeObj.minutesChkPnL; }
             set{tm_MinutesChkPnL = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.minutesChkPnL = Math.Max(-1, value); }
-        }		
+        }
 		
 		[Description("Bar count before checking P&L")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
@@ -366,7 +366,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             get{return tm_EnCounterPBBars;}// { return tradeObj==null? 0 : tradeObj.enCounterPBBars; }
             set{tm_EnCounterPBBars = Math.Max(1, value);}// { if(tradeObj!=null) tradeObj.enCounterPBBars = Math.Max(-1, value); }
-        }		
+        }
 				
 		[Description("Bar count since last filled PT or SL")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]

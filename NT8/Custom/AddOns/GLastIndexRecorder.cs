@@ -73,7 +73,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 				GLastIndexRecord r = null;
 				for(int i=lastIndexRecords.Count-1; i>=0; i--) {
 					r = lastIndexRecords[i];
-					if(r.BarNumber <= barNo && r.BarType == lbBarType)
+					if(r.BarNumber <= barNo && (lbBarType== LookbackBarType.Unknown || r.BarType == lbBarType))
 						return r;
 				}
 			}
