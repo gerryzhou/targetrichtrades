@@ -122,8 +122,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 //        }
 		
 		public int IsLastBarOnChart() {
-			try{
-				Print("IsLastBarOnChart called:(CurBar,Count)=" + CurrentBar + "," + Count);
+			try{				
 //				if(CurrentBar < Count - 1)
 //					return -1;
 				if(CurrentBar < Count - 2)
@@ -131,6 +130,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				{
 					return -1;					
 				} else {
+					Print("IsLastBarOnChart called:(CurBar,Count)=" + CurrentBar + "," + Count);
 					return Count;//Inputs[0].Count;
 				}
 		
@@ -172,12 +172,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 				if((inflection[i]<0 && dir == TrendDirection.Down) ||
 					(inflection[i]>0 && dir == TrendDirection.Up))
 					inft = i;
-				if(barNo > 6065)
+				if(barNo >= Input.Count)
 					Print("inflection[" + i + "]=" + inflection[i] + ", inft=" + inft);
 			}
 			if(inft > 0 && barIdxType == BarIndexType.BarNO)
 				inft = CurrentBar - inft;
-			Print("GetLastInflection barNo, currentBar, inft=" + barNo + "," + CurrentBar + "," + inft);
+			//Print("GetLastInflection barNo, currentBar, inft=" + barNo + "," + CurrentBar + "," + inft);
 			return inft;
 		}
 

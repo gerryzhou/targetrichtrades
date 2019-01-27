@@ -95,7 +95,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
-			Print(CurrentBar.ToString() + " -- AwesomeOscillator OnBarUpdate called");
+			//Print(CurrentBar.ToString() + " -- AwesomeOscillator OnBarUpdate called");
 	        if (CurrentBar < 1)
 			{
 				OscillatorLine[0] = 0;
@@ -175,11 +175,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		public override Direction GetDirection() {
-			Print(CurrentBar.ToString() + " -- GIAwesomeOscillator GetDirection called");
+			//Print(CurrentBar.ToString() + " -- GIAwesomeOscillator GetDirection called");
 			Direction dir = new Direction();
 			if(Oscillator[0] > 0) dir.TrendDir = TrendDirection.Up;
 			else if (Oscillator[0] < 0) dir.TrendDir = TrendDirection.Down;
-			Print(CurrentBar.ToString() + " -- GIAwesomeOscillator, GetDirection=" + Oscillator[0] + "," + dir.TrendDir.ToString());
+			//Print(CurrentBar.ToString() + " -- GIAwesomeOscillator, GetDirection=" + Oscillator[0] + "," + dir.TrendDir.ToString());
 			return dir;
 		}
 

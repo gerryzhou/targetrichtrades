@@ -89,16 +89,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnBarUpdate()
 		{
 			base.OnBarUpdate();
-			Print(CurrentBar.ToString() + " -- StgTRT - Add your custom strategy logic here.");
+			//Print(CurrentBar.ToString() + " -- StgTRT - Add your custom strategy logic here.");
 			indicatorProxy.Update();
 			indicatorSignal = GetIndicatorSignal();
+			//SetStopLoss(CalculationMode.Price, tradeObj.stopLossPrice);
 			//CheckExitTrade();
 			CheckEntryTrade();
 			PutTrade();
 		}
 		
 		public override Direction GetDirection(GIndicatorBase ind){
-			Print(CurrentBar.ToString() + " -- StgTRT override GetDirection: " + ind.GetType().Name + " called...");
+			//Print(CurrentBar.ToString() + " -- StgTRT override GetDirection: " + ind.GetType().Name + " called...");
 			//ind.Update();
 			return ind.GetDirection();
 //			Direction dir_gismi = giSMI.GetDirection();
@@ -111,7 +112,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			awOscillator.Update();
 			IndicatorSignal indSignal = null; //= new IndicatorSignal();
 			int infl = giSMI.InflectionRecorder.GetLastIndex(CurrentBar, LookbackBarType.Down);//GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarsAgo);
-			Print(CurrentBar + ": GetIndicatorSignal giSMI.InflectionRecorder.GetLastIndex=" + infl);
+			//Print(CurrentBar + ": GetIndicatorSignal giSMI.InflectionRecorder.GetLastIndex=" + infl);
 			if(infl > 0 && CurrentBar-infl < CP_EnBarsBeforeInflection) {
 				indSignal = new IndicatorSignal();
 				try{
@@ -149,9 +150,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 					tradeObj.tradeDirection = TradingDirection.Down;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 					tradeObj.SetTradeType(TradeType.Entry);
+					tradeObj.PTCalculationMode = CalculationMode.Currency;
 					tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
-					tradeObj.stopLossAmt = MM_StopLossAmt;
+					tradeObj.SLCalculationMode = CalculationMode.Price;
+					tradeObj.stopLossPrice = indicatorSignal.SnR.GetSptRstValue();
 					tradeObj.barsSincePTSL = TM_BarsSincePTSL;
+					tradeObj.profitFactor = MM_ProfitFactor;
 				}
 			} else {
 				tradeObj.SetTradeType(TradeType.NoTrade);
@@ -162,7 +166,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override void PutTrade() {
 			if(tradeObj.GetTradeType() == TradeType.Entry) {
 				if(tradeObj.tradeDirection == TradingDirection.Down)
-					EnterShort();
+					EnterShort(OrderSignalName.EntryShort.ToString());
 			}
 		}
 		

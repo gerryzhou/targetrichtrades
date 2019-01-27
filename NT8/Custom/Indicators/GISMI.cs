@@ -96,7 +96,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
-			Print(CurrentBar.ToString() + " -- GISMI OnBarUpdate called");
+			//Print(CurrentBar.ToString() + " -- GISMI OnBarUpdate called");
 			if (( CurrentBar < emaperiod2) || ( CurrentBar < emaperiod1)) 
 			{
 				return;
@@ -185,7 +185,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				inft = 1;//inflection[1] = 1;
 			else if(d[1].ApproxCompare(d[0]) < 0 && d[1].ApproxCompare(d[2]) < 0)
 				inft = -1;//inflection[1] = -1;
-			Print("inft=" + (CurrentBar-1).ToString() + "," + inft);
+			//Print("inft=" + (CurrentBar-1).ToString() + "," + inft);
 			return inft;//inflection[1];
 		}
 		
@@ -202,11 +202,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		public override Direction GetDirection() {			
-			Print(CurrentBar.ToString() + " -- GISMI GetDirection called");			
+			//Print(CurrentBar.ToString() + " -- GISMI GetDirection called");			
 			Direction dir = new Direction();
 			if(GetTrendByMA() > 0) dir.TrendDir = TrendDirection.Up;
 			else if (GetTrendByMA() < 0) dir.TrendDir = TrendDirection.Down;
-			Print(CurrentBar.ToString() + " -- GISMI GetTrendByMA(), GetDirection=" + GetTrendByMA() + "," + dir.TrendDir.ToString());
+			//Print(CurrentBar.ToString() + " -- GISMI GetTrendByMA(), GetDirection=" + GetTrendByMA() + "," + dir.TrendDir.ToString());
 			return dir;
 		}
 		
@@ -217,16 +217,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 				GLastIndexRecord rec = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Unknown);
 				int lcrs = -1;
 				if(rec != null)
-					lcrs = rec.BarNumber;				
-			//isolate the last inflection
+					lcrs = rec.BarNumber;
+				if(barNo > 17600 && barNo < 17650)
+					Print(CurrentBar + "-LastCrossover, barNo=" + lcrs + "," + barNo);
+			//isolate the last inflection 
 				//LastInflection = GetLastInflection(GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarNO);
 			
 			//lookback to the crossover and if that candle is bearish we isolate the open as resistance;
 			// if that candlestick is bullish we isolate the close as resistance
 				//LastCrossover = GetLastCrossover(GetCrossover(), LastInflection, CrossoverType.Both, BarIndexType.BarsAgo);
 				if(lcrs > 0) {
-					double open_lcrs = Open[lcrs];
-					double close_lcrs = Close[lcrs];
+					double open_lcrs = Open.GetValueAt(lcrs);
+					double close_lcrs = Close.GetValueAt(lcrs);
 					snr.SetSptRstValue(Math.Max(open_lcrs,close_lcrs));
 				}
 			}

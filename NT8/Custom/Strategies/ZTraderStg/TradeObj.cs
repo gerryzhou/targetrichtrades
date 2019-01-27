@@ -44,6 +44,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double breakEvenAmt = 150; //150 the profits amount to trigger setting breakeven order
 		public double trailingSLAmt = 100; //300 Default setting for trailing Stop Loss Amt
 		public double dailyLossLmt = -200; //-300 the daily loss limit amount
+		public double profitFactor = 0.5;
 
 		public bool enTrailing = true; //use trailing entry: counter pullback bars or simple enOffsetPnts
 		public bool ptTrailing = true; //use trailing profit target every bar

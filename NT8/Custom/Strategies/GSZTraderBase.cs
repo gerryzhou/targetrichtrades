@@ -52,7 +52,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.Configure)
 			{
-				InitTradeMgmt();
+				//InitTradeMgmt();
 				//AddDataSeries("@SPX500", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
 			}
 			else if (State == State.DataLoaded)
@@ -149,11 +149,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		protected override void OnBarUpdate()
 		{
-			Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
+			//Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
 			int bsx = BarsSinceExitExecution();
 			int bse = BarsSinceEntryExecution();
 			
-			Print(CurrentBar + ":" + this.Name + " OnBarUpdate, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
+			//Print(CurrentBar + ":" + this.Name + " OnBarUpdate, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
 			
 			indicatorProxy.Update();
 		}
