@@ -35,13 +35,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected double CalProfitTargetAmt(double price, double profitFactor) {
 			switch(tradeObj.SLCalculationMode) {
 				case CalculationMode.Currency:
-					tradeObj.profitTargetAmt = profitFactor*tradeObj.stopLossAmt;
+					if(profitFactor == 0)
+						tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
+					else
+						tradeObj.profitTargetAmt = 
+							profitFactor*tradeObj.stopLossAmt;
 					break;
 				case CalculationMode.Price:
-					tradeObj.profitTargetAmt = 
-					profitFactor*Math.Abs(price-tradeObj.stopLossPrice)*Instrument.MasterInstrument.PointValue;
+					if(profitFactor == 0)
+						tradeObj.profitTargetAmt = MM_ProfitTargetAmt;			
+					else
+						tradeObj.profitTargetAmt = 
+							profitFactor*Math.Abs(price-tradeObj.stopLossPrice)*Instrument.MasterInstrument.PointValue;
 					break;
-			}
+			}			
 			return 0;
 		}
 		
@@ -291,7 +298,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public double MM_ProfitFactor
         {
             get{return mm_ProfitFactor;}// { return tradeObj==null? 0 : tradeObj.dailyLossLmt; }
-            set{mm_ProfitFactor = Math.Max(0.1, value);}// { if(tradeObj!=null) tradeObj.dailyLossLmt = Math.Min(-100, value); }
+            set{mm_ProfitFactor = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.dailyLossLmt = Math.Min(-100, value); }
         }
 		
 		[Description("Use trailing entry every bar")]
