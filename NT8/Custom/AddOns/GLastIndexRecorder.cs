@@ -26,16 +26,24 @@ using NinjaTrader.NinjaScript.Indicators;
 //This namespace holds Add ons in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.AddOns
 {
-	public class GLastIndexRecord
+	public class GLastIndexRecord<T>
 	{
 		private int BarNo;
+		private int BarNo2;
 		private LookbackBarType LBBarType;
+		private T LB_Value; //Lookback value
 		
 		public GLastIndexRecord(int bar_no, LookbackBarType lbBarType){
 			BarNumber = bar_no;
 			BarType = lbBarType;
 		}
-		
+
+		public GLastIndexRecord(int bar_no, int bar_no2, LookbackBarType lbBarType, T lbValue){
+			BarNumber = bar_no;
+			BarNumber2 = bar_no2;
+			BarType = lbBarType;
+			LBValue = lbValue;
+		}
 		#region Properties
 		
 		[Range(0, int.MaxValue), NinjaScriptProperty]
@@ -43,34 +51,45 @@ namespace NinjaTrader.NinjaScript.AddOns
 		[XmlIgnore()]		
 		public int BarNumber
 		{ get; set; }
-		
+
 		[Range(0, int.MaxValue), NinjaScriptProperty]
+        [Browsable(false)]
+		[XmlIgnore()]		
+		public int BarNumber2
+		{ get; set; }
+		
+		[NinjaScriptProperty]
         [Browsable(false)]
 		[XmlIgnore()]	
 		public LookbackBarType BarType
 		{ get; set; }
 		
+		[NinjaScriptProperty]
+        [Browsable(false)]
+		[XmlIgnore()]	
+		public T LBValue
+		{ get; set; }		
 		#endregion
 	}
 	
-	public class GLastIndexRecorder{
+	public class GLastIndexRecorder<T>{
 		private Indicator ind;
-		private List<GLastIndexRecord> lastIndexRecords = new List<GLastIndexRecord>();
+		private List<GLastIndexRecord<T>> lastIndexRecords = new List<GLastIndexRecord<T>>();
 		
 		public GLastIndexRecorder(Indicator indicator) {
 			this.ind = indicator;
 		}
 		
-		public GLastIndexRecord GetLastIndexRecord() {
+		public GLastIndexRecord<T> GetLastIndexRecord() {
 			if(lastIndexRecords.Count > 0) {
 				return lastIndexRecords[lastIndexRecords.Count-1];
 			} else
 				return null;
 		}
 
-		public GLastIndexRecord GetLastIndexRecord(int barNo, LookbackBarType lbBarType) {		
+		public GLastIndexRecord<T> GetLastIndexRecord(int barNo, LookbackBarType lbBarType) {		
 			if(lastIndexRecords.Count > 0) {
-				GLastIndexRecord r = null;
+				GLastIndexRecord<T> r = null;
 				for(int i=lastIndexRecords.Count-1; i>=0; i--) {
 					r = lastIndexRecords[i];
 					if(r.BarNumber <= barNo && (lbBarType== LookbackBarType.Unknown || r.BarType == lbBarType))
@@ -81,17 +100,17 @@ namespace NinjaTrader.NinjaScript.AddOns
 		}
 	
 		public int GetLastIndex(int barNo, LookbackBarType lbBarType) {
-			GLastIndexRecord r = GetLastIndexRecord(barNo, lbBarType);
+			GLastIndexRecord<T> r = GetLastIndexRecord(barNo, lbBarType);
 			if(r == null) return -1;
 			else return r.BarNumber;
 		}
 		
-		public void AddLastIndexRecord(GLastIndexRecord r) {
+		public void AddLastIndexRecord(GLastIndexRecord<T> r) {
 			lastIndexRecords.Add(r);
 		}
 		
 		public void PrintRecords() {
-			foreach(GLastIndexRecord item in lastIndexRecords) {
+			foreach(GLastIndexRecord<T> item in lastIndexRecords) {
 				ind.Print("GLastIndexRecord:" + item.BarNumber + "," + item.BarType);
 			}
 		}

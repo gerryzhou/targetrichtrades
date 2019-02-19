@@ -32,7 +32,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		private Direction trendDir = null;//TrendDirection.UnKnown; //1=up, -1=down, 0=flat/unknown
 		private Breakout breakoutDir = Breakout.UnKnown; //1=bk up, -1=bk down, 0=no bk/unknown
 		private Reversal reversalDir = Reversal.UnKnown; //1=rev up, -1=rev down, 0=no rev/unknown
-		private SupportResistance sptRst;
+		private SupportResistanceBar sptRst;
 		
 		#region Protperies
 		[Browsable(false)]
@@ -61,13 +61,15 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		
 		[Browsable(false)]
 		[XmlIgnore]
-		public SupportResistance SnR {
+		public SupportResistanceBar SnR {
 			get { return sptRst;}
 			set { sptRst = value;}
 		}		
 		#endregion
 	}
 }
+
+
 
 
 

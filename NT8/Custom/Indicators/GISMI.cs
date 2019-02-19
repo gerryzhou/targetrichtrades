@@ -39,8 +39,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private Series<double>	smis;
 		private Series<double>	tma;
 		
-		private GLastIndexRecorder inflectionRecorder;
-		private GLastIndexRecorder crossoverRecorder;
+		private GLastIndexRecorder<double> inflectionRecorder;
+		private GLastIndexRecorder<double> crossoverRecorder;
 		private Series<int> inflection;
 		private Series<int> crossover;
 		//The barNo of last inflection
@@ -86,11 +86,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 			{
 				//Save the inflection bar;
 				inflection = new Series<int>(this, MaximumBarsLookBack.Infinite);
-				inflectionRecorder = new GLastIndexRecorder(this);
+				inflectionRecorder = new GLastIndexRecorder<double>(this);
 				
 				//Save the crossover bar;
 				crossover = new Series<int>(this, MaximumBarsLookBack.Infinite);
-				crossoverRecorder = new GLastIndexRecorder(this);
+				crossoverRecorder = new GLastIndexRecorder<double>(this);
 			}
 		}
 
@@ -132,25 +132,25 @@ namespace NinjaTrader.NinjaScript.Indicators
 				if(infl > 0) {
 					inflection[1] = 1;
 					LastInflection = CurrentBar - 1;
-					inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord(LastInflection, LookbackBarType.Up));
+					inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastInflection, LookbackBarType.Up));
 					DrawDiamond(1, "res"+CurrentBar, (3*High[1]-Low[1])/2, 0, Brushes.Red);
 				}
 				else if (infl < 0) {
 					inflection[1] = -1;
 					LastInflection = CurrentBar - 1;
-					inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord(LastInflection, LookbackBarType.Down));
+					inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastInflection, LookbackBarType.Down));
 					DrawDiamond(1, "spt"+CurrentBar, (3*Low[1]-High[1])/2, 0, Brushes.Aqua);
 				}
 				
 				if(CrossAbove(SMITMA, smi, 1)) {
 					crossover[0] = 1;
 					LastCrossover = CurrentBar;
-					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord(LastCrossover, LookbackBarType.Up));
+					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Up));
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + "\r\nX", 0, High[0]+5, Brushes.Black);
 				} else if (CrossBelow(SMITMA, smi, 1)) {
 					crossover[0] = -1;
 					LastCrossover = CurrentBar;
-					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord(LastCrossover, LookbackBarType.Down));
+					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Down));
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + "\r\nX", 0, Low[0]-5, Brushes.Black);
 				}
 			}
@@ -210,11 +210,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return dir;
 		}
 		
-		public override SupportResistance GetSupportResistance(int barNo, SupportResistanceType srType) {
-			SupportResistance snr = new SupportResistance();
+		public override SupportResistanceBar GetSupportResistance(int barNo, SupportResistanceType srType) {
+			SupportResistanceBar snr = new SupportResistanceBar();
 			
 			if(srType == SupportResistanceType.Resistance) {
-				GLastIndexRecord rec = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Unknown);
+				GLastIndexRecord<double> rec = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Unknown);
 				int lcrs = -1;
 				if(rec != null)
 					lcrs = rec.BarNumber;
@@ -229,7 +229,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 				if(lcrs > 0) {
 					double open_lcrs = Open.GetValueAt(lcrs);
 					double close_lcrs = Close.GetValueAt(lcrs);
-					snr.SetSptRstValue(Math.Max(open_lcrs,close_lcrs));
+					snr.BarNo = lcrs;
+					snr.SnRType = SupportResistanceType.Resistance;
+					snr.SnRPriceType = open_lcrs > close_lcrs ? PriceSubtype.Open : PriceSubtype.Close;
+					//snr.SetSptRstValue(Math.Max(open_lcrs,close_lcrs));
 				}
 			}
 			return snr;
@@ -306,7 +309,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[Browsable(false)]
 		[XmlIgnore]
-		public GLastIndexRecorder InflectionRecorder
+		public GLastIndexRecorder<double> InflectionRecorder
 		{
 			get { return inflectionRecorder;}
 			

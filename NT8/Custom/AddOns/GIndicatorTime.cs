@@ -219,10 +219,34 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		#endregion
-				
+	
+		#region Properties
+		[Description("Hour of opening start")]
+ 		[Range(0, 23), NinjaScriptProperty]		
+		[Display(Name="OpenStartH", Order=0, GroupName="Timming")]
+		public int TM_OpenStartH
+		{ get; set; }
+
+		[Description("Minute of opening start")]
+		[Range(0, 59), NinjaScriptProperty]
+		[Display(Name="OpenStartM", Order=1, GroupName="Timming")]
+		public int TM_OpenStartM
+		{ get; set; }
+		
+		#endregion
+		
+		#region Variables for Properties	
+		private int tm_OpenStartH = 8; //Default setting for open Start hour
+		private int tm_OpenStartM = 30; //Default setting for open Start minute		
+        
+		private int tm_OpenEndH = 10; //Default setting for open End hour
+		private int tm_OpenEndM = 30; //Default setting for open End minute
+		#endregion
 	}
+
 }
 
+/*
 #region NinjaScript generated code. Neither change nor remove.
 
 namespace NinjaTrader.NinjaScript.Indicators
@@ -279,3 +303,4 @@ namespace NinjaTrader.NinjaScript.Strategies
 }
 
 #endregion
+*/

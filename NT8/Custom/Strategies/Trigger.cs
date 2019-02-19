@@ -47,7 +47,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// 4) if there is signal fired for entry
 		/// </summary>
 		public virtual void CheckTrigger() {
-			if(IsLiquidateTime(TG_TimeLiqH, TG_TimeLiqM)) {
+			if(IsLiquidateTime(TG_TradeLiqH, TG_TradeLiqM)) {
 				CloseAllPositions();
 			}
 			else {
@@ -70,8 +70,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public bool IsTradingTime(int session_start) {
 			//Bars.Session.GetNextBeginEnd(DateTime time, out DateTime sessionBegin, out DateTime sessionEnd)
-			int time_start = indicatorProxy.GetTimeByHM(TG_TimeStartH, TG_TimeStartM);
-			int time_end = indicatorProxy.GetTimeByHM(TG_TimeEndH, TG_TimeEndM);
+			int time_start = indicatorProxy.GetTimeByHM(TG_TradeStartH, TG_TradeStartM);
+			int time_end = indicatorProxy.GetTimeByHM(TG_TradeEndH, TG_TradeEndM);
 			int time_now = ToTime(Time[0]);
 			bool isTime= false;
 			if(time_start >= session_start) {
@@ -253,73 +253,114 @@ namespace NinjaTrader.NinjaScript.Strategies
             set { tg_EnPullbackMaxPnts = Math.Max(2, value); }
         }
 
-        [Description("Time start hour")]
+        [Description("Trade start hour")]
  		[Range(0, 23), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeStartH", GroupName = "Trigger", Order = 6)]
-        public int TG_TimeStartH
+        public int TG_TradeStartH
         {
-            get { return tg_TimeStartH; }
-            set { tg_TimeStartH = Math.Max(0, value); }
+            get { return tg_TradeStartH; }
+            set { tg_TradeStartH = Math.Max(0, value); }
         }
 		
-        [Description("Time start minute")]
+        [Description("Trade start minute")]
  		[Range(0, 59), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeStartM", GroupName = "Trigger", Order = 7)]
-        public int TG_TimeStartM
+        public int TG_TradeStartM
         {
-            get { return tg_TimeStartM; }
-            set { tg_TimeStartM = Math.Max(0, value); }
+            get { return tg_TradeStartM; }
+            set { tg_TradeStartM = Math.Max(0, value); }
         }
 		
-        [Description("Time end hour")]
+        [Description("Trade end hour")]
  		[Range(0, 23), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeEndH", GroupName = "Trigger", Order = 8)]
-        public int TG_TimeEndH
+        public int TG_TradeEndH
         {
-            get { return tg_TimeEndH; }
-            set { tg_TimeEndH = Math.Max(0, value); }
+            get { return tg_TradeEndH; }
+            set { tg_TradeEndH = Math.Max(0, value); }
         }
 
-        [Description("Time end minute")]
+        [Description("Trade end minute")]
  		[Range(0, 59), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeEndM", GroupName = "Trigger", Order = 9)]
-        public int TG_TimeEndM
+        public int TG_TradeEndM
         {
-            get { return tg_TimeEndM; }
-            set { tg_TimeEndM = Math.Max(0, value); }
+            get { return tg_TradeEndM; }
+            set { tg_TradeEndM = Math.Max(0, value); }
         }
 		
         [Description("Liquidate hour")]
  		[Range(0, 23), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeLiqH", GroupName = "Trigger", Order = 10)]
-        public int TG_TimeLiqH
+        public int TG_TradeLiqH
         {
-            get { return tg_TimeLiqH; }
-            set { tg_TimeLiqH = Math.Max(0, value); }
+            get { return tg_TradeLiqH; }
+            set { tg_TradeLiqH = Math.Max(0, value); }
         }
 
         [Description("Liquidate minute")]
  		[Range(0, 59), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeLiqM", GroupName = "Trigger", Order = 11)]
-        public int TG_TimeLiqM
+        public int TG_TradeLiqM
         {
-            get { return tg_TimeLiqM; }
-            set { tg_TimeLiqM = Math.Max(0, value); }
+            get { return tg_TradeLiqM; }
+            set { tg_TradeLiqM = Math.Max(0, value); }
+        }
+
+        [Description("Open start hour")]
+ 		[Range(0, 23), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenStartH", GroupName = "Trigger", Order = 12)]
+        public int TG_OpenStartH
+        {
+            get { return tg_OpenStartH; }
+            set { tg_OpenStartH = Math.Max(0, value); }
+        }
+
+        [Description("Open start minute")]
+ 		[Range(0, 59), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenStartM", GroupName = "Trigger", Order = 13)]
+        public int TG_OpenStartM
+        {
+            get { return tg_OpenStartM; }
+            set { tg_OpenStartM = Math.Max(0, value); }
         }
 		
+        [Description("Open end hour")]
+ 		[Range(0, 23), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenEndH", GroupName = "Trigger", Order = 14)]
+        public int TG_OpenEndH
+        {
+            get { return tg_OpenEndH; }
+            set { tg_OpenEndH = Math.Max(0, value); }
+        }
+
+        [Description("Open end minute")]
+ 		[Range(0, 59), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenEndM", GroupName = "Trigger", Order = 15)]
+        public int TG_OpenEndM
+        {
+            get { return tg_OpenEndM; }
+            set { tg_OpenEndM = Math.Max(0, value); }
+        }		
         #endregion
 		
 		#region Variables for Properties
 
 		//time=H*10000+M*100+S, S is skipped here;
-        private int tg_TimeStartH = 1; //10100 Default setting for timeStart hour
-		private int tg_TimeStartM = 1; //10100 Default setting for timeStart minute
+        private int tg_TradeStartH = 1; //10100 Default setting for trade Start hour
+		private int tg_TradeStartM = 1; //10100 Default setting for trade Start minute
 		//private int timeStart = -1; //10100 Default setting for timeStart
-        private int tg_TimeEndH = 14; // Default setting for timeEnd hour
-		private int tg_TimeEndM = 59; // Default setting for timeEnd minute
+        private int tg_TradeEndH = 14; // Default setting for trade End hour
+		private int tg_TradeEndM = 59; // Default setting for trade End minute
 		//private int timeEnd = -1; // Default setting for timeEnd
-		private int tg_TimeLiqH = 15; //Time H to liquidate
-		private int tg_TimeLiqM = 8; //Time M to liquidate
+		private int tg_TradeLiqH = 15; //Time H to liquidate
+		private int tg_TradeLiqM = 8; //Time M to liquidate
+		
+        private int tg_OpenStartH = 8; //Default setting for open Start hour
+		private int tg_OpenStartM = 30; //Default setting for open Start minute		
+        
+		private int tg_OpenEndH = 10; //Default setting for open End hour
+		private int tg_OpenEndM = 30; //Default setting for open End minute
 		
         private double tg_EnSwingMinPnts = 10; //10 Default setting for EnSwingMinPnts
         private double tg_EnSwingMaxPnts = 35; //16 Default setting for EnSwingMaxPnts

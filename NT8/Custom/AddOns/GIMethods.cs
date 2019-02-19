@@ -207,6 +207,27 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		#endregion
 
+		#region Price Functions
+		public double GetPriceByType(int barNo, PriceSubtype priceType) {
+			Print(CurrentBar + ":GetPriceByType=" + barNo + "," + priceType);
+			double prc = 0;
+			switch(priceType) {
+				case PriceSubtype.Low:
+					prc = Bars.GetLow(barNo);
+					break;
+				case PriceSubtype.High:
+					prc = Bars.GetHigh(barNo);
+					break;
+				case PriceSubtype.Open:
+					prc = Bars.GetOpen(barNo);
+					break;
+				case PriceSubtype.Close:
+					prc = Bars.GetClose(barNo);
+					break;
+			}
+			return prc;
+		}
+		#endregion
 		#region Properties
 		
 //		[Description("If it runs for backtesting")]
@@ -224,5 +245,3 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
     }
 }
-
-

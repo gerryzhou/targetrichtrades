@@ -63,7 +63,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
-				indicatorProxy = new GIndicatorBase();
+				//indicatorProxy = new GIndicatorBase();
+				//indicatorProxy = GIndicatorProxy(1);
 				giSMI = GISMI(3, 5, 5, 8);
 				awOscillator = GIAwesomeOscillator(5, 34, 5, MovingAvgType.SMA);
 				//smaSlow = SMA(Slow);
@@ -75,6 +76,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 				AddChartIndicator(giSMI);
 				AddChartIndicator(awOscillator);
+				AddChartIndicator(indicatorProxy);
 				//AddChartIndicator(smaFast);
 				//AddChartIndicator(smaSlow);
 			}			
@@ -146,19 +148,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public TradeObj CheckEntryTrade() {			
 			if(NewOrderAllowed()) { //|| Position.Quantity == 0 giSMI.IsNewInflection(TrendDirection.Down) && 
 				if(indicatorSignal != null && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down
-					&& indicatorSignal.SnR.GetSptRstValue() > High[0]) {
+					&& indicatorProxy.GetResistance(indicatorSignal.SnR) > High[0]) {
 					tradeObj.tradeDirection = TradingDirection.Down;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 					tradeObj.SetTradeType(TradeType.Entry);
 					tradeObj.PTCalculationMode = CalculationMode.Currency;
 					tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
 					tradeObj.SLCalculationMode = CalculationMode.Price;
-					tradeObj.stopLossPrice = indicatorSignal.SnR.GetSptRstValue();
+					tradeObj.stopLossPrice = indicatorProxy.GetResistance(indicatorSignal.SnR);
 					tradeObj.barsSincePTSL = TM_BarsSincePTSL;
 					tradeObj.profitFactor = MM_ProfitFactor;
 				}
 			} else {
 				tradeObj.SetTradeType(TradeType.NoTrade);
+			}
+			if(indicatorSignal != null && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down) {
+				//Print(CurrentBar + ": GetResistance=" + indicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);
 			}
 			return tradeObj;
 		}

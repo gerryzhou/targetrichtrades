@@ -45,9 +45,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		public virtual Direction GetDirection() {return null;}
 		
-		public virtual SupportResistance GetSupport(){return null;}
-		public virtual SupportResistance GetResistance(){return null;}
-		public virtual SupportResistance GetSupportResistance(int barNo, SupportResistanceType srType){return null;}
+		//public virtual SupportResistance GetSupport(){return null;}
+		//public virtual SupportResistance GetResistance(){return null;}
+		public virtual SupportResistanceBar GetSupportResistance(int barNo, SupportResistanceType srType){return null;}
 
 		public IndicatorSignal CheckIndicatorSignal() {
 			return null;

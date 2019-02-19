@@ -27,6 +27,12 @@ using NinjaTrader.NinjaScript.AddOns;
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators
 {
+	[Gui.CategoryOrder("CustomParams", 1)] // display "CP" first
+	[Gui.CategoryOrder("GIndicator", 2)] // then "GStrategy"
+	[Gui.CategoryOrder("OSI", 3)] // then "MM"
+	[Gui.CategoryOrder("MA", 4)] // and then "TM"
+	[Gui.CategoryOrder("Timming", 5)] // and finally "TG"
+	
 	/// <summary>
 	/// It defined a set of interfaces to talk with strategy;
 	/// The derived indicators should override the methods to be able be combined with other indicators; 
@@ -37,11 +43,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				
 		#region Variables
         // User defined variables (add any user defined variables below)
-            private int startH = 9; // Default setting for StartH
-            private int startM = 5; // Default setting for StartM
-            private int endH = 11; // Default setting for EndH
-            private int endM = 5; // Default setting for EndM
-			private string accName = ""; //account name from strategy, extracting simply string for print/log;
+		private string accName = ""; //account name from strategy, extracting simply string for print/log;
 		protected string symbol = "";
 		protected int printOut = 1;
 		protected string logFile = ""; //Log file full path		
@@ -199,7 +201,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return crsov;
 		}
 		
-		public int GetLastIndexRecord(GLastIndexRecorder rec, int barNo, BarIndexType barIdxType, LookbackBarType lbBarType) {
+		public int GetLastIndexRecord(GLastIndexRecorder<double> rec, int barNo, BarIndexType barIdxType, LookbackBarType lbBarType) {
 			int idx = -1;
 			
 			return idx;
@@ -525,8 +527,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 					file.WriteLine(text);
 				}
 			}
-		}
-				
+		}				
 		
         #region Properties
         [Browsable(false)]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
@@ -543,41 +544,9 @@ namespace NinjaTrader.NinjaScript.Indicators
             get { return Values[1]; }
         }
 
-        [Description("Hour of start trading")]
-        //[GridCategory("Parameters")]
-        public int StartH
-        {
-            get { return startH; }
-            set { startH = Math.Max(0, value); }
-        }
-
-        [Description("Min of start trading")]
-        //[GridCategory("Parameters")]
-        public int StartM
-        {
-            get { return startM; }
-            set { startM = Math.Max(0, value); }
-        }
-
-        [Description("Hour of end trading")]
-        //[GridCategory("Parameters")]
-        public int EndH
-        {
-            get { return endH; }
-            set { endH = Math.Max(0, value); }
-        }
-
-        [Description("Min of end trading")]
-        //[GridCategory("Parameters")]
-        public int EndM
-        {
-            get { return endM; }
-            set { endM = Math.Max(0, value); }
-        }
-
 		[NinjaScriptProperty]
 		[XmlIgnore]
-		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName="Parameters")]
+		[Display(Name="CustomColor1", Description="Color-1", Order=0, GroupName="GIndicator")]
 		public Brush CustomColor1
 		{ get; set; }
 
@@ -590,18 +559,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[NinjaScriptProperty]
 		[Range(0, double.MaxValue)]
-		[Display(Name="CustomPrc1", Description="CustomPrc-1", Order=2, GroupName="Parameters")]
+		[Display(Name="CustomPrc1", Description="CustomPrc-1", Order=1, GroupName="GIndicator")]
 		public double CustomPrc1
 		{ get; set; }
 
 		[NinjaScriptProperty]
-		[Display(Name="CustomStr1", Description="CustomStr-1", Order=3, GroupName="Parameters")]
+		[Display(Name="CustomStr1", Description="CustomStr-1", Order=2, GroupName="GIndicator")]
 		public string CustomStr1
 		{ get; set; }
 
 		[NinjaScriptProperty]
 		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
-		[Display(Name="CustomTime1", Description="CustomTime-1", Order=4, GroupName="Parameters")]
+		[Display(Name="CustomTime1", Description="CustomTime-1", Order=3, GroupName="GIndicator")]
 		public DateTime CustomTime1
 		{ get; set; }
 		#endregion
@@ -670,8 +639,65 @@ namespace NinjaTrader.NinjaScript.Indicators
            drawTxt = draw_txt;
         }
 		#endregion		
+	}	
+}
+
+#region NinjaScript generated code. Neither change nor remove.
+
+namespace NinjaTrader.NinjaScript.Indicators
+{
+	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
+	{
+		private GIndicatorBase[] cacheGIndicatorBase;
+		public GIndicatorBase GIndicatorBase()
+		{
+			return GIndicatorBase(Input);
+		}
+
+		public GIndicatorBase GIndicatorBase(ISeries<double> input)
+		{
+			if (cacheGIndicatorBase != null)
+				for (int idx = 0; idx < cacheGIndicatorBase.Length; idx++)
+					if (cacheGIndicatorBase[idx] != null &&  cacheGIndicatorBase[idx].EqualsInput(input))
+						return cacheGIndicatorBase[idx];
+			return CacheIndicator<GIndicatorBase>(new GIndicatorBase(), input, ref cacheGIndicatorBase);
+		}
 	}
 }
+
+namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
+{
+	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
+	{
+		public Indicators.GIndicatorBase GIndicatorBase()
+		{
+			return indicator.GIndicatorBase(Input);
+		}
+
+		public Indicators.GIndicatorBase GIndicatorBase(ISeries<double> input )
+		{
+			return indicator.GIndicatorBase(input);
+		}
+	}
+}
+
+namespace NinjaTrader.NinjaScript.Strategies
+{
+	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
+	{
+		public Indicators.GIndicatorBase GIndicatorBase()
+		{
+			return indicator.GIndicatorBase(Input);
+		}
+
+		public Indicators.GIndicatorBase GIndicatorBase(ISeries<double> input )
+		{
+			return indicator.GIndicatorBase(input);
+		}
+	}
+}
+
+#endregion
 
 
 

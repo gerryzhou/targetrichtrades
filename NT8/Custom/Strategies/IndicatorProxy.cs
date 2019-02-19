@@ -35,7 +35,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 	{
 		private List<Indicator> listIndicator = new List<Indicator>();
 		
-		private IndicatorSignal indSignal;
+		protected GIndicatorProxy indicatorProxy;
+		//private IndicatorSignal indSignal;
 		
 		/// <summary>
 		/// Volatility measurement is for target, stop loss, etc.
@@ -59,9 +60,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Support and resistance is to define entry/exit level, target and stop loss
 		/// </summary>
 		/// <returns></returns>
-		public SupportResistance GetSupport(){return null;}
-		public SupportResistance GetResistance(){return null;}
-		public virtual SupportResistance GetSptRest(int barNo) {return null;}
+		public SupportResistanceBar GetSupport(){return null;}
+		//public SupportResistance GetResistance(){return null;}
+		public virtual SupportResistanceBar GetSptRest(int barNo) {return null;}
 		
 		/// <summary>
 		/// The indicator signal is to trigger entry/exit, 

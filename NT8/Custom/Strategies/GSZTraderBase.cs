@@ -35,7 +35,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	
 	public partial class GSZTraderBase : Strategy
 	{
-		protected GIndicatorBase indicatorProxy;
+		//protected GIndicatorBase indicatorProxy;
 		protected IndicatorSignal indicatorSignal;
 		protected TradeObj tradeObj;
 		
@@ -57,8 +57,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
+				indicatorProxy = GIndicatorProxy(1);
 				indicatorSignal = new IndicatorSignal();
-				indicatorProxy = new GIndicatorBase();
 				//CustomDatsSeries1 = new Series<double>(this);
 			}
 		}
