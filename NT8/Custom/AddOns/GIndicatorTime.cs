@@ -232,7 +232,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[Display(Name="OpenStartM", Order=1, GroupName="Timming")]
 		public int TM_OpenStartM
 		{ get; set; }
-		
+
+		[Description("Hour of opening end")]
+ 		[Range(0, 23), NinjaScriptProperty]		
+		[Display(Name="OpenEndH", Order=2, GroupName="Timming")]
+		public int TM_OpenEndH
+		{ get; set; }
+
+		[Description("Minute of opening end")]
+		[Range(0, 59), NinjaScriptProperty]
+		[Display(Name="OpenEndM", Order=3, GroupName="Timming")]
+		public int TM_OpenEndM
+		{ get; set; }
+			
 		#endregion
 		
 		#region Variables for Properties	
