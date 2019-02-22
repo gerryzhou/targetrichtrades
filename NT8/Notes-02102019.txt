@@ -5,3 +5,4 @@ Dev plan:
 4) Breakout Pattern-2: open/mourning breakout, the first pullback evaluation: 38.2/50/61.8
 5) Trending/pullback Pattern-1: early-trend pullback, mid-trend pullback, late-trend pullback;
 6) ES noon time range Pattern-1: resume or reversal?
+7) ZiZag: add percentage of the underling ZZ size as the threshold to generate new ZZ/pivot point;
