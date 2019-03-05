@@ -6,3 +6,24 @@ Dev plan:
 5) Trending/pullback Pattern-1: early-trend pullback, mid-trend pullback, late-trend pullback;
 6) ES noon time range Pattern-1: resume or reversal?
 7) ZiZag: add percentage of the underling ZZ size as the threshold to generate new ZZ/pivot point;
+8) Volatility measurement:
+
+Meeting minutes 03/01/2019
+Gann: 50%, 75%, 25% instead of Fib ratios;
+
+Find trades with SnR and SMI:
+trending market: the red inflection keep trending up, the SMI keep up, buy at the previous green inflection, until get the divergence action: SMI moving down, get out the trade;
+The measurement of the 50% of the SnR of the morning opening;
+negative inflection: red, or resistance;
+
+Test inflections against SMI readings to determine trend -matching inflections against SMI readings to determine if still holding momentumLook for divergence,
+ if not, we can set up a trade in the direction of trend with risk at parameters of prior inflections;
+If divergent, meaning smi not following direction of price, we are looking for a trade of reversal;
+FOr a short, we locate the last high of the red diamond, and the last high of the cyan diamond and when we lose that level, we go short;
+Testing for divergence
+At inflection, measure the SMI reading
+For negative inflection
+When next negative inflection shows, measure SMI reading
+If negative inflection of n-1 has a lower high price than the negative inflection of candle n, 
+AND SMI of n-1 candle is HIGHER than SMI of n candle, then we have divergence
+
