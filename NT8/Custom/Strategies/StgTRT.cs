@@ -33,6 +33,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	{
 		private GISMI giSMI;
 		private GIAwesomeOscillator awOscillator;
+		private GISnR giSnR;
 		
 		protected override void OnStateChange()
 		{
@@ -67,6 +68,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//indicatorProxy = GIndicatorProxy(1);
 				giSMI = GISMI(3, 5, 5, 8);
 				awOscillator = GIAwesomeOscillator(5, 34, 5, MovingAvgType.SMA);
+				giSnR = GISnR(false, true, false);
+				
 				//smaSlow = SMA(Slow);
 
 				//giSMI.Plots[0].Brush = Brushes.Blue;
@@ -76,12 +79,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 				AddChartIndicator(giSMI);
 				AddChartIndicator(awOscillator);
+				AddChartIndicator(giSnR);
 				AddChartIndicator(indicatorProxy);
 				//AddChartIndicator(smaFast);
 				//AddChartIndicator(smaSlow);
 			}			
 			else if (State == State.Configure)
 			{
+				AddDataSeries(Data.BarsPeriodType.Day, 1);
 				//IncludeCommission = true;
 				tradeObj = new TradeObj(this);
 				tradeObj.barsSincePTSL = TM_BarsSincePTSL;
@@ -90,6 +95,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		protected override void OnBarUpdate()
 		{
+			//if(BarsInProgress !=0) return;
 			base.OnBarUpdate();
 			//Print(CurrentBar.ToString() + " -- StgTRT - Add your custom strategy logic here.");
 			indicatorProxy.Update();
@@ -112,6 +118,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override IndicatorSignal GetIndicatorSignal() {
 			giSMI.Update();
 			awOscillator.Update();
+			giSnR.Update();
 			IndicatorSignal indSignal = null; //= new IndicatorSignal();
 			int infl = giSMI.InflectionRecorder.GetLastIndex(CurrentBar, LookbackBarType.Down);//GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarsAgo);
 			//Print(CurrentBar + ": GetIndicatorSignal giSMI.InflectionRecorder.GetLastIndex=" + infl);

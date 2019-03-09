@@ -52,83 +52,9 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	public enum MovingAvgType {SMA, EMA, TMA};
 	
 	public enum FibRatioType { R1, R2, R3, R4, R5, E1, E2, E3, E4, E5, E6};
-	/// <summary>
-	/// Fibonacci ratio: retracement and extensions
-	///  Gartley Pattern: 0.618, 0.382, 0.786, 1.618
-	/// </summary>
-	/// 
-	public static class FibRatio {
-		public const double R1 = 0.236;
-		public const double R2 = 0.382;
-		public const double R3 = 0.5;
-		public const double R4 = 0.618;
-		public const double R5 = 0.764;
-		public const double E1 = 1 + R1;
-		public const double E2 = 1 + R2;
-		public const double E3 = 1 + R3;
-		public const double E4 = 1 + R4;
-		public const double E5 = 2;
-		public const double E6 = 2 + R4;
-		
-		public static double GetFibRetracePrice(double prc, FibRatioType fibRType) {
-			switch(fibRType) {
-				case FibRatioType.R1: prc = prc*R1;
-					break;
-				case FibRatioType.R2: prc = prc*R2;
-					break;
-				case FibRatioType.R3: prc = prc*R3;
-					break;
-				case FibRatioType.R4: prc = prc*R4;
-					break;
-				case FibRatioType.R5: prc = prc*R5;
-					break;
-			}
-			return prc;
-		}
-		
-		public static double GetFibExtensionPrice(double prc, FibRatioType fibRType) {
-			switch(fibRType) {
-				case FibRatioType.E1: prc = prc*E1;
-					break;
-				case FibRatioType.E2: prc = prc*E2;
-					break;
-				case FibRatioType.E3: prc = prc*E3;
-					break;
-				case FibRatioType.E4: prc = prc*E4;
-					break;
-				case FibRatioType.E5: prc = prc*E5;
-					break;
-				case FibRatioType.E6: prc = prc*E6;
-					break;
-			}			
-			return prc;
-		}
-		
-	}
+	
+	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4};
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -77,7 +77,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			GIFibonacci fib = GIFibonacci(1);
 
-			//Print(CurrentBar + ":BarsInProgress=" + BarsInProgress);
+			Print(CurrentBar + ":BarsInProgress, Bars.GetDayBar(1)=" + BarsInProgress + "," + Bars.GetDayBar(1));
 		    if (BarsInProgress == 1 || BarsInProgress == 2)
    			return;
  

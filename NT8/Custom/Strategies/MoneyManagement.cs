@@ -188,9 +188,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		protected override void OnPositionUpdate(Cbi.Position position, double averagePrice, 
 			int quantity, Cbi.MarketPosition marketPosition)
-		{
-			int bsx = BarsSinceExitExecution();
-			int bse = BarsSinceEntryExecution();
+		{			
+			int bsx = BarsSinceExitExecution(0, "", 0);
+			int bse = BarsSinceEntryExecution(0, "", 0);
 			
 			Print(CurrentBar + ":OnPositionUpdate- quantity, marketPosition, BarsSinceExit, BarsSinceEntry=" 
 			+ quantity + "," + marketPosition + ","

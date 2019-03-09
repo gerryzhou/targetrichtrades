@@ -54,7 +54,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// Key1=Date; Key2=Time;
 		/// </summary>		
 		protected Dictionary<string,Dictionary<int,PriceAction>> Dict_SpvPR = null;
-		
+		private List<SpvPR> List_SpvPR = null; 
 		/// <summary>
 		/// Bitwise op to tell which Price Action allowed to be the supervised entry approach
 		/// 0111 1111: [0 UnKnown RngWide RngTight DnWide DnTight UpWide UpTight]
@@ -92,7 +92,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return filesInOrder;
 		}
 		
-		protected void ReadSpvPRLine(string line) {
+		protected Dictionary<int,PriceAction> ReadSpvPRLine(string line, out string key) {
 				string[] line_pa = line.Split(';');
 				Dictionary<int,PriceAction> mkt_ctxs = new Dictionary<int,PriceAction>();
 				for(int i=1; i<line_pa.Length; i++) {
@@ -112,9 +112,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 					
 					mkt_ctxs.Add(t, new PriceAction(pat, minUp, maxUp, minDn, maxDn));
 				}
-				if(mkt_ctxs.Count > 0) {
-					Dict_SpvPR.Add(line_pa[0], mkt_ctxs);
-				}			
+//				if(mkt_ctxs.Count > 0) {
+//					Dict_SpvPR.Add(line_pa[0], mkt_ctxs);
+//				}
+				key = line_pa[0];
+				return mkt_ctxs;
 		}
 		
 		/// <summary>
@@ -142,9 +144,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 			while((line = file.ReadLine()) != null)  
 			{
 				if(line.StartsWith("//")) continue; //comments line, skip it;
-				
-				ReadSpvPRLine(line.Substring(1, line.Length-3));//remove leading " and ending ",
+				string key;
+				Dictionary<int,PriceAction> mkt_ctxs = ReadSpvPRLine(line.Substring(1, line.Length-3), out key);//remove leading " and ending ",
 				//Print(line);
+				if(mkt_ctxs.Count > 0) {
+					Dict_SpvPR.Add(key, mkt_ctxs);
+				}
 				counter++;
 			}
 
@@ -163,6 +168,32 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <summary>
 		/// 20170522;9501459:UpTight#10-16-3-5
 		/// </summary>
+		/// <returns></returns>
+		public List<SpvPR> LoadSpvPRList() {
+			//Dictionary<string,Dictionary<int,PriceActionType>> 
+			Dict_SpvPR = new Dictionary<string,Dictionary<int,PriceAction>>();			
+			List_SpvPR = new List<SpvPR>();
+			
+			int counter = 0;  
+			//string line;
+			foreach(string dayPR in SpvDailyPattern.spvPRDay) {
+				//Print(dayPR);
+				string key;
+				int key_int;
+				Dictionary<int,PriceAction> mkt_ctxs = ReadSpvPRLine(dayPR, out key);
+				int.TryParse(key, out key_int);
+				if(mkt_ctxs.Count > 0) {					
+					List_SpvPR.Add(new SpvPR(key_int, mkt_ctxs));
+				}
+				counter++;
+			}
+			//Print("ReadSpvPRList:" + counter);
+			return List_SpvPR;
+		}
+
+		/// <summary>
+		/// 20170522;9501459:UpTight#10-16-3-5
+		/// </summary>
 		/// <param name="srcDir"></param>
 		/// <param name="symbol"></param>
 		/// <returns></returns>
@@ -174,13 +205,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 			//string line;
 			foreach(string dayPR in SpvDailyPattern.spvPRDay) {
 				//Print(dayPR);
-				ReadSpvPRLine(dayPR);
+				//ReadSpvPRLine(dayPR);
 				counter++;
 			}
 			//Print("ReadSpvPRList:" + counter);
 			return Dict_SpvPR;
 		}
-
+		
 		#endregion
 		
 		#region Properties

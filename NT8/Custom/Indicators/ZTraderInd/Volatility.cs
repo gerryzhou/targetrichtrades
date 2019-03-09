@@ -26,7 +26,16 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 {
 	public class Volatility
 	{
-
+		/// <summary>
+		/// Volatility in a time period: 
+		/// max range;
+		/// max swing;
+		/// average swing size;
+		/// 
+		/// </summary>
+		private double hi;
+		
 	}
 }
+
 

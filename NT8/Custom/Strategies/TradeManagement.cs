@@ -68,8 +68,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		protected bool NewOrderAllowed()
 		{
-			int bsx = BarsSinceExitExecution();
-			int bse = BarsSinceEntryExecution();		
+			if(BarsInProgress !=0) return false;
+			
+			int bsx = BarsSinceExitExecution(0, "", 0);
+			int bse = BarsSinceEntryExecution(0, "", 0);		
 			//Print(CurrentBar + ":" + this.Name + " NewOrderAllowed, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
 			
 			double pnl = CheckAccPnL();//GetAccountValue(AccountItem.RealizedProfitLoss);
@@ -282,8 +284,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		protected override void OnExecutionUpdate(Execution execution, string executionId, double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
 		{
-			int bsx = BarsSinceExitExecution();
-			int bse = BarsSinceEntryExecution();
+			if(BarsInProgress !=0) return;
+			
+			int bsx = BarsSinceExitExecution(0, "", 0);
+			int bse = BarsSinceEntryExecution(0, "", 0);
 			
 			Print(CurrentBar + ":OnExecutionUpdate- quantity, marketPosition, price, BarsSinceExit, BarsSinceEntry=" 
 			+ quantity + "," + marketPosition + "," + price + ","
@@ -310,8 +314,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int quantity, int filled, double averageFillPrice, 
 			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
 		{
-			int bsx = BarsSinceExitExecution();
-			int bse = BarsSinceEntryExecution();
+			if(BarsInProgress !=0) return;
+			
+			int bsx = BarsSinceExitExecution(0, "", 0);
+			int bse = BarsSinceEntryExecution(0, "", 0);
 			
 			Print(CurrentBar + ":OnOrderUpdate-" + order.Name + "-" + order.FromEntrySignal + ";" + order.OrderTypeString
 			+ ";" + order.OrderState.ToString() + ";" + order.OrderAction.ToString()

@@ -150,8 +150,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnBarUpdate()
 		{
 			//Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
-			int bsx = BarsSinceExitExecution();
-			int bse = BarsSinceEntryExecution();
+			int bsx = BarsSinceExitExecution(0, "", 0);
+			int bse = BarsSinceEntryExecution(0, "", 0);
 			
 			//Print(CurrentBar + ":" + this.Name + " OnBarUpdate, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
 			
