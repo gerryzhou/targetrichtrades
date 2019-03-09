@@ -16,7 +16,8 @@ trending market: the red inflection keep trending up, the SMI keep up, buy at th
 The measurement of the 50% of the SnR of the morning opening;
 negative inflection: red, or resistance;
 
-Test inflections against SMI readings to determine trend -matching inflections against SMI readings to determine if still holding momentumLook for divergence,
+Test inflections against SMI readings to determine trend -matching inflections against SMI readings to determine if still holding momentum
+Look for divergence,
  if not, we can set up a trade in the direction of trend with risk at parameters of prior inflections;
 If divergent, meaning smi not following direction of price, we are looking for a trade of reversal;
 FOr a short, we locate the last high of the red diamond, and the last high of the cyan diamond and when we lose that level, we go short;
