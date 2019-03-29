@@ -1,5 +1,6 @@
 #region Using declarations
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -63,7 +64,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				PaintPriceMarkers			= true;
 				ScaleJustification			= NinjaTrader.Gui.Chart.ScaleJustification.Right;
 				IsSuspendedWhileInactive	= true;
-				MaximumBarsLookBack = MaximumBarsLookBack.Infinite;
+				MaximumBarsLookBack 		= MaximumBarsLookBack.Infinite;
 
 				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.Line, "SMI");
 				AddPlot(new Stroke(Brushes.Yellow, 4), PlotStyle.Line, "SMITMA");
@@ -101,7 +102,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 			{
 				return;
 			}
-			
 			//inflectionRecorder.PrintRecords();
 			//Stochastic Momentum = SM {distance of close - midpoint}
 		 	sms[0] = (Close[0] - 0.5 * ((MAX(High, range)[0] + MIN(Low, range)[0])));
@@ -129,14 +129,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 				if(tr > 0) PlotBrushes[1][0] = Brushes.Green;
 				else if(tr < 0) PlotBrushes[1][0] = Brushes.Red;
 				
-				if(infl > 0) {
-					inflection[1] = 1;
+				if(infl < 0) {
+					inflection[1] = -1;
 					LastInflection = CurrentBar - 1;
 					inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastInflection, LookbackBarType.Up));
 					DrawDiamond(1, "res"+CurrentBar, (3*High[1]-Low[1])/2, 0, Brushes.Red);
 				}
-				else if (infl < 0) {
-					inflection[1] = -1;
+				else if (infl > 0) {
+					inflection[1] = 1;
 					LastInflection = CurrentBar - 1;
 					inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastInflection, LookbackBarType.Down));
 					DrawDiamond(1, "spt"+CurrentBar, (3*Low[1]-High[1])/2, 0, Brushes.Aqua);
@@ -178,17 +178,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return tr;
 		}
 		
-		private int GetInflection(ISeries<double> d){
-			int inft = 0;//inflection[0] = 0;
-
-			if(d[1].ApproxCompare(d[0]) > 0 && d[1].ApproxCompare(d[2]) > 0) 
-				inft = 1;//inflection[1] = 1;
-			else if(d[1].ApproxCompare(d[0]) < 0 && d[1].ApproxCompare(d[2]) < 0)
-				inft = -1;//inflection[1] = -1;
-			//Print("inft=" + (CurrentBar-1).ToString() + "," + inft);
-			return inft;//inflection[1];
-		}
-		
 		public Series<int> GetInflection() {
 			return inflection;
 		}
@@ -208,6 +197,53 @@ namespace NinjaTrader.NinjaScript.Indicators
 			else if (GetTrendByMA() < 0) dir.TrendDir = TrendDirection.Down;
 			//Print(CurrentBar.ToString() + " -- GISMI GetTrendByMA(), GetDirection=" + GetTrendByMA() + "," + dir.TrendDir.ToString());
 			return dir;
+		}
+
+		/// <summary>
+		/// Get the high of last support inflection and low of last resistence inflection
+		/// </summary>
+		/// <param name="barNo">BarNo to lookback from</param>
+		/// <returns></returns>
+		public override SupportResistanceRange<SupportResistanceBar> GetSupportResistance(int barNo) {
+			SupportResistanceRange<SupportResistanceBar> rng = new SupportResistanceRange<SupportResistanceBar>();
+			SupportResistanceBar rst = new SupportResistanceBar();
+			SupportResistanceBar spt = new SupportResistanceBar();
+
+			GLastIndexRecord<double> rec1 = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Down);
+			GLastIndexRecord<double> rec2 = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Up);
+			int lcrs1 = -1, lcrs2 = -1;
+			if(rec1 != null) {
+				lcrs1 = rec1.BarNumber;
+			}
+			if(rec2 != null) {
+				lcrs2 = rec2.BarNumber;
+			}
+			if(barNo > 17600 && barNo < 17650)
+				Print(CurrentBar + "-Rst, Spt, barNo=" + lcrs1 + "," + lcrs2 + "," + barNo);
+			//isolate the last inflection 
+				//LastInflection = GetLastInflection(GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarNO);
+			
+			//lookback to the crossover and if that candle is bearish we isolate the open as resistance;
+			// if that candlestick is bullish we isolate the close as resistance
+			//LastCrossover = GetLastCrossover(GetCrossover(), LastInflection, CrossoverType.Both, BarIndexType.BarsAgo);
+			if (lcrs1 > 0) {
+				double open_lcrs = Open.GetValueAt(lcrs1);
+				double close_lcrs = Close.GetValueAt(lcrs1);
+				rst.BarNo = lcrs1;
+				rst.SnRType = SupportResistanceType.Resistance;
+				rst.SnRPriceType = open_lcrs < close_lcrs ? PriceSubtype.Open : PriceSubtype.Close;
+				rng.Resistance = rst;
+			}
+			if (lcrs2 > 0) {
+				double open_lcrs = Open.GetValueAt(lcrs2);
+				double close_lcrs = Close.GetValueAt(lcrs2);
+				spt.BarNo = lcrs2;
+				spt.SnRType = SupportResistanceType.Support;
+				spt.SnRPriceType = open_lcrs > close_lcrs ? PriceSubtype.Open : PriceSubtype.Close;
+				rng.Support = spt;
+			}				
+			
+			return rng;
 		}
 		
 		public override SupportResistanceBar GetSupportResistance(int barNo, SupportResistanceType srType) {
@@ -238,6 +274,34 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return snr;
 		}
 
+		/// <summary>
+		/// Testing for divergence
+		/// At inflection, measure the SMI reading
+		/// For negative inflection
+		/// When next negative inflection shows, measure SMI reading
+		/// If negative inflection of n-1 has a lower high price than the negative inflection of candle n, 
+		/// AND SMI of n-1 candle is HIGHER than SMI of n candle, then we have divergence
+		/// </summary>
+		/// <returns></returns>
+		public override DivergenceType CheckDivergence() {
+			int infl = GetInflection(SMITMA);
+			if(infl < 0) {
+				int infl_bar = this.GetLastInflection( GetInflection(), CurrentBar-1, TrendDirection.Up, BarIndexType.BarNO);
+				if(infl_bar > 0 && High[CurrentBar-infl_bar] < High[0]) {
+					if(SMITMA[CurrentBar-infl_bar] > SMITMA[0]) return DivergenceType.Divergent;
+					else if (SMITMA[CurrentBar-infl_bar] < SMITMA[0]) return DivergenceType.Convergent;
+				}
+			}
+			else if(infl > 0) {
+				int infl_bar = this.GetLastInflection( GetInflection(), CurrentBar-1, TrendDirection.Down, BarIndexType.BarNO);
+				if(infl_bar > 0 && Low[CurrentBar-infl_bar] > Low[0]) {
+					if(SMITMA[CurrentBar-infl_bar] < SMITMA[0]) return DivergenceType.Divergent;
+					else if (SMITMA[CurrentBar-infl_bar] > SMITMA[0]) return DivergenceType.Convergent;
+				}
+			}
+			
+			return DivergenceType.UnKnown;
+		}
 		
 		private void DrawDiamond(int barsBack, string tag, double prc, double offset, SolidColorBrush brush) {				
 			// Instantiates a red diamond on the current bar 1 tick below the low

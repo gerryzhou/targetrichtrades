@@ -228,6 +228,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return prc;
 		}
 		#endregion
+		
 		#region Properties
 		
 //		[Description("If it runs for backtesting")]

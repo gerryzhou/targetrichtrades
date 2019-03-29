@@ -131,7 +131,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					//lookback to the crossover and if that candle is bearish we isolate the open as resistance;
 					// if that candlestick is bullish we isolate the close as resistance
 					//giSMI.LastCrossover = giSMI.GetLastCrossover(giSMI.GetCrossover(), CurrentBar-inft, CrossoverType.Both);
-					indSignal.SnR = giSMI.GetSupportResistance(infl, SupportResistanceType.Resistance);
+					indSignal.SnR.Resistance = giSMI.GetSupportResistance(infl, SupportResistanceType.Resistance);
 				} catch(Exception ex) {
 					Print("GetIndicatorSignal ex=" + ex.Message);
 				}
@@ -155,14 +155,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public TradeObj CheckEntryTrade() {			
 			if(NewOrderAllowed()) { //|| Position.Quantity == 0 giSMI.IsNewInflection(TrendDirection.Down) && 
 				if(indicatorSignal != null && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down
-					&& indicatorProxy.GetResistance(indicatorSignal.SnR) > High[0]) {
+					&& indicatorProxy.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
 					tradeObj.tradeDirection = TradingDirection.Down;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 					tradeObj.SetTradeType(TradeType.Entry);
 					tradeObj.PTCalculationMode = CalculationMode.Currency;
 					tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
 					tradeObj.SLCalculationMode = CalculationMode.Price;
-					tradeObj.stopLossPrice = indicatorProxy.GetResistance(indicatorSignal.SnR);
+					tradeObj.stopLossPrice = indicatorProxy.GetResistance(indicatorSignal.SnR.Resistance);
 					tradeObj.barsSincePTSL = TM_BarsSincePTSL;
 					tradeObj.profitFactor = MM_ProfitFactor;
 				}

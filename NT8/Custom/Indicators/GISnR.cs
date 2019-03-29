@@ -78,9 +78,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 			GIFibonacci fib = GIFibonacci(1);
 
 			Print(CurrentBar + ":BarsInProgress, Bars.GetDayBar(1)=" + BarsInProgress + "," + Bars.GetDayBar(1));
-		    if (BarsInProgress == 1 || BarsInProgress == 2)
-   			return;
- 
+		    if (BarsInProgress != 0) return;
+
 			if(Bars.GetDayBar(1) != null) {
 			    Print(CurrentBar + ": day[1],[0]'s high,low are: [" + Bars.GetDayBar(1).High + "," + Bars.GetDayBar(1).Low + "]"
 				+ ",[" + CurrentDayOHL().CurrentHigh[0] + "," + CurrentDayOHL().CurrentLow[0] + "]");

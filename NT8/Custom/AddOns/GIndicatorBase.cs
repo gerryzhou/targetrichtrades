@@ -154,6 +154,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		#region Search Functions
+		
+		public int GetInflection(ISeries<double> d){
+			int inft = 0;//inflection[0] = 0;
+
+			if(d[1].ApproxCompare(d[0]) > 0 && d[1].ApproxCompare(d[2]) > 0) 
+				inft = -1;//inflection[1] = 1;
+			else if(d[1].ApproxCompare(d[0]) < 0 && d[1].ApproxCompare(d[2]) < 0)
+				inft = 1;//inflection[1] = -1;
+			//Print("inft=" + (CurrentBar-1).ToString() + "," + inft);
+			return inft;//inflection[1];
+		}
+		
 		public int GetLastBar4Inflection(Series<int> inflection, int curBar) {
 			int n = 0;
 			for(int i=1; i>curBar-BarsRequiredToPlot; i--) {

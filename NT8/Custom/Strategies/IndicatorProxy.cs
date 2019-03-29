@@ -65,11 +65,26 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual SupportResistanceBar GetSptRest(int barNo) {return null;}
 		
 		/// <summary>
+		/// Check if divergence occurs in this indicator;
+		/// </summary>
+		/// <returns></returns>
+		public virtual DivergenceType CheckDivergence(GIndicatorBase indicator) {
+			return DivergenceType.UnKnown;
+		}		
+		
+		/// <summary>
 		/// The indicator signal is to trigger entry/exit, 
 		/// or modify existing orders for extry/exit;
 		/// </summary>
 		/// <returns></returns>
 		public virtual IndicatorSignal GetIndicatorSignal() {return null;}
+		
+		/// <summary>
+		/// Detect if the market condition has changed or not since last signal
+		/// </summary>
+		/// <returns></returns>
+		public bool HasMarketContextChanged() {return false;}
+		
 		
 		#region Variables
         // User defined variables (add any user defined variables below)

@@ -43,22 +43,18 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double stopLossIncTic = 4; //4 Default tick Amt for StopLoss increase Amt
 		public double breakEvenAmt = 150; //150 the profits amount to trigger setting breakeven order
 		public double trailingSLAmt = 100; //300 Default setting for trailing Stop Loss Amt
+		
 		public double dailyLossLmt = -200; //-300 the daily loss limit amount
 		public double profitFactor = 0.5;
-
-		public bool enTrailing = true; //use trailing entry: counter pullback bars or simple enOffsetPnts
-		public bool ptTrailing = true; //use trailing profit target every bar
-		public bool slTrailing = true; //use trailing stop loss every bar
-		
+	
 		public CalculationMode PTCalculationMode = CalculationMode.Currency;
 		public CalculationMode SLCalculationMode = CalculationMode.Currency;	
 		public CalculationMode BECalculationMode = CalculationMode.Currency;
-		
+
 		#endregion
 		
 		#region Trade Mgmt variables
 		
-		public double enOffsetPnts = 1.25;//instStrategy.TM_EnOffsetPnts;//Price offset for entry
 		public int enCounterPBBars = 1;//Bar count of pullback for breakout entry setup
 		
 		public int minutesChkEnOrder = 20; //how long before checking an entry order filled or not
@@ -67,17 +63,13 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public int barsHoldEnOrd = 10; // Bars count since en order was issued
         public int barsSincePTSL = 1;//instStrategy.TM_BarsSincePTSL; // Bar count since last P&L was filled
 		public int barsToCheckPnL = 2; // Bar count to check P&L since the entry
+
+		public int barsSinceEnOrd = 0; // bar count since the en order issued
 		
 		#endregion
 		
 		#region Order Objects
-		
-		public Order entryOrder = null;
-		public Order profitTargetOrder = null;
-		public Order stopLossOrder = null;
-		public double trailingPTTic = 36; //400, tick amount of trailing target
-		public double trailingSLTic = 16; // 200, tick amount of trailing stop loss
-		public int barsSinceEnOrd = 0; // bar count since the en order issued
+		private BracketOrderBase bracketOrder = new BracketOrderBase();
 		
 		#endregion
 		
@@ -96,8 +88,17 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			barsHoldEnOrd = instStrategy.TM_BarsHoldEnOrd;
 	        barsSincePTSL = instStrategy.TM_BarsSincePTSL;
 			barsToCheckPnL = instStrategy.TM_BarsToCheckPnL;
-			
 		}
+		
+		#region Properties
+		[Browsable(false)]
+		[XmlIgnore()]
+		public BracketOrderBase BracketOrder
+		{
+			get { return bracketOrder; }
+			set { bracketOrder = value; }
+		}		
+		#endregion
 		
 		#region Other Properties
 		public TradeType GetTradeType() {

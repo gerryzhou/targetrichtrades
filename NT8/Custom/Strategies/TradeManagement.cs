@@ -42,7 +42,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			}
 		}
 		
-		public virtual void PutTrade() {}
+		public virtual void PutTrade() {
+			Print(CurrentBar + "::" + this.ToString());
+		}
 		
 		public virtual TradeObj CheckExitTrade() {
 			if(Position.MarketPosition == MarketPosition.Flat) return null;
@@ -59,14 +61,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return tradeObj;
 		}
 		
-		protected virtual TradeObj CheckEntryTrade() {
-			if(NewOrderAllowed()) {
-
-			}
+		/// <summary>
+		/// Check if new entry trade could be generated
+		/// </summary>
+		/// <returns></returns>
+		public virtual TradeObj CheckNewEntryTrade() {
+//			if(NewOrderAllowed()) {
+//			}
 			return null;
 		}
 		
-		protected bool NewOrderAllowed()
+		public virtual bool NewOrderAllowed()
 		{
 			if(BarsInProgress !=0) return false;
 			
@@ -110,7 +115,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 			if (IsTradingTime(170000) && Position.Quantity == 0)
 			{
-				if (tradeObj.entryOrder == null || tradeObj.entryOrder.OrderState != OrderState.Working || MM_EnTrailing)
+				if (tradeObj.BracketOrder.EntryOrder == null || tradeObj.BracketOrder.EntryOrder.OrderState != OrderState.Working || MM_EnTrailing)
 				{					
 					if(bsx < 0 || bsx > tradeObj.barsSincePTSL) //if(bsx == -1 || bsx > tradeObj.barsSincePtSl)
 					{
@@ -120,13 +125,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 					} //else 
 						//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + "-NewOrderAllowed=false-[bsx,barsSincePtSl]" + bsx + "," + barsSincePtSl + " - " + Get24HDateTime(Time[0]));
 				} //else
-					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + "-NewOrderAllowed=false-[entryOrder.OrderState,entryOrder.OrderType]" + entryOrder.OrderState + "," + entryOrder.OrderType + " - " + Get24HDateTime(Time[0]));
+					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + "-NewOrderAllowed=false-[BracketOrder.EntryOrder.OrderState,BracketOrder.EntryOrder.OrderType]" + BracketOrder.EntryOrder.OrderState + "," + BracketOrder.EntryOrder.OrderType + " - " + Get24HDateTime(Time[0]));
 			}
 			
 			return false;
 		}
 		
-		protected void NewShortLimitOrder(string msg, double zzGap, double curGap)
+		public virtual void NewShortLimitOrder(string msg, double zzGap, double curGap)
 		{
 			double prc = (MM_EnTrailing && TM_EnCounterPBBars>0) ? Close[0]+TM_EnOffsetPnts : High[0]+TM_EnOffsetPnts;
 			
@@ -144,39 +149,63 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				giParabSAR.PrintLog(true, !backTest, log_file, logText);
 //			}
 			//enCounterPBBars
-			if(tradeObj.entryOrder == null) {
+			if(tradeObj.BracketOrder.EntryOrder == null) {
 //				if(TG_PrintOut > -1)
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + msg + ", EnterShortLimit called short price=" + prc + "--" + Get24HDateTime(Time[0]));			
 			}
-			else if (tradeObj.entryOrder.OrderState == OrderState.Working) {
+			else if (tradeObj.BracketOrder.EntryOrder.OrderState == OrderState.Working) {
 //				if(TG_PrintOut > -1)
-					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + msg +  ", EnterShortLimit updated short price (old, new)=(" + entryOrder.LimitPrice + "," + prc + ") -- " + Get24HDateTime(Time[0]));		
-				CancelOrder(tradeObj.entryOrder);
-				//entryOrder = EnterShortLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
+					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + msg +  ", EnterShortLimit updated short price (old, new)=(" + BracketOrder.EntryOrder.LimitPrice + "," + prc + ") -- " + Get24HDateTime(Time[0]));		
+				CancelOrder(tradeObj.BracketOrder.EntryOrder);
+				//BracketOrder.EntryOrder = EnterShortLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
 			}
-			tradeObj.entryOrder = EnterShortLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
+			tradeObj.BracketOrder.EntryOrder = EnterShortLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
 			tradeObj.barsSinceEnOrd = 0;
 		}
 		
-		protected void NewLongLimitOrder(string msg, double zzGap, double curGap)
+		public virtual void NewLongLimitOrder(string msg, double zzGap, double curGap)
 		{
 			double prc = (MM_EnTrailing && TM_EnCounterPBBars>0) ? Close[0]-TM_EnOffsetPnts :  Low[0]-TM_EnOffsetPnts;
 			
-			if(tradeObj.entryOrder == null) {
-				tradeObj.entryOrder = EnterLongLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
+			if(tradeObj.BracketOrder.EntryOrder == null) {
+				tradeObj.BracketOrder.EntryOrder = EnterLongLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
 //				if(TG_PrintOut > -1)
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + msg +  ", EnterLongLimit called buy price= " + prc + " -- " + Get24HDateTime(Time[0]));
 			}
-			else if (tradeObj.entryOrder.OrderState == OrderState.Working) {
+			else if (tradeObj.BracketOrder.EntryOrder.OrderState == OrderState.Working) {
 //				if(TG_PrintOut > -1)
-					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + msg +  ", EnterLongLimit updated buy price (old, new)=(" + entryOrder.LimitPrice + "," + prc + ") -- " + Get24HDateTime(Time[0]));
-				CancelOrder(tradeObj.entryOrder);
-				tradeObj.entryOrder = EnterLongLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
+					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + msg +  ", EnterLongLimit updated buy price (old, new)=(" + BracketOrder.EntryOrder.LimitPrice + "," + prc + ") -- " + Get24HDateTime(Time[0]));
+				CancelOrder(tradeObj.BracketOrder.EntryOrder);
+				tradeObj.BracketOrder.EntryOrder = EnterLongLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
+			}
+			tradeObj.barsSinceEnOrd = 0;
+		}
+
+		public virtual void NewEntryLongOrder()
+		{
+			double prc = GetEnLongPrice();//(MM_EnTrailing && TM_EnCounterPBBars>0) ? Close[0]-TM_EnOffsetPnts :  Low[0]-TM_EnOffsetPnts;
+			
+			if (tradeObj.BracketOrder.EntryOrder.OrderState == OrderState.Working) {
+//				if(TG_PrintOut > -1)
+					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + msg +  ", EnterLongLimit updated buy price (old, new)=(" + BracketOrder.EntryOrder.LimitPrice + "," + prc + ") -- " + Get24HDateTime(Time[0]));
+				//CancelOrder(tradeObj.BracketOrder.EntryOrder);
+				CancelEntryOrders();
+				//tradeObj.BracketOrder.EntryOrder = EnterLongLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
+			}
+			if(tradeObj.BracketOrder.EntryOrder == null) {
+				if(tradeObj.BracketOrder.EnOrderType == OrderType.StopMarket) {
+					tradeObj.BracketOrder.EntryOrder = EnterLongStopMarket(DefaultQuantity, prc, OrderSignalName.EntryLong.ToString());
+				}
+				else if(tradeObj.BracketOrder.EnOrderType == OrderType.Limit) {
+					tradeObj.BracketOrder.EntryOrder = EnterLongLimit(DefaultQuantity, prc, OrderSignalName.EntryLong.ToString());
+				}
+//				if(TG_PrintOut > -1)
+					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + msg +  ", EnterLongLimit called buy price= " + prc + " -- " + Get24HDateTime(Time[0]));
 			}
 			tradeObj.barsSinceEnOrd = 0;
 		}
 		
-		protected void SetProfitTargetOrder(string sigName) {
+		public virtual void SetProfitTargetOrder(string sigName) {
 			Print(CurrentBar + ": SetProfitTargetOrder-" 
 			+ sigName + "-" + tradeObj.PTCalculationMode 
 			+ "-" + tradeObj.profitTargetAmt
@@ -199,8 +228,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 					
 		}
 
-		protected void SetStoplossOrder(string sigName) {
-			Print(CurrentBar + ": SetStoplossOrder-" 
+		public virtual void SetStopLossOrder(string sigName) {
+			Print(CurrentBar + ": SetStopLossOrder-" 
 			+ sigName + "-" + tradeObj.SLCalculationMode 
 			+ "-" + tradeObj.stopLossAmt
 			+ "-" + tradeObj.stopLossPrice);
@@ -217,33 +246,49 @@ namespace NinjaTrader.NinjaScript.Strategies
 					break;
 			}
 			} catch(Exception ex) {
-				Print("Ex SetStoplossOrder:" + ex.Message);
+				Print("Ex SetStopLossOrder:" + ex.Message);
 			}
 		}
 		
-		public bool CheckEnOrder(double cur_gap)
+		public virtual bool CheckEnOrder(double cur_gap)
         {
             double min_en = -1;
 
-            if (tradeObj.entryOrder != null && tradeObj.entryOrder.OrderState == OrderState.Working)
+            if (tradeObj.BracketOrder.EntryOrder != null && tradeObj.BracketOrder.EntryOrder.OrderState == OrderState.Working)
             {
-                min_en = indicatorProxy.GetMinutesDiff(tradeObj.entryOrder.Time, Time[0]);// DateTime.Now);
+                min_en = indicatorProxy.GetMinutesDiff(tradeObj.BracketOrder.EntryOrder.Time, Time[0]);// DateTime.Now);
                 //if ( IsTwoBarReversal(cur_gap, TickSize, enCounterPBBars) || (barsHoldEnOrd > 0 && barsSinceEnOrd >= barsHoldEnOrd) || ( minutesChkEnOrder > 0 &&  min_en >= minutesChkEnOrder))
 				if ( (TM_BarsHoldEnOrd > 0 && tradeObj.barsSinceEnOrd >= TM_BarsHoldEnOrd) || ( TM_MinutesChkEnOrder > 0 &&  min_en >= TM_MinutesChkEnOrder))	
                 {
-                    CancelOrder(tradeObj.entryOrder);
-                    //giParabSAR.PrintLog(true, !backTest, log_file, "Order cancelled for " + AccName + ":" + barsSinceEnOrd + "/" + min_en + " bars/mins elapsed--" + entryOrder.ToString());
+                    CancelOrder(tradeObj.BracketOrder.EntryOrder);
+                    //giParabSAR.PrintLog(true, !backTest, log_file, "Order cancelled for " + AccName + ":" + barsSinceEnOrd + "/" + min_en + " bars/mins elapsed--" + BracketOrder.EntryOrder.ToString());
 					return true;
                 }
 				else {
-					//giParabSAR.PrintLog(true, !backTest, log_file, "Order working for " + AccName + ":" + barsSinceEnOrd + "/" + min_en + " bars/mins elapsed--" + entryOrder.ToString());
+					//giParabSAR.PrintLog(true, !backTest, log_file, "Order working for " + AccName + ":" + barsSinceEnOrd + "/" + min_en + " bars/mins elapsed--" + BracketOrder.EntryOrder.ToString());
 					tradeObj.barsSinceEnOrd++;
 				}
             }
             return false;
         }
 		
-		public bool CloseAllPositions() 
+		public virtual double GetEnLongPrice() {
+			double prc = -1;
+			switch(tradeObj.BracketOrder.EnOrderType) {
+				case OrderType.Limit:
+					prc = (tradeObj.enTrailing && tradeObj.enCounterPBBars>0) ? Close[0]-tradeObj.enOffsetPnts :  Low[0]-tradeObj.enOffsetPnts;
+					break;
+				case OrderType.StopMarket:
+					prc = tradeObj.enStopPrice;
+					break;
+				case OrderType.StopLimit:
+					prc = tradeObj.enStopPrice;
+					break;
+			}
+			return prc;
+		}
+		
+		public virtual bool CloseAllPositions() 
 		{
 			//giParabSAR.PrintLog(true, !backTest, log_file, "CloseAllPosition called");
 			if(Position.MarketPosition == MarketPosition.Long)
@@ -253,28 +298,30 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return true;
 		}
 		
-		public bool CancelAllOrders()
+		public virtual bool CancelAllOrders()
 		{
 			CancelExitOrders();
 			CancelEntryOrders();
 			return true;
 		}
 
-		public bool CancelEntryOrders()
+		public virtual bool CancelEntryOrders()
 		{
 			//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "- CancelAllOrders called");
-			if(tradeObj.entryOrder != null)
-				CancelOrder(tradeObj.entryOrder);
+			if(tradeObj.BracketOrder.EntryOrder != null) {
+				CancelOrder(tradeObj.BracketOrder.EntryOrder);
+				tradeObj.BracketOrder.EntryOrder = null;
+			}
 			return true;
 		}
 		
-		public bool CancelExitOrders()
+		public virtual bool CancelExitOrders()
 		{
 			//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "- CancelAllOrders called");
-			if(tradeObj.stopLossOrder != null)
-				CancelOrder(tradeObj.stopLossOrder);
-			if(tradeObj.profitTargetOrder != null)
-				CancelOrder(tradeObj.profitTargetOrder);
+			if(tradeObj.BracketOrder.OCOOrder.StopLossOrder != null)
+				CancelOrder(tradeObj.BracketOrder.OCOOrder.StopLossOrder);
+			if(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null)
+				CancelOrder(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder);
 			return true;
 		}
 		
@@ -299,7 +346,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if(Position.Quantity != 0) {
 					CalProfitTargetAmt(price, tradeObj.profitFactor);
 					SetProfitTargetOrder(OrderSignalName.EntryShort.ToString());
-					SetStoplossOrder(OrderSignalName.EntryShort.ToString());
+					SetStopLossOrder(OrderSignalName.EntryShort.ToString());
 				}
 				//if(TG_PrintOut > -1)
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + " Exe=" + execution.Name + ",Price=" + execution.Price + "," + execution.Time.ToShortTimeString());
@@ -324,7 +371,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";SP=" + order.StopPrice + ";LP=" + order.LimitPrice
 			+ "; BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
 			
-		    if (tradeObj.entryOrder != null && tradeObj.entryOrder == order)
+		    if (tradeObj.BracketOrder.EntryOrder != null && tradeObj.BracketOrder.EntryOrder == order)
 		    {
 				//giParabSAR.PrintLog(true, !backTest, log_file, order.ToString() + "--" + order.OrderState);
 		        if (order.OrderState == OrderState.Cancelled || 
@@ -333,48 +380,48 @@ namespace NinjaTrader.NinjaScript.Strategies
 					order.OrderState == OrderState.Unknown)
 				{
 					tradeObj.barsSinceEnOrd = 0;
-					tradeObj.entryOrder = null;
+					tradeObj.BracketOrder.EntryOrder = null;
 				}
 		    }
 			
-		    if (tradeObj.stopLossOrder != null && tradeObj.stopLossOrder == order)
+		    if (tradeObj.BracketOrder.OCOOrder.StopLossOrder != null && tradeObj.BracketOrder.OCOOrder.StopLossOrder == order)
 		    {
 				//giParabSAR.PrintLog(true, !backTest, log_file, order.ToString() + "--" + order.OrderState);
 		        if (order.OrderState == OrderState.Cancelled || 
 					order.OrderState == OrderState.Filled || 
 					order.OrderState == OrderState.Rejected)
 				{
-					tradeObj.stopLossOrder = null;
+					tradeObj.BracketOrder.OCOOrder.StopLossOrder = null;
 				}
 		    }
 
-		    if (tradeObj.profitTargetOrder != null && tradeObj.profitTargetOrder == order)
+		    if (tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null && tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == order)
 		    {
 				//giParabSAR.PrintLog(true, !backTest, log_file, order.ToString() + "--" + order.OrderState);
 		        if (order.OrderState == OrderState.Cancelled || 
 					order.OrderState == OrderState.Filled || 
 					order.OrderState == OrderState.Rejected)
 				{
-					tradeObj.profitTargetOrder = null;
+					tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder = null;
 				}
 		    }	
 			
 			if (order.OrderState == OrderState.Working){// || order.OrderType == OrderType.StopMarket) {
 				if(order.Name == OrderSignalName.EntryLong.ToString() || order.Name == OrderSignalName.EntryShort.ToString()) {
-					tradeObj.entryOrder = order;
+					tradeObj.BracketOrder.EntryOrder = order;
 				}
 				if(order.Name == OrderSignalName.ProfitTarget.ToString()) {
-					tradeObj.profitTargetOrder = order;
+					tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder = order;
 				}				
 				//				if(TG_PrintOut > -1)
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + order.ToString());
 			}
 			
 			if(order.Name == OrderSignalName.StopLoss.ToString() && (order.OrderState == OrderState.Accepted || order.OrderState == OrderState.Working)) {
-				tradeObj.stopLossOrder = order;
+				tradeObj.BracketOrder.OCOOrder.StopLossOrder = order;
 			}
 			
-//			if(tradeObj.stopLossOrder == null && tradeObj.profitTargetOrder == null)
+//			if(tradeObj.BracketOrder.OCOOrder.StopLossOrder == null && tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == null)
 				//InitTradeMgmt();			
 		}
 		
@@ -414,7 +461,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("How long to check entry order filled or not")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkEnOrder", GroupName = "TradeMgmt", Order = 3)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkEnOrder", GroupName = "TradeMgmt", Order = 4)]	
         public int TM_MinutesChkEnOrder
         {
             get{return tm_MinutesChkEnOrder;}// { return tradeObj==null? 0 : tradeObj.minutesChkEnOrder; }
@@ -423,7 +470,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("How long to check P&L")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkPnL", GroupName = "TradeMgmt", Order = 4)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkPnL", GroupName = "TradeMgmt", Order = 5)]	
         public int TM_MinutesChkPnL
         {
             get{return tm_MinutesChkPnL;}// { return tradeObj==null? 0 : tradeObj.minutesChkPnL; }
@@ -432,16 +479,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Bar count before checking P&L")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsToCheckPL", GroupName = "TradeMgmt", Order = 5)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsToCheckPL", GroupName = "TradeMgmt", Order = 6)]	
         public int TM_BarsToCheckPnL
         {
             get{return tm_BarsToCheckPnL;}// { return tradeObj==null? 0 : tradeObj.barsToCheckPL; }
             set{tm_BarsToCheckPnL = Math.Max(1, value);}// { if(tradeObj!=null) tradeObj.barsToCheckPL = Math.Max(1, value); }
         }
 		
-        [Description("Bar count since en order issued")]
+        [Description("How many bars to hold entry order before cancel it")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsHoldEnOrd", GroupName = "TradeMgmt", Order = 6)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsHoldEnOrd", GroupName = "TradeMgmt", Order = 7)]	
         public int TM_BarsHoldEnOrd
         {
             get{return tm_BarsHoldEnOrd;}// { return tradeObj==null? 0 : tradeObj.barsHoldEnOrd; }
@@ -450,7 +497,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Bar count for en order counter pullback")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnCounterPBBars", GroupName = "TradeMgmt", Order = 7)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnCounterPBBars", GroupName = "TradeMgmt", Order = 8)]	
         public int TM_EnCounterPBBars
         {
             get{return tm_EnCounterPBBars;}// { return tradeObj==null? 0 : tradeObj.enCounterPBBars; }
@@ -459,7 +506,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				
 		[Description("Bar count since last filled PT or SL")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsSincePTSL", GroupName = "TradeMgmt", Order = 8)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsSincePTSL", GroupName = "TradeMgmt", Order = 9)]	
         public int TM_BarsSincePTSL
         {
             get{return tm_BarsSincePtSl;}// { return tradeObj==null? 1 : tradeObj.barsSincePtSl; }

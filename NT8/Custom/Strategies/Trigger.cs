@@ -56,7 +56,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					CheckExitTrade();
 				}
 				else { // no positions
-					CheckEntryTrade();
+					CheckNewEntryTrade();
 				}
 			}
 		}		

@@ -156,6 +156,31 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//Print(CurrentBar + ":" + this.Name + " OnBarUpdate, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
 			
 			indicatorProxy.Update();
+			CheckPerformance();
+			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
+			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
+			switch(AlgoMode) {
+				case AlgoModeType.Liquidate: //liquidate
+					CloseAllPositions();
+					break;
+				case AlgoModeType.Trading: //trading
+					//PutTrade(); break;
+					ChangeSLPT();
+					//CheckEnOrder(gap);
+					
+					if(NewOrderAllowed())
+					{
+						CheckNewEntryTrade();
+						PutTrade();
+					}
+					break;
+				case AlgoModeType.CancelOrders: //cancel order
+					CancelAllOrders();
+					break;
+				case AlgoModeType.StopTrading: //stop trading
+					indicatorProxy.PrintLog(true, !backTest, CurrentBar + "- Stop trading cmd:" + indicatorProxy.Get24HDateTime(Time[0]));
+					break;
+			}			
 		}
 
 		#region Properties

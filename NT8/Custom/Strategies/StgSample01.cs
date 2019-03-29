@@ -25,7 +25,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	public class GSZTraderInst1 : GSZTraderBase
+	public class StgSample01 : GSZTraderBase
 	{
 		protected override void OnStateChange()
 		{
