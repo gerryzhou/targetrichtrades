@@ -96,14 +96,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnBarUpdate()
 		{
 			//if(BarsInProgress !=0) return;
+			Print("OnBarUpdate - 1");
 			base.OnBarUpdate();
 			//Print(CurrentBar.ToString() + " -- StgTRT - Add your custom strategy logic here.");
-			indicatorProxy.Update();
+			//Print("OnBarUpdate - 2");
+			//indicatorProxy.Update(); //base has this call;
+			Print("OnBarUpdate - 2");
 			indicatorSignal = GetIndicatorSignal();
 			//SetStopLoss(CalculationMode.Price, tradeObj.stopLossPrice);
 			//CheckExitTrade();
+			Print("OnBarUpdate - 3");
 			CheckEntryTrade();
-			PutTrade();
+			//PutTrade();
 		}
 		
 		public override Direction GetDirection(GIndicatorBase ind){
@@ -120,8 +124,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			awOscillator.Update();
 			giSnR.Update();
 			IndicatorSignal indSignal = null; //= new IndicatorSignal();
+			Print("GetIndicatorSignal - 1");
 			int infl = giSMI.InflectionRecorder.GetLastIndex(CurrentBar, LookbackBarType.Down);//GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarsAgo);
 			//Print(CurrentBar + ": GetIndicatorSignal giSMI.InflectionRecorder.GetLastIndex=" + infl);
+			Print("GetIndicatorSignal - 2");
 			if(infl > 0 && CurrentBar-infl < CP_EnBarsBeforeInflection) {
 				indSignal = new IndicatorSignal();
 				try{
@@ -153,16 +159,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public TradeObj CheckEntryTrade() {			
-			if(NewOrderAllowed()) { //|| Position.Quantity == 0 giSMI.IsNewInflection(TrendDirection.Down) && 
-				if(indicatorSignal != null && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down
-					&& indicatorProxy.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
+			if(NewOrderAllowed()) {
+				Print("CheckEntryTrade - 1");//|| Position.Quantity == 0 giSMI.IsNewInflection(TrendDirection.Down) && 
+				Print("indicatorSignal=" + (indicatorSignal==null));
+				if(indicatorSignal != null)// && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down
+					//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
+				{	Print("CheckEntryTrade - 2");
 					tradeObj.tradeDirection = TradingDirection.Down;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 					tradeObj.SetTradeType(TradeType.Entry);
 					tradeObj.PTCalculationMode = CalculationMode.Currency;
 					tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
 					tradeObj.SLCalculationMode = CalculationMode.Price;
-					tradeObj.stopLossPrice = indicatorProxy.GetResistance(indicatorSignal.SnR.Resistance);
+					tradeObj.stopLossPrice = High[0] + 10;//giSMI.GetResistance.GetResistance(indicatorSignal.SnR.Resistance);
 					tradeObj.barsSincePTSL = TM_BarsSincePTSL;
 					tradeObj.profitFactor = MM_ProfitFactor;
 				}

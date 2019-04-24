@@ -67,16 +67,17 @@ namespace NinjaTrader.NinjaScript.Strategies
          		//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- Open PnL: " + pl);
 				//int nChkPnL = (int)(timeSinceEn/minutesChkPnL);
 				double curPTTics = -1;
-				double slPrc = tradeObj.BracketOrder.OCOOrder.StopLossOrder == null ? Position.AveragePrice : tradeObj.BracketOrder.OCOOrder.StopLossOrder.StopPrice;
+				double slPrc = (tradeObj.BracketOrder.OCOOrder == null || tradeObj.BracketOrder.OCOOrder.StopLossOrder == null) ?
+					Position.AveragePrice : tradeObj.BracketOrder.OCOOrder.StopLossOrder.StopPrice;
 				
 				if(MM_PTTrailing && pl >= 12.5*(tradeObj.trailingPTTic - 2*MM_ProfitTgtIncTic))
 				{
 					tradeObj.trailingPTTic = tradeObj.trailingPTTic + MM_ProfitTgtIncTic;
-					if(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null) {
+					if(tradeObj.BracketOrder.OCOOrder != null && tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null) {
 						curPTTics = Math.Abs(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder.LimitPrice - Position.AveragePrice)/TickSize;
 					}
 					//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- update PT: PnL=" + pl + ",(trailingPTTic, curPTTics, $Amt, $Amt_cur)=(" + trailingPTTic + "," + curPTTics + "," + 12.5*trailingPTTic + "," + 12.5*curPTTics + ")");
-					if(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == null || tradeObj.trailingPTTic > curPTTics)
+					if(tradeObj.BracketOrder.OCOOrder == null || tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == null || tradeObj.trailingPTTic > curPTTics)
 						SetProfitTarget(CalculationMode.Ticks, tradeObj.trailingPTTic);
 				}
 				
@@ -97,9 +98,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 //					}
 					if(tradeObj.trailingSLTic > MM_ProfitLockMaxTic && pl >= 12.5*(tradeObj.trailingSLTic + 2*MM_ProfitTgtIncTic)) {
 						tradeObj.trailingSLTic = tradeObj.trailingSLTic + MM_ProfitTgtIncTic;
-						if(tradeObj.BracketOrder.OCOOrder.StopLossOrder != null)
+						if(tradeObj.BracketOrder.OCOOrder != null && tradeObj.BracketOrder.OCOOrder.StopLossOrder != null)
 							CancelOrder(tradeObj.BracketOrder.OCOOrder.StopLossOrder);
-						if(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null)
+						if(tradeObj.BracketOrder.OCOOrder != null && tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null)
 							CancelOrder(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder);
 						SetTrailStop(CalculationMode.Currency, MM_TrailingStopLossAmt);
 						//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- SetTrailStop over SL Max: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= (" + slTrailing + "," + trailingSLTic + "," + slPrc + ")");						
@@ -123,7 +124,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 						//SetStopLoss(CalculationMode.Price, slPrc);
 					}
 				}
-				if(tradeObj.BracketOrder.OCOOrder.StopLossOrder == null || 
+				if(tradeObj.BracketOrder.OCOOrder == null || tradeObj.BracketOrder.OCOOrder.StopLossOrder == null || 
 					(Position.MarketPosition == MarketPosition.Long && slPrc > tradeObj.BracketOrder.OCOOrder.StopLossOrder.StopPrice) ||
 					(Position.MarketPosition == MarketPosition.Short && slPrc < tradeObj.BracketOrder.OCOOrder.StopLossOrder.StopPrice)) 
 				{

@@ -30,6 +30,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	/// <summary>
 	/// This file defined the interfaces talking with indicators;
+	/// This interface needs to work with multiple indicators in the strategy
+	/// to generate the signal or get the value of the functions 
 	/// </summary>
 	public partial class GSZTraderBase : Strategy
 	{
@@ -60,8 +62,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Support and resistance is to define entry/exit level, target and stop loss
 		/// </summary>
 		/// <returns></returns>
-		public SupportResistanceBar GetSupport(){return null;}
-		//public SupportResistance GetResistance(){return null;}
+		public virtual SupportResistanceBar GetSupport(){return null;}
+		public virtual SupportResistanceBar GetResistance(){return null;}
 		public virtual SupportResistanceBar GetSptRest(int barNo) {return null;}
 		
 		/// <summary>

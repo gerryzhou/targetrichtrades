@@ -43,6 +43,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double stopLossIncTic = 4; //4 Default tick Amt for StopLoss increase Amt
 		public double breakEvenAmt = 150; //150 the profits amount to trigger setting breakeven order
 		public double trailingSLAmt = 100; //300 Default setting for trailing Stop Loss Amt
+		public double trailingPTTic = 16; //
+		public double trailingSLTic = 4; //
 		
 		public double dailyLossLmt = -200; //-300 the daily loss limit amount
 		public double profitFactor = 0.5;
@@ -56,6 +58,9 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		#region Trade Mgmt variables
 		
 		public int enCounterPBBars = 1;//Bar count of pullback for breakout entry setup
+		public bool enTrailing = true; //Trailing the entry price
+		public double enOffsetPnts = 1; //
+		public double enStopPrice = 0; // The stop market price for entry order
 		
 		public int minutesChkEnOrder = 20; //how long before checking an entry order filled or not
 		public int minutesChkPnL = 30; //how long before checking P&L
