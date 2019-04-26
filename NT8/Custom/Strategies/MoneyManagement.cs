@@ -60,9 +60,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				timeSinceEn = indicatorProxy.GetMinutesDiff(Time[0], Time[bse]);
 //			}
 			
-			double pl = Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);//.GetProfitLoss(Close[0], PerformanceUnit.Currency);
-			 // If not flat print out unrealized PnL
-    		if (Position.MarketPosition != MarketPosition.Flat) 
+			double pl = PositionAccount.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);//.GetProfitLoss(Close[0], PerformanceUnit.Currency);
+			
+			if(PositionAccount.Quantity == 0)
+				indicatorProxy.PrintLog(true, !backTest, 
+						AccName + "- ChangeSLPT=0: (PnL, posAvgPrc, MM_BreakEvenAmt)=(" + pl + "," + Position.AveragePrice + "," + MM_BreakEvenAmt + ")");
+			else
+				indicatorProxy.PrintLog(true, !backTest, 
+						AccName + "- ChangeSLPT<>0: (PnL, posAvgPrc, MM_BreakEvenAmt)=(" + pl + "," + Position.AveragePrice + "," + MM_BreakEvenAmt + ")");
+			
+			// If not flat print out unrealized PnL
+    		if (PositionAccount.MarketPosition != MarketPosition.Flat) 
 			{
          		//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- Open PnL: " + pl);
 				//int nChkPnL = (int)(timeSinceEn/minutesChkPnL);
@@ -80,10 +88,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 					if(tradeObj.BracketOrder.OCOOrder == null || tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == null || tradeObj.trailingPTTic > curPTTics)
 						SetProfitTarget(CalculationMode.Ticks, tradeObj.trailingPTTic);
 				}
+				indicatorProxy.PrintLog(true, !backTest, 
+					AccName + "- SL Breakeven: (PnL, posAvgPrc, MM_BreakEvenAmt)=(" + pl + "," + PositionAccount.AveragePrice + "," + MM_BreakEvenAmt + ")");
 				
 				if(pl >= MM_BreakEvenAmt) { //setup breakeven order
-					//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- setup SL Breakeven: (PnL, posAvgPrc)=(" + pl + "," + Position.AvgPrice + ")");
-					slPrc = Position.AveragePrice;
+					indicatorProxy.PrintLog(true, !backTest, AccName + "- setup SL Breakeven: (PnL, posAvgPrc)=(" + pl + "," + PositionAccount.AveragePrice + ")");
+					slPrc = PositionAccount.AveragePrice;
 					//SetStopLoss(0);
 				}
 				
@@ -358,7 +368,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#endregion
 		
-		#region Variables for Properties
+		#region Variables for Properties		
 		
 		private double mm_ProfitTargetAmt = 500;
 		private int mm_ProfitTgtIncTic = 8;

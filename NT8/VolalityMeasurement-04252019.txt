@@ -1,0 +1,6 @@
+Volatility Measurement:
+* Swing based
+* Channel based
+* Range based
+* Volatility of a Reversal 
+

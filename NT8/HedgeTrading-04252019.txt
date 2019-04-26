@@ -1,0 +1,13 @@
+Hedge Trading
+* Channel hedging:
+	** Trend following hold the poistion after the trend is established;
+	** Counter trend scalping when the channel is running normally;
+	** 
+	
+* Range hedging:
+	** Bet for both sides false breakout;
+	** 
+	
+* Breakout hedging:
+	** Bet for both sides breakout;
+	** Tight stop loss, wide target;

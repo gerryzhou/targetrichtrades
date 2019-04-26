@@ -118,12 +118,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 		}
 
-//		protected override void OnExecutionUpdate(Cbi.Execution execution, string executionId, double price, int quantity, 
-//			Cbi.MarketPosition marketPosition, string orderId, DateTime time)
-//		{
-			
-//		}
-
 		protected override void OnMarketData(MarketDataEventArgs marketDataUpdate)
 		{
 			
@@ -134,19 +128,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 		}
 
-//		protected override void OnOrderUpdate(Cbi.Order order, double limitPrice, double stopPrice, 
-//			int quantity, int filled, double averageFillPrice, 
-//			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
-//		{
-			
-//		}
-
-//		protected override void OnPositionUpdate(Cbi.Position position, double averagePrice, 
-//			int quantity, Cbi.MarketPosition marketPosition)
-//		{
-			
-//		}
-
 		protected override void OnBarUpdate()
 		{
 			//Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
@@ -154,38 +135,38 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			
 			//Print(CurrentBar + ":" + this.Name + " OnBarUpdate, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
-			Print("base OnBarUpdate -1");
+			indicatorProxy.TraceMessage(this.Name);
 			indicatorProxy.Update();
-			Print("base OnBarUpdate -2");
+			indicatorProxy.TraceMessage(this.Name);
 			CheckPerformance();
 			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
 			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
-			Print("base OnBarUpdate -3");
+			indicatorProxy.TraceMessage(this.Name);
 			switch(AlgoMode) {
 				case AlgoModeType.Liquidate: //liquidate
-					Print("base OnBarUpdate -Liquidate");
+					indicatorProxy.TraceMessage(this.Name);
 					CloseAllPositions();
 					break;
 				case AlgoModeType.Trading: //trading
 					//PutTrade(); break;
-					Print("base OnBarUpdate -Trading");
+					indicatorProxy.TraceMessage(this.Name);
 					ChangeSLPT();
 					//CheckEnOrder(gap);
 					
 					if(NewOrderAllowed())
 					{
-						Print("base OnBarUpdate -Trading1");
+						indicatorProxy.TraceMessage(this.Name);
 						CheckNewEntryTrade();
-						Print("base OnBarUpdate -Trading2");
+						indicatorProxy.TraceMessage(this.Name);
 						PutTrade();
 					}
 					break;
 				case AlgoModeType.CancelOrders: //cancel order
-					Print("base OnBarUpdate -CancelOrders");
+					indicatorProxy.TraceMessage(this.Name);
 					CancelAllOrders();
 					break;
 				case AlgoModeType.StopTrading: //stop trading
-					Print("base OnBarUpdate -StopTrading");
+					indicatorProxy.TraceMessage(this.Name);
 					indicatorProxy.PrintLog(true, !backTest, CurrentBar + "- Stop trading cmd:" + indicatorProxy.Get24HDateTime(Time[0]));
 					break;
 			}			

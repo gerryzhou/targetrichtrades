@@ -11,6 +11,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Reflection;
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Chart;
@@ -528,6 +531,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return gapText; 
 		}
 		
+		#region Print and Log functions
 		public void PrintLog(bool prt_con, bool prt_file, string text) {
 			string fpath = GetLogFile();
 			//Print("PrintLog: " + fpath);
@@ -539,7 +543,35 @@ namespace NinjaTrader.NinjaScript.Indicators
 					file.WriteLine(text);
 				}
 			}
-		}				
+		}
+
+
+		public void TraceMessage(string message,
+        [CallerMemberName] string callingMethod = "",
+        [CallerFilePath] string callingFilePath = "",
+        [CallerLineNumber] int callingFileLineNumber = 0)
+		{			
+		    // Write out message
+			Print(CurrentBar + "-[" + message + ":" + callingMethod + "-" + callingFileLineNumber + "]-" + Path.GetFileName(callingFilePath));
+		}
+		
+//		[MethodImpl(MethodImplOptions.NoInlining)]
+//		public static string GetMyMethodName() {
+//			//Print(MethodBase.GetCurrentMethod().ToString() + " - 1");
+//			var st = new StackTrace(new StackFrame(1));
+//			return st.GetFrame(0).GetMethod().Name;
+//		}
+		
+//		public static void TraceLog(string message) {
+//		   StackFrame stackFrame = new System.Diagnostics.StackTrace(1).GetFrame(1);
+//		   string fileName = stackFrame.GetFileName();
+//		   string methodName = stackFrame.GetMethod().ToString();
+//		   int lineNumber = stackFrame.GetFileLineNumber();
+
+//		   Print(methodName + "," + Path.GetFileName(fileName) + "," +  lineNumber + "," + message);
+//		}
+		
+		#endregion
 		
         #region Properties
         [Browsable(false)]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove

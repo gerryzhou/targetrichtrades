@@ -1,0 +1,20 @@
+TradeMgmt-
+* Breakeven;
+
+* Trailinig entry;
+
+* Trailing stop loss after a target is reached;
+
+* 
+
+MoneyMgmt-
+* Gambling theory: 
+	** 1-2-3-4 attempts;
+	** 50% WR;
+	** Scale in for losing trades: 2x, 3x, 4x or more...., 
+	or start to scale in after a series of losing trades such as 3 times losing trade in a row, start to scale in;
+	** Preset W/L ratio 1.0~2.0; expected to work for breakout with better W/L ratio;
+	** Develop a simulator to calculate for different parameters combination;
+
+
+

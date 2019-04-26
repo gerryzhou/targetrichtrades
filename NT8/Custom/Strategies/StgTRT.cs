@@ -95,18 +95,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		protected override void OnBarUpdate()
 		{
+			indicatorProxy.TraceMessage(this.Name);
+			indicatorSignal = GetIndicatorSignal();
 			//if(BarsInProgress !=0) return;
-			Print("OnBarUpdate - 1");
+			indicatorProxy.TraceMessage(this.Name);
 			base.OnBarUpdate();
 			//Print(CurrentBar.ToString() + " -- StgTRT - Add your custom strategy logic here.");
 			//Print("OnBarUpdate - 2");
 			//indicatorProxy.Update(); //base has this call;
-			Print("OnBarUpdate - 2");
-			indicatorSignal = GetIndicatorSignal();
+
 			//SetStopLoss(CalculationMode.Price, tradeObj.stopLossPrice);
 			//CheckExitTrade();
-			Print("OnBarUpdate - 3");
-			CheckEntryTrade();
+			indicatorProxy.TraceMessage(this.Name);
+			//CheckEntryTrade();
 			//PutTrade();
 		}
 		
@@ -158,20 +159,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return indSignal;
 		}
 		
-		public TradeObj CheckEntryTrade() {			
+		public override TradeObj CheckNewEntryTrade() {			
 			if(NewOrderAllowed()) {
-				Print("CheckEntryTrade - 1");//|| Position.Quantity == 0 giSMI.IsNewInflection(TrendDirection.Down) && 
-				Print("indicatorSignal=" + (indicatorSignal==null));
-				if(indicatorSignal != null)// && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down
+				indicatorProxy.TraceMessage(this.Name);//|| Position.Quantity == 0 giSMI.IsNewInflection(TrendDirection.Down) && 
+				Print("indicatorSignal null=" + (indicatorSignal==null));
+				if(indicatorSignal != null && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down)
 					//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
-				{	Print("CheckEntryTrade - 2");
+				{	
+					indicatorProxy.TraceMessage(this.Name);
 					tradeObj.tradeDirection = TradingDirection.Down;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 					tradeObj.SetTradeType(TradeType.Entry);
 					tradeObj.PTCalculationMode = CalculationMode.Currency;
 					tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
-					tradeObj.SLCalculationMode = CalculationMode.Price;
-					tradeObj.stopLossPrice = High[0] + 10;//giSMI.GetResistance.GetResistance(indicatorSignal.SnR.Resistance);
+					tradeObj.SLCalculationMode = CalculationMode.Currency;
+					tradeObj.stopLossAmt = MM_StopLossAmt;
+					tradeObj.stopLossPrice = High[0] + 5;//giSMI.GetResistance.GetResistance(indicatorSignal.SnR.Resistance);
 					tradeObj.barsSincePTSL = TM_BarsSincePTSL;
 					tradeObj.profitFactor = MM_ProfitFactor;
 				}
