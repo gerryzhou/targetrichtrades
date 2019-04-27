@@ -45,6 +45,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double trailingSLAmt = 100; //300 Default setting for trailing Stop Loss Amt
 		public double trailingPTTic = 16; //
 		public double trailingSLTic = 4; //
+		public bool slTrailing = false; //trailing stop loss
 		
 		public double dailyLossLmt = -200; //-300 the daily loss limit amount
 		public double profitFactor = 0.5;
@@ -93,6 +94,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			barsHoldEnOrd = instStrategy.TM_BarsHoldEnOrd;
 	        barsSincePTSL = instStrategy.TM_BarsSincePTSL;
 			barsToCheckPnL = instStrategy.TM_BarsToCheckPnL;
+			
+			slTrailing = instStrategy.MM_SLTrailing;
 		}
 		
 		#region Properties

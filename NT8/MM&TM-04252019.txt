@@ -1,5 +1,5 @@
 TradeMgmt-
-* Breakeven;
+* Breakeven; - done;
 
 * Trailinig entry;
 
@@ -9,7 +9,7 @@ TradeMgmt-
 
 MoneyMgmt-
 * Gambling theory: 
-	** 1-2-3-4 attempts;
+	** 1-2-3-4 attempts; track win/lose trades;
 	** 50% WR;
 	** Scale in for losing trades: 2x, 3x, 4x or more...., 
 	or start to scale in after a series of losing trades such as 3 times losing trade in a row, start to scale in;

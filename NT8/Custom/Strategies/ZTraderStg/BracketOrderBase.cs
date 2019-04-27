@@ -23,7 +23,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	{
 		private BracketOrderSubType bracketOrderSubType = BracketOrderSubType.UnKnown;
 		private Order entryOrder;
-		private OCOBase ocoOrder;
+		private OCOBase ocoOrder = new OCOBase();
 		public OrderType EnOrderType = OrderType.Limit;
 		public CalculationMode EnCalculationMode = CalculationMode.Price;
 		

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -354,10 +355,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			
-			Print(CurrentBar + ":OnExecutionUpdate- quantity, marketPosition, price, BarsSinceExit, BarsSinceEntry=" 
+			Print(CurrentBar + ":OnExecutionUpdate-quant,mktPos,prc,BarsSinceEx,BarsSinceEn=" 
 			+ quantity + "," + marketPosition + "," + price + ","
 			+ bsx + "," + bse
-			+ ",SL=" + tradeObj.stopLossPrice);
+			+ ",SL=" + tradeObj.stopLossPrice
+			+ ",Ordername=" + GetOrderName(execution.Order.Name));
 			
 			// Remember to check the underlying IOrder object for null before trying to access its properties
 			if (execution.Order != null && execution.Order.OrderState == OrderState.Filled) {
@@ -385,7 +387,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			
-			Print(CurrentBar + ":OnOrderUpdate name-" + order.Name + "-" + order.FromEntrySignal + ";" + order.OrderTypeString
+			Print(CurrentBar + ":OnOrderUpdate name-" + GetOrderName(order.Name) + "-" + order.FromEntrySignal + ";" + order.OrderTypeString
 			+ ";" + order.OrderState.ToString() + ";" + order.OrderAction.ToString()
 			+ ";SP=" + order.StopPrice + ";LP=" + order.LimitPrice
 			+ "; BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
@@ -405,7 +407,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		    }
 			
 			indicatorProxy.TraceMessage(this.Name);
-		    if (tradeObj.BracketOrder.OCOOrder != null &&
+		    if (//tradeObj.BracketOrder.OCOOrder != null &&
 				tradeObj.BracketOrder.OCOOrder.StopLossOrder != null &&
 				tradeObj.BracketOrder.OCOOrder.StopLossOrder == order)
 		    {
@@ -419,7 +421,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		    }
 			
 			indicatorProxy.TraceMessage(this.Name);
-		    if (tradeObj.BracketOrder.OCOOrder != null &&
+		    if (//tradeObj.BracketOrder.OCOOrder != null &&
 				tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null &&
 				tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == order)
 		    {
@@ -434,11 +436,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			indicatorProxy.TraceMessage(this.Name);
 			if (order.OrderState == OrderState.Working){// || order.OrderType == OrderType.StopMarket) {
-				if(order.Name == OrderSignalName.EntryLong.ToString() || order.Name == OrderSignalName.EntryShort.ToString()) {
-					indicatorProxy.PrintLog(true, !BackTest, "Entry Order Name=" + order.Name);
+				if(GetOrderName(order.Name) == OrderSignalName.EntryLong.ToString() ||
+					GetOrderName(order.Name) == OrderSignalName.EntryShort.ToString()) {
+					indicatorProxy.PrintLog(true, !BackTest, "Entry Order Name=" + GetOrderName(order.Name));
 					//tradeObj.BracketOrder.EntryOrder = order;
 				}
-				if(order.Name == OrderSignalName.ProfitTarget.ToString()) {
+				if(GetOrderName(order.Name) == OrderSignalName.Profittarget.ToString()) {
+					indicatorProxy.PrintLog(true, !BackTest, "order.Name == OrderSignalName.Profittarget");
 					tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder = order;
 				}				
 				//				if(TG_PrintOut > -1)
@@ -446,12 +450,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			
 			indicatorProxy.TraceMessage(this.Name);
-			if(order.Name == OrderSignalName.StopLoss.ToString() && (order.OrderState == OrderState.Accepted || order.OrderState == OrderState.Working)) {
+			if(GetOrderName(order.Name) == OrderSignalName.Stoploss.ToString() &&
+				(order.OrderState == OrderState.Accepted || order.OrderState == OrderState.Working)) {
 				tradeObj.BracketOrder.OCOOrder.StopLossOrder = order;
 			}
 			
 //			if(tradeObj.BracketOrder.OCOOrder.StopLossOrder == null && tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == null)
 				//InitTradeMgmt();			
+		}
+		
+		//Remove whitespaces from order name
+		public string GetOrderName(string orderName) {
+			return Regex.Replace(orderName, @"\s+", "");
 		}
 		
 		#endregion
