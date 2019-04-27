@@ -385,7 +385,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			
-			Print(CurrentBar + ":OnOrderUpdate-" + order.Name + "-" + order.FromEntrySignal + ";" + order.OrderTypeString
+			Print(CurrentBar + ":OnOrderUpdate name-" + order.Name + "-" + order.FromEntrySignal + ";" + order.OrderTypeString
 			+ ";" + order.OrderState.ToString() + ";" + order.OrderAction.ToString()
 			+ ";SP=" + order.StopPrice + ";LP=" + order.LimitPrice
 			+ "; BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
@@ -435,7 +435,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.TraceMessage(this.Name);
 			if (order.OrderState == OrderState.Working){// || order.OrderType == OrderType.StopMarket) {
 				if(order.Name == OrderSignalName.EntryLong.ToString() || order.Name == OrderSignalName.EntryShort.ToString()) {
-					tradeObj.BracketOrder.EntryOrder = order;
+					indicatorProxy.PrintLog(true, !BackTest, "Entry Order Name=" + order.Name);
+					//tradeObj.BracketOrder.EntryOrder = order;
 				}
 				if(order.Name == OrderSignalName.ProfitTarget.ToString()) {
 					tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder = order;

@@ -190,7 +190,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override void PutTrade() {
 			if(tradeObj.GetTradeType() == TradeType.Entry) {
 				if(tradeObj.tradeDirection == TradingDirection.Down)
-					EnterShort(OrderSignalName.EntryShort.ToString());
+					tradeObj.BracketOrder.EntryOrder = EnterShort(OrderSignalName.EntryShort.ToString());
+				else if(tradeObj.tradeDirection == TradingDirection.Up)
+					tradeObj.BracketOrder.EntryOrder = EnterLong(OrderSignalName.EntryLong.ToString());
 			}
 		}
 		

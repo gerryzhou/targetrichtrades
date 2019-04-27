@@ -60,9 +60,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				timeSinceEn = indicatorProxy.GetMinutesDiff(Time[0], Time[bse]);
 //			}
 			
-			double pl = PositionAccount.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);//.GetProfitLoss(Close[0], PerformanceUnit.Currency);
+			double pl = Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);//.GetProfitLoss(Close[0], PerformanceUnit.Currency);
 			
-			if(PositionAccount.Quantity == 0)
+			if(Position.Quantity == 0)
 				indicatorProxy.PrintLog(true, !backTest, 
 						AccName + "- ChangeSLPT=0: (PnL, posAvgPrc, MM_BreakEvenAmt)=(" + pl + "," + Position.AveragePrice + "," + MM_BreakEvenAmt + ")");
 			else
@@ -70,7 +70,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 						AccName + "- ChangeSLPT<>0: (PnL, posAvgPrc, MM_BreakEvenAmt)=(" + pl + "," + Position.AveragePrice + "," + MM_BreakEvenAmt + ")");
 			
 			// If not flat print out unrealized PnL
-    		if (PositionAccount.MarketPosition != MarketPosition.Flat) 
+    		if (Position.MarketPosition != MarketPosition.Flat) 
 			{
          		//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- Open PnL: " + pl);
 				//int nChkPnL = (int)(timeSinceEn/minutesChkPnL);
@@ -89,23 +89,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 						SetProfitTarget(CalculationMode.Ticks, tradeObj.trailingPTTic);
 				}
 				indicatorProxy.PrintLog(true, !backTest, 
-					AccName + "- SL Breakeven: (PnL, posAvgPrc, MM_BreakEvenAmt)=(" + pl + "," + PositionAccount.AveragePrice + "," + MM_BreakEvenAmt + ")");
+					AccName + "- SL Breakeven: (PnL, posAvgPrc, MM_BreakEvenAmt)=(" + pl + "," + Position.AveragePrice + "," + MM_BreakEvenAmt + ")");
 				
 				if(pl >= MM_BreakEvenAmt) { //setup breakeven order
-					indicatorProxy.PrintLog(true, !backTest, AccName + "- setup SL Breakeven: (PnL, posAvgPrc)=(" + pl + "," + PositionAccount.AveragePrice + ")");
-					slPrc = PositionAccount.AveragePrice;
-					//SetStopLoss(0);
+					indicatorProxy.PrintLog(true, !backTest, AccName + "- setup SL Breakeven: (PnL, posAvgPrc)=(" + pl + "," + Position.AveragePrice + ")");
+					slPrc = Position.AveragePrice;
+					SetStopLoss(CalculationMode.Currency, 0);
 				}
 				
 				if(MM_SLTrailing) { // trailing max and min profits then converted to trailing stop after over the max
-//					if(trailingSLTic > profitLockMaxTic && pl >= 12.5*(trailingSLTic + 2*profitTgtIncTic)) {
-//						trailingSLTic = trailingSLTic + profitTgtIncTic;
-//						if(Position.MarketPosition == MarketPosition.Long)
-//							slPrc = Position.AvgPrice+TickSize*trailingSLTic;
-//						if(Position.MarketPosition == MarketPosition.Short)
-//							slPrc = Position.AvgPrice-TickSize*trailingSLTic;
-//						Print(AccName + "- update SL over Max: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= (" + slTrailing + "," + trailingSLTic + "," + slPrc + ")");						
-//					}
+					if(tradeObj.trailingSLTic > tradeObj.profitLockMaxTic && pl >= 12.5*(tradeObj.trailingSLTic + 2*tradeObj.profitTgtIncTic)) {
+						tradeObj.trailingSLTic = tradeObj.trailingSLTic + tradeObj.profitTgtIncTic;
+						if(Position.MarketPosition == MarketPosition.Long)
+							slPrc = Position.AveragePrice+TickSize*tradeObj.trailingSLTic;
+						if(Position.MarketPosition == MarketPosition.Short)
+							slPrc = Position.AveragePrice-TickSize*tradeObj.trailingSLTic;
+						Print(AccName + "- update SL over Max: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= (" + MM_SLTrailing + "," + tradeObj.trailingSLTic + "," + slPrc + ")");						
+					}
 					if(tradeObj.trailingSLTic > MM_ProfitLockMaxTic && pl >= 12.5*(tradeObj.trailingSLTic + 2*MM_ProfitTgtIncTic)) {
 						tradeObj.trailingSLTic = tradeObj.trailingSLTic + MM_ProfitTgtIncTic;
 						if(tradeObj.BracketOrder.OCOOrder != null && tradeObj.BracketOrder.OCOOrder.StopLossOrder != null)
@@ -168,7 +168,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			double pl = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;//Performance.AllTrades.TradesPerformance.Currency.CumProfit;
 			double plrt = SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit;//Performance.RealtimeTrades.TradesPerformance.Currency.CumProfit;
-			//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ": Cum all PnL= " + pl + ", Cum runtime PnL= " + plrt);
+			indicatorProxy.PrintLog(true, !backTest, CurrentBar + "-" + AccName + ": Cum all PnL= " + pl + ", Cum runtime PnL= " + plrt);
 			return plrt;
 		}
 		
