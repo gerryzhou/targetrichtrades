@@ -46,6 +46,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double trailingPTTic = 16; //
 		public double trailingSLTic = 4; //
 		public bool slTrailing = false; //trailing stop loss
+		public bool ptTrailing = false; //trailing profit target
 		
 		public double dailyLossLmt = -200; //-300 the daily loss limit amount
 		public double profitFactor = 0.5;
@@ -85,6 +86,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		}
 		
 		private void InitParams() {
+			enTrailing = instStrategy.TM_EnTrailing;
 			enOffsetPnts = instStrategy.TM_EnOffsetPnts;
 			enCounterPBBars = instStrategy.TM_EnCounterPBBars;
 			
@@ -95,7 +97,23 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	        barsSincePTSL = instStrategy.TM_BarsSincePTSL;
 			barsToCheckPnL = instStrategy.TM_BarsToCheckPnL;
 			
+			profitTargetAmt = instStrategy.MM_ProfitTargetAmt; //36 Default(450-650 USD) setting for MM_ProfitTargetAmt
+			profitTgtIncTic = instStrategy.MM_ProfitTgtIncTic; //8 Default tick Amt for ProfitTarget increase Amt
+			profitLockMinTic = instStrategy.MM_ProfitLockMinTic; //24 Default ticks Amt for Min Profit locking
+			profitLockMaxTic = instStrategy.MM_ProfitLockMaxTic; //80 Default ticks Amt for Max Profit locking
+			
+	        stopLossAmt = instStrategy.MM_StopLossAmt; //16 Default setting for stopLossAmt
+			stopLossIncTic = instStrategy.MM_StopLossIncTic; //4 Default tick Amt for StopLoss increase Amt
+			trailingSLAmt = instStrategy.MM_TrailingStopLossAmt; //300 Default setting for trailing Stop Loss Amt
+			//trailingPTTic = instStrategy; //
+			//trailingSLTic = 4; //
+						
+			breakEvenAmt = instStrategy.MM_BreakEvenAmt;
 			slTrailing = instStrategy.MM_SLTrailing;
+			ptTrailing = instStrategy.MM_PTTrailing;
+			
+			profitFactor = instStrategy.MM_ProfitFactor;
+			dailyLossLmt = instStrategy.MM_DailyLossLmt;
 		}
 		
 		#region Properties

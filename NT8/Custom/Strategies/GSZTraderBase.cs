@@ -150,13 +150,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 				case AlgoModeType.Trading: //trading
 					//PutTrade(); break;
 					indicatorProxy.TraceMessage(this.Name);
-					ChangeSLPT();
-					//CheckEnOrder(gap);
-					
-					if(NewOrderAllowed())
+					if(hasPosition() != 0) {
+						CheckExitTrade();
+					} else if(NewOrderAllowed())
 					{
 						indicatorProxy.TraceMessage(this.Name);
 						CheckNewEntryTrade();
+						
 						indicatorProxy.TraceMessage(this.Name);
 						PutTrade();
 					}
@@ -169,7 +169,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					indicatorProxy.TraceMessage(this.Name);
 					indicatorProxy.PrintLog(true, !backTest, CurrentBar + "- Stop trading cmd:" + indicatorProxy.Get24HDateTime(Time[0]));
 					break;
-			}			
+			}
 		}
 
 		#region Properties

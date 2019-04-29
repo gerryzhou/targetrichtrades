@@ -5,7 +5,10 @@ TradeMgmt-
 
 * Trailing stop loss after a target is reached;
 
-* 
+* OnBarUpdate: check position, exit trade or entry trade? curStg: check signal;
+baseStg: check performance, check newOrderAllowed? check Exit, check Entry, putTrade;
+How to use signal: entry always needs signal; exit: check signal first or check the performance first(performance first)?
+
 
 MoneyMgmt-
 * Gambling theory: 

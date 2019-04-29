@@ -38,7 +38,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	
 	public enum TradingStyle {TrendFollowing=1, CounterTrend=-1, Ranging=0};
 	
-	public enum TradeType {Entry=1, Exit=-1, NoTrade=0};
+	public enum TradeType {Entry=1, Exit=-1, Liquidate=-2, Reverse=2, NoTrade=0};
 	
 	public enum OrderSignalName {EntryLong, EntryShort, ExitLong, ExitShort, Profittarget, Stoploss};
 	

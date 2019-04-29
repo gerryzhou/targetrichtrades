@@ -48,18 +48,34 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Print(CurrentBar + "::" + this.ToString());
 		}
 		
+		/// <summary>
+		/// Check performance first, 
+		/// then check signal to determine special exit: 
+		/// liquidate, reverse, or scale in/out;
+		/// </summary>
+		/// <returns></returns>
 		public virtual TradeObj CheckExitTrade() {
-			if(Position.MarketPosition == MarketPosition.Flat) return null;
-			else if((indicatorSignal.ReversalDir == Reversal.Up && Position.MarketPosition == MarketPosition.Short) ||
+			//tradeObj.SetTradeType(TradeType.Exit);
+			ChangeSLPT();
+			//if(Position.MarketPosition == MarketPosition.Flat) return null;
+			CheckExitTradeBySignal();
+			
+			return tradeObj;
+		}
+		
+		/// <summary>
+		/// Check exit trader from signal instead of by money management policy
+		/// </summary>
+		/// <returns></returns>
+		public virtual TradeObj CheckExitTradeBySignal() {
+			if((indicatorSignal.ReversalDir == Reversal.Up && Position.MarketPosition == MarketPosition.Short) ||
 				(indicatorSignal.ReversalDir == Reversal.Down && Position.MarketPosition == MarketPosition.Long)) {
+				tradeObj.SetTradeType(TradeType.Liquidate);
 				CloseAllPositions();
 				CancelExitOrders();
-				tradeObj.SetTradeType(TradeType.Exit);
 			} else {
-				ChangeSLPT();
-				tradeObj.SetTradeType(TradeType.Exit);
-			}
-			
+
+			}			
 			return tradeObj;
 		}
 		
@@ -71,6 +87,44 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			if(NewOrderAllowed()) {
 //			}
 			return null;
+		}
+	
+		public virtual bool CheckEnOrder(double cur_gap)
+        {
+            double min_en = -1;
+
+            if (tradeObj.BracketOrder.EntryOrder != null && tradeObj.BracketOrder.EntryOrder.OrderState == OrderState.Working)
+            {
+                min_en = indicatorProxy.GetMinutesDiff(tradeObj.BracketOrder.EntryOrder.Time, Time[0]);// DateTime.Now);
+                //if ( IsTwoBarReversal(cur_gap, TickSize, enCounterPBBars) || (barsHoldEnOrd > 0 && barsSinceEnOrd >= barsHoldEnOrd) || ( minutesChkEnOrder > 0 &&  min_en >= minutesChkEnOrder))
+				if ( (tradeObj.barsHoldEnOrd > 0 && tradeObj.barsSinceEnOrd >= tradeObj.barsHoldEnOrd) || ( tradeObj.minutesChkEnOrder > 0 &&  min_en >= tradeObj.minutesChkEnOrder))	
+                {
+                    CancelOrder(tradeObj.BracketOrder.EntryOrder);
+                    //giParabSAR.PrintLog(true, !backTest, log_file, "Order cancelled for " + AccName + ":" + barsSinceEnOrd + "/" + min_en + " bars/mins elapsed--" + BracketOrder.EntryOrder.ToString());
+					return true;
+                }
+				else {
+					//giParabSAR.PrintLog(true, !backTest, log_file, "Order working for " + AccName + ":" + barsSinceEnOrd + "/" + min_en + " bars/mins elapsed--" + BracketOrder.EntryOrder.ToString());
+					tradeObj.barsSinceEnOrd++;
+				}
+            }
+            return false;
+        }
+		
+		public virtual double GetEnLongPrice() {
+			double prc = -1;
+			switch(tradeObj.BracketOrder.EnOrderType) {
+				case OrderType.Limit:
+					prc = (tradeObj.enTrailing && tradeObj.enCounterPBBars>0) ? Close[0]-tradeObj.enOffsetPnts :  Low[0]-tradeObj.enOffsetPnts;
+					break;
+				case OrderType.StopMarket:
+					prc = tradeObj.enStopPrice;
+					break;
+				case OrderType.StopLimit:
+					prc = tradeObj.enStopPrice;
+					break;
+			}
+			return prc;
 		}
 		
 		public virtual bool NewOrderAllowed()
@@ -112,7 +166,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			
 			//indicatorProxy.TraceMessage(this.Name);
-			if(!backTest && (plrt <= MM_DailyLossLmt || pnl_daily <= MM_DailyLossLmt))
+			if(!backTest && (plrt <= tradeObj.dailyLossLmt || pnl_daily <= tradeObj.dailyLossLmt))
 			{
 				if(PrintOut > -1) {
 					Print(CurrentBar + "-" + AccName + ": dailyLossLmt reached = " + pnl_daily + "," + plrt);
@@ -122,7 +176,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			
 			//indicatorProxy.TraceMessage(this.Name);
-			if (backTest && pnl_daily <= MM_DailyLossLmt) {
+			if (backTest && pnl_daily <= tradeObj.dailyLossLmt) {
 				if(PrintOut > -3) {
 					Print(CurrentBar + "-" + AccName + ": dailyLossLmt reached = " + pnl_daily + "," + plrt);
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ": backTest dailyLossLmt reached = " + pnl);
@@ -134,7 +188,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//indicatorProxy.TraceMessage(this.Name);
 			if (IsTradingTime(170000) && Position.Quantity == 0)
 			{
-				if (tradeObj.BracketOrder.EntryOrder == null || tradeObj.BracketOrder.EntryOrder.OrderState != OrderState.Working || MM_EnTrailing)
+				if (tradeObj.BracketOrder.EntryOrder == null || tradeObj.BracketOrder.EntryOrder.OrderState != OrderState.Working || tradeObj.enTrailing)
 				{					
 					if(bsx < 0 || bsx > tradeObj.barsSincePTSL) //if(bsx == -1 || bsx > tradeObj.barsSincePtSl)
 					{
@@ -152,7 +206,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public virtual void NewShortLimitOrder(string msg, double zzGap, double curGap)
 		{
-			double prc = (MM_EnTrailing && TM_EnCounterPBBars>0) ? Close[0]+TM_EnOffsetPnts : High[0]+TM_EnOffsetPnts;
+			double prc = (tradeObj.enTrailing && tradeObj.enCounterPBBars>0) ? Close[0]+tradeObj.enOffsetPnts : High[0]+tradeObj.enOffsetPnts;
 			
 //			double curGap = giParabSAR.GetCurGap();
 //			double todaySAR = giParabSAR.GetTodaySAR();		
@@ -184,7 +238,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public virtual void NewLongLimitOrder(string msg, double zzGap, double curGap)
 		{
-			double prc = (MM_EnTrailing && TM_EnCounterPBBars>0) ? Close[0]-TM_EnOffsetPnts :  Low[0]-TM_EnOffsetPnts;
+			double prc = (tradeObj.enTrailing && tradeObj.enCounterPBBars>0) ? Close[0]-tradeObj.enOffsetPnts :  Low[0]-tradeObj.enOffsetPnts;
 			
 			if(tradeObj.BracketOrder.EntryOrder == null) {
 				tradeObj.BracketOrder.EntryOrder = EnterLongLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
@@ -202,7 +256,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		public virtual void NewEntryLongOrder()
 		{
-			double prc = GetEnLongPrice();//(MM_EnTrailing && TM_EnCounterPBBars>0) ? Close[0]-TM_EnOffsetPnts :  Low[0]-TM_EnOffsetPnts;
+			double prc = GetEnLongPrice();//(MM_EnTrailing && tradeObj.enCounterPBBars>0) ? Close[0]-tradeObj.enOffsetPnts :  Low[0]-tradeObj.enOffsetPnts;
 			
 			if (tradeObj.BracketOrder.EntryOrder.OrderState == OrderState.Working) {
 //				if(TG_PrintOut > -1)
@@ -267,44 +321,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			} catch(Exception ex) {
 				Print("Ex SetStopLossOrder:" + ex.Message);
 			}
-		}
-		
-		public virtual bool CheckEnOrder(double cur_gap)
-        {
-            double min_en = -1;
-
-            if (tradeObj.BracketOrder.EntryOrder != null && tradeObj.BracketOrder.EntryOrder.OrderState == OrderState.Working)
-            {
-                min_en = indicatorProxy.GetMinutesDiff(tradeObj.BracketOrder.EntryOrder.Time, Time[0]);// DateTime.Now);
-                //if ( IsTwoBarReversal(cur_gap, TickSize, enCounterPBBars) || (barsHoldEnOrd > 0 && barsSinceEnOrd >= barsHoldEnOrd) || ( minutesChkEnOrder > 0 &&  min_en >= minutesChkEnOrder))
-				if ( (TM_BarsHoldEnOrd > 0 && tradeObj.barsSinceEnOrd >= TM_BarsHoldEnOrd) || ( TM_MinutesChkEnOrder > 0 &&  min_en >= TM_MinutesChkEnOrder))	
-                {
-                    CancelOrder(tradeObj.BracketOrder.EntryOrder);
-                    //giParabSAR.PrintLog(true, !backTest, log_file, "Order cancelled for " + AccName + ":" + barsSinceEnOrd + "/" + min_en + " bars/mins elapsed--" + BracketOrder.EntryOrder.ToString());
-					return true;
-                }
-				else {
-					//giParabSAR.PrintLog(true, !backTest, log_file, "Order working for " + AccName + ":" + barsSinceEnOrd + "/" + min_en + " bars/mins elapsed--" + BracketOrder.EntryOrder.ToString());
-					tradeObj.barsSinceEnOrd++;
-				}
-            }
-            return false;
-        }
-		
-		public virtual double GetEnLongPrice() {
-			double prc = -1;
-			switch(tradeObj.BracketOrder.EnOrderType) {
-				case OrderType.Limit:
-					prc = (tradeObj.enTrailing && tradeObj.enCounterPBBars>0) ? Close[0]-tradeObj.enOffsetPnts :  Low[0]-tradeObj.enOffsetPnts;
-					break;
-				case OrderType.StopMarket:
-					prc = tradeObj.enStopPrice;
-					break;
-				case OrderType.StopLimit:
-					prc = tradeObj.enStopPrice;
-					break;
-			}
-			return prc;
 		}
 		
 		public virtual bool CloseAllPositions() 
@@ -489,9 +505,18 @@ namespace NinjaTrader.NinjaScript.Strategies
             set { tm_TradingStyle = value; }
         }
 		
+		[Description("Use trailing entry every bar")]
+ 		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnTrailing", GroupName = "TradeMgmt", Order = 2)]	
+        public bool TM_EnTrailing
+        {
+            get{return tm_EnTrailing;}// { return tradeObj==null? false : tradeObj.enTrailing; }
+            set{tm_EnTrailing = value;}// { if(tradeObj!=null) tradeObj.enTrailing = value; }
+        }
+		
         [Description("Offeset points for limit price entry")]
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnOffsetPnts", GroupName = "TradeMgmt", Order = 2)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnOffsetPnts", GroupName = "TradeMgmt", Order = 3)]		
         public double TM_EnOffsetPnts
         {
             get{return tm_EnOffsetPnts;}// { return tradeObj==null? 0 : tradeObj.enOffsetPnts; }
@@ -558,6 +583,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		private TradingDirection tm_TradingDirection = TradingDirection.Both; // -1=short; 0-both; 1=long;
 		private TradingStyle tm_TradingStyle = TradingStyle.TrendFollowing; // -1=counter trend; 1=trend following;				
+		private bool tm_EnTrailing = false;
 		private double tm_EnOffsetPnts = 1;
 		private int tm_MinutesChkEnOrder = 10;
 		private int tm_MinutesChkPnL = 30;
