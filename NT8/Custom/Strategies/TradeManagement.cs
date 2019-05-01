@@ -278,11 +278,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			tradeObj.barsSinceEnOrd = 0;
 		}
 		
+		#region Exit Order functions
 		public virtual void SetProfitTargetOrder(string sigName) {
 			Print(CurrentBar + ": SetProfitTargetOrder-" 
 			+ sigName + "-" + tradeObj.PTCalculationMode 
-			+ "-" + tradeObj.profitTargetAmt
-			+ "-" + tradeObj.profitTargetPrice + "-avg=" + Position.AveragePrice);
+			+ "-profitTargetAmt=" + tradeObj.profitTargetAmt
+			+ "-profitTargetTic" + tradeObj.profitTargetTic
+			+ "-profitTargetPrice" + tradeObj.profitTargetPrice + "-avg=" + Position.AveragePrice);
 			try{
 			switch(tradeObj.PTCalculationMode) {
 				case CalculationMode.Currency :
@@ -291,21 +293,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 				case CalculationMode.Price :
 					SetProfitTarget(sigName, CalculationMode.Price, tradeObj.profitTargetPrice);
 					break;
+				case CalculationMode.Ticks :
+					SetProfitTarget(sigName, CalculationMode.Ticks, tradeObj.profitTargetTic);
+					break;
 				default: 
 					SetProfitTarget(sigName, CalculationMode.Currency, tradeObj.profitTargetAmt);
 					break;
 			}
 			} catch(Exception ex) {
 				Print("Ex SetProfitTarget:" + ex.Message);
-			}			
-					
+			}
 		}
 
 		public virtual void SetStopLossOrder(string sigName) {
 			Print(CurrentBar + ": SetStopLossOrder-" 
 			+ sigName + "-" + tradeObj.SLCalculationMode 
-			+ "-" + tradeObj.stopLossAmt
-			+ "-" + tradeObj.stopLossPrice + "-avg=" + Position.AveragePrice);
+			+ "-stopLossAmt=" + tradeObj.stopLossAmt
+			+ "-stopLossTic" + tradeObj.stopLossTic
+			+ "-stopLossPrice=" + tradeObj.stopLossPrice + "-avg=" + Position.AveragePrice);
 			try {
 			switch(tradeObj.SLCalculationMode) {
 				case CalculationMode.Currency :
@@ -313,6 +318,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 					break;
 				case CalculationMode.Price :
 					SetStopLoss(sigName, CalculationMode.Price, tradeObj.stopLossPrice, true);
+					break;
+				case CalculationMode.Ticks :
+					SetStopLoss(sigName, CalculationMode.Ticks, tradeObj.stopLossTic, true);
 					break;
 				default: 
 					SetStopLoss(sigName, CalculationMode.Currency, tradeObj.stopLossAmt, true);
@@ -325,11 +333,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		public virtual void SetTrailingStopLossOrder(string sigName) {
 			Print(CurrentBar + ": SetTrailingStopLossOrder-" 
-			+ sigName + "-" + tradeObj.SLCalculationMode 
-			+ "-" + tradeObj.stopLossAmt
-			+ "-" + tradeObj.stopLossPrice + "-avg=" + Position.AveragePrice);
+			+ sigName + "-" + tradeObj.TLSLCalculationMode 
+			+ "-trailingSLAmt=" + tradeObj.trailingSLAmt
+			+ "-trailingSLTic=" + tradeObj.trailingSLTic + "-avg=" + Position.AveragePrice);
 			try {
-			switch(tradeObj.SLCalculationMode) {
+			switch(tradeObj.TLSLCalculationMode) {
 				case CalculationMode.Ticks :
 					SetTrailStop(sigName, CalculationMode.Ticks, tradeObj.trailingSLTic, true);
 					break;
@@ -344,8 +352,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Print("Ex SetStopLossOrder:" + ex.Message);
 			}
 		}
-		
+
+		public virtual void SetSimpleExitOCO(string sigName) {
+			Print(CurrentBar + ": SetSimpleExitOCO-" 
+			+ sigName + "-avg=" + Position.AveragePrice);
+			tradeObj.stopLossAmt = MM_StopLossAmt;
+			tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
+			tradeObj.SLCalculationMode = CalculationMode.Currency;
+			tradeObj.PTCalculationMode = CalculationMode.Currency;
+			SetStopLossOrder(sigName);
+			SetProfitTargetOrder(sigName);
+		}
 		//SetParabolicStop(string fromEntrySignal, CalculationMode mode, double value, bool isSimulatedStop, double acceleration, double accelerationMax, double accelerationStep)
+		#endregion
 		
 		public virtual bool CloseAllPositions() 
 		{

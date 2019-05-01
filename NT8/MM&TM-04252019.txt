@@ -9,6 +9,19 @@ TradeMgmt-
 baseStg: check performance, check newOrderAllowed? check Exit, check Entry, putTrade;
 How to use signal: entry always needs signal; exit: check signal first or check the performance first(performance first)?
 
+* ChangeSLPT:
+		/// For position exit OCO order adjustment
+		/// breakEvenAmt<MinLock<ProfitTargetAmt<MaxLock
+		/// ** Check trailing stop loss if PnL>MaxLock
+		/// ** Check trailing profit target if ProfitTargetAmt<PnL<MaxLock
+		///   * Keep moving target away;
+		///   * Keep stop loss at MinLock no change;
+		/// ** Check stop loss:
+		///   * Check if MinLock<PnL, lock stop loss to MinLock
+		///   * Keep target no change;
+		/// ** Check BreakEven:
+		///   * If PnL>breakEvenAmt, set SL to breakeven;
+		///   * Keep target no change;
 
 MoneyMgmt-
 * Gambling theory: 

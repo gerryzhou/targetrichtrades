@@ -35,11 +35,13 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		public double profitTargetPrice = 0;
 		public double profitTargetAmt = 350; //36 Default(450-650 USD) setting for MM_ProfitTargetAmt
+		public double profitTargetTic = 36; //Ticks of profit target 
 		public double profitTgtIncTic = 6; //8 Default tick Amt for ProfitTarget increase Amt
 		public double profitLockMinTic = 16; //24 Default ticks Amt for Min Profit locking
 		public double profitLockMaxTic = 30; //80 Default ticks Amt for Max Profit locking
 		public double stopLossPrice = 0;
-        public double stopLossAmt = 200; //16 Default setting for stopLossAmt
+        public double stopLossAmt = 200; //16 ticks Default setting for stopLossAmt
+		public double stopLossTic = 16; //16 Default setting for stopLossTic
 		public double stopLossIncTic = 4; //4 Default tick Amt for StopLoss increase Amt
 		public double breakEvenAmt = 150; //150 the profits amount to trigger setting breakeven order
 		public double trailingSLAmt = 100; //300 Default setting for trailing Stop Loss Amt
