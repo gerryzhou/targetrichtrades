@@ -43,4 +43,6 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	public enum OrderSignalName {EntryLong, EntryShort, ExitLong, ExitShort, Profittarget, Stoploss};
 	
 	public enum BracketOrderSubType {Entry, ProfitTarget, StoppLoss, UnKnown};
+	
+	public enum MoneyMgmtPolicy {SimpleSLPT, TrailingSLPT, PositionScaleInOut};
 }

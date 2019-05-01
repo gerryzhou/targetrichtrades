@@ -43,17 +43,19 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double stopLossIncTic = 4; //4 Default tick Amt for StopLoss increase Amt
 		public double breakEvenAmt = 150; //150 the profits amount to trigger setting breakeven order
 		public double trailingSLAmt = 100; //300 Default setting for trailing Stop Loss Amt
-		public double trailingPTTic = 16; //
 		public double trailingSLTic = 4; //
+		public double traillingSLPercent = 1;//
+		public double trailingPTTic = 16; //
 		public bool slTrailing = false; //trailing stop loss
 		public bool ptTrailing = false; //trailing profit target
 		
 		public double dailyLossLmt = -200; //-300 the daily loss limit amount
-		public double profitFactor = 0.5;
+		public double profitFactor = 0.5; //PT/SL ratio
 	
-		public CalculationMode PTCalculationMode = CalculationMode.Currency;
-		public CalculationMode SLCalculationMode = CalculationMode.Currency;	
-		public CalculationMode BECalculationMode = CalculationMode.Currency;
+		public CalculationMode PTCalculationMode = CalculationMode.Currency; // Profit target CalMode
+		public CalculationMode SLCalculationMode = CalculationMode.Currency; // Stoploss CalMode
+		public CalculationMode BECalculationMode = CalculationMode.Currency; // Breakeven CalMode
+		public CalculationMode TLSLCalculationMode = CalculationMode.Ticks; //Trailing SL CalMode
 
 		#endregion
 		
@@ -104,9 +106,12 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			
 	        stopLossAmt = instStrategy.MM_StopLossAmt; //16 Default setting for stopLossAmt
 			stopLossIncTic = instStrategy.MM_StopLossIncTic; //4 Default tick Amt for StopLoss increase Amt
+			
+			trailingPTTic = profitLockMinTic;
+			trailingSLTic = instStrategy.MM_TrailingStopLossTicks; // Ticks for trailing stop loss order
 			trailingSLAmt = instStrategy.MM_TrailingStopLossAmt; //300 Default setting for trailing Stop Loss Amt
-			//trailingPTTic = instStrategy; //
-			//trailingSLTic = 4; //
+			traillingSLPercent = 1;//Percent for trailing stop loss order
+			
 						
 			breakEvenAmt = instStrategy.MM_BreakEvenAmt;
 			slTrailing = instStrategy.MM_SLTrailing;

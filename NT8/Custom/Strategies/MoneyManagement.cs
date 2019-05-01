@@ -52,6 +52,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return 0;
 		}
 		
+		/// <summary>
+		/// For position exit OCO order adjustment
+		/// breakEvenAmt<MinLock<ProfitTargetAmt<MaxLock
+		/// ** Check trailing stop loss if PnL>MaxLock
+		/// ** Check trailing profit target if ProfitTargetAmt<PnL<MaxLock
+		///   * Keep moving target away;
+		///   * Keep stop loss at MinLock no change;
+		/// ** Check stop loss:
+		///   * Check if MinLock<PnL, lock stop loss to MinLock
+		///   * Keep target no change;
+		/// ** Check BreakEven:
+		///   * If PnL>breakEvenAmt, set SL to breakeven;
+		///   * Keep target no change;
+		///
+		/// </summary>
+		/// <returns></returns>
 		protected bool ChangeSLPT()
 		{
 //			int bse = BarsSinceEntry();
@@ -60,7 +76,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				timeSinceEn = indicatorProxy.GetMinutesDiff(Time[0], Time[bse]);
 //			}
 			
-			double pl = Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);//.GetProfitLoss(Close[0], PerformanceUnit.Currency);
+			double pl = CheckUnrealizedPnL();
 			
 			if(Position.Quantity == 0)
 				indicatorProxy.PrintLog(true, !backTest, 
@@ -78,78 +94,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 				double slPrc = tradeObj.BracketOrder.OCOOrder.StopLossOrder == null ?
 					Position.AveragePrice : tradeObj.BracketOrder.OCOOrder.StopLossOrder.StopPrice;
 				
-				if(tradeObj.ptTrailing && pl >= GetTickValue()*(tradeObj.trailingPTTic - 2*tradeObj.profitTgtIncTic))
-				{
-					tradeObj.trailingPTTic = tradeObj.trailingPTTic + tradeObj.profitTgtIncTic;
-					if(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null) {
-						curPTTics = Math.Abs(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder.LimitPrice - Position.AveragePrice)/TickSize;
-					}
-					//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- update PT: PnL=" + pl + ",(trailingPTTic, curPTTics, $Amt, $Amt_cur)=(" + trailingPTTic + "," + curPTTics + "," + GetTickValue()*trailingPTTic + "," + GetTickValue()*curPTTics + ")");
-					if(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == null || tradeObj.trailingPTTic > curPTTics)
-						SetProfitTarget(CalculationMode.Ticks, tradeObj.trailingPTTic);
-				}
+				ChangeProfitTarget();
+
 				indicatorProxy.PrintLog(true, !backTest, 
 					AccName + "- SL Breakeven: (PnL, posAvgPrc, MM_BreakEvenAmt)=(" + pl + "," + Position.AveragePrice + "," + tradeObj.breakEvenAmt + ")");
+				ChangeBreakEven();
+				ChangeStopLoss();
 				
-				if(pl >= tradeObj.breakEvenAmt) { //setup breakeven order
-					indicatorProxy.PrintLog(true, !backTest, 
-						AccName + "- setup SL Breakeven: (PnL, posAvgPrc)=(" + pl + "," + Position.AveragePrice + ")");
-					slPrc = Position.AveragePrice;
-					//SetStopLoss(CalculationMode.Currency, 0);
-					if(tradeObj.BracketOrder.OCOOrder.StopLossOrder != null) {
-						indicatorProxy.PrintLog(true, !backTest, 
-							AccName + "- Setup SL Breakeven Price=" + slPrc + "," + tradeObj.BracketOrder.OCOOrder.StopLossOrder.TimeInForce.ToString());
-//						ChangeOrder(tradeObj.BracketOrder.OCOOrder.StopLossOrder, 
-//						tradeObj.BracketOrder.OCOOrder.StopLossOrder.Quantity, 0, slPrc);
-						tradeObj.stopLossAmt = 0;
-						SetStopLossOrder(tradeObj.BracketOrder.OCOOrder.StopLossOrder.FromEntrySignal);						
-					}
-				}
-				
-				GetTickValue();
-				if(tradeObj.slTrailing) { // trailing max and min profits then converted to trailing stop after over the max
-					if(tradeObj.trailingSLTic > tradeObj.profitLockMaxTic && pl >= GetTickValue()*(tradeObj.trailingSLTic + 2*tradeObj.profitTgtIncTic)) {
-						tradeObj.trailingSLTic = tradeObj.trailingSLTic + tradeObj.profitTgtIncTic;
-						if(Position.MarketPosition == MarketPosition.Long)
-							slPrc = Position.AveragePrice+TickSize*tradeObj.trailingSLTic;
-						if(Position.MarketPosition == MarketPosition.Short)
-							slPrc = Position.AveragePrice-TickSize*tradeObj.trailingSLTic;
-						Print(AccName + "- update SL over Max: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= (" + tradeObj.slTrailing + "," + tradeObj.trailingSLTic + "," + slPrc + ")");						
-					}
-					if(tradeObj.trailingSLTic > tradeObj.profitLockMaxTic && pl >= GetTickValue()*(tradeObj.trailingSLTic + 2*tradeObj.profitTgtIncTic)) {
-						tradeObj.trailingSLTic = tradeObj.trailingSLTic + tradeObj.profitTgtIncTic;
-						if(tradeObj.BracketOrder.OCOOrder.StopLossOrder != null)
-							CancelOrder(tradeObj.BracketOrder.OCOOrder.StopLossOrder);
-						if(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null)
-							CancelOrder(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder);
-						SetTrailStop(CalculationMode.Currency, tradeObj.trailingSLAmt);
-						indicatorProxy.PrintLog(true, !backTest,
-							AccName + "- SetTrailStop over SL Max: PnL=" + pl +
-							"(slTrailing, trailingSLTic, slPrc)= (" + tradeObj.slTrailing + "," + tradeObj.trailingSLTic + "," + slPrc + ")");						
-					}
-					else if(pl >= GetTickValue()*(tradeObj.profitLockMaxTic + 2*tradeObj.profitTgtIncTic)) { // lock max profits
-						tradeObj.trailingSLTic = tradeObj.trailingSLTic + tradeObj.profitTgtIncTic;
-						if(Position.MarketPosition == MarketPosition.Long)
-							slPrc = tradeObj.trailingSLTic > tradeObj.profitLockMaxTic ? Position.AveragePrice+TickSize*tradeObj.trailingSLTic : Position.AveragePrice+TickSize*tradeObj.profitLockMaxTic;
-						if(Position.MarketPosition == MarketPosition.Short)
-							slPrc = tradeObj.trailingSLTic > tradeObj.profitLockMaxTic ? Position.AveragePrice-TickSize*tradeObj.trailingSLTic :  Position.AveragePrice-TickSize*tradeObj.profitLockMaxTic;
-						indicatorProxy.PrintLog(true, !backTest,
-							AccName + "- update SL Max: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= ("
-							+ tradeObj.slTrailing + "," + tradeObj.trailingSLTic + "," + slPrc + ")");
-						//SetStopLoss(CalculationMode.Price, slPrc);
-					}
-					else if(pl >= GetTickValue()*(tradeObj.profitLockMinTic + 2*tradeObj.profitTgtIncTic)) { //lock min profits
-						tradeObj.trailingSLTic = tradeObj.trailingSLTic + tradeObj.profitTgtIncTic;
-						if(Position.MarketPosition == MarketPosition.Long)
-							slPrc = Position.AveragePrice+TickSize*tradeObj.profitLockMinTic;
-						if(Position.MarketPosition == MarketPosition.Short)
-							slPrc = Position.AveragePrice-TickSize*tradeObj.profitLockMinTic;
-						indicatorProxy.PrintLog(true, !backTest, 
-							AccName + "- update SL Min: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= ("
-							+ tradeObj.slTrailing + "," + tradeObj.trailingSLTic + "," + slPrc + ")");
-						//SetStopLoss(CalculationMode.Price, slPrc);
-					}
-				}
 				if(tradeObj.BracketOrder.OCOOrder.StopLossOrder == null || 
 					(Position.MarketPosition == MarketPosition.Long && slPrc > tradeObj.BracketOrder.OCOOrder.StopLossOrder.StopPrice) ||
 					(Position.MarketPosition == MarketPosition.Short && slPrc < tradeObj.BracketOrder.OCOOrder.StopLossOrder.StopPrice)) 
@@ -162,6 +113,121 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 			return false;
 		}
+		
+		public void ChangeProfitTarget() {
+			if(!tradeObj.ptTrailing) return;
+			double plTicks = CheckUnrealizedPnLTicks();
+			double curPTTics = tradeObj.profitLockMinTic;
+			if(plTicks >= (tradeObj.trailingPTTic - 2*tradeObj.profitTgtIncTic))
+			{
+				tradeObj.trailingPTTic = tradeObj.trailingPTTic + tradeObj.profitTgtIncTic;
+				if(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null) {
+					curPTTics = Math.Abs(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder.LimitPrice - Position.AveragePrice)/TickSize;
+				}
+				//giParabSAR.PrintLog(true, !backTest, log_file, AccName + "- update PT: PnL=" + pl + ",(trailingPTTic, curPTTics, $Amt, $Amt_cur)=(" + trailingPTTic + "," + curPTTics + "," + GetTickValue()*trailingPTTic + "," + GetTickValue()*curPTTics + ")");
+				if(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == null || tradeObj.trailingPTTic > curPTTics)
+					SetProfitTarget(CalculationMode.Ticks, tradeObj.trailingPTTic);
+			}
+		}
+		
+		/// <summary>
+		/// Trailing max and min profits then converted to trailing stop after over the max
+		/// </summary>
+		public void ChangeStopLoss() {
+			if(!tradeObj.slTrailing) return;
+			else {
+				double pl = CheckUnrealizedPnL();
+				double slPrc = Position.AveragePrice;
+				if(tradeObj.trailingSLTic > tradeObj.profitLockMaxTic && pl >= GetTickValue()*(tradeObj.trailingSLTic + 2*tradeObj.profitTgtIncTic)) {
+					tradeObj.trailingSLTic = tradeObj.trailingSLTic + tradeObj.profitTgtIncTic;
+					if(Position.MarketPosition == MarketPosition.Long)
+						slPrc = Position.AveragePrice+TickSize*tradeObj.trailingSLTic;
+					if(Position.MarketPosition == MarketPosition.Short)
+						slPrc = Position.AveragePrice-TickSize*tradeObj.trailingSLTic;
+					Print(AccName + "- update SL over Max: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= (" + tradeObj.slTrailing + "," + tradeObj.trailingSLTic + "," + slPrc + ")");						
+				}
+				if(tradeObj.trailingSLTic > tradeObj.profitLockMaxTic && pl >= GetTickValue()*(tradeObj.trailingSLTic + 2*tradeObj.profitTgtIncTic)) {
+					tradeObj.trailingSLTic = tradeObj.trailingSLTic + tradeObj.profitTgtIncTic;
+					if(tradeObj.BracketOrder.OCOOrder.StopLossOrder != null)
+						CancelOrder(tradeObj.BracketOrder.OCOOrder.StopLossOrder);
+					if(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null)
+						CancelOrder(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder);
+					SetTrailStop(CalculationMode.Currency, tradeObj.trailingSLAmt);
+					indicatorProxy.PrintLog(true, !backTest,
+						AccName + "- SetTrailStop over SL Max: PnL=" + pl +
+						"(slTrailing, trailingSLTic, slPrc)= (" + tradeObj.slTrailing + "," + tradeObj.trailingSLTic + "," + slPrc + ")");						
+				}
+				else if(pl >= GetTickValue()*(tradeObj.profitLockMaxTic + 2*tradeObj.profitTgtIncTic)) { // lock max profits
+					tradeObj.trailingSLTic = tradeObj.trailingSLTic + tradeObj.profitTgtIncTic;
+					if(Position.MarketPosition == MarketPosition.Long)
+						slPrc = tradeObj.trailingSLTic > tradeObj.profitLockMaxTic ? Position.AveragePrice+TickSize*tradeObj.trailingSLTic : Position.AveragePrice+TickSize*tradeObj.profitLockMaxTic;
+					if(Position.MarketPosition == MarketPosition.Short)
+						slPrc = tradeObj.trailingSLTic > tradeObj.profitLockMaxTic ? Position.AveragePrice-TickSize*tradeObj.trailingSLTic :  Position.AveragePrice-TickSize*tradeObj.profitLockMaxTic;
+					indicatorProxy.PrintLog(true, !backTest,
+						AccName + "- update SL Max: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= ("
+						+ tradeObj.slTrailing + "," + tradeObj.trailingSLTic + "," + slPrc + ")");
+					//SetStopLoss(CalculationMode.Price, slPrc);
+				}
+				else if(pl >= GetTickValue()*(tradeObj.profitLockMinTic + 2*tradeObj.profitTgtIncTic)) { //lock min profits
+					tradeObj.trailingSLTic = tradeObj.trailingSLTic + tradeObj.profitTgtIncTic;
+					if(Position.MarketPosition == MarketPosition.Long)
+						slPrc = Position.AveragePrice+TickSize*tradeObj.profitLockMinTic;
+					if(Position.MarketPosition == MarketPosition.Short)
+						slPrc = Position.AveragePrice-TickSize*tradeObj.profitLockMinTic;
+					indicatorProxy.PrintLog(true, !backTest, 
+						AccName + "- update SL Min: PnL=" + pl + "(slTrailing, trailingSLTic, slPrc)= ("
+						+ tradeObj.slTrailing + "," + tradeObj.trailingSLTic + "," + slPrc + ")");
+					//SetStopLoss(CalculationMode.Price, slPrc);
+				}
+			}
+		}
+		
+		/// <summary>
+		/// Setup breakeven order
+		/// </summary>
+		public void ChangeBreakEven() {
+			double pl = CheckUnrealizedPnL();
+			if(pl >= tradeObj.breakEvenAmt) {
+				double slPrc = Position.AveragePrice;
+				indicatorProxy.PrintLog(true, !backTest, 
+					AccName + "- Over SL Breakeven: (PnL, posAvgPrc)=(" + pl + "," + slPrc + ")");
+				
+				if(tradeObj.BracketOrder.OCOOrder.StopLossOrder != null) {
+					indicatorProxy.PrintLog(true, !backTest, 
+						AccName + "- Setup SL Breakeven posAvgPrc=" + slPrc + "," + tradeObj.BracketOrder.OCOOrder.StopLossOrder.TimeInForce.ToString());
+//						ChangeOrder(tradeObj.BracketOrder.OCOOrder.StopLossOrder, 
+//						tradeObj.BracketOrder.OCOOrder.StopLossOrder.Quantity, 0, slPrc);
+					tradeObj.stopLossAmt = 0;
+					SetStopLossOrder(tradeObj.BracketOrder.OCOOrder.StopLossOrder.FromEntrySignal);						
+				}
+			}
+		}
+		
+		#endregion
+		
+		#region Check PnL functions
+		//Instrument.MasterInstrument.RoundToTickSize(double price)
+		
+		/// <summary>
+		/// Get the difference of PnL over the breakEven threshold
+		/// return -1 if PnL is below the breakEven threshold
+		/// </summary>
+		/// <returns></returns>
+		public double isOverBreakeven() {
+			double overAmt = -1;
+			double pl = CheckUnrealizedPnL();
+			if(pl >= tradeObj.breakEvenAmt)
+				overAmt = pl - tradeObj.breakEvenAmt;
+			return overAmt;
+		}
+		
+		public double CheckUnrealizedPnL() {
+			return Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
+		}
+		
+		public int CheckUnrealizedPnLTicks() {
+			return (int)(CheckUnrealizedPnL()/GetTickValue());
+		}		
 		
 		public double CheckAccPnL() {
 			double pnl = 0;//GetAccountValue(AccountItem.RealizedProfitLoss);
@@ -237,13 +303,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#region MM Properties
         [Description("Money amount of profit target")]
- 		[Range(0, double.MaxValue), NinjaScriptProperty]
-		//[DefaultValueAttribute(300)]
+ 		[Range(0, double.MaxValue), NinjaScriptProperty]		
 		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtAmt", GroupName = "MoneyMgmt", Order = 0)]	
         public double MM_ProfitTargetAmt
         {
-            get{return mm_ProfitTargetAmt;}// { return tradeObj==null? 50 : tradeObj.profitTargetAmt; }
-            set{mm_ProfitTargetAmt = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.profitTargetAmt = Math.Max(0, value); }
+            get{return mm_ProfitTargetAmt;}
+            set{mm_ProfitTargetAmt = Math.Max(0, value);}
         }
 
         [Description("Money amount for profit target increasement")]
@@ -251,8 +316,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtIncTic", GroupName = "MoneyMgmt", Order = 1)]	
         public int MM_ProfitTgtIncTic
         {
-            get{return mm_ProfitTgtIncTic;}// { return tradeObj==null? 0 : tradeObj.profitTgtIncTic; }
-            set{mm_ProfitTgtIncTic = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.profitTgtIncTic = Math.Max(0, value); }
+            get{return mm_ProfitTgtIncTic;}
+            set{mm_ProfitTgtIncTic = Math.Max(0, value);}
         }
 		
         [Description("Tick amount for min profit locking")]
@@ -260,8 +325,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitLockMinTic", GroupName = "MoneyMgmt", Order = 2)]	
         public int MM_ProfitLockMinTic
         {
-            get{return mm_ProfitLockMinTic;}// { return tradeObj==null? 0 : tradeObj.profitLockMinTic; }
-            set{mm_ProfitLockMinTic = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.profitLockMinTic = Math.Max(0, value); }
+            get{return mm_ProfitLockMinTic;}
+            set{mm_ProfitLockMinTic = Math.Max(0, value);}
         }
 
 		[Description("Tick amount for max profit locking")]
@@ -269,8 +334,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitLockMaxTic", GroupName = "MoneyMgmt", Order = 3)]	
         public int MM_ProfitLockMaxTic
         {
-            get{return mm_ProfitLockMaxTic;}// { return tradeObj==null? 0 : tradeObj.profitLockMaxTic; }
-            set{mm_ProfitLockMaxTic = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.profitLockMaxTic = Math.Max(0, value); }
+            get{return mm_ProfitLockMaxTic;}
+            set{mm_ProfitLockMaxTic = Math.Max(0, value);}
         }
 		
         [Description("Money amount of stop loss")]
@@ -278,8 +343,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossAmt", GroupName = "MoneyMgmt", Order = 4)]	
         public double MM_StopLossAmt
         {
-            get{return mm_StopLossAmt;}// { return tradeObj==null? 30 : tradeObj.stopLossAmt; }
-            set{mm_StopLossAmt = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.stopLossAmt = Math.Max(0, value); }
+            get{return mm_StopLossAmt;}
+            set{mm_StopLossAmt = Math.Max(0, value);}
         }
 		
         [Description("Money amount of trailing stop loss")]
@@ -287,41 +352,50 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossAmt", GroupName = "MoneyMgmt", Order = 5)]	
         public double MM_TrailingStopLossAmt
         {
-            get{return mm_TrailingStopLossAmt;}// { return tradeObj==null? 0 : tradeObj.trailingSLAmt; }
-            set{mm_TrailingStopLossAmt = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.trailingSLAmt = Math.Max(0, value); }
+            get{return mm_TrailingStopLossAmt;}
+            set{mm_TrailingStopLossAmt = Math.Max(0, value);}
         }
+        
+		[Description("Ticks amount of trailing stop loss")]
+ 		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossTicks", GroupName = "MoneyMgmt", Order = 6)]	
+        public double MM_TrailingStopLossTicks
+        {
+            get{return mm_TrailingStopLossTicks;}
+            set{mm_TrailingStopLossTicks = Math.Max(0, value);}
+		}
 		
 		[Description("Money amount for stop loss increasement")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossIncTic", GroupName = "MoneyMgmt", Order = 6)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossIncTic", GroupName = "MoneyMgmt", Order = 7)]	
         public int MM_StopLossIncTic
         {
-            get{return mm_StopLossIncTic;}// { return tradeObj==null? 0 : tradeObj.stopLossIncTic; }
-            set{mm_StopLossIncTic = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.stopLossIncTic = Math.Max(0, value); }
+            get{return mm_StopLossIncTic;}
+            set{mm_StopLossIncTic = Math.Max(0, value);}
         }
 		
         [Description("Break Even amount")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
 		[XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BreakEvenAmt", GroupName = "MoneyMgmt", Order = 7)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BreakEvenAmt", GroupName = "MoneyMgmt", Order = 8)]	
         public double MM_BreakEvenAmt
         {
-            get{return mm_BreakEvenAmt;}// { return tradeObj==null? 0 : tradeObj.breakEvenAmt; }
-            set{mm_BreakEvenAmt = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.breakEvenAmt = Math.Max(0, value); }
+            get{return mm_BreakEvenAmt;}
+            set{mm_BreakEvenAmt = Math.Max(0, value);}
         }
 
 		[Description("Daily Loss Limit amount")]
  		[Range(double.MinValue, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "DailyLossLmt", GroupName = "MoneyMgmt", Order = 8)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "DailyLossLmt", GroupName = "MoneyMgmt", Order = 9)]	
         public double MM_DailyLossLmt
         {
-            get{return mm_DailyLossLmt;}// { return tradeObj==null? 0 : tradeObj.dailyLossLmt; }
+            get{return mm_DailyLossLmt;}
             set{mm_DailyLossLmt = Math.Min(-100, value);}// { if(tradeObj!=null) tradeObj.dailyLossLmt = Math.Min(-100, value); }
         }
 
 		[Description("Profit Factor")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitFactor", GroupName = "MoneyMgmt", Order = 9)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitFactor", GroupName = "MoneyMgmt", Order = 10)]	
         public double MM_ProfitFactor
         {
             get{return mm_ProfitFactor;}// { return tradeObj==null? 0 : tradeObj.dailyLossLmt; }
@@ -373,6 +447,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             set{mm_BECalculationMode = value;}// { if(tradeObj!=null) tradeObj.slTrailing = value; }
         }
 		
+		[Description("Calculation mode for trailing stop loss")]
+ 		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TLSLCalculationMode", GroupName = "MoneyMgmt", Order = 16)]	
+        public CalculationMode MM_TLSLCalculationMode
+        {
+            get{return mm_TLSLCalculationMode;}
+            set{mm_TLSLCalculationMode = value;}
+        }
+		
 		#endregion
 		
 		#region Variables for Properties		
@@ -382,8 +465,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private int mm_ProfitLockMinTic = 16;
 		private int mm_ProfitLockMaxTic = 40;
 		private double mm_StopLossAmt = 300;
-		private double mm_TrailingStopLossAmt = 16;
 		private int mm_StopLossIncTic = 8;
+		private double mm_TrailingStopLossAmt = 200;
+		private double mm_TrailingStopLossTicks = 16;		
 		private double mm_BreakEvenAmt = 150;
 		private double mm_DailyLossLmt = -200;
 		private double mm_ProfitFactor = 1.5;
@@ -391,8 +475,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private bool mm_PTTrailing = false;
 		private bool mm_SLTrailing = false;
 		private CalculationMode mm_PTCalculationMode = CalculationMode.Currency;
-		private CalculationMode mm_SLCalculationMode = CalculationMode.Currency;	
+		private CalculationMode mm_SLCalculationMode = CalculationMode.Currency;
 		private CalculationMode mm_BECalculationMode = CalculationMode.Currency;
+		private CalculationMode mm_TLSLCalculationMode = CalculationMode.Ticks;
 		
 		#endregion
 	}

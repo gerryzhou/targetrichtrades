@@ -322,6 +322,30 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Print("Ex SetStopLossOrder:" + ex.Message);
 			}
 		}
+
+		public virtual void SetTrailingStopLossOrder(string sigName) {
+			Print(CurrentBar + ": SetTrailingStopLossOrder-" 
+			+ sigName + "-" + tradeObj.SLCalculationMode 
+			+ "-" + tradeObj.stopLossAmt
+			+ "-" + tradeObj.stopLossPrice + "-avg=" + Position.AveragePrice);
+			try {
+			switch(tradeObj.SLCalculationMode) {
+				case CalculationMode.Ticks :
+					SetTrailStop(sigName, CalculationMode.Ticks, tradeObj.trailingSLTic, true);
+					break;
+				case CalculationMode.Percent :
+					SetTrailStop(sigName, CalculationMode.Percent, tradeObj.trailingSLAmt, true);
+					break;
+				default: 
+					SetTrailStop(sigName, CalculationMode.Ticks, tradeObj.trailingSLTic, true);
+					break;
+			}
+			} catch(Exception ex) {
+				Print("Ex SetStopLossOrder:" + ex.Message);
+			}
+		}
+		
+		//SetParabolicStop(string fromEntrySignal, CalculationMode mode, double value, bool isSimulatedStop, double acceleration, double accelerationMax, double accelerationStep)
 		
 		public virtual bool CloseAllPositions() 
 		{
