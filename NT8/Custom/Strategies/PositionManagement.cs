@@ -31,6 +31,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	public partial class GSZTraderBase : Strategy
 	{
 		public int hasPosition() {
+			indicatorProxy.TraceMessage(this.Name);
 			int pos = 0;
 			if(Position != null)
 				pos = Position.Quantity;

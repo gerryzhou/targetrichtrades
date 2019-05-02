@@ -30,54 +30,63 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		private TradeType tradeType = TradeType.NoTrade;
 		public TradingDirection tradeDirection = TradingDirection.Both;
 		public TradingStyle tradeStyle = TradingStyle.TrendFollowing;
+		public OrderSignalName entrySignalName = OrderSignalName.UnKnown;
 		
 		#region Money Mgmt variables
 		
-		public double profitTargetPrice = 0;
-		public double profitTargetAmt = 350; //36 Default(450-650 USD) setting for MM_ProfitTargetAmt
-		public double profitTargetTic = 36; //Ticks of profit target 
-		public double profitTgtIncTic = 6; //8 Default tick Amt for ProfitTarget increase Amt
-		public double profitLockMinTic = 16; //24 Default ticks Amt for Min Profit locking
-		public double profitLockMaxTic = 30; //80 Default ticks Amt for Max Profit locking
-		public double stopLossPrice = 0;
-        public double stopLossAmt = 200; //16 ticks Default setting for stopLossAmt
-		public double stopLossTic = 16; //16 Default setting for stopLossTic
-		public double stopLossIncTic = 4; //4 Default tick Amt for StopLoss increase Amt
-		public double breakEvenAmt = 150; //150 the profits amount to trigger setting breakeven order
-		public double trailingSLAmt = 100; //300 Default setting for trailing Stop Loss Amt
-		public double trailingSLTic = 4; //
-		public double traillingSLPercent = 1;//
-		public double trailingPTTic = 16; //
-		public bool slTrailing = false; //trailing stop loss
-		public bool ptTrailing = false; //trailing profit target
+		public double profitTargetAmt = 350;//36 Default(450-650 USD) setting for MM_ProfitTargetAmt
+		public int profitTargetTic = 36;//Ticks of profit target
+		public int profitTgtIncTic = 6;//8 Default tick Amt for ProfitTarget increase Amt
+		public int profitLockMinTic = 16;//24 Default ticks Amt for Min Profit locking
+		public int profitLockMaxTic = 30;//80 Default ticks Amt for Max Profit locking
+		public int trailingPTTic = 16;//Ticks for trailing ProfitTarget, using ticks to record current PT
+		public double profitTargetPrice = 0;//For trailing PT using the price to set OCO order
+		public double stopLossPrice = 0;//Using price to set OCO order, since Amt could be negative
+        public double stopLossAmt = 200;//16 ticks Default setting for stopLossAmt
+		public int stopLossTic = 16;//16 Default setting for stopLossTic
+		public int stopLossIncTic = 4;//4 Default tick Amt for StopLoss increase Amt
+		public double breakEvenAmt = 150;//150 the profits amount to trigger setting breakeven order
+		public double trailingSLAmt = 100;//300 Default setting for trailing Stop Loss Amt
+		public int trailingSLTic = 4;//Ticks for trailing stop loss order
+		public double traillingSLPercent = 1;//Percent for trailing stop loss order
+		public bool slTrailing = false;//Trailing stop loss
+		public bool ptTrailing = false;//Trailing profit target
 		
-		public double dailyLossLmt = -200; //-300 the daily loss limit amount
-		public double profitFactor = 0.5; //PT/SL ratio
+		public double dailyLossLmt = -200;//-300 the daily loss limit amount
+		public double profitFactor = 0.5;//PT/SL ratio
 	
-		public CalculationMode PTCalculationMode = CalculationMode.Currency; // Profit target CalMode
-		public CalculationMode SLCalculationMode = CalculationMode.Currency; // Stoploss CalMode
-		public CalculationMode BECalculationMode = CalculationMode.Currency; // Breakeven CalMode
-		public CalculationMode TLSLCalculationMode = CalculationMode.Ticks; //Trailing SL CalMode
+		/// <summary>
+		/// Use price for the internal unified CalculationMode
+		/// since the stop loss over breakeven will be negative,
+		/// and it is easy to find conflict with SL/PT/TLSL price in OCO order;
+		/// SL, PT Amt and Tic are non-changable after tradeObj is init for new trade,
+		/// the price is changable to ajust during the exit OCO lifecycle;
+		/// </summary>
+		public CalculationMode PTCalculationMode = CalculationMode.Currency;//Profit target CalMode
+		public CalculationMode SLCalculationMode = CalculationMode.Currency;//Stoploss CalMode
+		public CalculationMode BECalculationMode = CalculationMode.Currency;//Breakeven CalMode
+		public CalculationMode TLSLCalculationMode = CalculationMode.Ticks;//Trailing SL CalMode
 
 		#endregion
 		
 		#region Trade Mgmt variables
 		
 		public int enCounterPBBars = 1;//Bar count of pullback for breakout entry setup
-		public bool enTrailing = true; //Trailing the entry price
-		public double enOffsetPnts = 1; //
-		public double enStopPrice = 0; // The stop market price for entry order
+		public bool enTrailing = true;//Trailing the entry price
+		public double enOffsetPnts = 1;//The offset for price of entry limite order
+		public double enStopPrice = 0;//The stop market price for entry order
 		
-		public int minutesChkEnOrder = 20; //how long before checking an entry order filled or not
-		public int minutesChkPnL = 30; //how long before checking P&L
+		public int minutesChkEnOrder = 20;//How long before checking an entry order filled or not
+		public int minutesChkPnL = 30;//How long before checking P&L
 		
-		public int barsHoldEnOrd = 10; // Bars count since en order was issued
-        public int barsSincePTSL = 1;//instStrategy.TM_BarsSincePTSL; // Bar count since last P&L was filled
-		public int barsToCheckPnL = 2; // Bar count to check P&L since the entry
+		public int barsHoldEnOrd = 10; //Bars count since en order was issued
+        public int barsSincePTSL = 1;//Bar count since last P&L was filled
+		public int barsToCheckPnL = 2;//Bar count to check P&L since the entry
 
-		public int barsSinceEnOrd = 0; // bar count since the en order issued
+		public int barsSinceEnOrd = 0;//Bar count since the en order issued
 		
 		#endregion
+		
 		
 		#region Order Objects
 		private BracketOrderBase bracketOrder = new BracketOrderBase();
@@ -101,18 +110,18 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	        barsSincePTSL = instStrategy.TM_BarsSincePTSL;
 			barsToCheckPnL = instStrategy.TM_BarsToCheckPnL;
 			
-			profitTargetAmt = instStrategy.MM_ProfitTargetAmt; //36 Default(450-650 USD) setting for MM_ProfitTargetAmt
-			profitTgtIncTic = instStrategy.MM_ProfitTgtIncTic; //8 Default tick Amt for ProfitTarget increase Amt
-			profitLockMinTic = instStrategy.MM_ProfitLockMinTic; //24 Default ticks Amt for Min Profit locking
-			profitLockMaxTic = instStrategy.MM_ProfitLockMaxTic; //80 Default ticks Amt for Max Profit locking
+			profitTargetAmt = instStrategy.MM_ProfitTargetAmt;
+			profitTgtIncTic = instStrategy.MM_ProfitTgtIncTic;
+			profitLockMinTic = instStrategy.MM_ProfitLockMinTic;
+			profitLockMaxTic = instStrategy.MM_ProfitLockMaxTic;
 			
-	        stopLossAmt = instStrategy.MM_StopLossAmt; //16 Default setting for stopLossAmt
-			stopLossIncTic = instStrategy.MM_StopLossIncTic; //4 Default tick Amt for StopLoss increase Amt
+	        stopLossAmt = instStrategy.MM_StopLossAmt;
+			stopLossIncTic = instStrategy.MM_StopLossIncTic;
 			
 			trailingPTTic = profitLockMinTic;
-			trailingSLTic = instStrategy.MM_TrailingStopLossTicks; // Ticks for trailing stop loss order
-			trailingSLAmt = instStrategy.MM_TrailingStopLossAmt; //300 Default setting for trailing Stop Loss Amt
-			traillingSLPercent = 1;//Percent for trailing stop loss order
+			trailingSLTic = instStrategy.MM_TrailingStopLossTicks;
+			trailingSLAmt = instStrategy.MM_TrailingStopLossAmt;
+			traillingSLPercent = 1;
 			
 						
 			breakEvenAmt = instStrategy.MM_BreakEvenAmt;
@@ -121,6 +130,10 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			
 			profitFactor = instStrategy.MM_ProfitFactor;
 			dailyLossLmt = instStrategy.MM_DailyLossLmt;
+		}
+		
+		public void InitNewEntryTrade() {
+			InitParams();
 		}
 		
 		#region Properties

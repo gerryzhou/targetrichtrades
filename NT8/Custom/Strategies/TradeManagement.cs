@@ -56,8 +56,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public virtual TradeObj CheckExitTrade() {
 			//tradeObj.SetTradeType(TradeType.Exit);
+			indicatorProxy.TraceMessage(this.Name);
 			ChangeSLPT();
 			//if(Position.MarketPosition == MarketPosition.Flat) return null;
+			indicatorProxy.TraceMessage(this.Name);
 			CheckExitTradeBySignal();
 			
 			return tradeObj;
@@ -354,8 +356,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 
 		public virtual void SetSimpleExitOCO(string sigName) {
+			indicatorProxy.TraceMessage(this.Name);
 			Print(CurrentBar + ": SetSimpleExitOCO-" 
 			+ sigName + "-avg=" + Position.AveragePrice);
+			indicatorProxy.TraceMessage(this.Name);
 			tradeObj.stopLossAmt = MM_StopLossAmt;
 			tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
 			tradeObj.SLCalculationMode = CalculationMode.Currency;
@@ -498,7 +502,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if(GetOrderName(order.Name) == OrderSignalName.EntryLong.ToString() ||
 					GetOrderName(order.Name) == OrderSignalName.EntryShort.ToString()) {
 					indicatorProxy.PrintLog(true, !BackTest, "Entry Order Name=" + GetOrderName(order.Name));
-					//tradeObj.BracketOrder.EntryOrder = order;
+					tradeObj.BracketOrder.EntryOrder = order;
 				}
 				if(GetOrderName(order.Name) == OrderSignalName.Profittarget.ToString()) {
 					indicatorProxy.PrintLog(true, !BackTest, "order.Name == OrderSignalName.Profittarget");

@@ -40,7 +40,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	
 	public enum TradeType {Entry=1, Exit=-1, Liquidate=-2, Reverse=2, NoTrade=0};
 	
-	public enum OrderSignalName {EntryLong, EntryShort, ExitLong, ExitShort, Profittarget, Stoploss};
+	public enum OrderSignalName {EntryLong, EntryShort, ExitLong, ExitShort, Profittarget, Stoploss, Trailstop, UnKnown};
 	
 	public enum BracketOrderSubType {Entry, ProfitTarget, StoppLoss, UnKnown};
 	
