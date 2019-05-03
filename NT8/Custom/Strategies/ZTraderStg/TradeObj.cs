@@ -30,7 +30,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		private TradeType tradeType = TradeType.NoTrade;
 		public TradingDirection tradeDirection = TradingDirection.Both;
 		public TradingStyle tradeStyle = TradingStyle.TrendFollowing;
-		public OrderSignalName entrySignalName = OrderSignalName.UnKnown;
+		public string entrySignalName = "";
 		
 		#region Money Mgmt variables
 		
@@ -53,6 +53,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public bool ptTrailing = false;//Trailing profit target
 		
 		public double dailyLossLmt = -200;//-300 the daily loss limit amount
+		public int quantity = 1; //Quantity of the contracts traded
 		public double profitFactor = 0.5;//PT/SL ratio
 	
 		/// <summary>
@@ -75,6 +76,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public bool enTrailing = true;//Trailing the entry price
 		public double enOffsetPnts = 1;//The offset for price of entry limite order
 		public double enStopPrice = 0;//The stop market price for entry order
+		public double enLimitPrice = 0;//The limit price for entry order
 		
 		public int minutesChkEnOrder = 20;//How long before checking an entry order filled or not
 		public int minutesChkPnL = 30;//How long before checking P&L
@@ -85,8 +87,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 
 		public int barsSinceEnOrd = 0;//Bar count since the en order issued
 		
-		#endregion
-		
+		#endregion		
 		
 		#region Order Objects
 		private BracketOrderBase bracketOrder = new BracketOrderBase();
@@ -130,6 +131,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			
 			profitFactor = instStrategy.MM_ProfitFactor;
 			dailyLossLmt = instStrategy.MM_DailyLossLmt;
+			
+			quantity = instStrategy.DefaultQuantity;
 		}
 		
 		public void InitNewEntryTrade() {

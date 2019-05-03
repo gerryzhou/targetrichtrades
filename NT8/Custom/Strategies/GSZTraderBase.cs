@@ -98,7 +98,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			//CustomColor1					= Brushes.Orange;
 			StartH						= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
-			//CustomPrc1					= 1;		
+			//CustomPrc1					= 1;
+			// Use Unmanaged order methods
+        	IsUnmanaged = true;
 			AlgoMode = AlgoModeType.Trading;
 		}
 		

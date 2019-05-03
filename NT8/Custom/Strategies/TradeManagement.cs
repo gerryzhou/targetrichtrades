@@ -206,9 +206,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return false;
 		}
 		
-		public virtual void NewShortLimitOrder(string msg, double zzGap, double curGap)
+		/// <summary>
+		/// Submit unmanaged short limit order, set the order object in OnOrderUpdate handler
+		/// </summary>
+		/// <param name="msg"></param>
+		public virtual void NewShortLimitOrderUM(string msg)
 		{
-			double prc = (tradeObj.enTrailing && tradeObj.enCounterPBBars>0) ? Close[0]+tradeObj.enOffsetPnts : High[0]+tradeObj.enOffsetPnts;
+			SubmitOrderUnmanaged(0, OrderAction.SellShort, OrderType.Limit, tradeObj.quantity, tradeObj.enLimitPrice, 0, "", tradeObj.entrySignalName);
+			
+			//double prc = (tradeObj.enTrailing && tradeObj.enCounterPBBars>0) ? Close[0]+tradeObj.enOffsetPnts : High[0]+tradeObj.enOffsetPnts;
 			
 //			double curGap = giParabSAR.GetCurGap();
 //			double todaySAR = giParabSAR.GetTodaySAR();		
@@ -231,10 +237,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (tradeObj.BracketOrder.EntryOrder.OrderState == OrderState.Working) {
 //				if(TG_PrintOut > -1)
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + msg +  ", EnterShortLimit updated short price (old, new)=(" + BracketOrder.EntryOrder.LimitPrice + "," + prc + ") -- " + Get24HDateTime(Time[0]));		
-				CancelOrder(tradeObj.BracketOrder.EntryOrder);
+				//CancelOrder(tradeObj.BracketOrder.EntryOrder);
 				//BracketOrder.EntryOrder = EnterShortLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
 			}
-			tradeObj.BracketOrder.EntryOrder = EnterShortLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
+			//tradeObj.BracketOrder.EntryOrder = EnterShortLimit(0, true, DefaultQuantity, prc, "pbSAREntrySignal");
 			tradeObj.barsSinceEnOrd = 0;
 		}
 		
@@ -455,6 +461,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";SP=" + order.StopPrice + ";LP=" + order.LimitPrice
 			+ "; BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
 			
+			GetBracketOrderSubType(order);
+			
 			indicatorProxy.TraceMessage(this.Name);
 		    if (tradeObj.BracketOrder.EntryOrder != null && tradeObj.BracketOrder.EntryOrder == order)
 		    {
@@ -522,9 +530,48 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//InitTradeMgmt();			
 		}
 		
+		#endregion
+		
+		#region Order utilities functions
+		
+		/// <summary>
+		/// Entry order Signal name with timestamp:
+		/// EntryShort-201905312359888
+		/// </summary>
+		/// <param name="nameTag"></param>
+		/// <returns></returns>
+		public string GetNewEnOrderSignalName(string nameTag) {
+			string sName = nameTag + "-" + GetCurTimestampStr();
+			return sName;
+		}
+
+		/// <summary>
+		/// New OCO ID with timestamp:
+		/// OCO-201905312359888
+		/// </summary>
+		/// <returns></returns>
+		public string GetNewOCOId() {
+			string sName = "OCO-" + GetCurTimestampStr();
+			return sName;
+		}
+		
 		//Remove whitespaces from order name
 		public string GetOrderName(string orderName) {
 			return Regex.Replace(orderName, @"\s+", "");
+		}
+		
+		/// <summary>
+		/// Get the subType of the bracket order: entry, SL or PT
+		/// </summary>
+		/// <param name="order"></param>
+		/// <returns></returns>
+		public BracketOrderSubType GetBracketOrderSubType(Order order) {
+			BracketOrderSubType bost = BracketOrderSubType.UnKnown;
+			if(order != null) {
+				indicatorProxy.PrintLog(true, !BackTest, "GetBracketOrderSubType:" +
+				order.Name + "," + order.OrderTypeString);
+			}
+			return bost;
 		}
 		
 		#endregion

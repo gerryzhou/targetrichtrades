@@ -144,6 +144,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return timeSinceEn;
 		}
 		
+		/// <summary>
+		/// Timestamp: 20190503172538957
+		/// </summary>
+		/// <returns></returns>
+		public string GetCurTimestampStr() {
+			return DateTime.Now.ToString("yyyyMMddHHmmssfff");
+		}
+		
 		#endregion Trigger Functions
 		
 		protected virtual bool PatternMatched()

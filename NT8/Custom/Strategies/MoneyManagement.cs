@@ -81,7 +81,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.TraceMessage(this.Name);
 			if(pl_tics >= (tradeObj.profitLockMaxTic+2*tradeObj.profitTgtIncTic)) {
 				indicatorProxy.TraceMessage(this.Name);
-				SetTrailingStopLossOrder(tradeObj.BracketOrder.EntryOrder.FromEntrySignal);
+				SetTrailingStopLossOrder(tradeObj.entrySignalName.ToString());
 			} // start trailing SL
 			else if (pl >= (tradeObj.profitTargetAmt+2*GetCurrencyByTicks(tradeObj.profitTgtIncTic))) {
 				indicatorProxy.TraceMessage(this.Name);
@@ -97,7 +97,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			} // PT no change, BE SL
 			else {
 				indicatorProxy.TraceMessage(this.Name);
-				SetSimpleExitOCO(tradeObj.BracketOrder.EntryOrder.FromEntrySignal);
+				SetSimpleExitOCO(tradeObj.entrySignalName.ToString());
 			} // set simple PT, SL
 			
 //			if(Position.Quantity == 0)
@@ -253,8 +253,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
 			tradeObj.SLCalculationMode = CalculationMode.Currency;
 			tradeObj.PTCalculationMode = CalculationMode.Currency;
-			SetStopLossOrder(tradeObj.BracketOrder.EntryOrder.FromEntrySignal);
-			SetProfitTargetOrder(tradeObj.BracketOrder.EntryOrder.FromEntrySignal);
+			SetStopLossOrder(tradeObj.entrySignalName.ToString());
+			SetProfitTargetOrder(tradeObj.entrySignalName.ToString());
 		}
 		
 		#endregion
