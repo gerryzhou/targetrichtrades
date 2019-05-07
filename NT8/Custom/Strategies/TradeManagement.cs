@@ -313,6 +313,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 
+		public virtual void SetProfitTargetOrderUM() {
+			Print(CurrentBar + ": SetProfitTargetOrderUM-sigName-ocoID=GetExitOrderAction()=" 
+			+ tradeObj.entrySignalName + "-" + tradeObj.ocoID+ "-" + GetExitOrderAction().ToString()
+			+ "-profitTargetAmt=" + tradeObj.profitTargetAmt
+			+ "-profitTargetTic" + tradeObj.profitTargetTic
+			+ "-profitTargetPrice" + tradeObj.profitTargetPrice + "-avg=" + Position.AveragePrice);
+			
+			try{			
+				SubmitOrderUnmanaged(0, GetExitOrderAction(), OrderType.Limit, tradeObj.quantity,
+				tradeObj.profitTargetPrice, 0, tradeObj.ocoID, tradeObj.entrySignalName);
+				//SetProfitTarget(sigName, CalculationMode.Price, tradeObj.profitTargetPrice);
+			} catch(Exception ex) {
+				Print("Ex SetProfitTargetUM:" + ex.Message);
+			}
+		}
+		
 		public virtual void SetStopLossOrder(string sigName) {
 			Print(CurrentBar + ": SetStopLossOrder-" 
 			+ sigName + "-" + tradeObj.SLCalculationMode 
@@ -338,7 +354,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Print("Ex SetStopLossOrder:" + ex.Message);
 			}
 		}
-
+		
+		public virtual void SetStopLossOrderUM() {
+			Print(CurrentBar + ": SetStopLossOrderUM-sigName-OCO=GetExitOrderAction()=" 
+			+ tradeObj.entrySignalName + "-" + tradeObj.ocoID+ "-" + GetExitOrderAction().ToString()
+			+ "-stopLossAmt=" + tradeObj.stopLossAmt
+			+ "-stopLossTic" + tradeObj.stopLossTic
+			+ "-SetStopLossOrder" + tradeObj.stopLossPrice + "-avg=" + Position.AveragePrice);
+			
+			try{			
+				SubmitOrderUnmanaged(0, GetExitOrderAction(), OrderType.StopMarket, tradeObj.quantity,
+				0, tradeObj.stopLossPrice, tradeObj.ocoID, tradeObj.entrySignalName);
+				//SetProfitTarget(sigName, CalculationMode.Price, tradeObj.profitTargetPrice);
+			} catch(Exception ex) {
+				Print("Ex SetStopLossOrderUM:" + ex.Message);
+			}
+		}
+		
 		public virtual void SetTrailingStopLossOrder(string sigName) {
 			Print(CurrentBar + ": SetTrailingStopLossOrder-" 
 			+ sigName + "-" + tradeObj.TLSLCalculationMode 
@@ -361,6 +393,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 
+		public virtual void SetExitOcoUM() {
+			indicatorProxy.TraceMessage(this.Name);
+			Print(CurrentBar + ": SetExitOcoUM-" 
+			+ "-avg=" + Position.AveragePrice);
+			indicatorProxy.TraceMessage(this.Name);
+			SetProfitTargetOrderUM();
+			SetStopLossOrderUM();
+		}
+		
 		public virtual void SetSimpleExitOCO(string sigName) {
 			indicatorProxy.TraceMessage(this.Name);
 			Print(CurrentBar + ": SetSimpleExitOCO-" 
@@ -433,10 +474,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			// Remember to check the underlying IOrder object for null before trying to access its properties
 			if (execution.Order != null && execution.Order.OrderState == OrderState.Filled) {
 				if(Position.Quantity != 0) {
-					//SetEntryOrder(OrderSignalName.EntryShort, execution.Order);
+					//SetEntryOrder(OrderSignalName.EntryShort, execution.Order);					
 					CalProfitTargetAmt(price, tradeObj.profitFactor);
-					SetProfitTargetOrder(OrderSignalName.EntryShort.ToString());
-					SetStopLossOrder(OrderSignalName.EntryShort.ToString());
+					CalExitOcoPrice(Position.AveragePrice, tradeObj.profitFactor);
+					SetExitOcoUM();
+
+					//SetProfitTargetOrder(OrderSignalName.EntryShort.ToString());
+					//SetStopLossOrder(OrderSignalName.EntryShort.ToString());
 				}
 				//if(TG_PrintOut > -1)
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + " Exe=" + execution.Name + ",Price=" + execution.Price + "," + execution.Time.ToShortTimeString());
@@ -572,6 +616,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 				order.Name + "," + order.OrderTypeString);
 			}
 			return bost;
+		}
+		
+		public OrderAction GetExitOrderAction() {
+			OrderAction oAct;
+			if(Position.MarketPosition==MarketPosition.Short)
+				oAct = OrderAction.BuyToCover;
+			else if(Position.MarketPosition==MarketPosition.Long)
+				oAct = OrderAction.Sell;
+			else throw new Exception("GetExitOrderAction error MarketPosition=" + Position.MarketPosition);
+			return oAct;
 		}
 		
 		#endregion

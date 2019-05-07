@@ -31,6 +31,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public TradingDirection tradeDirection = TradingDirection.Both;
 		public TradingStyle tradeStyle = TradingStyle.TrendFollowing;
 		public string entrySignalName = "";
+		public string ocoID = "";
 		
 		#region Money Mgmt variables
 		

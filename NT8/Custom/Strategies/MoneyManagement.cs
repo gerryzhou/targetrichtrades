@@ -51,6 +51,48 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}			
 			return 0;
 		}
+
+		/// <summary>
+		/// Calculation of price for unmanaged OCO exit order
+		/// </summary>
+		/// <param name="avgPrice">Avg entry price</param>
+		/// <param name="profitFactor">PT/SL>0</param>
+		protected void CalExitOcoPrice(double avgPrice, double profitFactor) {			
+			switch(tradeObj.SLCalculationMode) {
+				case CalculationMode.Currency:
+					if(profitFactor > 0)
+						tradeObj.profitTargetAmt = 
+							profitFactor*tradeObj.stopLossAmt;
+					if(Position.MarketPosition == MarketPosition.Long) {
+						tradeObj.stopLossPrice = avgPrice - GetPriceByCurrency(tradeObj.stopLossAmt);
+						tradeObj.profitTargetPrice = avgPrice + GetPriceByCurrency(tradeObj.profitTargetAmt);
+					}
+					else if(Position.MarketPosition == MarketPosition.Short) {
+						tradeObj.stopLossPrice = avgPrice + GetPriceByCurrency(tradeObj.stopLossAmt);
+						tradeObj.profitTargetPrice = avgPrice - GetPriceByCurrency(tradeObj.profitTargetAmt);
+					}
+						
+					break;
+				case CalculationMode.Ticks:
+					if(profitFactor > 0)
+						tradeObj.profitTargetTic = 
+							(int)profitFactor*tradeObj.stopLossTic;
+					if(Position.MarketPosition == MarketPosition.Long) {
+						tradeObj.stopLossPrice = avgPrice - GetPriceByTicks(tradeObj.stopLossTic);
+						tradeObj.profitTargetPrice = avgPrice + GetPriceByTicks(tradeObj.profitTargetTic);
+					}
+					else if(Position.MarketPosition == MarketPosition.Short) {
+						tradeObj.stopLossPrice = avgPrice + GetPriceByTicks(tradeObj.stopLossTic);
+						tradeObj.profitTargetPrice = avgPrice - GetPriceByTicks(tradeObj.profitTargetTic);
+					}					
+					break;
+				case CalculationMode.Price:
+					if(profitFactor > 0)
+						tradeObj.profitTargetAmt = 
+							profitFactor*Math.Abs(avgPrice-tradeObj.stopLossPrice)*Instrument.MasterInstrument.PointValue;
+					break;
+			}
+		}
 		
 		/// <summary>
 		/// For position exit OCO order adjustment
