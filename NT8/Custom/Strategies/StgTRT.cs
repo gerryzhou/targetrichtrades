@@ -180,9 +180,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				
 				tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 				tradeObj.SetTradeType(TradeType.Entry);					
-				tradeObj.PTCalculationMode = CalculationMode.Price;
+				tradeObj.PTCalculationMode = MM_PTCalculationMode;
 				tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
-				tradeObj.SLCalculationMode = CalculationMode.Price;
+				tradeObj.SLCalculationMode = MM_SLCalculationMode;
 				tradeObj.stopLossAmt = MM_StopLossAmt;
 				//tradeObj.stopLossPrice = giSMI.GetResistance.GetResistance(indicatorSignal.SnR.Resistance);
 				tradeObj.barsSincePTSL = TM_BarsSincePTSL;
@@ -205,13 +205,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 					//tradeObj.BracketOrder.EntryOrder = 
 					//EnterShort(OrderSignalName.EntryShort.ToString());
 					//EnterShortLimit(Close[0], OrderSignalName.EntryShort.ToString());
-					tradeObj.entrySignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShort.ToString());
+					//tradeObj.entrySignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShort.ToString());
 					tradeObj.enLimitPrice = Close[0];
-					NewShortLimitOrderUM(OrderSignalName.EntryShort.ToString());
+					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
 				}
 				else if(tradeObj.tradeDirection == TradingDirection.Up)
 					//tradeObj.BracketOrder.EntryOrder = 
-					EnterLong(OrderSignalName.EntryLong.ToString());
+					EnterLong(OrderSignalName.EntryLongMkt.ToString());
 					//EnterLongLimit(Low[0]-5, OrderSignalName.EntryLong.ToString());
 				indicatorProxy.PrintLog(true, !BackTest, "PutTrade OrderSignalName=" + tradeObj.entrySignalName);
 			}

@@ -212,6 +212,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="msg"></param>
 		public virtual void NewShortLimitOrderUM(string msg)
 		{
+			tradeObj.entrySignalName = GetNewBracketOrderSignalName(OrderSignalName.EntryShortLmt.ToString());
 			SubmitOrderUnmanaged(0, OrderAction.SellShort, OrderType.Limit, tradeObj.quantity, tradeObj.enLimitPrice, 0, "", tradeObj.entrySignalName);
 			
 			//double prc = (tradeObj.enTrailing && tradeObj.enCounterPBBars>0) ? Close[0]+tradeObj.enOffsetPnts : High[0]+tradeObj.enOffsetPnts;
@@ -275,10 +276,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			if(tradeObj.BracketOrder.EntryOrder == null) {
 				if(tradeObj.BracketOrder.EnOrderType == OrderType.StopMarket) {
-					tradeObj.BracketOrder.EntryOrder = EnterLongStopMarket(DefaultQuantity, prc, OrderSignalName.EntryLong.ToString());
+					tradeObj.BracketOrder.EntryOrder = EnterLongStopMarket(DefaultQuantity, prc, OrderSignalName.EntryLongStopMkt.ToString());
 				}
 				else if(tradeObj.BracketOrder.EnOrderType == OrderType.Limit) {
-					tradeObj.BracketOrder.EntryOrder = EnterLongLimit(DefaultQuantity, prc, OrderSignalName.EntryLong.ToString());
+					tradeObj.BracketOrder.EntryOrder = EnterLongLimit(DefaultQuantity, prc, OrderSignalName.EntryLongLmt.ToString());
 				}
 //				if(TG_PrintOut > -1)
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + msg +  ", EnterLongLimit called buy price= " + prc + " -- " + Get24HDateTime(Time[0]));
@@ -322,7 +323,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			try{			
 				SubmitOrderUnmanaged(0, GetExitOrderAction(), OrderType.Limit, tradeObj.quantity,
-				tradeObj.profitTargetPrice, 0, tradeObj.ocoID, tradeObj.entrySignalName);
+				tradeObj.profitTargetPrice, 0, tradeObj.ocoID, tradeObj.profitTargetSignalName);
 				//SetProfitTarget(sigName, CalculationMode.Price, tradeObj.profitTargetPrice);
 			} catch(Exception ex) {
 				Print("Ex SetProfitTargetUM:" + ex.Message);
@@ -356,7 +357,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public virtual void SetStopLossOrderUM() {
-			Print(CurrentBar + ": SetStopLossOrderUM-sigName-OCO=GetExitOrderAction()=" 
+			Print(CurrentBar + ":SetStopLossOrderUM-sigName-OCO=GetExitOrderAction()=" 
 			+ tradeObj.entrySignalName + "-" + tradeObj.ocoID+ "-" + GetExitOrderAction().ToString()
 			+ "-stopLossAmt=" + tradeObj.stopLossAmt
 			+ "-stopLossTic" + tradeObj.stopLossTic
@@ -364,7 +365,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			try{			
 				SubmitOrderUnmanaged(0, GetExitOrderAction(), OrderType.StopMarket, tradeObj.quantity,
-				0, tradeObj.stopLossPrice, tradeObj.ocoID, tradeObj.entrySignalName);
+				0, tradeObj.stopLossPrice, tradeObj.ocoID, tradeObj.stopLossSignalName);
 				//SetProfitTarget(sigName, CalculationMode.Price, tradeObj.profitTargetPrice);
 			} catch(Exception ex) {
 				Print("Ex SetStopLossOrderUM:" + ex.Message);
@@ -395,6 +396,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		public virtual void SetExitOcoUM() {
 			indicatorProxy.TraceMessage(this.Name);
+			tradeObj.ocoID = GetNewOCOId();
 			Print(CurrentBar + ": SetExitOcoUM-" 
 			+ "-avg=" + Position.AveragePrice);
 			indicatorProxy.TraceMessage(this.Name);
@@ -462,11 +464,32 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if(BarsInProgress !=0) return;
 			
+			Print(CurrentBar + ":OnExecutionUpdate-IsUnmanaged=" + IsUnmanaged);
+			if(IsUnmanaged) 
+				OnExecutionUpdateUM(execution, executionId, price, quantity, marketPosition, orderId, time);
+			else
+				OnExecutionUpdateMG(execution, executionId, price, quantity, marketPosition, orderId, time);
+		}
+		
+		/// <summary>
+		/// For managed orders approach
+		/// </summary>
+		/// <param name="execution"></param>
+		/// <param name="executionId"></param>
+		/// <param name="price"></param>
+		/// <param name="quantity"></param>
+		/// <param name="marketPosition"></param>
+		/// <param name="orderId"></param>
+		/// <param name="time"></param>
+		public virtual void OnExecutionUpdateMG(Execution execution, string executionId, double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
+		{
+			if(BarsInProgress !=0) return;
+			
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			
-			Print(CurrentBar + ":OnExecutionUpdate-quant,mktPos,prc,BarsSinceEx,BarsSinceEn=" 
-			+ quantity + "," + marketPosition + "," + price + ","
+			Print(CurrentBar + ":OnExecutionUpdateMG-quant,mktPos,prc, AvgPrc, BarsSinceEx,BarsSinceEn=" 
+			+ quantity + "," + marketPosition + "," + price + "," + Position.AveragePrice + ","
 			+ bsx + "," + bse
 			+ ",SL=" + tradeObj.stopLossPrice
 			+ ",Ordername=" + GetOrderName(execution.Order.Name));
@@ -490,8 +513,84 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//}
 			}
 		}
+		
+		/// <summary>
+		/// For un-managed orders approach
+		/// </summary>
+		/// <param name="execution"></param>
+		/// <param name="executionId"></param>
+		/// <param name="price"></param>
+		/// <param name="quantity"></param>
+		/// <param name="marketPosition"></param>
+		/// <param name="orderId"></param>
+		/// <param name="time"></param>
+		public virtual void OnExecutionUpdateUM(Execution execution, string executionId, double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
+		{
+			if(BarsInProgress !=0) return;
+			
+			int bsx = BarsSinceExitExecution(0, "", 0);
+			int bse = BarsSinceEntryExecution(0, "", 0);
+			
+			Print(CurrentBar + ":OnExecutionUpdateUM-quant,mktPos,prc, AvgPrc, BarsSinceEx,BarsSinceEn=" 
+			+ quantity + "," + marketPosition + "," + price + "," + Position.AveragePrice + ","
+			+ bsx + "," + bse
+			+ ",ocoID=" + tradeObj.ocoID
+			+ ",OCO=" + execution.Order.Oco
+			+ ",Ordername=" + GetOrderName(execution.Order.Name)
+			+ ",entrySignalName=" + tradeObj.entrySignalName);
+			
+			// Remember to check the underlying IOrder object for null before trying to access its properties
+			if (execution.Order != null && execution.Order.OrderState == OrderState.Filled) {
+				if(Position.Quantity != 0 && 
+				GetOrderName(execution.Order.Name).Equals(tradeObj.entrySignalName)) {
+					//SetEntryOrder(OrderSignalName.EntryShort, execution.Order);
+					tradeObj.BracketOrder.EntryOrder = execution.Order;
+					CalProfitTargetAmt(price, tradeObj.profitFactor);
+					CalExitOcoPrice(Position.AveragePrice, tradeObj.profitFactor);
+					SetExitOcoUM();
+
+					//SetProfitTargetOrder(OrderSignalName.EntryShort.ToString());
+					//SetStopLossOrder(OrderSignalName.EntryShort.ToString());
+				}
+				//if(TG_PrintOut > -1)
+					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + " Exe=" + execution.Name + ",Price=" + execution.Price + "," + execution.Time.ToShortTimeString());
+				//if(drawTxt) {
+				//	IText it = DrawText(CurrentBar.ToString()+Time[0].ToShortTimeString(), Time[0].ToString().Substring(10)+"\r\n"+execution.Name+":"+execution.Price, 0, execution.Price, Color.Red);
+				//	it.Locked = false;
+				//}
+			}
+		}
 
 		protected override void OnOrderUpdate(Cbi.Order order, double limitPrice, double stopPrice, 
+			int quantity, int filled, double averageFillPrice, 
+			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
+		{
+			if(BarsInProgress !=0) return;
+			
+			Print(CurrentBar + ":OnOrderUpdate IsUnmanaged=" + IsUnmanaged);
+			
+			if(IsUnmanaged)
+				OnOrderUpdateUM(order, limitPrice, stopPrice, quantity, filled, 
+				averageFillPrice, orderState, time, error, comment);
+			else
+				OnOrderUpdateMG(order, limitPrice, stopPrice, quantity, filled, 
+				averageFillPrice, orderState, time, error, comment);	
+		}
+		
+		/// <summary>
+		/// For managed orders approach
+		/// </summary>
+		/// <param name="order"></param>
+		/// <param name="limitPrice"></param>
+		/// <param name="stopPrice"></param>
+		/// <param name="quantity"></param>
+		/// <param name="filled"></param>
+		/// <param name="averageFillPrice"></param>
+		/// <param name="orderState"></param>
+		/// <param name="time"></param>
+		/// <param name="error"></param>
+		/// <param name="comment"></param>
+		public virtual void OnOrderUpdateMG(Cbi.Order order, double limitPrice, double stopPrice, 
 			int quantity, int filled, double averageFillPrice, 
 			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
 		{
@@ -500,7 +599,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			
-			Print(CurrentBar + ":OnOrderUpdate name-" + GetOrderName(order.Name) + "-" + order.FromEntrySignal + ";" + order.OrderTypeString
+			Print(CurrentBar + ":OnOrderUpdateMG name-" + GetOrderName(order.Name) + "-" + order.FromEntrySignal + ";" + order.OrderTypeString
 			+ ";" + order.OrderState.ToString() + ";" + order.OrderAction.ToString()
 			+ ";SP=" + order.StopPrice + ";LP=" + order.LimitPrice
 			+ "; BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
@@ -551,8 +650,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			indicatorProxy.TraceMessage(this.Name);
 			if (order.OrderState == OrderState.Working){// || order.OrderType == OrderType.StopMarket) {
-				if(GetOrderName(order.Name) == OrderSignalName.EntryLong.ToString() ||
-					GetOrderName(order.Name) == OrderSignalName.EntryShort.ToString()) {
+				if(GetOrderName(order.Name) == tradeObj.entrySignalName) //OrderSignalName.EntryLong.ToString() ||
+					//GetOrderName(order.Name) == OrderSignalName.EntryShort.ToString()) 
+				{
 					indicatorProxy.PrintLog(true, !BackTest, "Entry Order Name=" + GetOrderName(order.Name));
 					tradeObj.BracketOrder.EntryOrder = order;
 				}
@@ -574,6 +674,104 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//InitTradeMgmt();			
 		}
 		
+		/// <summary>
+		/// For un-managed orders approach
+		/// </summary>
+		/// <param name="order"></param>
+		/// <param name="limitPrice"></param>
+		/// <param name="stopPrice"></param>
+		/// <param name="quantity"></param>
+		/// <param name="filled"></param>
+		/// <param name="averageFillPrice"></param>
+		/// <param name="orderState"></param>
+		/// <param name="time"></param>
+		/// <param name="error"></param>
+		/// <param name="comment"></param>
+		public virtual void OnOrderUpdateUM(Cbi.Order order, double limitPrice, double stopPrice, 
+			int quantity, int filled, double averageFillPrice, 
+			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
+		{
+			if(BarsInProgress !=0) return;
+			
+			int bsx = BarsSinceExitExecution(0, "", 0);
+			int bse = BarsSinceEntryExecution(0, "", 0);
+			
+			Print(CurrentBar + ":OnOrderUpdateUM name-" + GetOrderName(order.Name) + "-" + order.FromEntrySignal + ";" + order.OrderTypeString
+			+ ";" + order.OrderState.ToString() + ";" + order.OrderAction.ToString()
+			+ ",ocoID=" + tradeObj.ocoID
+			+ ",OCO=" + order.Oco
+			+ ";SP=" + order.StopPrice + ";LP=" + order.LimitPrice
+			+ "; BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
+			
+			GetBracketOrderSubType(order);
+			
+			indicatorProxy.TraceMessage(this.Name);
+		    if (tradeObj.BracketOrder.EntryOrder != null && tradeObj.BracketOrder.EntryOrder == order)
+		    {
+				//giParabSAR.PrintLog(true, !backTest, log_file, order.ToString() + "--" + order.OrderState);
+		        if (order.OrderState == OrderState.Cancelled || 
+					//order.OrderState == OrderState.Filled || 
+					order.OrderState == OrderState.Rejected || 
+					order.OrderState == OrderState.Unknown)
+				{
+					tradeObj.barsSinceEnOrd = 0;
+					tradeObj.BracketOrder.EntryOrder = null;
+				}
+		    }
+			
+			indicatorProxy.TraceMessage(this.Name);
+		    if (//tradeObj.BracketOrder.OCOOrder != null &&
+				tradeObj.BracketOrder.OCOOrder.StopLossOrder != null &&
+				tradeObj.BracketOrder.OCOOrder.StopLossOrder == order)
+		    {
+				//giParabSAR.PrintLog(true, !backTest, log_file, order.ToString() + "--" + order.OrderState);
+		        if (order.OrderState == OrderState.Cancelled || 
+					order.OrderState == OrderState.Filled || 
+					order.OrderState == OrderState.Rejected)
+				{
+					tradeObj.BracketOrder.OCOOrder.StopLossOrder = null;
+				}
+		    }
+			indicatorProxy.TraceMessage(this.Name);
+			if((order.Oco != null && order.Oco.Equals(tradeObj.ocoID)) &&
+				(order.OrderState == OrderState.Accepted || order.OrderState == OrderState.Working)) {
+				tradeObj.BracketOrder.OCOOrder.StopLossOrder = order;
+			}
+			
+			indicatorProxy.TraceMessage(this.Name);
+		    if (//tradeObj.BracketOrder.OCOOrder != null &&
+				tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null &&
+				tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == order)
+		    {
+				//giParabSAR.PrintLog(true, !backTest, log_file, order.ToString() + "--" + order.OrderState);
+		        if (order.OrderState == OrderState.Cancelled || 
+					order.OrderState == OrderState.Filled || 
+					order.OrderState == OrderState.Rejected)
+				{
+					tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder = null;
+				}
+		    }
+			
+			indicatorProxy.TraceMessage(this.Name);
+			if (order.OrderState == OrderState.Working){// || order.OrderType == OrderType.StopMarket) {
+				if(GetOrderName(order.Name) == tradeObj.entrySignalName) //OrderSignalName.EntryLong.ToString() ||
+					//GetOrderName(order.Name) == OrderSignalName.EntryShort.ToString()) 
+				{
+					indicatorProxy.PrintLog(true, !BackTest, "Entry Order Name=" + GetOrderName(order.Name));
+					tradeObj.BracketOrder.EntryOrder = order;
+				}
+				if(GetOrderName(order.Name) == OrderSignalName.Profittarget.ToString()) {
+					indicatorProxy.PrintLog(true, !BackTest, "order.Name == OrderSignalName.Profittarget");
+					tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder = order;
+				}				
+			}
+			
+
+			
+//			if(tradeObj.BracketOrder.OCOOrder.StopLossOrder == null && tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == null)
+				//InitTradeMgmt();			
+		}
+		
 		#endregion
 		
 		#region Order utilities functions
@@ -588,7 +786,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 			string sName = nameTag + "-" + GetCurTimestampStr();
 			return sName;
 		}
-
+				
+		/// <summary>
+		/// Bracket order Signal name with timestamp:
+		/// EntryShort-201905312359888
+		/// </summary>
+		/// <param name="nameTag"></param>
+		/// <returns></returns>
+		public string GetNewBracketOrderSignalName(string nameTag) {
+			string timeStr = GetCurTimestampStr();
+			tradeObj.entrySignalName = nameTag + "-" + timeStr;
+			tradeObj.stopLossSignalName = nameTag + "-SL-" + timeStr;
+			tradeObj.profitTargetSignalName = nameTag + "-PT-" + timeStr;
+			return tradeObj.entrySignalName;
+		}
+		
 		/// <summary>
 		/// New OCO ID with timestamp:
 		/// OCO-201905312359888

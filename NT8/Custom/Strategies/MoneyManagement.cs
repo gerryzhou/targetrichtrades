@@ -57,7 +57,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <param name="avgPrice">Avg entry price</param>
 		/// <param name="profitFactor">PT/SL>0</param>
-		protected void CalExitOcoPrice(double avgPrice, double profitFactor) {			
+		protected void CalExitOcoPrice(double avgPrice, double profitFactor) {
+			indicatorProxy.TraceMessage(this.Name);
 			switch(tradeObj.SLCalculationMode) {
 				case CalculationMode.Currency:
 					if(profitFactor > 0)
@@ -70,13 +71,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 					else if(Position.MarketPosition == MarketPosition.Short) {
 						tradeObj.stopLossPrice = avgPrice + GetPriceByCurrency(tradeObj.stopLossAmt);
 						tradeObj.profitTargetPrice = avgPrice - GetPriceByCurrency(tradeObj.profitTargetAmt);
-					}
-						
+					}						
 					break;
 				case CalculationMode.Ticks:
 					if(profitFactor > 0)
 						tradeObj.profitTargetTic = 
-							(int)profitFactor*tradeObj.stopLossTic;
+							(int)(profitFactor*tradeObj.stopLossTic);
 					if(Position.MarketPosition == MarketPosition.Long) {
 						tradeObj.stopLossPrice = avgPrice - GetPriceByTicks(tradeObj.stopLossTic);
 						tradeObj.profitTargetPrice = avgPrice + GetPriceByTicks(tradeObj.profitTargetTic);
@@ -92,6 +92,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 							profitFactor*Math.Abs(avgPrice-tradeObj.stopLossPrice)*Instrument.MasterInstrument.PointValue;
 					break;
 			}
+			Print(CurrentBar + ":CalExitOcoPrice-tradeObj.SLCalculationMode" + tradeObj.SLCalculationMode + ","
+			+ "-stopLossPrice=" + tradeObj.stopLossPrice + ","
+			+ "-profitTargetPrice=" + tradeObj.profitTargetPrice);
 		}
 		
 		/// <summary>
