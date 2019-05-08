@@ -291,9 +291,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Setup breakeven order
 		/// </summary>
 		public void ChangeBreakEven() {
+			if(IsUnmanaged) {
+				ChangeBreakEvenUM();
+				return;
+			}
 			double slPrc = Position.AveragePrice;
+			Order stopOrder = tradeObj.BracketOrder.OCOOrder.StopLossOrder;
+			string tif = stopOrder == null? "N/A":stopOrder.TimeInForce.ToString()+","+stopOrder.IsLiveUntilCancelled;
 			indicatorProxy.PrintLog(true, !backTest, 
-				AccName + "- Setup SL Breakeven posAvgPrc=" + slPrc + "," + tradeObj.BracketOrder.OCOOrder.StopLossOrder.TimeInForce.ToString());
+				AccName + "- Setup SL Breakeven posAvgPrc=" + slPrc + "," + tif);			
 			tradeObj.stopLossAmt = 0;
 			tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
 			tradeObj.SLCalculationMode = CalculationMode.Currency;
@@ -302,6 +308,25 @@ namespace NinjaTrader.NinjaScript.Strategies
 			SetProfitTargetOrder(tradeObj.entrySignalName.ToString());
 		}
 		
+		/// <summary>
+		/// Setup breakeven order for unmanaged approach
+		/// </summary>
+		public void ChangeBreakEvenUM() {
+			double slPrc = Position.AveragePrice;
+			Order stopOrder = tradeObj.BracketOrder.OCOOrder.StopLossOrder;
+			string tif = stopOrder == null? "N/A":stopOrder.TimeInForce.ToString()+","+stopOrder.IsLiveUntilCancelled;
+			indicatorProxy.PrintLog(true, !backTest, 
+				AccName + "- Setup SL BreakevenUM posAvgPrc=" + slPrc + "," + tif);
+			tradeObj.stopLossAmt = 0;
+			tradeObj.stopLossPrice = slPrc;			
+			if (tradeObj.BracketOrder.OCOOrder.StopLossOrder != null)
+        		ChangeOrder(stopOrder, stopOrder.Quantity, 0, slPrc);
+			//tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
+			//tradeObj.SLCalculationMode = CalculationMode.Currency;
+			//tradeObj.PTCalculationMode = CalculationMode.Currency;
+			//SetStopLossOrder(tradeObj.entrySignalName.ToString());
+			//SetProfitTargetOrder(tradeObj.entrySignalName.ToString());
+		}		
 		#endregion
 		
 		#region Check PnL functions
