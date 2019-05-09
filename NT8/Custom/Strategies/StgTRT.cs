@@ -89,7 +89,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				AddDataSeries(Data.BarsPeriodType.Day, 1);
 				//IncludeCommission = true;
 				tradeObj = new TradeObj(this);
-				tradeObj.barsSincePTSL = TM_BarsSincePTSL;
+				//tradeObj.barsSincePTSL = TM_BarsSincePTSL;
 			}
 		}
 
@@ -179,14 +179,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}			
 				
 				tradeObj.tradeStyle = TradingStyle.TrendFollowing;
-				tradeObj.SetTradeType(TradeType.Entry);					
-				tradeObj.PTCalculationMode = MM_PTCalculationMode;
-				tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
-				tradeObj.SLCalculationMode = MM_SLCalculationMode;
-				tradeObj.stopLossAmt = MM_StopLossAmt;
-				//tradeObj.stopLossPrice = giSMI.GetResistance.GetResistance(indicatorSignal.SnR.Resistance);
-				tradeObj.barsSincePTSL = TM_BarsSincePTSL;
-				tradeObj.profitFactor = MM_ProfitFactor;
 				
 			} else {
 				tradeObj.SetTradeType(TradeType.NoTrade);

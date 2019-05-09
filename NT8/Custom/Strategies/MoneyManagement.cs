@@ -161,12 +161,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 				double slPrc = tradeObj.BracketOrder.OCOOrder.StopLossOrder == null ?
 					Position.AveragePrice : tradeObj.BracketOrder.OCOOrder.StopLossOrder.StopPrice;
 				
-				MoveProfitTarget();
+				//MoveProfitTarget();
 
 				indicatorProxy.PrintLog(true, !backTest, 
 					AccName + "- SL Breakeven: (PnL, posAvgPrc, MM_BreakEvenAmt)=(" + pl + "," + Position.AveragePrice + "," + tradeObj.breakEvenAmt + ")");
-				ChangeBreakEven();
-				ChangeStopLoss();
+				//ChangeBreakEven();
+				//ChangeStopLoss();
 				
 				if(tradeObj.BracketOrder.OCOOrder.StopLossOrder == null || 
 					(Position.MarketPosition == MarketPosition.Long && slPrc > tradeObj.BracketOrder.OCOOrder.StopLossOrder.StopPrice) ||
@@ -187,6 +187,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Using price to setup PT order;
 		/// </summary>
 		public void MoveProfitTarget() {
+			if(IsUnmanaged) {
+				MoveProfitTargetUM();
+				return;
+			}
 			//if(!tradeObj.ptTrailing) return;
 			if(GetCurrencyByTicks(tradeObj.trailingPTTic) <= tradeObj.profitTargetAmt) { //first time move the profit target
 				tradeObj.trailingPTTic = GetTicksByCurrency(tradeObj.profitTargetAmt) + tradeObj.profitTgtIncTic;
@@ -208,6 +212,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 			tradeObj.profitTargetPrice = MovePriceByTicks(Position.AveragePrice, tradeObj.trailingPTTic);
 			SetProfitTargetOrder(tradeObj.entrySignalName.ToString());
 			LockStopLossAtMinPT();
+		}
+
+		/// <summary>
+		/// For unmanaged approach
+		/// Trail PT after PnL>PTAmount and PnL<LockMaxPT
+		/// Using tics to record the current trailing PT;
+		/// Using price to setup PT order;
+		/// </summary>
+		public void MoveProfitTargetUM() {
+
 		}
 		
 		/// <summary>
@@ -267,10 +281,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Keep target no change
 		/// </summary>
 		public void LockMinProfitTarget(){
+			if(IsUnmanaged) {
+				LockMinProfitTargetUM();
+				return;
+			}			
 			LockStopLossAtMinPT();
 			tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
 			tradeObj.PTCalculationMode = CalculationMode.Currency;
 			SetProfitTargetOrder(tradeObj.entrySignalName.ToString());
+		}
+
+		/// <summary>
+		/// Move stop loss to LockMinProfit for unmanaged approach
+		/// Keep target no change
+		/// </summary>
+		public void LockMinProfitTargetUM(){
+
 		}
 		
 		/// <summary>
@@ -457,7 +483,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#region MM Properties
         [Description("Money amount of profit target")]
- 		[Range(0, double.MaxValue), NinjaScriptProperty]		
+ 		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]		
 		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtAmt", GroupName = "MoneyMgmt", Order = 0)]	
         public double MM_ProfitTargetAmt
         {
@@ -465,9 +491,18 @@ namespace NinjaTrader.NinjaScript.Strategies
             set{mm_ProfitTargetAmt = Math.Max(0, value);}
         }
 
+        [Description("Ticks amount for profit target")]
+ 		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtTic", GroupName = "MoneyMgmt", Order = 1)]	
+        public int MM_ProfitTgtTic
+        {
+            get{return mm_ProfitTgtTic;}
+            set{mm_ProfitTgtTic = Math.Max(0, value);}
+        }
+		
         [Description("Money amount for profit target increasement")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtIncTic", GroupName = "MoneyMgmt", Order = 1)]	
+ 		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtIncTic", GroupName = "MoneyMgmt", Order = 2)]	
         public int MM_ProfitTgtIncTic
         {
             get{return mm_ProfitTgtIncTic;}
@@ -475,8 +510,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 		
         [Description("Tick amount for min profit locking")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitLockMinTic", GroupName = "MoneyMgmt", Order = 2)]	
+ 		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitLockMinTic", GroupName = "MoneyMgmt", Order = 3)]	
         public int MM_ProfitLockMinTic
         {
             get{return mm_ProfitLockMinTic;}
@@ -484,8 +519,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
 		[Description("Tick amount for max profit locking")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitLockMaxTic", GroupName = "MoneyMgmt", Order = 3)]	
+ 		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitLockMaxTic", GroupName = "MoneyMgmt", Order = 4)]	
         public int MM_ProfitLockMaxTic
         {
             get{return mm_ProfitLockMaxTic;}
@@ -493,17 +528,44 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 		
         [Description("Money amount of stop loss")]
- 		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossAmt", GroupName = "MoneyMgmt", Order = 4)]	
+ 		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossAmt", GroupName = "MoneyMgmt", Order = 5)]	
         public double MM_StopLossAmt
         {
             get{return mm_StopLossAmt;}
             set{mm_StopLossAmt = Math.Max(0, value);}
         }
 		
+		[Description("Ticks amount for stop loss")]
+ 		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossTic", GroupName = "MoneyMgmt", Order = 6)]	
+        public int MM_StopLossTic
+        {
+            get{return mm_StopLossTic;}
+            set{mm_StopLossTic = Math.Max(0, value);}
+        }
+		
+		[Description("Money amount for stop loss increasement")]
+ 		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossIncTic", GroupName = "MoneyMgmt", Order = 7)]	
+        public int MM_StopLossIncTic
+        {
+            get{return mm_StopLossIncTic;}
+            set{mm_StopLossIncTic = Math.Max(0, value);}
+        }
+
+        [Description("Break Even amount")]
+ 		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BreakEvenAmt", GroupName = "MoneyMgmt", Order = 8)]	
+        public double MM_BreakEvenAmt
+        {
+            get{return mm_BreakEvenAmt;}
+            set{mm_BreakEvenAmt = Math.Max(0, value);}
+        }
+		
         [Description("Money amount of trailing stop loss")]
- 		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossAmt", GroupName = "MoneyMgmt", Order = 5)]	
+ 		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossAmt", GroupName = "MoneyMgmt", Order = 9)]	
         public double MM_TrailingStopLossAmt
         {
             get{return mm_TrailingStopLossAmt;}
@@ -511,127 +573,125 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
         
 		[Description("Ticks amount of trailing stop loss")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossTicks", GroupName = "MoneyMgmt", Order = 6)]	
-        public int MM_TrailingStopLossTicks
+ 		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossTic", GroupName = "MoneyMgmt", Order = 10)]	
+        public int MM_TrailingStopLossTic
         {
-            get{return mm_TrailingStopLossTicks;}
-            set{mm_TrailingStopLossTicks = Math.Max(0, value);}
+            get{return mm_TrailingStopLossTic;}
+            set{mm_TrailingStopLossTic = Math.Max(0, value);}
 		}
-		
-		[Description("Money amount for stop loss increasement")]
- 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossIncTic", GroupName = "MoneyMgmt", Order = 7)]	
-        public int MM_StopLossIncTic
-        {
-            get{return mm_StopLossIncTic;}
-            set{mm_StopLossIncTic = Math.Max(0, value);}
-        }
-		
-        [Description("Break Even amount")]
- 		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BreakEvenAmt", GroupName = "MoneyMgmt", Order = 8)]	
-        public double MM_BreakEvenAmt
-        {
-            get{return mm_BreakEvenAmt;}
-            set{mm_BreakEvenAmt = Math.Max(0, value);}
-        }
 
-		[Description("Daily Loss Limit amount")]
- 		[Range(double.MinValue, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "DailyLossLmt", GroupName = "MoneyMgmt", Order = 9)]	
-        public double MM_DailyLossLmt
+        [Description("Percent amount of trailing stop loss")]
+ 		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossPercent", GroupName = "MoneyMgmt", Order = 11)]	
+        public double MM_TrailingStopLossPercent
         {
-            get{return mm_DailyLossLmt;}
-            set{mm_DailyLossLmt = Math.Min(-100, value);}// { if(tradeObj!=null) tradeObj.dailyLossLmt = Math.Min(-100, value); }
-        }
-
-		[Description("Profit Factor")]
- 		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitFactor", GroupName = "MoneyMgmt", Order = 10)]	
-        public double MM_ProfitFactor
-        {
-            get{return mm_ProfitFactor;}// { return tradeObj==null? 0 : tradeObj.dailyLossLmt; }
-            set{mm_ProfitFactor = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.dailyLossLmt = Math.Min(-100, value); }
-        }
-		
-		[Description("Use trailing profit target every bar")]
- 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "PTTrailing", GroupName = "MoneyMgmt", Order = 11)]	
-        public bool MM_PTTrailing
-        {
-            get{return mm_PTTrailing;}// { return tradeObj==null? false : tradeObj.ptTrailing; }
-            set{mm_PTTrailing = value;}// { if(tradeObj!=null) tradeObj.ptTrailing = value; }
+            get{return mm_TrailingStopLossPercent;}
+            set{mm_TrailingStopLossPercent = Math.Max(0, value);}
         }
 		
 		[Description("Use trailing stop loss every bar")]
- 		[NinjaScriptProperty]
+ 		[NinjaScriptProperty, XmlIgnore]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "SLTrailing", GroupName = "MoneyMgmt", Order = 12)]	
         public bool MM_SLTrailing
         {
-            get{return mm_SLTrailing;}// { return tradeObj==null? false : tradeObj.slTrailing; }
-            set{mm_SLTrailing = value;}// { if(tradeObj!=null) tradeObj.slTrailing = value; }
+            get{return mm_SLTrailing;}
+            set{mm_SLTrailing = value;}
+        }
+		
+		[Description("Use trailing profit target every bar")]
+ 		[NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PTTrailing", GroupName = "MoneyMgmt", Order = 13)]	
+        public bool MM_PTTrailing
+        {
+            get{return mm_PTTrailing;}
+            set{mm_PTTrailing = value;}
         }
 
 		[Description("Calculation mode for profit target")]
- 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "PTCalculationMode", GroupName = "MoneyMgmt", Order = 13)]	
+ 		[NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PTCalculationMode", GroupName = "MoneyMgmt", Order = 14)]	
         public CalculationMode MM_PTCalculationMode
         {
-            get{return mm_PTCalculationMode;}// { return tradeObj==null? false : tradeObj.slTrailing; }
-            set{mm_PTCalculationMode = value;}// { if(tradeObj!=null) tradeObj.slTrailing = value; }
+            get{return mm_PTCalculationMode;}
+            set{mm_PTCalculationMode = value;}
         }
 
 		[Description("Calculation mode for stop loss")]
- 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "SLCalculationMode", GroupName = "MoneyMgmt", Order = 14)]	
+ 		[NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SLCalculationMode", GroupName = "MoneyMgmt", Order = 15)]	
         public CalculationMode MM_SLCalculationMode
         {
-            get{return mm_SLCalculationMode;}// { return tradeObj==null? false : tradeObj.slTrailing; }
-            set{mm_SLCalculationMode = value;}// { if(tradeObj!=null) tradeObj.slTrailing = value; }
+            get{return mm_SLCalculationMode;}
+            set{mm_SLCalculationMode = value;}
         }
 
 		[Description("Calculation mode for break even")]
- 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BECalculationMode", GroupName = "MoneyMgmt", Order = 15)]	
+ 		[NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BECalculationMode", GroupName = "MoneyMgmt", Order = 16)]	
         public CalculationMode MM_BECalculationMode
         {
-            get{return mm_BECalculationMode;}// { return tradeObj==null? false : tradeObj.slTrailing; }
-            set{mm_BECalculationMode = value;}// { if(tradeObj!=null) tradeObj.slTrailing = value; }
+            get{return mm_BECalculationMode;}
+            set{mm_BECalculationMode = value;}
         }
 		
 		[Description("Calculation mode for trailing stop loss")]
- 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TLSLCalculationMode", GroupName = "MoneyMgmt", Order = 16)]	
+ 		[NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TLSLCalculationMode", GroupName = "MoneyMgmt", Order = 17)]	
         public CalculationMode MM_TLSLCalculationMode
         {
             get{return mm_TLSLCalculationMode;}
             set{mm_TLSLCalculationMode = value;}
-        }
+        }		
 		
+		[Description("Daily Loss Limit amount")]
+ 		[Range(double.MinValue, double.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "DailyLossLmt", GroupName = "MoneyMgmt", Order = 18)]	
+        public double MM_DailyLossLmt
+        {
+            get{return mm_DailyLossLmt;}
+            set{mm_DailyLossLmt = Math.Min(-100, value);}
+        }
+
+		[Description("Profit Factor")]
+ 		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitFactor", GroupName = "MoneyMgmt", Order = 19)]	
+        public double MM_ProfitFactor
+        {
+            get{return mm_ProfitFactor;}
+            set{mm_ProfitFactor = Math.Max(0, value);}
+        }		
 		#endregion
 		
 		#region Variables for Properties		
 		
 		private double mm_ProfitTargetAmt = 500;
+		private int mm_ProfitTgtTic = 32;
 		private int mm_ProfitTgtIncTic = 8;
 		private int mm_ProfitLockMinTic = 16;
 		private int mm_ProfitLockMaxTic = 40;
+		
 		private double mm_StopLossAmt = 300;
+		private int mm_StopLossTic = 16;
 		private int mm_StopLossIncTic = 8;
-		private double mm_TrailingStopLossAmt = 200;
-		private int mm_TrailingStopLossTicks = 16;		
+		
 		private double mm_BreakEvenAmt = 150;
-		private double mm_DailyLossLmt = -200;
-		private double mm_ProfitFactor = 1.5;
-		private bool mm_EnTrailing = true;
+		
+		private double mm_TrailingStopLossAmt = 200;
+		private int mm_TrailingStopLossTic = 16;
+		private double mm_TrailingStopLossPercent = 1;
+
+		//private bool mm_EnTrailing = true;
 		private bool mm_PTTrailing = false;
 		private bool mm_SLTrailing = false;
+		
 		private CalculationMode mm_PTCalculationMode = CalculationMode.Currency;
 		private CalculationMode mm_SLCalculationMode = CalculationMode.Currency;
 		private CalculationMode mm_BECalculationMode = CalculationMode.Currency;
 		private CalculationMode mm_TLSLCalculationMode = CalculationMode.Ticks;
+		
+		private double mm_DailyLossLmt = -200;
+		private double mm_ProfitFactor = 1.5;
 		
 		#endregion
 	}
