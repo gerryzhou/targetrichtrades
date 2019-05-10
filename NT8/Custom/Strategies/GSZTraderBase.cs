@@ -154,7 +154,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 					indicatorProxy.TraceMessage(this.Name);
 					if(hasPosition() != 0) {
 						CheckExitTrade();
-					} else if(NewOrderAllowed())
+					}
+					else if(NewOrderAllowed())
 					{
 						indicatorProxy.TraceMessage(this.Name);
 						CheckNewEntryTrade();

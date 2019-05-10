@@ -212,7 +212,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="msg"></param>
 		public virtual void NewShortLimitOrderUM(string msg)
 		{
-			tradeObj.entrySignalName = GetNewBracketOrderSignalName(OrderSignalName.EntryShortLmt.ToString());
+			tradeObj.entrySignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShortLmt.ToString());
 			SubmitOrderUnmanaged(0, OrderAction.SellShort, OrderType.Limit, tradeObj.quantity, tradeObj.enLimitPrice, 0, "", tradeObj.entrySignalName);
 			
 			//double prc = (tradeObj.enTrailing && tradeObj.enCounterPBBars>0) ? Close[0]+tradeObj.enOffsetPnts : High[0]+tradeObj.enOffsetPnts;
@@ -407,6 +407,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public virtual void SetTrailingStopLossOrder(string sigName) {
+			CancelExitOrders();
+			
 			if(IsUnmanaged) {
 				SetTrailingStopLossOrderUM();
 				return;
@@ -429,7 +431,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 						break;
 				}
 			} catch(Exception ex) {
-				Print("Ex SetStopLossOrder:" + ex.Message);
+				Print("Ex SetTrailingStopLossOrder:" + ex.Message);
 			}
 		}
 
@@ -454,7 +456,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 						break;
 				}
 			} catch(Exception ex) {
-				Print("Ex SetStopLossOrder:" + ex.Message);
+				Print("Ex SetTrailingStopLossOrderUM:" + ex.Message);
 			}
 		}
 		
@@ -530,6 +532,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public virtual bool CancelExitOrders()
 		{
+			CancelExitOCO();
+			CancelTrailingStopLoss();
+			return true;
+		}
+		
+		public virtual bool CancelExitOCO()
+		{
 			//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "- CancelAllOrders called");
 			if(tradeObj.BracketOrder.OCOOrder.StopLossOrder != null)
 				CancelOrder(tradeObj.BracketOrder.OCOOrder.StopLossOrder);
@@ -537,7 +546,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 				CancelOrder(tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder);		
 			return true;
 		}
-		
+
+		public virtual bool CancelTrailingStopLoss()
+		{
+			if(tradeObj.TrailingSLOrder != null)
+				CancelOrder(tradeObj.TrailingSLOrder);
+			return true;
+		}		
 		#endregion
 		
 		#region Event Handlers
@@ -556,13 +571,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <summary>
 		/// For managed orders approach
 		/// </summary>
-		/// <param name="execution"></param>
-		/// <param name="executionId"></param>
-		/// <param name="price"></param>
-		/// <param name="quantity"></param>
-		/// <param name="marketPosition"></param>
-		/// <param name="orderId"></param>
-		/// <param name="time"></param>
 		public virtual void OnExecutionUpdateMG(Execution execution, string executionId, double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
 		{
 			if(BarsInProgress !=0) return;
@@ -581,7 +589,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if(Position.Quantity != 0) {
 					//SetEntryOrder(OrderSignalName.EntryShort, execution.Order);					
 					CalProfitTargetAmt(price, tradeObj.profitFactor);
-					CalExitOcoPrice(Position.AveragePrice, tradeObj.profitFactor);
+					CalExitOcoPrice(GetAvgPrice(), tradeObj.profitFactor);
 					SetSimpleExitOCOUM();
 
 					//SetProfitTargetOrder(OrderSignalName.EntryShort.ToString());
@@ -599,13 +607,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <summary>
 		/// For un-managed orders approach
 		/// </summary>
-		/// <param name="execution"></param>
-		/// <param name="executionId"></param>
-		/// <param name="price"></param>
-		/// <param name="quantity"></param>
-		/// <param name="marketPosition"></param>
-		/// <param name="orderId"></param>
-		/// <param name="time"></param>
 		public virtual void OnExecutionUpdateUM(Execution execution, string executionId, double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
 		{
 			if(BarsInProgress !=0) return;
@@ -631,7 +632,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					//SetEntryOrder(OrderSignalName.EntryShort, execution.Order);
 						tradeObj.BracketOrder.EntryOrder = execution.Order;
 						CalProfitTargetAmt(price, tradeObj.profitFactor);
-						CalExitOcoPrice(Position.AveragePrice, tradeObj.profitFactor);
+						CalExitOcoPrice(GetAvgPrice(), tradeObj.profitFactor);
 						SetSimpleExitOCOUM();
 					}
 				}
@@ -657,16 +658,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <summary>
 		/// For managed orders approach
 		/// </summary>
-		/// <param name="order"></param>
-		/// <param name="limitPrice"></param>
-		/// <param name="stopPrice"></param>
-		/// <param name="quantity"></param>
-		/// <param name="filled"></param>
-		/// <param name="averageFillPrice"></param>
-		/// <param name="orderState"></param>
-		/// <param name="time"></param>
-		/// <param name="error"></param>
-		/// <param name="comment"></param>
 		public virtual void OnOrderUpdateMG(Cbi.Order order, double limitPrice, double stopPrice, 
 			int quantity, int filled, double averageFillPrice, 
 			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
@@ -754,16 +745,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <summary>
 		/// For un-managed orders approach
 		/// </summary>
-		/// <param name="order"></param>
-		/// <param name="limitPrice"></param>
-		/// <param name="stopPrice"></param>
-		/// <param name="quantity"></param>
-		/// <param name="filled"></param>
-		/// <param name="averageFillPrice"></param>
-		/// <param name="orderState"></param>
-		/// <param name="time"></param>
-		/// <param name="error"></param>
-		/// <param name="comment"></param>
 		public virtual void OnOrderUpdateUM(Cbi.Order order, double limitPrice, double stopPrice, 
 			int quantity, int filled, double averageFillPrice, 
 			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
@@ -864,22 +845,32 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="nameTag"></param>
 		/// <returns></returns>
 		public string GetNewEnOrderSignalName(string nameTag) {
-			string sName = nameTag + "-" + GetCurTimestampStr();
-			return sName;
+			string timeStr = GetCurTimestampStr();
+			tradeObj.entrySignalName = nameTag + "-" + timeStr;
+			SetNewOcoOrderSignalName(nameTag, timeStr);
+			SetNewTLSLOrderSignalName(nameTag, timeStr);
+			return tradeObj.entrySignalName;
 		}
 				
 		/// <summary>
 		/// Bracket order Signal name with timestamp:
-		/// EntryShort-201905312359888
+		/// EntryShort-SL-201905312359888
 		/// </summary>
 		/// <param name="nameTag"></param>
 		/// <returns></returns>
-		public string GetNewBracketOrderSignalName(string nameTag) {
-			string timeStr = GetCurTimestampStr();
-			tradeObj.entrySignalName = nameTag + "-" + timeStr;
+		public void SetNewOcoOrderSignalName(string nameTag, string timeStr) {
 			tradeObj.stopLossSignalName = nameTag + "-SL-" + timeStr;
-			tradeObj.profitTargetSignalName = nameTag + "-PT-" + timeStr;
-			return tradeObj.entrySignalName;
+			tradeObj.profitTargetSignalName = nameTag + "-PT-" + timeStr;			
+		}
+
+		/// <summary>
+		/// TrailingSL order Signal name with timestamp:
+		/// EntryShort-TLSL-201905312359888
+		/// </summary>
+		/// <param name="nameTag"></param>
+		/// <returns></returns>
+		public void SetNewTLSLOrderSignalName(string nameTag, string timeStr) {
+			tradeObj.trailingSLSignalName = nameTag + "-TLSL-" + timeStr;
 		}
 		
 		/// <summary>

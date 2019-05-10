@@ -34,7 +34,10 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public string stopLossSignalName = String.Empty;
 		public string profitTargetSignalName = String.Empty;
 		public string ocoID = String.Empty;
-		private BracketOrderBase bracketOrder = new BracketOrderBase();		
+		public string trailingSLSignalName = String.Empty;
+		
+		private BracketOrderBase bracketOrder = new BracketOrderBase();
+		private TrailingSLOrderBase trailingSLOrder = new TrailingSLOrderBase();
 		#endregion
 		
 		#region Trade Mgmt variables
@@ -170,7 +173,15 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		{
 			get { return bracketOrder; }
 			set { bracketOrder = value; }
-		}		
+		}
+
+		[Browsable(false)]
+		[XmlIgnore()]
+		public TrailingSLOrderBase TrailingSLOrder
+		{
+			get { return trailingSLOrder; }
+			set { trailingSLOrder = value; }
+		}
 		#endregion
 		
 		#region Other Properties
