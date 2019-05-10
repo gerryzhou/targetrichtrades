@@ -98,6 +98,54 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 
 		/// <summary>
+		/// Calculation of price for unmanaged trailing stoploss order
+		/// </summary>
+		/// <param name="avgPrice">Avg entry price</param>
+		public virtual void CalTLSLPrice(double avgPrice, int pl_tics) {
+			indicatorProxy.TraceMessage(this.Name);
+
+//			if(pl_tics >= (tradeObj.profitLockMaxTic+2*tradeObj.profitTgtIncTic))
+//				overAmt = pl_tics - tradeObj.profitLockMaxTic;
+			
+			switch(tradeObj.TLSLCalculationMode) {
+				case CalculationMode.Currency:
+
+					break;
+				case CalculationMode.Ticks:
+					
+					break;
+				case CalculationMode.Percent:
+					throw new Exception("CalculationMode.Percent for trailing stoploss not supported yet!");
+					break;
+			}
+			Print(CurrentBar + ":CalTLSLPrice-Pre"
+			+ ";TLSLCalculationMode=" + tradeObj.TLSLCalculationMode
+			+ ";trailingSLPrice=" + tradeObj.trailingSLPrice
+			+ ";trailingPTTic=" + tradeObj.trailingPTTic
+			+ ";trailingSLTic=" + tradeObj.trailingSLTic
+			+ ";avgPrice=" + avgPrice);
+			
+			if(tradeObj.trailingPTTic < tradeObj.profitLockMaxTic)
+				tradeObj.trailingPTTic = Math.Max(tradeObj.profitLockMaxTic, pl_tics-tradeObj.trailingSLTic);
+			else
+				tradeObj.trailingPTTic = Math.Max(tradeObj.trailingPTTic, pl_tics-tradeObj.trailingSLTic);
+			
+			indicatorProxy.TraceMessage(this.Name);
+			if(Position.MarketPosition == MarketPosition.Long) {
+				tradeObj.trailingSLPrice = MovePriceByTicks(avgPrice, tradeObj.trailingPTTic);
+			}
+			else if(Position.MarketPosition == MarketPosition.Short) {
+				tradeObj.trailingSLPrice = MovePriceByTicks(avgPrice, -tradeObj.trailingPTTic);
+			}
+			
+			Print(CurrentBar + ":CalTLSLPrice"
+			+ ";TLSLCalculationMode=" + tradeObj.TLSLCalculationMode
+			+ ";trailingSLPrice=" + tradeObj.trailingSLPrice
+			+ ";trailingPTTic=" + tradeObj.trailingPTTic
+			+ ";avgPrice=" + avgPrice);
+		}
+		
+		/// <summary>
 		/// For position exit OCO order adjustment
 		/// breakEvenAmt<MinLockPT<ProfitTargetAmt<MaxLockPT
 		/// breakEvenAmt<MinLockPT+2*SLIncTic<ProfitTargetAmt+2*PTIncTic<MaxLockPT
@@ -128,12 +176,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 				case ExitOrderType.TrailingStopLoss: // start trailing SL
 					Print(CurrentBar + ":isOverMaxLockPT, pl_tics=" + pl_tics);
 					indicatorProxy.TraceMessage(this.Name);
-					SetTrailingStopLossOrder(tradeObj.entrySignalName.ToString());					
+					CalTLSLPrice(avgPrc, pl_tics);
+					SetTrailingStopLossOrder(tradeObj.entrySignalName.ToString());
 					break;
 				case ExitOrderType.LockMinProfit: // move PT, lock SL at MinPT
 					Print(CurrentBar + ":isOverMinLockPT, pl_tics=" + pl_tics);
-					indicatorProxy.TraceMessage(this.Name);				
-					LockMinProfitTarget(avgPrc);			
+					indicatorProxy.TraceMessage(this.Name);
+					LockMinProfitTarget(avgPrc);
 					break;
 				case ExitOrderType.BreakEven: // PT no change, BE SL
 					Print(CurrentBar + ":isOverBreakeven, pl_tics=" + pl_tics);
@@ -256,7 +305,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			switch(tradeObj.exitOrderType) {
 				case ExitOrderType.LockMinProfit: // move PT, lock SL at MinPT
 					if(isOverMaxLockPT(pl_tics) > 0)
-						tradeObj.exitOrderType = ExitOrderType.TrailingStopLoss;			
+						tradeObj.InitNewTLSL();
+						//tradeObj.exitOrderType = ExitOrderType.TrailingStopLoss;			
 					break;
 				case ExitOrderType.BreakEven: // PT no change, BE SL
 					if(isOverMaxLockPT(pl_tics) > 0)
@@ -287,6 +337,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 				else if(Position.MarketPosition == MarketPosition.Short) {
 					isValid = (tradeObj.profitTargetPrice < tradeObj.stopLossPrice);
+				}
+			}
+			return isValid;
+		}
+
+		/// <summary>
+		/// Check if the trailing stoploss price is valid
+		/// </summary>
+		/// <returns></returns>
+		public bool isTLSLPriceValid() {
+			bool isValid = false;
+			if(tradeObj.trailingSLPrice > 0) {
+				if(Position.MarketPosition == MarketPosition.Long) {
+					isValid = (tradeObj.trailingSLPrice < Close[0]);
+				}
+				else if(Position.MarketPosition == MarketPosition.Short) {
+					isValid = (tradeObj.trailingSLPrice > Close[0]);
 				}
 			}
 			return isValid;

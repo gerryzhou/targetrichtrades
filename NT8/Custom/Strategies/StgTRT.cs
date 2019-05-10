@@ -198,7 +198,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					//EnterShort(OrderSignalName.EntryShort.ToString());
 					//EnterShortLimit(Close[0], OrderSignalName.EntryShort.ToString());
 					//tradeObj.entrySignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShort.ToString());
-					tradeObj.enLimitPrice = Close[0];
+					tradeObj.enLimitPrice = Close[0];					
 					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
 				}
 				else if(tradeObj.tradeDirection == TradingDirection.Up)

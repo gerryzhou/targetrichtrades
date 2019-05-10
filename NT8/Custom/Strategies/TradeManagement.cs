@@ -438,7 +438,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public virtual void SetTrailingStopLossOrder(string sigName) {
-			CancelExitOrders();
+			CancelExitOCO();
 			
 			if(IsUnmanaged) {
 				SetTrailingStopLossOrderUM();
@@ -467,7 +467,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 
 		public virtual void SetTrailingStopLossOrderUM() {
-			Print(CurrentBar + ":SetTrailingStopLossOrderUM;"
+			Print(CurrentBar + ":SetTrailingStopLossOrderUM"
 			+ ";trailingSLSignalName=" + tradeObj.trailingSLSignalName
 			+ ";TLSLCalculationMode=" + tradeObj.TLSLCalculationMode
 			+ ";trailingPTTic=" + tradeObj.trailingPTTic
@@ -476,15 +476,26 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";GetAvgPrice=" + GetAvgPrice()
 			+ ";Position.Quantity=" + Position.Quantity);
 
-			Order slOrder = tradeObj.TrailingSLOrder;
+			Order tlslOrder = tradeObj.TrailingSLOrder.TLSLOrder;
+			bool isPrcValid = isTLSLPriceValid();
 			try{
-				if(slOrder == null || !slOrder.Name.Equals(tradeObj.trailingSLSignalName)) {
-					SubmitOrderUnmanaged(0, GetExitOrderAction(), OrderType.StopMarket, Position.Quantity,
-					0, tradeObj.stopLossPrice, String.Empty, tradeObj.trailingSLSignalName);
+				if(tlslOrder == null || !tlslOrder.Name.Equals(tradeObj.trailingSLSignalName)) {
+					if(isPrcValid)
+						SubmitOrderUnmanaged(0, GetExitOrderAction(), OrderType.StopMarket, Position.Quantity,
+						0, tradeObj.trailingSLPrice, String.Empty, tradeObj.trailingSLSignalName);
+					else {
+						CloseAllPositions();
+					}
 				}
-				else if(slOrder != null && slOrder.Name.Equals(tradeObj.trailingSLSignalName)
-					&& slOrder.StopPrice != tradeObj.stopLossPrice) {
-					ChangeOrder(slOrder, slOrder.Quantity, 0, tradeObj.stopLossPrice);
+				else if(tlslOrder != null && tlslOrder.Name.Equals(tradeObj.trailingSLSignalName)
+					&& tlslOrder.StopPrice != tradeObj.trailingSLPrice
+					&& isPrcValid) {
+					ChangeOrder(tlslOrder, tlslOrder.Quantity, 0, tradeObj.trailingSLPrice);
+				}
+				if(!isPrcValid) {
+					throw new Exception("isTLSLPriceValid false"
+					+ ";trailingSLPrice=" + tradeObj.trailingSLPrice
+					+ ";Close[0]=" + Close[0]);
 				}
 			} catch(Exception ex) {
 				throw new Exception("Ex SetTrailingStopLossOrderUM:" + ex.Message);
@@ -537,10 +548,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual bool CloseAllPositions() 
 		{
 			//giParabSAR.PrintLog(true, !backTest, log_file, "CloseAllPosition called");
-			if(Position.MarketPosition == MarketPosition.Long)
-				ExitLong();
-			if(Position.MarketPosition == MarketPosition.Short)
-				ExitShort();
+			if(Position.MarketPosition == MarketPosition.Long) {
+				if(IsUnmanaged)
+					SubmitOrderUnmanaged(0, OrderAction.Sell, OrderType.Market, Position.Quantity);
+				else
+					ExitLong();
+			}
+			if(Position.MarketPosition == MarketPosition.Short) {
+				if(IsUnmanaged)
+					SubmitOrderUnmanaged(0, OrderAction.BuyToCover, OrderType.Market, Position.Quantity);
+				else				
+					ExitShort();
+			}
 			return true;
 		}
 		
@@ -580,8 +599,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		public virtual bool CancelTrailingStopLoss()
 		{
-			if(tradeObj.TrailingSLOrder != null)
-				CancelOrder(tradeObj.TrailingSLOrder);
+			if(tradeObj.TrailingSLOrder.TLSLOrder != null)
+				CancelOrder(tradeObj.TrailingSLOrder.TLSLOrder);
 			return true;
 		}		
 		#endregion
@@ -670,6 +689,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 						CalExitOcoPrice(GetAvgPrice(), tradeObj.profitFactor);
 						SetSimpleExitOCOUM();
 					}
+				}
+				else if (oName.Equals(OrderSignalName.Exitonsessionclose.ToString())) {
+					CancelExitOrders();
 				}
 			}
 		}
@@ -856,7 +878,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		    }
 
 			indicatorProxy.TraceMessage(this.Name);
-		    if ( tradeObj.TrailingSLOrder != null && tradeObj.TrailingSLOrder.TLSLOrder == order)
+		    if ( tradeObj.TrailingSLOrder.TLSLOrder != null && tradeObj.TrailingSLOrder.TLSLOrder == order)
 		    {				
 		        if (orderState == OrderState.Cancelled || 
 					orderState == OrderState.Filled || 
@@ -950,8 +972,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public void ClearOrderName(string oName) {
 			if(oName == null) return;
 			else if(oName.Equals(tradeObj.entrySignalName)) tradeObj.entrySignalName = String.Empty;
-			else if(oName.Equals(tradeObj.stopLossSignalName)) tradeObj.stopLossSignalName = String.Empty;
-			else if(oName.Equals(tradeObj.profitTargetSignalName)) tradeObj.profitTargetSignalName = String.Empty;
+			else if(oName.Equals(tradeObj.stopLossSignalName)) {
+				tradeObj.stopLossSignalName = String.Empty;
+				tradeObj.ocoID = String.Empty;
+			}
+			else if(oName.Equals(tradeObj.profitTargetSignalName)) {
+				tradeObj.profitTargetSignalName = String.Empty;
+				tradeObj.ocoID = String.Empty;
+			}
 			else if(oName.Equals(tradeObj.trailingSLSignalName)) tradeObj.trailingSLSignalName = String.Empty;
 		}
 		

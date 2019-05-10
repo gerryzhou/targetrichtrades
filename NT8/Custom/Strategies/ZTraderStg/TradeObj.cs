@@ -74,11 +74,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public int profitTgtIncTic = 6;//8 Default tick Amt for ProfitTarget increase Amt
 		public int profitLockMinTic = 16;//24 Default ticks Amt for Min Profit locking
 		public int profitLockMaxTic = 30;//80 Default ticks Amt for Max Profit locking
-		public double profitTargetPrice = 0;//Runtime var. For trailing PT using the price to set OCO order
-		public int trailingPTTic = 16;//Runtime var. Ticks for trailing ProfitTarget, using ticks to record current PT
-		
-		public double stopLossPrice = 0;//Runtime var; Using price to set OCO order, since Amt could be negative
-        public double stopLossAmt = 200;//16 ticks Default setting for stopLossAmt
+		     
+		public double stopLossAmt = 200;//16 ticks Default setting for stopLossAmt
 		public int stopLossTic = 16;//16 Default setting for stopLossTic
 		public int stopLossIncTic = 4;//4 Default tick Amt for StopLoss increase Amt
 
@@ -106,6 +103,11 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double dailyLossLmt = -200;//-300 the daily loss limit amount
 		public double profitFactor = 0.5;//PT/SL ratio
 		public int quantity = 1; //Quantity of the contracts traded
+
+		public double profitTargetPrice = 0;//Runtime var. For trailing PT using the price to set OCO order
+		public double stopLossPrice = 0;//Runtime var; Using price to set OCO order, since Amt could be negative		
+		public double trailingSLPrice = 0;//Runtime var. Price for trailing stoploss price
+		public int trailingPTTic = 16;//Runtime var. Ticks for trailing ProfitTarget, using ticks to record current PT	
 		
 		#endregion
 		
@@ -166,6 +168,22 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public void InitNewEntryTrade() {
 			InitParams();
 			SetTradeType(TradeType.Entry);
+			exitOrderType = ExitOrderType.SimpleOCO;
+		}
+
+		public void InitNewTLSL() {
+			//InitParams();
+			SetTradeType(TradeType.Exit);
+			exitOrderType = ExitOrderType.TrailingStopLoss;
+			this.trailingPTTic = 0;
+			switch(TLSLCalculationMode) {
+				case CalculationMode.Currency:
+					this.trailingSLTic = instStrategy.GetTicksByCurrency(this.trailingSLAmt);
+					break;
+				
+				case CalculationMode.Percent:
+					break;				
+			}
 		}
 		
 		#region Properties
