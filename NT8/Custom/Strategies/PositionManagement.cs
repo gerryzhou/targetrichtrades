@@ -43,5 +43,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//Print("TickSize, name, pointvalue=" + maIns.TickSize + "," + maIns.Name + "," + maIns.PointValue);
 			return maIns.TickSize*maIns.PointValue;
 		}
+		
+		public double GetAvgPrice() {
+			MasterInstrument maIns = Bars.Instrument.MasterInstrument;			
+			return maIns.RoundToTickSize(Position.AveragePrice);
+		}
 	}
 }
