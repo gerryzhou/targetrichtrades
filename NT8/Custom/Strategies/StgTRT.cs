@@ -169,14 +169,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
 				{
 					indicatorProxy.TraceMessage(this.Name);
-					tradeObj.tradeDirection = TradingDirection.Down;				
+					tradeObj.tradeDirection = TradingDirection.Down;
 				}
 				if(indicatorSignal.TrendDir.TrendDir == TrendDirection.Up)
 				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
 				{
 					indicatorProxy.TraceMessage(this.Name);
-					tradeObj.tradeDirection = TradingDirection.Up;				
-				}			
+					tradeObj.tradeDirection = TradingDirection.Up;
+				}
 				
 				tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 				

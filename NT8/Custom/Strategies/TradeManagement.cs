@@ -334,8 +334,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Order ptOrder = tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder;
 			
 			try{
-				if(ptOrder == null || !ptOrder.Oco.Equals(tradeObj.ocoID)
-					|| ptOrder.LimitPrice != tradeObj.profitTargetPrice) {
+				if(ptOrder == null || !ptOrder.Oco.Equals(tradeObj.ocoID)) {
 					SubmitOrderUnmanaged(0, GetExitOrderAction(), OrderType.Limit, tradeObj.quantity,
 					tradeObj.profitTargetPrice, 0, tradeObj.ocoID, tradeObj.profitTargetSignalName);
 				}
@@ -808,9 +807,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.TraceMessage(this.Name);
 		    if (tradeObj.BracketOrder.EntryOrder != null && tradeObj.BracketOrder.EntryOrder == order)
 		    {
-				if (orderState == OrderState.Cancelled || 
-					//order.OrderState == OrderState.Filled || 
-					orderState == OrderState.Rejected || 
+				if (orderState == OrderState.Cancelled ||
+					//order.OrderState == OrderState.Filled ||
+					orderState == OrderState.Rejected ||
 					orderState == OrderState.Unknown)
 				{
 					tradeObj.barsSinceEnOrd = 0;
@@ -1007,74 +1006,74 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Use trailing entry every bar")]
  		[NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnTrailing", GroupName = "TradeMgmt", Order = 2)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnTrailing", GroupName = "TradeMgmt", Order = 2)]
         public bool TM_EnTrailing
         {
-            get{return tm_EnTrailing;}// { return tradeObj==null? false : tradeObj.enTrailing; }
-            set{tm_EnTrailing = value;}// { if(tradeObj!=null) tradeObj.enTrailing = value; }
+            get{return tm_EnTrailing;}
+            set{tm_EnTrailing = value;}
         }
 		
         [Description("Offeset points for limit price entry")]
 		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnOffsetPnts", GroupName = "TradeMgmt", Order = 3)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnOffsetPnts", GroupName = "TradeMgmt", Order = 3)]
         public double TM_EnOffsetPnts
         {
-            get{return tm_EnOffsetPnts;}// { return tradeObj==null? 0 : tradeObj.enOffsetPnts; }
-            set{tm_EnOffsetPnts = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.enOffsetPnts = Math.Max(0, value); }
+            get{return tm_EnOffsetPnts;}
+            set{tm_EnOffsetPnts = Math.Max(0, value);}
         }
 		
         [Description("How long to check entry order filled or not")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkEnOrder", GroupName = "TradeMgmt", Order = 4)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkEnOrder", GroupName = "TradeMgmt", Order = 4)]
         public int TM_MinutesChkEnOrder
         {
-            get{return tm_MinutesChkEnOrder;}// { return tradeObj==null? 0 : tradeObj.minutesChkEnOrder; }
-            set{tm_MinutesChkEnOrder = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.minutesChkEnOrder = Math.Max(0, value); }
+            get{return tm_MinutesChkEnOrder;}
+            set{tm_MinutesChkEnOrder = Math.Max(0, value);}
         }
 		
         [Description("How long to check P&L")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkPnL", GroupName = "TradeMgmt", Order = 5)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkPnL", GroupName = "TradeMgmt", Order = 5)]
         public int TM_MinutesChkPnL
         {
-            get{return tm_MinutesChkPnL;}// { return tradeObj==null? 0 : tradeObj.minutesChkPnL; }
-            set{tm_MinutesChkPnL = Math.Max(0, value);}// { if(tradeObj!=null) tradeObj.minutesChkPnL = Math.Max(-1, value); }
+            get{return tm_MinutesChkPnL;}
+            set{tm_MinutesChkPnL = Math.Max(0, value);}
         }
 		
 		[Description("Bar count before checking P&L")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsToCheckPL", GroupName = "TradeMgmt", Order = 6)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsToCheckPL", GroupName = "TradeMgmt", Order = 6)]
         public int TM_BarsToCheckPnL
         {
-            get{return tm_BarsToCheckPnL;}// { return tradeObj==null? 0 : tradeObj.barsToCheckPL; }
-            set{tm_BarsToCheckPnL = Math.Max(1, value);}// { if(tradeObj!=null) tradeObj.barsToCheckPL = Math.Max(1, value); }
+            get{return tm_BarsToCheckPnL;}
+            set{tm_BarsToCheckPnL = Math.Max(1, value);}
         }
 		
         [Description("How many bars to hold entry order before cancel it")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsHoldEnOrd", GroupName = "TradeMgmt", Order = 7)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsHoldEnOrd", GroupName = "TradeMgmt", Order = 7)]
         public int TM_BarsHoldEnOrd
         {
-            get{return tm_BarsHoldEnOrd;}// { return tradeObj==null? 0 : tradeObj.barsHoldEnOrd; }
-            set{tm_BarsHoldEnOrd = Math.Max(1, value);}// { if(tradeObj!=null) tradeObj.barsHoldEnOrd = Math.Max(1, value); }
+            get{return tm_BarsHoldEnOrd;}
+            set{tm_BarsHoldEnOrd = Math.Max(1, value);}
         }
 		
         [Description("Bar count for en order counter pullback")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnCounterPBBars", GroupName = "TradeMgmt", Order = 8)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnCounterPBBars", GroupName = "TradeMgmt", Order = 8)]
         public int TM_EnCounterPBBars
         {
-            get{return tm_EnCounterPBBars;}// { return tradeObj==null? 0 : tradeObj.enCounterPBBars; }
-            set{tm_EnCounterPBBars = Math.Max(1, value);}// { if(tradeObj!=null) tradeObj.enCounterPBBars = Math.Max(-1, value); }
+            get{return tm_EnCounterPBBars;}
+            set{tm_EnCounterPBBars = Math.Max(1, value);}
         }
 				
 		[Description("Bar count since last filled PT or SL")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsSincePTSL", GroupName = "TradeMgmt", Order = 9)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsSincePTSL", GroupName = "TradeMgmt", Order = 9)]
         public int TM_BarsSincePTSL
         {
-            get{return tm_BarsSincePtSl;}// { return tradeObj==null? 1 : tradeObj.barsSincePtSl; }
-            set{tm_BarsSincePtSl = Math.Max(1, value);}// { if(tradeObj!=null) tradeObj.barsSincePtSl = Math.Max(1, value); }
+            get{return tm_BarsSincePtSl;}
+            set{tm_BarsSincePtSl = Math.Max(1, value);}
         }
 		
 		#endregion

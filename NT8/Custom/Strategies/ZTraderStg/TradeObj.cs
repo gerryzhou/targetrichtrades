@@ -38,6 +38,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		private BracketOrderBase bracketOrder = new BracketOrderBase();
 		private TrailingSLOrderBase trailingSLOrder = new TrailingSLOrderBase();
+		public ExitOrderType exitOrderType = ExitOrderType.SimpleOCO;
+
 		#endregion
 		
 		#region Trade Mgmt variables

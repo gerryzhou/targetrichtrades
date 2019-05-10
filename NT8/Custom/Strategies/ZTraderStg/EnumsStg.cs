@@ -46,4 +46,6 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	public enum BracketOrderSubType {Entry, ProfitTarget, StoppLoss, UnKnown};
 	
 	public enum MoneyMgmtPolicy {SimpleSLPT, TrailingSLPT, PositionScaleInOut};
+	
+	public enum ExitOrderType {SimpleOCO, BreakEven, LockMinProfit, TrailingStopLoss};
 }
