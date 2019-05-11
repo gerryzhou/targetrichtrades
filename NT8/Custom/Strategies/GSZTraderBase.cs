@@ -135,41 +135,42 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
+			int prtLevel = 1;
 			
 			//Print(CurrentBar + ":" + this.Name + " OnBarUpdate, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			indicatorProxy.Update();
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			CheckPerformance();
 			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
 			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			switch(AlgoMode) {
 				case AlgoModeType.Liquidate: //liquidate
-					indicatorProxy.TraceMessage(this.Name);
+					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					CloseAllPositions();
 					break;
 				case AlgoModeType.Trading: //trading
 					//PutTrade(); break;
-					indicatorProxy.TraceMessage(this.Name);
+					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					if(hasPosition() != 0) {
 						CheckExitTrade();
 					}
 					else if(NewOrderAllowed())
 					{
-						indicatorProxy.TraceMessage(this.Name);
+						indicatorProxy.TraceMessage(this.Name, prtLevel);
 						CheckNewEntryTrade();
 						
-						indicatorProxy.TraceMessage(this.Name);
+						indicatorProxy.TraceMessage(this.Name, prtLevel);
 						PutTrade();
 					}
 					break;
 				case AlgoModeType.CancelOrders: //cancel order
-					indicatorProxy.TraceMessage(this.Name);
+					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					CancelAllOrders();
 					break;
 				case AlgoModeType.StopTrading: //stop trading
-					indicatorProxy.TraceMessage(this.Name);
+					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					indicatorProxy.PrintLog(true, !backTest, CurrentBar + "- Stop trading cmd:" + indicatorProxy.Get24HDateTime(Time[0]));
 					break;
 			}

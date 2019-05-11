@@ -546,12 +546,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 
 
-		public void TraceMessage(string message,
+		public void TraceMessage(string message, int printLevel,
         [CallerMemberName] string callingMethod = "",
         [CallerFilePath] string callingFilePath = "",
         [CallerLineNumber] int callingFileLineNumber = 0)
-		{			
-			//Print(CurrentBar + "-[" + message + ":" + callingMethod + "-" + callingFileLineNumber + "]-" + Path.GetFileName(callingFilePath));
+		{
+			if(printLevel > 0)
+				Print(CurrentBar + "-[" + message + ":" + callingMethod + "-" + callingFileLineNumber + "]-" + Path.GetFileName(callingFilePath));
 		}
 		
 //		[MethodImpl(MethodImplOptions.NoInlining)]

@@ -56,11 +56,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public virtual TradeObj CheckExitTrade() {
+			int prtLevel = 1;
 			//tradeObj.SetTradeType(TradeType.Exit);
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			ChangeSLPT();
 			//if(Position.MarketPosition == MarketPosition.Flat) return null;
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			CheckExitTradeBySignal();
 			
 			return tradeObj;
@@ -70,7 +71,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Check exit trader from signal instead of by money management policy
 		/// </summary>
 		/// <returns></returns>
-		public virtual TradeObj CheckExitTradeBySignal() {
+		public virtual void CheckExitTradeBySignal() {
+			if(indicatorSignal == null) return;
+			Print(CurrentBar + ":CheckExitTradeBySignal"
+			+ ";indicatorSignal.ReversalDir=" + indicatorSignal.ReversalDir.ToString()
+			+ ";Position.MarketPosition=" + Position.MarketPosition
+			);
 			if((indicatorSignal.ReversalDir == Reversal.Up && Position.MarketPosition == MarketPosition.Short) ||
 				(indicatorSignal.ReversalDir == Reversal.Down && Position.MarketPosition == MarketPosition.Long)) {
 				tradeObj.SetTradeType(TradeType.Liquidate);
@@ -79,7 +85,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			} else {
 
 			}			
-			return tradeObj;
 		}
 		
 		/// <summary>
@@ -135,23 +140,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if(BarsInProgress !=0) return false;
 			
 			Print(MethodBase.GetCurrentMethod().ToString() + " - 1");
-			//indicatorProxy.TraceMessage(this.Name);
+			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);		
 			//Print(CurrentBar + ":" + this.Name + " NewOrderAllowed, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
 			
-			//indicatorProxy.TraceMessage(this.Name);
+			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			double pnl = CheckAccPnL();//GetAccountValue(AccountItem.RealizedProfitLoss);
 			
-			//indicatorProxy.TraceMessage(this.Name);
+			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			double plrt = CheckAccCumProfit();
 			//DateTime dayKey = new DateTime(Time[0].Year,Time[0].Month,Time[0].Day);
 			
-			//indicatorProxy.TraceMessage(this.Name);
+			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			double pnl_daily = CheckPnlByDay(Time[0].Year, Time[0].Month, Time[0].Day);
 			
 			
-			//indicatorProxy.TraceMessage(this.Name);
+			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if(PrintOut > -1) {
 				//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":(RealizedProfitLoss,RealtimeTrades.CumProfit)=(" + pnl + "," + plrt + ")--" + Get24HDateTime(Time[0]));	
 				if(SystemPerformance.AllTrades.ByDay.Count == 2) {
@@ -161,14 +166,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			
 			
-			//indicatorProxy.TraceMessage(this.Name);
+			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if((backTest && IsLiveTrading()) || (!backTest && !IsLiveTrading())) {
 				//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + "[backTest,Historical]=" + backTest + "," + Historical + "- NewOrderAllowed=false - " + Get24HDateTime(Time[0]));
 				return false;
 			}
 			
 			
-			//indicatorProxy.TraceMessage(this.Name);
+			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if(!backTest && (plrt <= tradeObj.dailyLossLmt || pnl_daily <= tradeObj.dailyLossLmt))
 			{
 				if(PrintOut > -1) {
@@ -178,7 +183,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			
 			
-			//indicatorProxy.TraceMessage(this.Name);
+			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if (backTest && pnl_daily <= tradeObj.dailyLossLmt) {
 				if(PrintOut > -3) {
 					Print(CurrentBar + "-" + AccName + ": dailyLossLmt reached = " + pnl_daily + "," + plrt);
@@ -188,7 +193,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		
 			
-			//indicatorProxy.TraceMessage(this.Name);
+			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if (IsTradingTime(170000) && Position.Quantity == 0)
 			{
 				if (tradeObj.BracketOrder.EntryOrder == null || tradeObj.BracketOrder.EntryOrder.OrderState != OrderState.Working || tradeObj.enTrailing)
@@ -206,7 +211,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			return false;
 		}
-		
+	
+		/// <summary>
+		/// Submit unmanaged long limit order, set the order object in OnOrderUpdate handler
+		/// </summary>
+		/// <param name="msg"></param>
+		public virtual void NewLongLimitOrderUM(string msg)
+		{
+			tradeObj.entrySignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
+			Print(CurrentBar + ":NewLongLimitOrderUM"
+			+";tradeObj.entrySignalName=" + tradeObj.entrySignalName);
+			SubmitOrderUnmanaged(0, OrderAction.Buy, OrderType.Limit, 
+			tradeObj.quantity, tradeObj.enLimitPrice, 0, "", tradeObj.entrySignalName);
+			
+			tradeObj.barsSinceEnOrd = 0;
+		}
 		/// <summary>
 		/// Submit unmanaged short limit order, set the order object in OnOrderUpdate handler
 		/// </summary>
@@ -510,11 +529,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if(IsUnmanaged) {
 				SetSimpleExitOCOUM();
 				return;
-			}			
-			indicatorProxy.TraceMessage(this.Name);
+			}
+			int prtLevel = 0;
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			Print(CurrentBar + ": SetSimpleExitOCO-" 
 			+ sigName + "-avg=" + Position.AveragePrice);
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			tradeObj.stopLossAmt = MM_StopLossAmt;
 			tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
 			tradeObj.SLCalculationMode = CalculationMode.Currency;
@@ -527,7 +547,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Set OCO for exit;
 		/// </summary>
 		public virtual void SetSimpleExitOCOUM() {
-			indicatorProxy.TraceMessage(this.Name);
+			int prtLevel = 0;
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			Print(CurrentBar + ": SetExitOcoUM;" 
 			+ ";avgPrc=" + Position.AveragePrice
 			+ ";ocoID=" + tradeObj.ocoID
@@ -538,7 +559,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if(tradeObj.ocoID == null || (slOrd == null && ptOrd == null) 
 				|| (slOrd.OrderState != OrderState.Working && ptOrd.OrderState != OrderState.Working))
 				tradeObj.ocoID = GetNewOCOId();
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			SetProfitTargetOrderUM();
 			SetStopLossOrderUM();
 		}		
@@ -723,6 +744,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
+			int prtLevel = 0;
 			
 			Print(CurrentBar + ":OnOrderUpdateMG name-" + GetOrderName(order.Name) + "-" + order.FromEntrySignal + ";" + order.OrderTypeString
 			+ ";" + order.OrderState.ToString() + ";" + order.OrderAction.ToString()
@@ -731,7 +753,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			GetBracketOrderSubType(order);
 			
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 		    if (tradeObj.BracketOrder.EntryOrder != null && tradeObj.BracketOrder.EntryOrder == order)
 		    {
 				//giParabSAR.PrintLog(true, !backTest, log_file, order.ToString() + "--" + order.OrderState);
@@ -745,7 +767,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 		    }
 			
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 		    if (//tradeObj.BracketOrder.OCOOrder != null &&
 				tradeObj.BracketOrder.OCOOrder.StopLossOrder != null &&
 				tradeObj.BracketOrder.OCOOrder.StopLossOrder == order)
@@ -759,7 +781,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 		    }
 			
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 		    if (//tradeObj.BracketOrder.OCOOrder != null &&
 				tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null &&
 				tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == order)
@@ -773,7 +795,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 		    }
 			
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if (order.OrderState == OrderState.Working){// || order.OrderType == OrderType.StopMarket) {
 				if(GetOrderName(order.Name) == tradeObj.entrySignalName) //OrderSignalName.EntryLong.ToString() ||
 					//GetOrderName(order.Name) == OrderSignalName.EntryShort.ToString()) 
@@ -789,7 +811,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ":" + order.ToString());
 			}
 			
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if(GetOrderName(order.Name) == OrderSignalName.Stoploss.ToString() &&
 				(order.OrderState == OrderState.Accepted || order.OrderState == OrderState.Working)) {
 				tradeObj.BracketOrder.OCOOrder.StopLossOrder = order;
@@ -811,6 +833,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			string oName = GetOrderName(order.Name);
+			int prtLevel = 0;
 			
 			Print(CurrentBar + ":OnOrderUpdateUM name=" + oName
 			+ ";Type=" + order.OrderTypeString
@@ -826,7 +849,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			GetBracketOrderSubType(order);
 						
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 		    if (tradeObj.BracketOrder.EntryOrder != null && tradeObj.BracketOrder.EntryOrder == order)
 		    {
 				if (orderState == OrderState.Cancelled ||
@@ -839,7 +862,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 		    }
 			
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 		    if (tradeObj.TrailingSLOrder.EntryOrder != null && tradeObj.TrailingSLOrder.EntryOrder == order)
 		    {
 				if (orderState == OrderState.Cancelled || 
@@ -851,7 +874,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 		    }
 			
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 		    if (tradeObj.BracketOrder.OCOOrder.StopLossOrder != null &&
 				tradeObj.BracketOrder.OCOOrder.StopLossOrder == order)
 		    {				
@@ -864,7 +887,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 		    }
 			
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 		    if (tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder != null &&
 				tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder == order)
 		    {
@@ -877,7 +900,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 		    }
 
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 		    if ( tradeObj.TrailingSLOrder.TLSLOrder != null && tradeObj.TrailingSLOrder.TLSLOrder == order)
 		    {				
 		        if (orderState == OrderState.Cancelled || 
@@ -889,7 +912,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 		    }
 			
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if (orderState == OrderState.Working || orderState == OrderState.Accepted) {
 				if(oName.Equals(tradeObj.entrySignalName)) {
 					indicatorProxy.PrintLog(true, !BackTest, "Entry Order Name=" + oName);

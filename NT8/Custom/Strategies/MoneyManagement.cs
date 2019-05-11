@@ -58,7 +58,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="avgPrice">Avg entry price</param>
 		/// <param name="profitFactor">PT/SL>0</param>
 		protected void CalExitOcoPrice(double avgPrice, double profitFactor) {
-			indicatorProxy.TraceMessage(this.Name);
+			int prtLevel = 0;
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			switch(tradeObj.SLCalculationMode) {
 				case CalculationMode.Currency:
 					if(profitFactor > 0)
@@ -102,7 +103,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <param name="avgPrice">Avg entry price</param>
 		public virtual void CalTLSLPrice(double avgPrice, int pl_tics) {
-			indicatorProxy.TraceMessage(this.Name);
+			int prtLevel = 0;
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 
 //			if(pl_tics >= (tradeObj.profitLockMaxTic+2*tradeObj.profitTgtIncTic))
 //				overAmt = pl_tics - tradeObj.profitLockMaxTic;
@@ -130,7 +132,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else
 				tradeObj.trailingPTTic = Math.Max(tradeObj.trailingPTTic, pl_tics-tradeObj.trailingSLTic);
 			
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if(Position.MarketPosition == MarketPosition.Long) {
 				tradeObj.trailingSLPrice = MovePriceByTicks(avgPrice, tradeObj.trailingPTTic);
 			}
@@ -165,33 +167,34 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		protected bool ChangeSLPT()
 		{
-			indicatorProxy.TraceMessage(this.Name);
+			int prtLevel = 0;
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			double pl = CheckUnrealizedPnL();
 			int pl_tics = CheckUnrealizedPnLTicks();
 			double avgPrc = GetAvgPrice();
 			GetExitOrderType(pl, pl_tics);
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			
 			switch(tradeObj.exitOrderType) {
 				case ExitOrderType.TrailingStopLoss: // start trailing SL
 					Print(CurrentBar + ":isOverMaxLockPT, pl_tics=" + pl_tics);
-					indicatorProxy.TraceMessage(this.Name);
+					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					CalTLSLPrice(avgPrc, pl_tics);
 					SetTrailingStopLossOrder(tradeObj.entrySignalName.ToString());
 					break;
 				case ExitOrderType.LockMinProfit: // move PT, lock SL at MinPT
 					Print(CurrentBar + ":isOverMinLockPT, pl_tics=" + pl_tics);
-					indicatorProxy.TraceMessage(this.Name);
+					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					LockMinProfitTarget(avgPrc);
 					break;
 				case ExitOrderType.BreakEven: // PT no change, BE SL
 					Print(CurrentBar + ":isOverBreakeven, pl_tics=" + pl_tics);
-					indicatorProxy.TraceMessage(this.Name);
+					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					SetBreakEvenOrder(avgPrc);
 					break;
 				case ExitOrderType.SimpleOCO: // set simple PT, SL
 					Print(CurrentBar + ":isBelowBreakeven, pl_tics=" + pl_tics);
-					indicatorProxy.TraceMessage(this.Name);
+					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					SetSimpleExitOCO(tradeObj.entrySignalName.ToString());
 					break;
 			}
@@ -545,28 +548,29 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			if(bse > 0) {
 //				timeSinceEn = indicatorProxy.GetMinutesDiff(Time[0], Time[bse]);
 //			}
-			indicatorProxy.TraceMessage(this.Name);
+			int prtLevel = 0;
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			double pl = CheckUnrealizedPnL();
 			double pl_tics = CheckUnrealizedPnLTicks();
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if(pl_tics >= (tradeObj.profitLockMaxTic+2*tradeObj.profitTgtIncTic)) {
-				indicatorProxy.TraceMessage(this.Name);
+				indicatorProxy.TraceMessage(this.Name, prtLevel);
 				//SetTrailingStopLossOrder(tradeObj.entrySignalName.ToString());
 			} // start trailing SL
 			else if (pl >= (tradeObj.profitTargetAmt+2*GetCurrencyByTicks(tradeObj.profitTgtIncTic))) {
-				indicatorProxy.TraceMessage(this.Name);
+				indicatorProxy.TraceMessage(this.Name, prtLevel);
 				//MoveProfitTarget();
 			} // move PT, lock SL
 			else if (pl_tics >= (tradeObj.profitLockMinTic+2*tradeObj.stopLossIncTic)) {
-				indicatorProxy.TraceMessage(this.Name);
+				indicatorProxy.TraceMessage(this.Name, prtLevel);
 				//LockMinProfitTarget();
 			} // PT no change, lock SL
 			else if (pl >= tradeObj.breakEvenAmt) {
-				indicatorProxy.TraceMessage(this.Name);
+				indicatorProxy.TraceMessage(this.Name, prtLevel);
 				SetBreakEvenOrder(GetAvgPrice());
 			} // PT no change, BE SL
 			else {
-				indicatorProxy.TraceMessage(this.Name);
+				indicatorProxy.TraceMessage(this.Name, prtLevel);
 				SetSimpleExitOCO(tradeObj.entrySignalName.ToString());
 			} // set simple PT, SL
 			
@@ -576,7 +580,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			else
 //				indicatorProxy.PrintLog(true, !backTest, 
 //					AccName + "- ChangeSLPT<>0: (PnL, posAvgPrc, MM_BreakEvenAmt)=(" + pl + "," + Position.AveragePrice + "," + tradeObj.breakEvenAmt + ")");
-			indicatorProxy.TraceMessage(this.Name);
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			// If not flat print out unrealized PnL
     		if (Position.MarketPosition != MarketPosition.Flat) 
 			{

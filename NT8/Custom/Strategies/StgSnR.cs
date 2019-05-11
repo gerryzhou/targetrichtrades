@@ -152,21 +152,25 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public override TradeObj CheckNewEntryTrade() {
-			if(NewOrderAllowed() && indicatorSignal != null) { //|| Position.Quantity == 0 giSMI.IsNewInflection(TrendDirection.Down) && 
-				if(indicatorSignal.TrendDir != null && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down
+			int prtLevel = 1;
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
+			if(indicatorSignal != null) {
+				tradeObj.InitNewEntryTrade();
+				if(indicatorSignal.TrendDir != null 
+					&& indicatorSignal.TrendDir.TrendDir == TrendDirection.Down
 					&& indicatorProxy.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
+					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					tradeObj.tradeDirection = TradingDirection.Down;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
-					tradeObj.SetTradeType(TradeType.Entry);
-					tradeObj.BracketOrder.EnOrderType = OrderType.StopMarket;
-					tradeObj.PTCalculationMode = CalculationMode.Currency;
-					tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
-					tradeObj.SLCalculationMode = CalculationMode.Price;
 					tradeObj.stopLossPrice = indicatorProxy.GetResistance(indicatorSignal.SnR.Resistance);
-					tradeObj.barsSincePTSL = TM_BarsSincePTSL;
-					tradeObj.profitFactor = MM_ProfitFactor;
 				}
-				if(indicatorSignal != null && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down) {
+				else if(indicatorSignal.TrendDir != null 
+					&& indicatorSignal.TrendDir.TrendDir == TrendDirection.Up
+					&& indicatorProxy.GetSupport(indicatorSignal.SnR.Support) < Low[0]) {
+					indicatorProxy.TraceMessage(this.Name, prtLevel);
+					tradeObj.tradeDirection = TradingDirection.Up;
+					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
+					tradeObj.stopLossPrice = indicatorProxy.GetSupport(indicatorSignal.SnR.Support);
 					//Print(CurrentBar + ": GetResistance=" + indicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);
 				}
 			} else {
@@ -175,11 +179,28 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return tradeObj;
 		}
 		
+//		public override void PutTrade() {
+//			Print(CurrentBar + ":" + this.ToString());
+//			if(tradeObj.GetTradeType() == TradeType.Entry) {
+//				if(tradeObj.tradeDirection == TradingDirection.Up)
+//					NewEntryLongOrder();
+//			}
+//		}
+
 		public override void PutTrade() {
-			Print(CurrentBar + ":" + this.ToString());
 			if(tradeObj.GetTradeType() == TradeType.Entry) {
-				if(tradeObj.tradeDirection == TradingDirection.Up)
-					NewEntryLongOrder();
+				indicatorProxy.PrintLog(true, !BackTest, "PutTrade tradeObj.stopLossAmt=" + tradeObj.stopLossAmt + "," + MM_StopLossAmt);
+				if(tradeObj.tradeDirection == TradingDirection.Down) {
+					//tradeObj.entrySignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShort.ToString());
+					indicatorProxy.PrintLog(true, !BackTest, "PutTrade Down OrderSignalName=" + tradeObj.entrySignalName);
+					tradeObj.enLimitPrice = Close[0];
+					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
+				}
+				else if(tradeObj.tradeDirection == TradingDirection.Up) {
+					indicatorProxy.PrintLog(true, !BackTest, "PutTrade Up OrderSignalName=" + tradeObj.entrySignalName);
+					tradeObj.enLimitPrice = Close[0];
+					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());
+				}				
 			}
 		}
 		
