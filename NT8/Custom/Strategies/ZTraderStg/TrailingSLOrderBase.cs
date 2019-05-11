@@ -21,7 +21,6 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 {
 	public class TrailingSLOrderBase : Order
 	{
-		private Order entryOrder;
 		public OrderType TLSLOrderType = OrderType.Market;
 		public CalculationMode TLSLCalculationMode = CalculationMode.Price;
 
@@ -30,15 +29,10 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double highestPrice = 0; //The highest price of long position
 		public double lowestPrice = 0; //The lowest price of short position
 		
+		private Order entryOrder = null;		
+		private Order tlslOrder = null;
+		
 		#region Properites
-		[Browsable(false)]
-		[XmlIgnore()]
-		public Order EntryOrder
-		{
-			get { return entryOrder; }
-			set { entryOrder = value; }
-		}
-
 		[Browsable(false)]
 		[XmlIgnore()]
 		public double HighestPrice
@@ -61,6 +55,22 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		{
 			get { return maxProfitAmt; }
 			set { maxProfitAmt = value; }
+		}		
+		
+		[Browsable(false)]
+		[XmlIgnore()]
+		public Order EntryOrder
+		{
+			get { return entryOrder; }
+			set { entryOrder = value; }
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore()]
+		public Order TLSLOrder
+		{
+			get { return tlslOrder; }
+			set { tlslOrder = value; }
 		}		
 		#endregion
 	}

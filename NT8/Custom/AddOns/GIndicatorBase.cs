@@ -551,8 +551,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         [CallerFilePath] string callingFilePath = "",
         [CallerLineNumber] int callingFileLineNumber = 0)
 		{			
-		    // Write out message
-			Print(CurrentBar + "-[" + message + ":" + callingMethod + "-" + callingFileLineNumber + "]-" + Path.GetFileName(callingFilePath));
+			//Print(CurrentBar + "-[" + message + ":" + callingMethod + "-" + callingFileLineNumber + "]-" + Path.GetFileName(callingFilePath));
 		}
 		
 //		[MethodImpl(MethodImplOptions.NoInlining)]

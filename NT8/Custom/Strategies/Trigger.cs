@@ -6,22 +6,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Xml.Serialization;
 using NinjaTrader.Cbi;
-using NinjaTrader.Gui;
-using NinjaTrader.Gui.Chart;
-using NinjaTrader.Gui.SuperDom;
-using NinjaTrader.Gui.Tools;
 using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
-using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
+using NinjaTrader.NinjaScript.AddOns;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -150,6 +143,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public string GetCurTimestampStr() {
 			return DateTime.Now.ToString("yyyyMMddHHmmssfff");
+		}
+		
+		/// <summary>
+		/// Timestamp for bars ago: 20190503172538957
+		/// </summary>
+		/// <returns></returns>
+		public string GetBarTimestampStr(int barsAgo) {
+			return Time[barsAgo].ToString("yyyyMMddHHmmssfff") 
+				+ GZUtils.GetRandomNumber(1000, 9999).ToString();
 		}
 		
 		#endregion Trigger Functions
