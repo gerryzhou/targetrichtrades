@@ -22,7 +22,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
+namespace NinjaTrader.NinjaScript.Indicators.ZTraderPattern
 {
 	public class SpvDailyPattern
 	{
@@ -142,4 +142,3 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		#endregion spvPRDay		
 	}
 }
-

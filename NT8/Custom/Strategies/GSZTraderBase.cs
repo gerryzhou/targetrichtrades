@@ -57,7 +57,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
-				indicatorProxy = GIndicatorProxy(1);
+				indicatorProxy = GIndicatorProxy(1, Account.Name);
 				indicatorSignal = new IndicatorSignal();
 				//CustomDatsSeries1 = new Series<double>(this);
 			}

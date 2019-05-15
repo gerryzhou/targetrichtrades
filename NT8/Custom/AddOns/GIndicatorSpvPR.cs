@@ -21,6 +21,7 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Indicators.ZTraderPattern;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 

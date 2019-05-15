@@ -377,8 +377,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 			Print("GetFileNameByDateTime: " + dt.ToString());
 			//path = "C:\\inetpub\\wwwroot\\nt_files\\log\\";
 			//ext = "log";
-			long flong = DateTime.Now.Minute + 100*DateTime.Now.Hour+ 10000*DateTime.Now.Day + 1000000*DateTime.Now.Month + (long)100000000*DateTime.Now.Year;
-			string fname = path + accName + Path.DirectorySeparatorChar + accName + "_" + symbol + "_" + flong.ToString() + "." + ext;
+			//long flong = DateTime.Now.Minute + 100*DateTime.Now.Hour+ 10000*DateTime.Now.Day + 1000000*DateTime.Now.Month + (long)100000000*DateTime.Now.Year;
+			string fname = string.Format("{0}_{1:yyyyMMddHHmmss}.{2}",
+				path + accName + Path.DirectorySeparatorChar
+				+ accName + "_" + symbol, DateTime.Now, ext);
+			//string fname = path + accName + Path.DirectorySeparatorChar + accName + "_" + symbol + "_" + flong.ToString() + "." + ext;
 			//Print(", FileName=" + fname);
 			//FileTest(DateTime.Now.Minute + 100*DateTime.Now.Hour+ 10000*DateTime.Now.Day+ 1000000*DateTime.Now.Month + (long)100000000*DateTime.Now.Year);
 
