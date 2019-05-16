@@ -130,13 +130,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 			try{				
 //				if(CurrentBar < Count - 1)
 //					return -1;
-				if(CurrentBar < Count - 2)
-				//if(Inputs[0].Count - Bars.CurrentBar <= 2) 
+//				if(CurrentBar < Count - 2)
+//				if(Inputs[0].Count - Bars.CurrentBar <= 2)
+				if(CurrentBar < Bars.Count - 2)
 				{
-					return -1;					
+					return -1;		
 				} else {
-					Print("IsLastBarOnChart called:(CurBar,Count)=" + CurrentBar + "," + Count);
-					return Count;//Inputs[0].Count;
+					Print("IsLastBarOnChart called:(CurBar,Count, Bars.Count)=" + CurrentBar + "," + Count + "," + Bars.Count);
+					return Bars.Count;//Count;//Inputs[0].Count;
 				}
 		
 			} catch(Exception ex){
@@ -430,72 +431,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 			char[] delimiterChars = {'!'};
 			string[] words = tst_acc.Split(delimiterChars);
 			return words[0];
-		}
-		
-		public PriceAction GetPriceAction(DateTime dt) {
-			
-			PriceAction pa = new PriceAction(PriceActionType.UnKnown, -1, -1, -1, -1);
-			
-			int key_date = GetDateByDateTime(dt);
-			int t = dt.Hour*100 + dt.Minute;
-			
-			Dictionary<int,PriceAction> mkt_ctxs = null;
-			if(Dict_SpvPR != null)
-				Dict_SpvPR.TryGetValue(key_date.ToString(), out mkt_ctxs);
-			//Print("key_year, time, Dict_SpvPR, mkt_ctxs=" + key_year.ToString() + "," + t.ToString() + "," + Dict_SpvPR + "," + mkt_ctxs);
-			if(mkt_ctxs != null) {
-				foreach(var mkt_ctx in mkt_ctxs) {
-					//Print("time,mkt_ctx=" + mkt_ctx.Key + "," + mkt_ctx.Value);
-					int start = mkt_ctx.Key/10000;
-					int end = mkt_ctx.Key % 10000;
-					
-					if(t >= start && t <= end) {
-						pa = mkt_ctx.Value;
-						break;
-					}
-				}
-			}
-			return pa;
-		}
-		
-		/// <summary>
-		/// Check if the price action type allowed for supervised PR 
-		/// </summary>
-		/// <returns></returns>
-		public bool IsSpvAllowed4PAT(PriceActionType pat) {
-			int i;
-			switch(pat) {
-				case PriceActionType.UpTight: //
-					i = (1 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (1 & SpvPRBits)=" + i);
-					return (1 & SpvPRBits) > 0;
-				case PriceActionType.UpWide: //wide up channel
-					i = (2 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (2 & SpvPRBits)=" + i);
-					return (2 & SpvPRBits) > 0;
-				case PriceActionType.DnTight: //
-					i = (4 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (4 & SpvPRBits)=" + i);
-					return (4 & SpvPRBits) > 0;
-				case PriceActionType.DnWide: //wide dn channel
-					i = (8 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (8 & SpvPRBits)=" + i);
-					return (8 & SpvPRBits) > 0;
-				case PriceActionType.RngTight: //
-					i = (16 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (16 & SpvPRBits)=" + i);
-					return (16 & SpvPRBits) > 0;
-				case PriceActionType.RngWide: //
-					i = (32 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (32 & SpvPRBits)=" + i);
-					return (32 & SpvPRBits) > 0;
-				case PriceActionType.UnKnown: //
-					i = (64 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (64 & SpvPRBits)=" + i);
-					return (64 & SpvPRBits) > 0;					
-				default:
-					return false;
-			}			
 		}
 
 		/// <summary>

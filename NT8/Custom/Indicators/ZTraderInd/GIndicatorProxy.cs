@@ -19,6 +19,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.ZTraderPattern;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -27,6 +28,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	public class GIndicatorProxy : GIndicatorBase
 	{
 		private Series<double> CustData;
+		private List<SpvPR> dailyPattern;
 
 		protected override void OnStateChange()
 		{
@@ -56,6 +58,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 			{				
 				CustData = new Series<double>(this);
 				SetLogFile(GetFileNameByDateTime(DateTime.Now, @"C:\www\log\", AccName, symbol, "log"));
+				dailyPattern = LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
 			}
 		}
 
@@ -67,6 +70,9 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		protected override void OnBarUpdate()
 		{
 			//Add your custom indicator logic here.
+			PrintTo = PrintTo.OutputTab2;
+			if(IsLastBarOnChart() > 0)
+				PrintLog(true, false, "dailyPattern=" + dailyPattern.Count);
 		}
 
 		#region Properties

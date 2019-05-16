@@ -48,7 +48,11 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
             this.maxUpTicks = max_UpTicks;
             this.minDownTicks = min_DnTicks;
             this.maxDownTicks = max_DnTicks;
-        }
+        }		
     }
 }
+	
+	
+
+
 
