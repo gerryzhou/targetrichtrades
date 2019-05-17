@@ -471,10 +471,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		#region Print and Log functions
 		public void PrintLog(bool prt_con, bool prt_file, string text) {
-			string fpath = GetLogFile();
-			//Print("PrintLog: " + fpath);
-			if(prt_con) Print(text); // return;
+			if(prt_con) Print(text);
 			if(prt_file) {
+				string fpath = GetLogFile();
 				using (System.IO.StreamWriter file = 
 					new System.IO.StreamWriter(@fpath, true))
 				{
@@ -489,7 +488,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         [CallerFilePath] string callingFilePath = "",
         [CallerLineNumber] int callingFileLineNumber = 0)
 		{
-			if(printLevel > 1)
+			if(printLevel > PrintOut)
 				Print(CurrentBar + "-[" + message + ":" + callingMethod + "-" + callingFileLineNumber + "]-" + Path.GetFileName(callingFilePath));
 		}
 		
@@ -525,10 +524,22 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
             get { return Values[1]; }
         }
-
+		
+		/// <summary>
+		/// The print out level
+		/// </summary>
+		/// <returns></returns>
+		[Display(Name="PrintOut", Description="The print out level", Order=0, GroupName="GIndicator")]
+        [XmlIgnore()] // ensures that the property will NOT be saved/recovered as part of a chart template or workspace
+        public int PrintOut
+        {
+            get{return printOut;}
+			set{printOut = value;}
+        }
+		
 		[NinjaScriptProperty]
 		[XmlIgnore]
-		[Display(Name="CustomColor1", Description="Color-1", Order=0, GroupName="GIndicator")]
+		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName="GIndicator")]
 		public Brush CustomColor1
 		{ get; set; }
 
@@ -541,18 +552,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[NinjaScriptProperty]
 		[Range(0, double.MaxValue)]
-		[Display(Name="CustomPrc1", Description="CustomPrc-1", Order=1, GroupName="GIndicator")]
+		[Display(Name="CustomPrc1", Description="CustomPrc-1", Order=2, GroupName="GIndicator")]
 		public double CustomPrc1
 		{ get; set; }
 
 		[NinjaScriptProperty]
-		[Display(Name="CustomStr1", Description="CustomStr-1", Order=2, GroupName="GIndicator")]
+		[Display(Name="CustomStr1", Description="CustomStr-1", Order=3, GroupName="GIndicator")]
 		public string CustomStr1
 		{ get; set; }
 
 		[NinjaScriptProperty]
 		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
-		[Display(Name="CustomTime1", Description="CustomTime-1", Order=3, GroupName="GIndicator")]
+		[Display(Name="CustomTime1", Description="CustomTime-1", Order=4, GroupName="GIndicator")]
 		public DateTime CustomTime1
 		{ get; set; }
 		#endregion
@@ -595,18 +606,8 @@ namespace NinjaTrader.NinjaScript.Indicators
            logFile = log_file;
         }
 		
-		/// <summary>
-		/// The print out level
-		/// </summary>
-		/// <returns></returns>
-        public int GetPrintOut()
-        {
-            return printOut;
-        }
-		public void SetPrintOut(int print_out)
-        {
-           printOut = print_out;
-        }
+
+ 
 		
 		/// <summary>
 		/// If it draws text on the chart

@@ -135,50 +135,54 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
-			int prtLevel = 1;
+			SetPrintOut(-1);
 			
 			//Print(CurrentBar + ":" + this.Name + " OnBarUpdate, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
-			indicatorProxy.TraceMessage(this.Name, prtLevel);
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			indicatorProxy.Update();
-			indicatorProxy.TraceMessage(this.Name, prtLevel);
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			CheckPerformance();
 			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
 			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
-			indicatorProxy.TraceMessage(this.Name, prtLevel);
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			GetIndicatorSignal();
 			CheckNewEntryTrade();
 			PutTrade();
 			switch(AlgoMode) {
 				case AlgoModeType.Liquidate: //liquidate
-					indicatorProxy.TraceMessage(this.Name, prtLevel);
+					indicatorProxy.TraceMessage(this.Name, PrintOut);
 					CloseAllPositions();
 					break;
 				case AlgoModeType.Trading: //trading
 					//PutTrade(); break;
-					indicatorProxy.TraceMessage(this.Name, prtLevel);
+					indicatorProxy.TraceMessage(this.Name, PrintOut);
 					if(hasPosition() != 0) {
 						CheckExitTrade();
 					}
 					else if(NewOrderAllowed())
 					{
-						indicatorProxy.TraceMessage(this.Name, prtLevel);
+						indicatorProxy.TraceMessage(this.Name, PrintOut);
 						CheckNewEntryTrade();
 						
-						indicatorProxy.TraceMessage(this.Name, prtLevel);
+						indicatorProxy.TraceMessage(this.Name, PrintOut);
 						PutTrade();
 					}
 					break;
 				case AlgoModeType.CancelOrders: //cancel order
-					indicatorProxy.TraceMessage(this.Name, prtLevel);
+					indicatorProxy.TraceMessage(this.Name, PrintOut);
 					CancelAllOrders();
 					break;
 				case AlgoModeType.StopTrading: //stop trading
-					indicatorProxy.TraceMessage(this.Name, prtLevel);
+					indicatorProxy.TraceMessage(this.Name, PrintOut);
 					indicatorProxy.PrintLog(true, !backTest, CurrentBar + "- Stop trading cmd:" + indicatorProxy.Get24HDateTime(Time[0]));
 					break;
 			}
 		}
 
+		public void SetPrintOut(int i) {
+			PrintOut = indicatorProxy.PrintOut + i;
+		}
+		
 		#region Properties
 		
 		[Description("Account Name")]

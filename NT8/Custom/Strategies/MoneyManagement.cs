@@ -429,8 +429,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			double pnl = 0;
 			TradeCollection tc = null;
 			DateTime dayKey = new DateTime(year, month, day);//(Time[0].Year,Time[0].Month,Time[0].Day);
-			Print(CurrentBar + "-CheckPnlByDay AllTrades(dayKey, ByDay.Count)=" + dayKey + "," + SystemPerformance.AllTrades.ByDay.Count
-			+ "RealTimeTrades ByDay.Count=" + SystemPerformance.RealTimeTrades.ByDay.Count);
+			SetPrintOut(1);
+			indicatorProxy.TraceMessage(CurrentBar + "-CheckPnlByDay AllTrades(dayKey, ByDay.Count)=" + dayKey
+			+ "," + SystemPerformance.AllTrades.ByDay.Count
+			+ "RealTimeTrades ByDay.Count=" + SystemPerformance.RealTimeTrades.ByDay.Count
+			+ "::" + this.Name, PrintOut);
+			
 			if(IsLiveTrading()) {
 				if(SystemPerformance.RealTimeTrades.ByDay.Keys.Contains(dayKey))
 					tc = (TradeCollection)SystemPerformance.RealTimeTrades.ByDay[dayKey];
@@ -441,7 +445,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			if(tc != null) {
 				pnl = tc.TradesPerformance.Currency.CumProfit;
-				Print(CurrentBar + "-CheckPnlByDay: Count, IsLiveTrading, pnl=" + tc.Count + "," + IsLiveTrading().ToString() + "," + pnl);
+				indicatorProxy.TraceMessage(CurrentBar + "-CheckPnlByDay: Count, IsLiveTrading, pnl="
+				+ tc.Count + "," + IsLiveTrading().ToString() + "," + pnl
+				+ "::" + this.Name, PrintOut);				
 			}
 			return pnl;
 		}

@@ -140,7 +140,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if(BarsInProgress !=0) return false;
 			
-			Print(MethodBase.GetCurrentMethod().ToString() + " - 1");
+			SetPrintOut(-1);
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			//Print(MethodBase.GetCurrentMethod().ToString() + " called");
 			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);		
@@ -177,19 +179,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if(!backTest && (plrt <= tradeObj.dailyLossLmt || pnl_daily <= tradeObj.dailyLossLmt))
 			{
-				if(PrintOut > -1) {
-					Print(CurrentBar + "-" + AccName + ": dailyLossLmt reached = " + pnl_daily + "," + plrt);
-				}
+				indicatorProxy.TraceMessage(CurrentBar + "-" + AccName 
+				+ ": dailyLossLmt reached = " + pnl_daily + "," + plrt
+				+ "::" + this.Name, PrintOut);
+				
 				return false;
 			}
 			
 			
 			//indicatorProxy.TraceMessage(this.Name, prtLevel);
-			if (backTest && pnl_daily <= tradeObj.dailyLossLmt) {
-				if(PrintOut > -3) {
-					Print(CurrentBar + "-" + AccName + ": dailyLossLmt reached = " + pnl_daily + "," + plrt);
-					//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + ": backTest dailyLossLmt reached = " + pnl);
-				}
+			if (backTest && pnl_daily <= tradeObj.dailyLossLmt) 
+			{
+				indicatorProxy.TraceMessage(CurrentBar + "-" + AccName 
+				+ ": dailyLossLmt reached = " + pnl_daily + "," + plrt
+				+ "::" + this.Name, PrintOut);
+				
 				return false;				
 			}
 		
@@ -201,8 +205,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				{					
 					if(bsx < 0 || bsx > tradeObj.barsSincePTSL) //if(bsx == -1 || bsx > tradeObj.barsSincePtSl)
 					{
-						Print(CurrentBar + "-bsx,bse,tradeObj.barsSincePtSl=" + bsx + "," + bse + "," + tradeObj.barsSincePTSL);
-						//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + "- NewOrderAllowed=true - " + Get24HDateTime(Time[0]));
+						indicatorProxy.TraceMessage(CurrentBar 
+						+ "-bsx,bse,tradeObj.barsSincePtSl=" + bsx + "," + bse + "," + tradeObj.barsSincePTSL
+						+ "::" + this.Name, PrintOut);
 						return true;
 					} //else
 						//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + "-NewOrderAllowed=false-[bsx,barsSincePtSl]" + bsx + "," + barsSincePtSl + " - " + Get24HDateTime(Time[0]));
