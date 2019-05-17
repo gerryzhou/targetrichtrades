@@ -489,7 +489,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         [CallerFilePath] string callingFilePath = "",
         [CallerLineNumber] int callingFileLineNumber = 0)
 		{
-			if(printLevel > 0)
+			if(printLevel > 1)
 				Print(CurrentBar + "-[" + message + ":" + callingMethod + "-" + callingFileLineNumber + "]-" + Path.GetFileName(callingFilePath));
 		}
 		

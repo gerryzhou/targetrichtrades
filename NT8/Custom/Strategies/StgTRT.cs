@@ -35,6 +35,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private GIAwesomeOscillator awOscillator;
 		private GISnR giSnR;
 		
+		#region OnStateChange
 		protected override void OnStateChange()
 		{
 			base.OnStateChange();
@@ -93,6 +94,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 
+		#endregion
+		
+		#region OnBarUpdate
 		protected override void OnBarUpdate()
 		{
 			int prtLevel = 0;
@@ -111,6 +115,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//CheckEntryTrade();
 			//PutTrade();
 		}
+		
+		#endregion
+		
+		#region Signal functions
 		
 		public override Direction GetDirection(GIndicatorBase ind){
 			//Print(CurrentBar.ToString() + " -- StgTRT override GetDirection: " + ind.GetType().Name + " called...");
@@ -162,6 +170,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			return indSignal;
 		}
+		#endregion
+		
+		#region Trade functions
 		
 		public override TradeObj CheckNewEntryTrade() {
 //			if(NewOrderAllowed()) {
@@ -214,6 +225,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}				
 			}
 		}
+		#endregion
 		
         #region Custom Properties
 		

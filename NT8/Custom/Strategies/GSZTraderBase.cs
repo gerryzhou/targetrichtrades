@@ -145,6 +145,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
 			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
+			GetIndicatorSignal();
+			CheckNewEntryTrade();
+			PutTrade();
 			switch(AlgoMode) {
 				case AlgoModeType.Liquidate: //liquidate
 					indicatorProxy.TraceMessage(this.Name, prtLevel);

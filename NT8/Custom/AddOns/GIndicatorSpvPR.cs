@@ -47,6 +47,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 	}
 	
+	
 	public partial class GIndicatorBase : Indicator
 	{
 		#region SpvPR Vars
@@ -56,6 +57,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// </summary>		
 		protected Dictionary<string,Dictionary<int,PriceAction>> Dict_SpvPR = null;
 		private List<SpvPR> List_SpvPR = null; 
+		protected Dictionary<string, List<MarketContext>> Dict_SpvPR2 =  null;
+		
 		/// <summary>
 		/// Bitwise op to tell which Price Action allowed to be the supervised entry approach
 		/// 0111 1111: [0 UnKnown RngWide RngTight DnWide DnTight UpWide UpTight]
@@ -67,6 +70,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		private int spvPRBits = 0;
 		
+		private int prt_lev = 1;
 		#endregion
 		
 		#region Supervised pattern recognition
@@ -99,11 +103,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <param name="line"></param>
 		/// <param name="key"></param>
 		/// <returns></returns>
-		protected Dictionary<int,PriceAction> ReadSpvPRLine(string line, out string key) {
+		protected List<MarketContext> ReadSpvPRLine(string line, out string key) {
 			int prt_lev = 1;
 			string[] line_pa = line.Split(',');
 			Print("line_pa=" + line_pa[0] + "," + line_pa[1]);
-			Dictionary<int,PriceAction> mkt_ctxs = new Dictionary<int,PriceAction>();
+			List<MarketContext> mkt_ctxs = new List<MarketContext>();
 			for(int i=1; i<line_pa.Length; i++) {
 				Print("line_pa[" + i + "]=" + line_pa[i]);
 				int t, minUp, maxUp, minDn, maxDn;
@@ -122,15 +126,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 				int.TryParse(v[2], out minDn);
 				int.TryParse(v[3], out maxDn);					
 				TraceMessage(this.Name, prt_lev);
-				mkt_ctxs.Add(t, new PriceAction(pat, minUp, maxUp, minDn, maxDn));
+				Print("t,pat,minUp,maxUp,minDn,maxDn=" +
+				t + "," + pat + "," + minUp + "," + maxUp + "," + minDn + "," + maxDn);
+				mkt_ctxs.Add(new MarketContext(t, new PriceAction(pat, minUp, maxUp, minDn, maxDn)));
 			}
 //				if(mkt_ctxs.Count > 0) {
 //					Dict_SpvPR.Add(line_pa[0], mkt_ctxs);
 //				}
 			key = line_pa[0];
+			TraceMessage(this.Name, prt_lev);
+			Print(CurrentBar + ":key=" + key + ",mkt_ctxs.Count=" + mkt_ctxs.Count);
 			return mkt_ctxs;
 		}
-		
+				
 		/// <summary>
 		/// 20170522;9501459:UpTight#10-16-3-5
 		/// </summary>
@@ -157,7 +165,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			{
 				if(line.StartsWith("//")) continue; //comments line, skip it;
 				string key;
-				Dictionary<int,PriceAction> mkt_ctxs = ReadSpvPRLine(line.Substring(1, line.Length-3), out key);//remove leading " and ending ",
+				Dictionary<int,PriceAction> mkt_ctxs = Dep_ReadSpvPRLine(line.Substring(1, line.Length-3), out key);//remove leading " and ending ",
 				//Print(line);
 				if(mkt_ctxs.Count > 0) {
 					Dict_SpvPR.Add(key, mkt_ctxs);
@@ -184,8 +192,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <returns></returns>
 		public List<SpvPR> LoadSpvPRList(List<string> dailyPattern) {
 			//Dictionary<string,Dictionary<int,PriceActionType>> 
-			Dict_SpvPR = new Dictionary<string,Dictionary<int,PriceAction>>();			
-			List_SpvPR = new List<SpvPR>();
+			//Dict_SpvPR = new Dictionary<string,Dictionary<int,PriceAction>>();			
+			//List_SpvPR = new List<SpvPR>();
+			Dict_SpvPR2 = new Dictionary<string, List<MarketContext>>();
 			
 			int counter = 0;  
 			//string line;
@@ -193,10 +202,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 				Print("dayPR=" + dayPR);
 				string key;
 				int key_int;
-				Dictionary<int,PriceAction> mkt_ctxs = ReadSpvPRLine(dayPR, out key);
+				//Dictionary<int,PriceAction> mkt_ctxs = ReadSpvPRLine(dayPR, out key);
+				List<MarketContext> mkt_ctxs = ReadSpvPRLine(dayPR, out key);
+				TraceMessage(this.Name, prt_lev);
 				int.TryParse(key, out key_int);
-				if(mkt_ctxs.Count > 0) {					
-					List_SpvPR.Add(new SpvPR(key_int, mkt_ctxs));
+				if(mkt_ctxs.Count > 0) {
+					TraceMessage(this.Name, prt_lev);
+					// MarketContext needs more time than one for a single day!!!!
+					//List_SpvPR.Add(new SpvPR(key_int, mkt_ctxs));
+					foreach(var mkt_ctx in mkt_ctxs){
+						Print("LoadSpvPRList mkt_ctx=" + mkt_ctx.Time + "," + mkt_ctx.Price_Ation);
+					}
+					Dict_SpvPR2.Add(key, mkt_ctxs);
 				}
 				counter++;
 			}
@@ -229,28 +246,36 @@ namespace NinjaTrader.NinjaScript.Indicators
 			
 			PriceAction pa = new PriceAction(PriceActionType.UnKnown, -1, -1, -1, -1);
 			
-			int key_date = GetDateByDateTime(dt);
+			//int key_date = GetDateByDateTime(dt);
+			string key_date = GetDateStrByDateTime(dt);
 			int t = dt.Hour*100 + dt.Minute;
-			
-			Dictionary<int,PriceAction> mkt_ctxs = null;
-			if(Dict_SpvPR != null)
-				Dict_SpvPR.TryGetValue(key_date.ToString(), out mkt_ctxs);
-			//Print("key_year, time, Dict_SpvPR, mkt_ctxs=" + key_year.ToString() + "," + t.ToString() + "," + Dict_SpvPR + "," + mkt_ctxs);
+			List<MarketContext> mkt_ctxs = null;
+//			Dictionary<int,PriceAction> mkt_ctxs = null;
+//			if(Dict_SpvPR != null)
+//				Dict_SpvPR.TryGetValue(key_date, out mkt_ctxs);
+			TraceMessage(this.Name, prt_lev);
+			if(Dict_SpvPR2 != null)
+				Dict_SpvPR2.TryGetValue(key_date, out mkt_ctxs);
+			TraceMessage(this.Name, prt_lev);
+			Print("key_date, time, Dict_SpvPR, mkt_ctxs=" + key_date 
+			+ "," + t.ToString() + "," + Dict_SpvPR2.Count + "," + mkt_ctxs);
+			TraceMessage(this.Name, prt_lev);
 			if(mkt_ctxs != null) {
 				foreach(var mkt_ctx in mkt_ctxs) {
-					//Print("time,mkt_ctx=" + mkt_ctx.Key + "," + mkt_ctx.Value);
-					int start = mkt_ctx.Key/10000;
-					int end = mkt_ctx.Key % 10000;
-					
+					Print("time, mkt_ctx.Time, mkt_ctx.Price_Ation=" + t + "," + 
+					mkt_ctx.Time + "," + mkt_ctx.Price_Ation);
+					int start = mkt_ctx.Time/10000;
+					int end = mkt_ctx.Time % 10000;
+					TraceMessage(this.Name, prt_lev);
 					if(t >= start && t <= end) {
-						pa = mkt_ctx.Value;
+						pa = mkt_ctx.Price_Ation;
 						break;
 					}
 				}
 			}
 			return pa;
 		}
-		
+
 		/// <summary>
 		/// Check if the price action type allowed for supervised PR 
 		/// </summary>
@@ -292,6 +317,77 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}		
 		#endregion
 		
+		#region Dep functions
+		/// <summary>
+		/// "20170607,8401151#DnWide#10-16-3-5,11521459#UpTight#10-16-3-5",
+		/// </summary>
+		/// <param name="line"></param>
+		/// <param name="key"></param>
+		/// <returns></returns>
+		protected Dictionary<int,PriceAction> Dep_ReadSpvPRLine(string line, out string key) {
+			int prt_lev = 1;
+			string[] line_pa = line.Split(',');
+			Print("line_pa=" + line_pa[0] + "," + line_pa[1]);
+			Dictionary<int,PriceAction> mkt_ctxs = new Dictionary<int,PriceAction>();
+			for(int i=1; i<line_pa.Length; i++) {
+				Print("line_pa[" + i + "]=" + line_pa[i]);
+				int t, minUp, maxUp, minDn, maxDn;
+				TraceMessage(this.Name, prt_lev);
+				string[] mkt_ctx = line_pa[i].Split('#');
+				TraceMessage(this.Name, prt_lev);
+				int.TryParse(mkt_ctx[0], out t);//parse the time of the PA;
+				TraceMessage(this.Name, prt_lev);
+				//string[] pa = mkt_ctx[1].Split('#');
+				PriceActionType pat = (PriceActionType)Enum.Parse(typeof(PriceActionType), mkt_ctx[1]);//parse the PA type;
+				TraceMessage(this.Name, prt_lev);
+				string[] v = mkt_ctx[2].Split('-');
+				TraceMessage(this.Name, prt_lev);
+				int.TryParse(v[0], out minUp);
+				int.TryParse(v[1], out maxUp);
+				int.TryParse(v[2], out minDn);
+				int.TryParse(v[3], out maxDn);					
+				TraceMessage(this.Name, prt_lev);
+				mkt_ctxs.Add(t, new PriceAction(pat, minUp, maxUp, minDn, maxDn));
+			}
+//				if(mkt_ctxs.Count > 0) {
+//					Dict_SpvPR.Add(line_pa[0], mkt_ctxs);
+//				}
+			key = line_pa[0];
+			return mkt_ctxs;
+		}
+		
+		public PriceAction Dep_GetPriceAction(DateTime dt) {
+			
+			PriceAction pa = new PriceAction(PriceActionType.UnKnown, -1, -1, -1, -1);
+			
+			//int key_date = GetDateByDateTime(dt);
+			string key_date = GetDateStrByDateTime(dt);
+			int t = dt.Hour*100 + dt.Minute;
+			MarketContext mkt_ctxs = null;
+//			Dictionary<int,PriceAction> mkt_ctxs = null;
+//			if(Dict_SpvPR != null)
+//				Dict_SpvPR.TryGetValue(key_date, out mkt_ctxs);
+//			if(Dict_SpvPR2 != null)
+//				Dict_SpvPR2.TryGetValue(key_date, out mkt_ctxs);
+			
+//			Print("key_date, time, Dict_SpvPR, mkt_ctxs=" + key_date 
+//			+ "," + t.ToString() + "," + Dict_SpvPR2.Count + "," + mkt_ctxs);
+			if(mkt_ctxs != null) {
+//				foreach(var mkt_ctx in mkt_ctxs) {
+//					Print("time, start, end, mkt_ctx=" + t + "," + 
+//					mkt_ctx.Key + "," + mkt_ctx.Value);
+//					int start = mkt_ctx.Key/10000;
+//					int end = mkt_ctx.Key % 10000;
+					
+//					if(t >= start && t <= end) {
+//						pa = mkt_ctx.Value;
+//						break;
+//					}
+//				}
+			}
+			return pa;
+		}		
+		#endregion
 		#region Properties
 		
 		[NinjaScriptProperty]

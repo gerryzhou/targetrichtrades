@@ -99,7 +99,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderPattern
 			"20170615,1300800#DnTight#10-16-3-5,8300930#RngWide#10-16-3-5,9301459#UpTight#10-16-3-5",
 			"20170616,6301000#DnTight#10-16-3-5,10051459#UpTight#10-16-3-5",
 			//April 2018
-			"20180402,7501059#UpWide#6-22-6-22",
+			"20180402,7501059#UpWide#6-22-6-22,11051259#RngTight#6-12-6-8",
 			"20180403,7501059#UpWide#6-22-6-22",
 			"20180404,7501059#UpWide#6-22-6-22",
 			"20180405,7501059#UpWide#6-22-6-22",
@@ -148,6 +148,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderPattern
 		#endregion spvPRDay		
 	}
 }
+
 
 
 

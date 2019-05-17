@@ -46,7 +46,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public virtual void PutTrade() {
-			Print(CurrentBar + "::" + this.ToString());
+			Print(CurrentBar + "::PutTrade()--" + this.ToString());
 		}
 		
 		/// <summary>
@@ -94,6 +94,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual TradeObj CheckNewEntryTrade() {
 //			if(NewOrderAllowed()) {
 //			}
+			Print(CurrentBar + "::CheckNewEntryTrade()--" + this.ToString());
 			return null;
 		}
 	

@@ -26,6 +26,23 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 {
 	public class MarketContext
 	{
+//		private int time;
+//		private PriceAction priceAction;
+		
+		public MarketContext(int t, PriceAction pa) {
+			Time = t;
+			Price_Ation = pa;
+		}
+		
+		#region Properties
+		public int Time {
+			get;set;
+		}
+		
+		public PriceAction Price_Ation {
+			get;set;
+		}
+		#endregion
 		
 	/*
 		#region SpvPR Vars
@@ -50,6 +67,11 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	*/		
 	}
 }
+
+
+
+
+
 
 
 

@@ -20,33 +20,47 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.AddOns;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies
 {
+	/// <summary>
+	/// Sample strategy fro GSZTrader:
+	/// 1) OnStateChange();
+	/// 2) OnBarUpdate();
+	/// 3) GetIndicatorSignal();
+	/// 4) CheckNewEntryTrade();
+	/// 5) PutTrade();
+	/// </summary>
 	public class StgSample01 : GSZTraderBase
 	{
+		private int prtLevel = 2;
+		
 		protected override void OnStateChange()
 		{
+			base.OnStateChange();
 			if (State == State.SetDefaults)
 			{
-				Description									= @"Enter the description for your new custom Strategy here.";
-				Name										= "GSZTraderInst1";
+				Description									= @"The sample strategy for GSZTrader.";
+				Name										= "StgSample01";
 				Calculate									= Calculate.OnBarClose;
-				EntriesPerDirection							= 1;
-				EntryHandling								= EntryHandling.AllEntries;
-				IsExitOnSessionCloseStrategy				= true;
-				ExitOnSessionCloseSeconds					= 30;
+				//EntriesPerDirection							= 1;
+				//EntryHandling								= EntryHandling.AllEntries;
+				//IsExitOnSessionCloseStrategy				= true;
+				//ExitOnSessionCloseSeconds					= 30;
 				IsFillLimitOnTouch							= false;
-				MaximumBarsLookBack							= MaximumBarsLookBack.TwoHundredFiftySix;
-				OrderFillResolution							= OrderFillResolution.Standard;
-				Slippage									= 0;
-				StartBehavior								= StartBehavior.WaitUntilFlat;
-				TimeInForce									= TimeInForce.Gtc;
+				//MaximumBarsLookBack							= MaximumBarsLookBack.TwoHundredFiftySix;
+				//OrderFillResolution							= OrderFillResolution.Standard;
+				//Slippage									= 0;
+				//StartBehavior								= StartBehavior.WaitUntilFlat;
+				//TimeInForce									= TimeInForce.Gtc;
 				TraceOrders									= false;
-				RealtimeErrorHandling						= RealtimeErrorHandling.StopCancelClose;
-				StopTargetHandling							= StopTargetHandling.PerEntryExecution;
+				//RealtimeErrorHandling						= RealtimeErrorHandling.StopCancelClose;
+				//StopTargetHandling							= StopTargetHandling.PerEntryExecution;
 				BarsRequiredToTrade							= 20;
 				// Disable this property for performance gains in Strategy Analyzer optimizations
 				// See the Help Guide for additional information
@@ -57,9 +71,27 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		protected override void OnBarUpdate()
 		{
-			//Add your custom strategy logic here.
+			base.OnBarUpdate();
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
+		}
+		
+		public override IndicatorSignal GetIndicatorSignal() {
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
+			return null;
+		}
+		
+		public override TradeObj CheckNewEntryTrade() {
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
+			return null;
+		}
+		
+		public override void PutTrade(){
+			indicatorProxy.TraceMessage(this.Name, prtLevel);
 		}
 	}
 }

@@ -20,6 +20,7 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Indicators.ZTraderPattern;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Strategies;
 using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
@@ -77,6 +78,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				AddChartIndicator(giSMI);
 				AddChartIndicator(giSnR);
 				AddChartIndicator(indicatorProxy);
+				indicatorProxy.LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
 			}			
 			else if (State == State.Configure)
 			{
@@ -93,7 +95,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			//Print(CurrentBar.ToString() + " -- StgTRT - Add your custom strategy logic here.");
 			indicatorProxy.Update();
-			
+			PriceAction pa = indicatorProxy.GetPriceAction(Time[0]);
+			indicatorProxy.PrintLog(true, false, CurrentBar + ":Time=" + Time[0].ToShortDateString() + "-" + Time[0].ToShortTimeString() + ", PriceAction=" + pa.paType.ToString());
 			indicatorSignal = GetIndicatorSignal();
 
 			base.OnBarUpdate();
@@ -147,7 +150,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					indSignal.ReversalDir = Reversal.Up;
 					indSignal.SnR = giSMI.GetSupportResistance(CurrentBar-1);
 				}//entry long by reversal
-			}		
+			}
 			return indSignal;
 		}
 		

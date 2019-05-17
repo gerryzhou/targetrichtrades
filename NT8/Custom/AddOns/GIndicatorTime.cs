@@ -172,6 +172,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 			int date = dt.Year*10000 + dt.Month*100 + dt.Day;
 			return date;
 		}
+
+		public string GetDateStrByDateTime(DateTime dt) {
+			return dt.ToString("yyyyMMdd");
+		}
 		
 		//time=10000*H + 100*M + S
 		public int GetTimeByHM(int hour, int min) {
