@@ -190,7 +190,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// Load daily pattern line to the dictionary
 		/// </summary>
 		/// <returns></returns>
-		public List<SpvPR> LoadSpvPRList(List<string> dailyPattern) {
+		public Dictionary<string, List<MarketContext>> LoadSpvPRList(List<string> dailyPattern) {
 			//Dictionary<string,Dictionary<int,PriceActionType>> 
 			//Dict_SpvPR = new Dictionary<string,Dictionary<int,PriceAction>>();			
 			//List_SpvPR = new List<SpvPR>();
@@ -218,7 +218,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				counter++;
 			}
 			//Print("ReadSpvPRList:" + counter);
-			return List_SpvPR;
+			return Dict_SpvPR2;
 		}
 
 		/// <summary>
@@ -388,6 +388,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return pa;
 		}		
 		#endregion
+		
 		#region Properties
 		
 		[NinjaScriptProperty]

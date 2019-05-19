@@ -37,9 +37,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// 5) PutTrade();
 	/// </summary>
 	public class StgSample01 : GSZTraderBase
-	{
-		private int prtLevel = 2;
-		
+	{		
 		protected override void OnStateChange()
 		{
 			base.OnStateChange();
@@ -48,26 +46,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Description									= @"The sample strategy for GSZTrader.";
 				Name										= "StgSample01";
 				Calculate									= Calculate.OnBarClose;
-				//EntriesPerDirection							= 1;
-				//EntryHandling								= EntryHandling.AllEntries;
-				//IsExitOnSessionCloseStrategy				= true;
-				//ExitOnSessionCloseSeconds					= 30;
 				IsFillLimitOnTouch							= false;
-				//MaximumBarsLookBack							= MaximumBarsLookBack.TwoHundredFiftySix;
-				//OrderFillResolution							= OrderFillResolution.Standard;
-				//Slippage									= 0;
-				//StartBehavior								= StartBehavior.WaitUntilFlat;
-				//TimeInForce									= TimeInForce.Gtc;
 				TraceOrders									= false;
-				//RealtimeErrorHandling						= RealtimeErrorHandling.StopCancelClose;
-				//StopTargetHandling							= StopTargetHandling.PerEntryExecution;
 				BarsRequiredToTrade							= 20;
 				// Disable this property for performance gains in Strategy Analyzer optimizations
 				// See the Help Guide for additional information
 				IsInstantiatedOnEachOptimizationIteration	= true;
 			}
+			else if (State == State.DataLoaded)
+			{
+				AddChartIndicator(indicatorProxy);
+				SetPrintOut(1);
+			}
 			else if (State == State.Configure)
 			{
+				tradeObj = new TradeObj(this);				
 			}
 		}
 
@@ -77,21 +70,63 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnBarUpdate()
 		{
 			base.OnBarUpdate();
-			indicatorProxy.TraceMessage(this.Name, prtLevel);
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
 		}
 		
 		public override IndicatorSignal GetIndicatorSignal() {
-			indicatorProxy.TraceMessage(this.Name, prtLevel);
-			return null;
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			IndicatorSignal indSignal = new IndicatorSignal();
+			Direction dir = new Direction();
+			
+			if(Close[0] > High[1] && Close[0] > High[2])
+				dir.TrendDir = TrendDirection.Up;
+
+			if(Close[0] < Low[1] && Close[0] < Low[2])
+				dir.TrendDir = TrendDirection.Down;
+			indSignal.TrendDir = dir;
+			
+			this.indicatorSignal = indSignal;
+			return indSignal;
 		}
 		
 		public override TradeObj CheckNewEntryTrade() {
-			indicatorProxy.TraceMessage(this.Name, prtLevel);
-			return null;
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			tradeObj.InitNewEntryTrade();
+			if(indicatorSignal != null) {
+				if(indicatorSignal.TrendDir.TrendDir == TrendDirection.Down)
+				{
+					indicatorProxy.TraceMessage(this.Name, PrintOut);
+					tradeObj.tradeDirection = TradingDirection.Down;
+				}
+				else if(indicatorSignal.TrendDir.TrendDir == TrendDirection.Up)
+				{
+					indicatorProxy.TraceMessage(this.Name, PrintOut);
+					tradeObj.tradeDirection = TradingDirection.Up;
+				}
+				
+				tradeObj.tradeStyle = TradingStyle.TrendFollowing;
+				
+			} else {
+				tradeObj.SetTradeType(TradeType.NoTrade);
+			}
+			return tradeObj;
 		}
 		
 		public override void PutTrade(){
-			indicatorProxy.TraceMessage(this.Name, prtLevel);
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			if(tradeObj.GetTradeType() == TradeType.Entry) {
+				indicatorProxy.PrintLog(true, !BackTest, "PutTrade tradeObj.stopLossAmt=" + tradeObj.stopLossAmt + "," + MM_StopLossAmt);
+				if(tradeObj.tradeDirection == TradingDirection.Down) {
+					indicatorProxy.PrintLog(true, !BackTest, "PutTrade Down OrderSignalName=" + tradeObj.entrySignalName);
+					tradeObj.enLimitPrice = Close[0];					
+					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
+				}
+				else if(tradeObj.tradeDirection == TradingDirection.Up) {
+					indicatorProxy.PrintLog(true, !BackTest, "PutTrade Up OrderSignalName=" + tradeObj.entrySignalName);
+					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());
+					//EnterLongLimit(Low[0]-5, OrderSignalName.EntryLong.ToString());
+				}				
+			}
 		}
 	}
 }

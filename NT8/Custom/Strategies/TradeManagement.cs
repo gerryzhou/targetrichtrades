@@ -241,7 +241,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			tradeObj.entrySignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShortLmt.ToString());
 			Print(CurrentBar + ":NewShortLimitOrderUM"
 			+";tradeObj.entrySignalName=" + tradeObj.entrySignalName);
-			SubmitOrderUnmanaged(0, OrderAction.SellShort, OrderType.Limit, tradeObj.quantity, tradeObj.enLimitPrice, 0, "", tradeObj.entrySignalName);
+			SubmitOrderUnmanaged(0, OrderAction.SellShort, OrderType.Limit,
+			tradeObj.quantity, tradeObj.enLimitPrice, 0, "", tradeObj.entrySignalName);
 			
 			//double prc = (tradeObj.enTrailing && tradeObj.enCounterPBBars>0) ? Close[0]+tradeObj.enOffsetPnts : High[0]+tradeObj.enOffsetPnts;
 			

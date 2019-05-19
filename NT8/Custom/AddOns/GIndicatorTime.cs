@@ -19,7 +19,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.Gui.Tools;
-using NinjaTrader.NinjaScript.Universal;
+//using NinjaTrader.NinjaScript.Universal;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion

@@ -135,13 +135,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 				if(CurrentBar < Bars.Count - 2)
 				{
 					return -1;		
-				} else {
+				} 
+				else {
 					Print("IsLastBarOnChart called:(CurBar,Count, Bars.Count)=" + CurrentBar + "," + Count + "," + Bars.Count);
 					return Bars.Count;//Count;//Inputs[0].Count;
 				}
 		
 			} catch(Exception ex){
-				//Print("IsLastBarOnChart:" + ex.Message);
+				Print("IsLastBarOnChart error:" + ex.Message);
 				return -1;
 			}
 		}

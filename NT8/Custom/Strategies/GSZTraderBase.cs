@@ -65,18 +65,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public void SetInitParams() {
 			Print("GSZTraderBase Set initParams called....");
-			//CalculateOnBarClose = true;
-			// Triggers the exit on close function 30 seconds prior to session end
-			//ExitOnClose = true;
-			//ExitOnCloseSeconds = 30;
-			
-			//SyncAccountPosition = true;
 			Description									= @"GS Z-Trader base;";
 			Name										= "GSZTraderBase";
 			Calculate									= Calculate.OnPriceChange;
 			EntriesPerDirection							= 1;
 			EntryHandling								= EntryHandling.AllEntries;
+			//SyncAccountPosition = true;			
 			IsExitOnSessionCloseStrategy				= true;
+			// Triggers the exit on close function 30 seconds prior to session end			
 			ExitOnSessionCloseSeconds					= 30;
 			IsFillLimitOnTouch							= true;
 			MaximumBarsLookBack							= MaximumBarsLookBack.Infinite;
@@ -146,8 +142,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			GetIndicatorSignal();
-			CheckNewEntryTrade();
-			PutTrade();
+//			CheckNewEntryTrade();
+//			PutTrade();
 			switch(AlgoMode) {
 				case AlgoModeType.Liquidate: //liquidate
 					indicatorProxy.TraceMessage(this.Name, PrintOut);

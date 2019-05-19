@@ -28,7 +28,8 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	public class GIndicatorProxy : GIndicatorBase
 	{
 		private Series<double> CustData;
-		private List<SpvPR> dailyPattern;
+		//private List<SpvPR> dailyPattern;
+		private Dictionary<string, List<MarketContext>> dailyPattern;
 
 		protected override void OnStateChange()
 		{
@@ -72,7 +73,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 			//Add your custom indicator logic here.
 			PrintTo = PrintTo.OutputTab2;
 			if(IsLastBarOnChart() > 0)
-				PrintLog(true, false, "dailyPattern=" + dailyPattern.Count);
+				PrintLog(true, false, "dailyPattern=" + DailyPattern.Count);
 		}
 
 		#region Properties
@@ -87,6 +88,14 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		[Display(Name="AccName", Description="Account Name for strategy", Order=1, GroupName="Parameters")]
 		public string AccName
 		{ get; set; }
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public Dictionary<string, List<MarketContext>> DailyPattern
+		{
+			get { return dailyPattern; }
+			set { dailyPattern = value;}
+		}
 		
 		[Browsable(false)]
 		[XmlIgnore]
