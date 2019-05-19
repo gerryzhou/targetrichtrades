@@ -128,7 +128,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		protected override void OnBarUpdate()
 		{
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			//Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
+			if(CurrentBar <= BarsRequiredToTrade)
+				return;
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			SetPrintOut(-1);

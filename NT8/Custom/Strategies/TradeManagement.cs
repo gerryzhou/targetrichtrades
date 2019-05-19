@@ -97,7 +97,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Print(CurrentBar + "::CheckNewEntryTrade()--" + this.ToString());
 			return null;
 		}
-	
+
 		public virtual bool CheckEnOrder(double cur_gap)
         {
             double min_en = -1;
