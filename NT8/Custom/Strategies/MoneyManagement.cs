@@ -258,7 +258,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			tradeObj.SLCalculationMode = CalculationMode.Price;
 			SetStopLossOrder(tradeObj.entrySignalName.ToString());
-		}		
+		}
+		
 		#endregion
 		
 		#region Check PnL functions
@@ -328,6 +329,69 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		
+		public double CheckUnrealizedPnL() {
+			return Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
+		}
+		
+		public int CheckUnrealizedPnLTicks() {
+			return GetTicksByCurrency(CheckUnrealizedPnL());
+		}		
+		
+		public double CheckAccPnL() {
+			double pnl = 0;//GetAccountValue(AccountItem.RealizedProfitLoss);
+			//Print(CurrentBar + "-" + AccName + ": GetAccountValue(AccountItem.RealizedProfitLoss)= " + pnl + " -- " + Time[0].ToString());
+			return pnl;
+		}
+		
+		public double CheckAccCumProfit() {
+			///Performance.RealtimeTrades.TradesPerformance.Currency.CumProfit;
+			//Print(CurrentBar + "-" + AccName + ": Cum runtime PnL= " + plrt);
+			if(IsLiveTrading()) {
+				return SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit;
+			}
+			else {
+				return SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
+			}
+		}
+		
+		public double CheckPerformance()
+		{
+			double pl = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;//Performance.AllTrades.TradesPerformance.Currency.CumProfit;
+			double plrt = SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit;//Performance.RealtimeTrades.TradesPerformance.Currency.CumProfit;
+			indicatorProxy.PrintLog(true, !backTest, CurrentBar + "-" + AccName + ": Cum all PnL= " + pl + ", Cum runtime PnL= " + plrt);
+			return plrt;
+		}
+		
+		public double CheckPnlByDay(int year, int month, int day) {
+			double pnl = 0;
+			TradeCollection tc = null;
+			DateTime dayKey = new DateTime(year, month, day);//(Time[0].Year,Time[0].Month,Time[0].Day);
+			SetPrintOut(1);
+			indicatorProxy.TraceMessage(CurrentBar + "-CheckPnlByDay AllTrades(dayKey, ByDay.Count)=" + dayKey
+			+ "," + SystemPerformance.AllTrades.ByDay.Count
+			+ "RealTimeTrades ByDay.Count=" + SystemPerformance.RealTimeTrades.ByDay.Count
+			+ "::" + this.Name, PrintOut);
+			
+			if(IsLiveTrading()) {
+				if(SystemPerformance.RealTimeTrades.ByDay.Keys.Contains(dayKey))
+					tc = (TradeCollection)SystemPerformance.RealTimeTrades.ByDay[dayKey];
+			} else {
+				if(SystemPerformance.AllTrades.ByDay.Keys.Contains(dayKey))
+					tc = (TradeCollection)SystemPerformance.AllTrades.ByDay[dayKey];//Performance.AllTrades.ByDay[dayKey];
+			}
+			
+			if(tc != null) {
+				pnl = tc.TradesPerformance.Currency.CumProfit;
+				indicatorProxy.TraceMessage(CurrentBar + "-CheckPnlByDay: Count, IsLiveTrading, pnl="
+				+ tc.Count + "," + IsLiveTrading().ToString() + "," + pnl
+				+ "::" + this.Name, PrintOut);				
+			}
+			return pnl;
+		}
+		
+		#endregion
+		
+		#region Price functions
 		/// <summary>
 		/// Check if the SL/PT prices are valid
 		/// </summary>
@@ -392,64 +456,27 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return amt;
 		}
 		
-		public double CheckUnrealizedPnL() {
-			return Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
+		public double GetHighestPrice(int barsAgo) {
+			double hiPrc = High[1];
+			if(barsAgo > 0) {
+				hiPrc = High[HighestBar(High, barsAgo)];
+			}
+			Print(CurrentBar + ":hiPrc=" + hiPrc);
+			return hiPrc;
+		}
+
+		public double GetLowestPrice(int barsAgo) {
+			double loPrc = Low[1];
+			if(barsAgo > 0) {
+				loPrc = Low[LowestBar(Low, barsAgo)];
+			}
+			Print(CurrentBar + ":loPrc=" + loPrc);
+			return loPrc;
 		}
 		
-		public int CheckUnrealizedPnLTicks() {
-			return GetTicksByCurrency(CheckUnrealizedPnL());
-		}		
-		
-		public double CheckAccPnL() {
-			double pnl = 0;//GetAccountValue(AccountItem.RealizedProfitLoss);
-			//Print(CurrentBar + "-" + AccName + ": GetAccountValue(AccountItem.RealizedProfitLoss)= " + pnl + " -- " + Time[0].ToString());
-			return pnl;
-		}
-		
-		public double CheckAccCumProfit() {
-			///Performance.RealtimeTrades.TradesPerformance.Currency.CumProfit;
-			//Print(CurrentBar + "-" + AccName + ": Cum runtime PnL= " + plrt);
-			if(IsLiveTrading()) {
-				return SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit;
-			}
-			else {
-				return SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;
-			}
-		}
-		
-		public double CheckPerformance()
-		{
-			double pl = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;//Performance.AllTrades.TradesPerformance.Currency.CumProfit;
-			double plrt = SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit;//Performance.RealtimeTrades.TradesPerformance.Currency.CumProfit;
-			indicatorProxy.PrintLog(true, !backTest, CurrentBar + "-" + AccName + ": Cum all PnL= " + pl + ", Cum runtime PnL= " + plrt);
-			return plrt;
-		}
-		
-		public double CheckPnlByDay(int year, int month, int day) {
-			double pnl = 0;
-			TradeCollection tc = null;
-			DateTime dayKey = new DateTime(year, month, day);//(Time[0].Year,Time[0].Month,Time[0].Day);
-			SetPrintOut(1);
-			indicatorProxy.TraceMessage(CurrentBar + "-CheckPnlByDay AllTrades(dayKey, ByDay.Count)=" + dayKey
-			+ "," + SystemPerformance.AllTrades.ByDay.Count
-			+ "RealTimeTrades ByDay.Count=" + SystemPerformance.RealTimeTrades.ByDay.Count
-			+ "::" + this.Name, PrintOut);
-			
-			if(IsLiveTrading()) {
-				if(SystemPerformance.RealTimeTrades.ByDay.Keys.Contains(dayKey))
-					tc = (TradeCollection)SystemPerformance.RealTimeTrades.ByDay[dayKey];
-			} else {
-				if(SystemPerformance.AllTrades.ByDay.Keys.Contains(dayKey))
-					tc = (TradeCollection)SystemPerformance.AllTrades.ByDay[dayKey];//Performance.AllTrades.ByDay[dayKey];
-			}
-			
-			if(tc != null) {
-				pnl = tc.TradesPerformance.Currency.CumProfit;
-				indicatorProxy.TraceMessage(CurrentBar + "-CheckPnlByDay: Count, IsLiveTrading, pnl="
-				+ tc.Count + "," + IsLiveTrading().ToString() + "," + pnl
-				+ "::" + this.Name, PrintOut);				
-			}
-			return pnl;
+		public double GetTypicalPrice(int barsAgo) {
+			MasterInstrument maIns = Bars.Instrument.MasterInstrument;			
+			return maIns.RoundToTickSize(Typical[barsAgo]);
 		}
 		
 		#endregion
@@ -827,7 +854,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private CalculationMode mm_TLSLCalculationMode = CalculationMode.Ticks;
 		
 		private double mm_DailyLossLmt = -200;
-		private double mm_ProfitFactor = 1.5;
+		private double mm_ProfitFactor = 2;
 		
 		#endregion
 	}

@@ -36,15 +36,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// 4) CheckNewEntryTrade();
 	/// 5) PutTrade();
 	/// </summary>
-	public class StgSample01 : GSZTraderBase
-	{		
+	public class StgSample02 : GSZTraderBase
+	{
+		private double c0 = 0, hi3 = Double.MaxValue, lo3 = Double.MinValue;
+		
 		protected override void OnStateChange()
 		{
 			base.OnStateChange();
 			if (State == State.SetDefaults)
 			{
 				Description									= @"The sample strategy for GSZTrader.";
-				Name										= "StgSample01";
+				Name										= "StgSample02";
 				Calculate									= Calculate.OnBarClose;
 				IsFillLimitOnTouch							= false;
 				TraceOrders									= false;
@@ -60,7 +62,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.Configure)
 			{
-				tradeObj = new TradeObj(this);				
+				tradeObj = new TradeObj(this);
 			}
 		}
 
@@ -78,14 +80,25 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorSignal indSignal = new IndicatorSignal();
 			Direction dir = new Direction();
 			
-			if(Close[0] > High[1] && Close[0] > High[2])
+			c0 = Close[0];
+			
+			Print(CurrentBar + ":"
+			+ ";c0=" + c0
+			+ ";hi3=" + hi3
+			+ ";lo3=" + lo3
+			+ ";BarsLookback=" + BarsLookback);
+			
+			if(c0 > hi3)
 				dir.TrendDir = TrendDirection.Up;
 
-			if(Close[0] < Low[1] && Close[0] < Low[2])
+			if(c0 < lo3)
 				dir.TrendDir = TrendDirection.Down;
 			indSignal.TrendDir = dir;
 			
 			this.indicatorSignal = indSignal;
+			hi3 = GetHighestPrice(BarsLookback);
+			lo3 = GetLowestPrice(BarsLookback);
+			
 			return indSignal;
 		}
 		
@@ -118,16 +131,29 @@ namespace NinjaTrader.NinjaScript.Strategies
 				indicatorProxy.PrintLog(true, !BackTest, "PutTrade tradeObj.stopLossAmt=" + tradeObj.stopLossAmt + "," + MM_StopLossAmt);
 				if(tradeObj.tradeDirection == TradingDirection.Down) {
 					indicatorProxy.PrintLog(true, !BackTest, "PutTrade Down OrderSignalName=" + tradeObj.entrySignalName);
-					tradeObj.enLimitPrice = Close[0];
+					tradeObj.enLimitPrice = GetTypicalPrice(0);
 					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
 				}
 				else if(tradeObj.tradeDirection == TradingDirection.Up) {
 					indicatorProxy.PrintLog(true, !BackTest, "PutTrade Up OrderSignalName=" + tradeObj.entrySignalName);
-					tradeObj.enLimitPrice = Close[0];
+					tradeObj.enLimitPrice = GetTypicalPrice(0);
 					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());
-					//EnterLongLimit(Low[0]-5, OrderSignalName.EntryLong.ToString());
 				}				
 			}
 		}
+		
+		#region Properties
+		[Description("Bars lookback period")]
+ 		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsLookback", GroupName = "CustomParams", Order = 0)]
+        public int BarsLookback
+        {
+            get { return barsLookback; }
+            set { barsLookback = Math.Max(1, value); }
+        }
+		
+		private int barsLookback = 15;
+		
+		#endregion
 	}
 }
