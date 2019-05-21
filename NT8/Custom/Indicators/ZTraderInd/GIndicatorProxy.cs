@@ -10,6 +10,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using System.IO;
+using log4net;
+using log4net.Config;
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Chart;
@@ -21,6 +24,7 @@ using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators.ZTraderPattern;
 using NinjaTrader.NinjaScript.Strategies;
+using NinjaTrader.NinjaScript.AddOns;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -54,7 +58,9 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 				AddPlot(Brushes.Orange, "CustPlot");
 			}
 			else if (State == State.Configure)
-			{				
+			{
+				XmlConfigurator.Configure(new FileInfo("C:\\www\\log\\log4net.config"));
+				GZLogger.ConfigureFileAppender( "C:\\www\\log\\log_test.txt" );
 			}
 			else if (State == State.DataLoaded)
 			{				

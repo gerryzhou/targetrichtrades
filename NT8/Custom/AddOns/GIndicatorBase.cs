@@ -14,7 +14,6 @@ using System.Xml.Serialization;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Reflection;
-
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Chart;
@@ -27,6 +26,8 @@ using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.AddOns;
 #endregion
+
+//[assembly: log4net.Config.XmlConfigurator(ConfigFile = "C:\\www\\log\\log4net.config", Watch = true)]
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators
@@ -44,7 +45,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class GIndicatorBase : Indicator
 	{
 		private Series<double> CustomDataSeries1;
-				
+		private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+		
 		#region Variables
         // User defined variables (add any user defined variables below)
 		private bool drawTxt = false; // Draw the text on chart
@@ -363,9 +365,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 			//path = "C:\\inetpub\\wwwroot\\nt_files\\log\\";
 			//ext = "log";
 			//long flong = DateTime.Now.Minute + 100*DateTime.Now.Hour+ 10000*DateTime.Now.Day + 1000000*DateTime.Now.Month + (long)100000000*DateTime.Now.Year;
-			string fname = string.Format("{0}_{1:yyyyMMddHHmmssfff}.{2}",
+			string fname = string.Format("{0}_{1:yyyyMMdd_HHmm_ssfff}.{2}",
 				path + accName + Path.DirectorySeparatorChar
 				+ accName + "_" + symbol, DateTime.Now, ext);
+			
 			//string fname = path + accName + Path.DirectorySeparatorChar + accName + "_" + symbol + "_" + flong.ToString() + "." + ext;
 			//Print(", FileName=" + fname);
 			//FileTest(DateTime.Now.Minute + 100*DateTime.Now.Hour+ 10000*DateTime.Now.Day+ 1000000*DateTime.Now.Month + (long)100000000*DateTime.Now.Year);
@@ -410,7 +413,50 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		#endregion
+		
+		#region Print and Log functions
+		public void PrintLog(bool prt_con, bool prt_file, string text) {
+			if(prt_con) Print(text);
+			log.Info("Log4Net logging:" + text);
+			if(prt_file) {
+				string fpath = GetLogFile();				
+				using (System.IO.StreamWriter file = 
+					new System.IO.StreamWriter(@fpath, true))
+				{
+					file.WriteLine(text);
+				}
+			}
+		}
 
+
+		public void TraceMessage(string message, int printLevel,
+        [CallerMemberName] string callingMethod = "",
+        [CallerFilePath] string callingFilePath = "",
+        [CallerLineNumber] int callingFileLineNumber = 0)
+		{
+			if(printLevel > PrintOut)
+				Print(CurrentBar + "-[" + message + ":" + callingMethod + "-" + callingFileLineNumber + "]-" + Path.GetFileName(callingFilePath));
+		}
+		
+//		[MethodImpl(MethodImplOptions.NoInlining)]
+//		public static string GetMyMethodName() {
+//			//Print(MethodBase.GetCurrentMethod().ToString() + " - 1");
+//			var st = new StackTrace(new StackFrame(1));
+//			return st.GetFrame(0).GetMethod().Name;
+//		}
+		
+//		public static void TraceLog(string message) {
+//		   StackFrame stackFrame = new System.Diagnostics.StackTrace(1).GetFrame(1);
+//		   string fileName = stackFrame.GetFileName();
+//		   string methodName = stackFrame.GetMethod().ToString();
+//		   int lineNumber = stackFrame.GetFileLineNumber();
+
+//		   Print(methodName + "," + Path.GetFileName(fileName) + "," +  lineNumber + "," + message);
+//		}
+		
+		#endregion
+		
+		#region Dep functions
 		public String GetTsTAccName(String tst_acc) {
 			char[] delimiterChars = {'!'};
 			string[] words = tst_acc.Split(delimiterChars);
@@ -452,45 +498,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//PrintLog(true, log_file, CurrentBar + "::" + this.ToString() + " GaP= " + gap + " - " + Time[0].ToShortTimeString());
 			return gapText; 
 		}
-		
-		#region Print and Log functions
-		public void PrintLog(bool prt_con, bool prt_file, string text) {
-			if(prt_con) Print(text);
-			if(prt_file) {
-				string fpath = GetLogFile();
-				using (System.IO.StreamWriter file = 
-					new System.IO.StreamWriter(@fpath, true))
-				{
-					file.WriteLine(text);
-				}
-			}
-		}
-
-
-		public void TraceMessage(string message, int printLevel,
-        [CallerMemberName] string callingMethod = "",
-        [CallerFilePath] string callingFilePath = "",
-        [CallerLineNumber] int callingFileLineNumber = 0)
-		{
-			if(printLevel > PrintOut)
-				Print(CurrentBar + "-[" + message + ":" + callingMethod + "-" + callingFileLineNumber + "]-" + Path.GetFileName(callingFilePath));
-		}
-		
-//		[MethodImpl(MethodImplOptions.NoInlining)]
-//		public static string GetMyMethodName() {
-//			//Print(MethodBase.GetCurrentMethod().ToString() + " - 1");
-//			var st = new StackTrace(new StackFrame(1));
-//			return st.GetFrame(0).GetMethod().Name;
-//		}
-		
-//		public static void TraceLog(string message) {
-//		   StackFrame stackFrame = new System.Diagnostics.StackTrace(1).GetFrame(1);
-//		   string fileName = stackFrame.GetFileName();
-//		   string methodName = stackFrame.GetMethod().ToString();
-//		   int lineNumber = stackFrame.GetFileLineNumber();
-
-//		   Print(methodName + "," + Path.GetFileName(fileName) + "," +  lineNumber + "," + message);
-//		}
 		
 		#endregion
 		
