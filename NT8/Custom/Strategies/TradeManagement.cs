@@ -46,7 +46,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public virtual void PutTrade() {
-			Print(CurrentBar + "::PutTrade()--" + this.ToString());
+			indicatorProxy.PrintLog(true, !BackTest, CurrentBar + "::PutTrade()--" + this.ToString());
 		}
 		
 		/// <summary>
@@ -73,7 +73,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public virtual void CheckExitTradeBySignal() {
 			if(indicatorSignal == null) return;
-			Print(CurrentBar + ":CheckExitTradeBySignal"
+			indicatorProxy.PrintLog(true, !BackTest, CurrentBar + ":CheckExitTradeBySignal"
 			+ ";indicatorSignal.ReversalDir=" + indicatorSignal.ReversalDir.ToString()
 			+ ";Position.MarketPosition=" + Position.MarketPosition
 			);
@@ -94,7 +94,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual TradeObj CheckNewEntryTrade() {
 //			if(NewOrderAllowed()) {
 //			}
-			Print(CurrentBar + "::CheckNewEntryTrade()--" + this.ToString());
+			indicatorProxy.PrintLog(true, !BackTest, 
+				CurrentBar + "::CheckNewEntryTrade()--" + this.ToString());
 			return null;
 		}
 
@@ -179,9 +180,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if(!backTest && (plrt <= tradeObj.dailyLossLmt || pnl_daily <= tradeObj.dailyLossLmt))
 			{
-				indicatorProxy.TraceMessage(CurrentBar + "-" + AccName 
+				indicatorProxy.PrintLog(true, !BackTest, CurrentBar + "-" + AccName 
 				+ ": dailyLossLmt reached = " + pnl_daily + "," + plrt
-				+ "::" + this.Name, PrintOut);
+				+ "::" + this.Name);
 				
 				return false;
 			}
@@ -190,9 +191,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//indicatorProxy.TraceMessage(this.Name, prtLevel);
 			if (backTest && pnl_daily <= tradeObj.dailyLossLmt) 
 			{
-				indicatorProxy.TraceMessage(CurrentBar + "-" + AccName 
+				indicatorProxy.PrintLog(true, !BackTest, CurrentBar + "-" + AccName 
 				+ ": dailyLossLmt reached = " + pnl_daily + "," + plrt
-				+ "::" + this.Name, PrintOut);
+				+ "::" + this.Name);
 				
 				return false;				
 			}
@@ -205,9 +206,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				{					
 					if(bsx < 0 || bsx > tradeObj.barsSincePTSL) //if(bsx == -1 || bsx > tradeObj.barsSincePtSl)
 					{
-						indicatorProxy.TraceMessage(CurrentBar 
+						indicatorProxy.PrintLog(true, !BackTest, CurrentBar 
 						+ "-bsx,bse,tradeObj.barsSincePtSl=" + bsx + "," + bse + "," + tradeObj.barsSincePTSL
-						+ "::" + this.Name, PrintOut);
+						+ "::" + this.Name);
 						return true;
 					} //else
 						//giParabSAR.PrintLog(true, !backTest, log_file, CurrentBar + "-" + AccName + "-NewOrderAllowed=false-[bsx,barsSincePtSl]" + bsx + "," + barsSincePtSl + " - " + Get24HDateTime(Time[0]));
@@ -225,7 +226,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual void NewLongLimitOrderUM(string msg)
 		{
 			tradeObj.entrySignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
-			Print(CurrentBar + ":NewLongLimitOrderUM"
+			indicatorProxy.PrintLog(true, !BackTest, CurrentBar + ":NewLongLimitOrderUM"
 			+";tradeObj.entrySignalName=" + tradeObj.entrySignalName);
 			SubmitOrderUnmanaged(0, OrderAction.Buy, OrderType.Limit, 
 			tradeObj.quantity, tradeObj.enLimitPrice, 0, "", tradeObj.entrySignalName);
@@ -239,7 +240,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual void NewShortLimitOrderUM(string msg)
 		{
 			tradeObj.entrySignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShortLmt.ToString());
-			Print(CurrentBar + ":NewShortLimitOrderUM"
+			indicatorProxy.PrintLog(true, !BackTest, CurrentBar + ":NewShortLimitOrderUM"
 			+";tradeObj.entrySignalName=" + tradeObj.entrySignalName);
 			SubmitOrderUnmanaged(0, OrderAction.SellShort, OrderType.Limit,
 			tradeObj.quantity, tradeObj.enLimitPrice, 0, "", tradeObj.entrySignalName);

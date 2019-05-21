@@ -35,9 +35,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private IndicatorSignal indSignal;
 	
 		#region Methods
-		public string GetAccName() {
-			return accName;
-		}
 		
 		public Volatility GetVolatility() {return null;}
 		

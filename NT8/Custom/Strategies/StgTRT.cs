@@ -41,7 +41,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			base.OnStateChange();
 			if (State == State.SetDefaults)
 			{
-				Print("StgTRT set defaults called....");
+				Print(this.Name + " set defaults called....");
 				Description									= @"Traget Rich Trade.";
 				Name										= "StgTRT";
 				Calculate									= Calculate.OnBarClose;
@@ -65,6 +65,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
+				Print(this.Name + " set DataLoaded called....");
 				//indicatorProxy = new GIndicatorBase();
 				//indicatorProxy = GIndicatorProxy(1);
 				giSMI = GISMI(3, 5, 5, 8);
@@ -87,6 +88,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}			
 			else if (State == State.Configure)
 			{
+				Print(this.Name + " set Configure called....");
 				AddDataSeries(Data.BarsPeriodType.Day, 1);
 				//IncludeCommission = true;
 				tradeObj = new TradeObj(this);

@@ -41,6 +41,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			base.OnStateChange();
 			if (State == State.SetDefaults)
 			{
+				Print(this.Name + " set defaults called....");
 				Description									= @"Strategy based on support and resistance, combined with fibonacci ratios.";
 				Name										= "StgSnR";
 				Calculate									= Calculate.OnBarClose;
@@ -69,6 +70,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
+				Print(this.Name + " set DataLoaded called....");
 				//indicatorProxy = new GIndicatorBase();
 				//indicatorProxy = GIndicatorProxy(1);
 				giSMI = GISMI(3, 5, 5, 8);
@@ -82,6 +84,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}			
 			else if (State == State.Configure)
 			{
+				Print(this.Name + " set Configure called....");
 				AddDataSeries(Data.BarsPeriodType.Day, 1);
 				//IncludeCommission = true;
 				tradeObj = new TradeObj(this);
@@ -181,14 +184,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			return tradeObj;
 		}
-		
-//		public override void PutTrade() {
-//			Print(CurrentBar + ":" + this.ToString());
-//			if(tradeObj.GetTradeType() == TradeType.Entry) {
-//				if(tradeObj.tradeDirection == TradingDirection.Up)
-//					NewEntryLongOrder();
-//			}
-//		}
 
 		public override void PutTrade() {
 			if(tradeObj.GetTradeType() == TradeType.Entry) {

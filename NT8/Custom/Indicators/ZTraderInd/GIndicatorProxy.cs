@@ -20,13 +20,14 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators.ZTraderPattern;
+using NinjaTrader.NinjaScript.Strategies;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 {
 	public class GIndicatorProxy : GIndicatorBase
-	{
+	{		
 		private Series<double> CustData;
 		//private List<SpvPR> dailyPattern;
 		private Dictionary<string, List<MarketContext>> dailyPattern;
@@ -53,12 +54,13 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 				AddPlot(Brushes.Orange, "CustPlot");
 			}
 			else if (State == State.Configure)
-			{	
+			{				
 			}
 			else if (State == State.DataLoaded)
 			{				
-				CustData = new Series<double>(this);
-				SetLogFile(GetFileNameByDateTime(DateTime.Now, @"C:\www\log\", AccName, symbol, "log"));
+				CustData = new Series<double>(this);				
+				SetLogFile(GetFileNameByDateTime(DateTime.Now, @"C:\www\log\", GSZTrader.AccName, GetSymbol(), "log"));
+				BackTest = GSZTrader.BackTest;
 				dailyPattern = LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
 			}
 		}
@@ -78,16 +80,25 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 
 		#region Properties
 		[NinjaScriptProperty]
+		[Display(Name="GSZTrader", Description="GSZTrader instance for indicator proxy")]
+		public GSZTraderBase GSZTrader
+		{ get; set; }
+		
+		//[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="CustInput", Description="CustInput for indicator proxy", Order=0, GroupName="Parameters")]
+		//[Display(Name="CustInput", Description="CustInput for indicator proxy", Order=0, GroupName="Parameters")]
+		[Browsable(false)]
+		[XmlIgnore]
 		public int CustInput
 		{ get; set; }
 
-		[NinjaScriptProperty]
+		//[NinjaScriptProperty]
 		//[Range(1, int.MaxValue)]
-		[Display(Name="AccName", Description="Account Name for strategy", Order=1, GroupName="Parameters")]
-		public string AccName
-		{ get; set; }
+		//[Display(Name="AccName", Description="Account Name for strategy", Order=1, GroupName="Parameters")]
+//		[Browsable(false)]
+//		[XmlIgnore]
+//		public string AccName
+//		{ get; set; }
 		
 		[Browsable(false)]
 		[XmlIgnore]
@@ -115,18 +126,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private ZTraderInd.GIndicatorProxy[] cacheGIndicatorProxy;
-		public ZTraderInd.GIndicatorProxy GIndicatorProxy(int custInput, string accName)
+		public ZTraderInd.GIndicatorProxy GIndicatorProxy(GSZTraderBase gSZTrader)
 		{
-			return GIndicatorProxy(Input, custInput, accName);
+			return GIndicatorProxy(Input, gSZTrader);
 		}
 
-		public ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input, int custInput, string accName)
+		public ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input, GSZTraderBase gSZTrader)
 		{
 			if (cacheGIndicatorProxy != null)
 				for (int idx = 0; idx < cacheGIndicatorProxy.Length; idx++)
-					if (cacheGIndicatorProxy[idx] != null && cacheGIndicatorProxy[idx].CustInput == custInput && cacheGIndicatorProxy[idx].AccName == accName && cacheGIndicatorProxy[idx].EqualsInput(input))
+					if (cacheGIndicatorProxy[idx] != null && cacheGIndicatorProxy[idx].GSZTrader == gSZTrader && cacheGIndicatorProxy[idx].EqualsInput(input))
 						return cacheGIndicatorProxy[idx];
-			return CacheIndicator<ZTraderInd.GIndicatorProxy>(new ZTraderInd.GIndicatorProxy(){ CustInput = custInput, AccName = accName }, input, ref cacheGIndicatorProxy);
+			return CacheIndicator<ZTraderInd.GIndicatorProxy>(new ZTraderInd.GIndicatorProxy(){ GSZTrader = gSZTrader }, input, ref cacheGIndicatorProxy);
 		}
 	}
 }
@@ -135,14 +146,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(int custInput, string accName)
+		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(GSZTraderBase gSZTrader)
 		{
-			return indicator.GIndicatorProxy(Input, custInput, accName);
+			return indicator.GIndicatorProxy(Input, gSZTrader);
 		}
 
-		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input , int custInput, string accName)
+		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input , GSZTraderBase gSZTrader)
 		{
-			return indicator.GIndicatorProxy(input, custInput, accName);
+			return indicator.GIndicatorProxy(input, gSZTrader);
 		}
 	}
 }
@@ -151,14 +162,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(int custInput, string accName)
+		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(GSZTraderBase gSZTrader)
 		{
-			return indicator.GIndicatorProxy(Input, custInput, accName);
+			return indicator.GIndicatorProxy(Input, gSZTrader);
 		}
 
-		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input , int custInput, string accName)
+		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input , GSZTraderBase gSZTrader)
 		{
-			return indicator.GIndicatorProxy(input, custInput, accName);
+			return indicator.GIndicatorProxy(input, gSZTrader);
 		}
 	}
 }

@@ -14,6 +14,7 @@ using System.Xml.Serialization;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Reflection;
+
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Chart;
@@ -46,14 +47,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				
 		#region Variables
         // User defined variables (add any user defined variables below)
-		private string accName = ""; //account name from strategy, extracting simply string for print/log;
-		protected string symbol = "";
-		protected int printOut = 1;
-		protected string logFile = ""; //Log file full path		
 		private bool drawTxt = false; // Draw the text on chart
 		protected Text it_gap = null; // The Text object drawn for bar
-		
-		protected bool backTest = true; //if it runs for backtesting;private bool backTest = true; //if it runs for backtesting;
 		protected double Day_Count = 0;
 		protected double Week_Count = 0;
 		
@@ -110,21 +105,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 //			accName = "";//GetTsTAccName(Strategy.Account.Name);
 //			IndicatorSignal indicatorSignal = new IndicatorSignal();
 //        }
-
-        /// <summary>
-        /// Called on each bar update event (incoming tick)
-        /// </summary>
-//        protected void OnBarUpdate()
-//        {
-            // Use this method for calculating your indicator values. Assign a value to each
-            // plot below by replacing 'Close[0]' with your own formula.
-//			if(CurrentBar >= BarsRequired) {
-//				if(GetTimeDiffByHM(StartH, StartM, Time[1]) > 0 && GetTimeDiffByHM(StartH, StartM, Time[0]) <= 0)
-//            		StartHM.Set(High[0]+0.25);
-//				if(GetTimeDiffByHM(EndH, EndM, Time[1]) > 0 && GetTimeDiffByHM(EndH, EndM, Time[0]) <= 0)
-//            		EndHM.Set(Low[0]-0.25);
-//			}
-//        }
 		
 		public int IsLastBarOnChart() {
 			try{				
@@ -137,12 +117,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 					return -1;		
 				} 
 				else {
-					Print("IsLastBarOnChart called:(CurBar,Count, Bars.Count)=" + CurrentBar + "," + Count + "," + Bars.Count);
+					PrintLog(true, !BackTest, 
+						"IsLastBarOnChart called:(CurBar,Count, Bars.Count)=" 
+						+ CurrentBar + "," + Count + "," + Bars.Count);
 					return Bars.Count;//Count;//Inputs[0].Count;
 				}
 		
 			} catch(Exception ex){
-				Print("IsLastBarOnChart error:" + ex.Message);
+				PrintLog(true, !BackTest, 
+					"IsLastBarOnChart error:" + ex.Message);
 				return -1;
 			}
 		}
@@ -376,11 +359,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 		#region File and Dict functions
 		
 		public string GetFileNameByDateTime(DateTime dt, string path, string accName, string symbol, string ext) {
-			Print("GetFileNameByDateTime: " + dt.ToString());
+			PrintLog(true, !BackTest, "GetFileNameByDateTime: " + dt.ToString());
 			//path = "C:\\inetpub\\wwwroot\\nt_files\\log\\";
 			//ext = "log";
 			//long flong = DateTime.Now.Minute + 100*DateTime.Now.Hour+ 10000*DateTime.Now.Day + 1000000*DateTime.Now.Month + (long)100000000*DateTime.Now.Year;
-			string fname = string.Format("{0}_{1:yyyyMMddHHmmss}.{2}",
+			string fname = string.Format("{0}_{1:yyyyMMddHHmmssfff}.{2}",
 				path + accName + Path.DirectorySeparatorChar
 				+ accName + "_" + symbol, DateTime.Now, ext);
 			//string fname = path + accName + Path.DirectorySeparatorChar + accName + "_" + symbol + "_" + flong.ToString() + "." + ext;
@@ -525,6 +508,17 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
             get { return Values[1]; }
         }
+
+		/// <summary>
+		/// If it runs for backtesting
+		/// </summary>		
+        [Browsable(false)]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+        [XmlIgnore()]		// this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+        public bool BackTest
+        {
+            get {return backTest;}
+			set {backTest = value;}
+        }
 		
 		/// <summary>
 		/// The print out level
@@ -576,21 +570,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <returns></returns>
         public string GetSymbol()
         {
-            return Instrument.FullName;
-        }
-		
-		/// <summary>
-		/// If it runs for backtesting
-		/// </summary>
-		/// <returns></returns>
-        public bool IsBackTest()
-        {
-            return backTest;
-        }
-		
-		public void SetBackTest(bool back_test)
-        {
-           backTest = back_test;
+            return Instrument.MasterInstrument.Name;
         }
 		
 		/// <summary>
@@ -606,10 +586,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
            logFile = log_file;
         }
-		
 
- 
-		
 		/// <summary>
 		/// If it draws text on the chart
 		/// </summary>
@@ -622,7 +599,15 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
            drawTxt = draw_txt;
         }
-		#endregion		
+		#endregion
+		
+		#region Variables for Properties
+
+		protected int printOut = 1;
+		protected string logFile = ""; //Log file full path
+		protected bool backTest = true;
+
+		#endregion
 	}	
 }
 

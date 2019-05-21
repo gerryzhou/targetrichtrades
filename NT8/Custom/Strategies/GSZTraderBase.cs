@@ -45,6 +45,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if (State == State.SetDefaults)
 			{
+				Print(this.Name + "set defaults called....");
 				SetInitParams();
 //				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.TriangleRight, "CustomPlot1");
 //				AddLine(Brushes.Orange, 1, "CustomLine1");
@@ -57,14 +58,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
-				indicatorProxy = GIndicatorProxy(1, Account.Name);
+				indicatorProxy = GIndicatorProxy(this);//1, Account.Name);
 				indicatorSignal = new IndicatorSignal();
 				//CustomDatsSeries1 = new Series<double>(this);
 			}
 		}
 		
 		public void SetInitParams() {
-			Print("GSZTraderBase Set initParams called....");
+			Print(this.Name + " Set initParams called....");			
 			Description									= @"GS Z-Trader base;";
 			Name										= "GSZTraderBase";
 			Calculate									= Calculate.OnPriceChange;

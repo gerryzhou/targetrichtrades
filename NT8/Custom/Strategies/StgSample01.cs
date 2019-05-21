@@ -43,6 +43,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			base.OnStateChange();
 			if (State == State.SetDefaults)
 			{
+				Print(this.Name + " set defaults called....");
 				Description									= @"The sample strategy for GSZTrader.";
 				Name										= "StgSample01";
 				Calculate									= Calculate.OnBarClose;
@@ -55,11 +56,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
+				Print(this.Name + " set DataLoaded called....");
 				AddChartIndicator(indicatorProxy);
 				SetPrintOut(1);
 			}
 			else if (State == State.Configure)
 			{
+				Print(this.Name + " set Configure called....");
 				tradeObj = new TradeObj(this);				
 			}
 		}
