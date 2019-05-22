@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using System.Reflection;
 using System.IO;
 using log4net;
 using log4net.Config;
@@ -59,8 +60,10 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 			}
 			else if (State == State.Configure)
 			{
-				XmlConfigurator.Configure(new FileInfo("C:\\www\\log\\log4net.config"));
-				GZLogger.ConfigureFileAppender( "C:\\www\\log\\log_test.txt" );
+				string config_file = GZLogger.GetConfigFilePath(GetConfigFileDir());
+				Print(this.Name + ":GetConfigFilePath=" + config_file);
+				XmlConfigurator.Configure(new FileInfo(@config_file));////"C:\\www\\log\\log4net.config"));
+				//GZLogger.ConfigureFileAppender( "C:\\www\\log\\log_test.txt" );
 			}
 			else if (State == State.DataLoaded)
 			{				
@@ -83,6 +86,18 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 			if(IsLastBarOnChart() > 0)
 				PrintLog(true, false, "dailyPattern=" + DailyPattern.Count);
 		}
+		
+		public string GetConfigFileDir() {
+			string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			Print(this.Name + ":Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)=" + currentDirectory);
+			string appPath = System.AppDomain.CurrentDomain.BaseDirectory;
+			Print(this.Name + ":System.AppDomain.CurrentDomain.BaseDirectory=" + appPath);
+			string entryPath = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+			Print(this.Name + ":System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)=" + entryPath);
+			string curPath = System.Environment.CurrentDirectory;
+			Print(this.Name + ":System.Environment.CurrentDirectory=" + curPath);
+			return Directory.GetParent(currentDirectory).FullName;
+		}		
 
 		#region Properties
 		[NinjaScriptProperty]

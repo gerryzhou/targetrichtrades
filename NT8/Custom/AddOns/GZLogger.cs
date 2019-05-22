@@ -10,6 +10,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using System.IO;
+
 using log4net;
 using log4net.Appender;
 using log4net.Config;
@@ -57,5 +59,12 @@ namespace NinjaTrader.NinjaScript.AddOns
 
 	        return appender;
 	    }
+		
+		public static string GetConfigFilePath(string config_dir) {
+			return config_dir + Path.DirectorySeparatorChar 
+				+ "bin" + Path.DirectorySeparatorChar
+				+ "Custom" + Path.DirectorySeparatorChar
+				+ "log4net.config";
+		}
 	}
 }
