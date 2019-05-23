@@ -30,10 +30,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// </summary>
 	public partial class GSZTraderBase : Strategy
 	{
-		public int hasPosition() {
+		public int HasPosition() {
 			indicatorProxy.TraceMessage(this.Name, 0);
 			int pos = 0;
-			if(Position != null)
+			if(IsLiveTrading()) {
+				if(PositionAccount != null)
+					return PositionAccount.Quantity;
+			}
+			else if(Position != null)
 				pos = Position.Quantity;
 			return pos;
 		}
@@ -45,8 +49,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public double GetAvgPrice() {
-			MasterInstrument maIns = Bars.Instrument.MasterInstrument;			
-			return maIns.RoundToTickSize(Position.AveragePrice);
+			MasterInstrument maIns = Bars.Instrument.MasterInstrument;
+			if(IsLiveTrading())
+				return maIns.RoundToTickSize(PositionAccount.AveragePrice);
+			else
+				return maIns.RoundToTickSize(Position.AveragePrice);
+		}
+				
+		public MarketPosition GetMarketPosition() {			
+			if(IsLiveTrading())
+				return PositionAccount.MarketPosition;
+			else
+				return Position.MarketPosition;
 		}
 	}
 }

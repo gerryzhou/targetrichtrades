@@ -156,7 +156,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				case AlgoModeType.Trading: //trading
 					//PutTrade(); break;
 					indicatorProxy.TraceMessage(this.Name, PrintOut);
-					if(hasPosition() != 0) {
+					if(HasPosition() != 0) {
 						CheckExitTrade();
 					}
 					else if(NewOrderAllowed())

@@ -417,14 +417,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 		#region Print and Log functions
 		public void PrintLog(bool prt_con, bool prt_file, string text) {
 			if(prt_con) Print(text);
-			log.Info("Log4Net logging:" + text);
+			
 			if(prt_file) {
-				string fpath = GetLogFile();				
-				using (System.IO.StreamWriter file = 
-					new System.IO.StreamWriter(@fpath, true))
-				{
-					file.WriteLine(text);
-				}
+				log.Info("Log4Net logging:" + text);
+//				string fpath = GetLogFile();				
+//				using (System.IO.StreamWriter file = 
+//					new System.IO.StreamWriter(@fpath, true))
+//				{
+//					file.WriteLine(text);
+//				}
 			}
 		}
 

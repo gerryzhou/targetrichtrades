@@ -45,7 +45,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else {
 				indicatorSignal = indicatorProxy.CheckIndicatorSignal();
-				if (Position.MarketPosition != MarketPosition.Flat) { //There are positions
+				if (GetMarketPosition() != MarketPosition.Flat) { //There are positions
 					CheckExitTrade();
 				}
 				else { // no positions

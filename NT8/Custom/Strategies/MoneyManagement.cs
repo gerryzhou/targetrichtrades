@@ -65,11 +65,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 					if(profitFactor > 0)
 						tradeObj.profitTargetAmt = 
 							profitFactor*tradeObj.stopLossAmt;
-					if(Position.MarketPosition == MarketPosition.Long) {
+					if(GetMarketPosition() == MarketPosition.Long) {
 						tradeObj.stopLossPrice = avgPrice - GetPriceByCurrency(tradeObj.stopLossAmt);
 						tradeObj.profitTargetPrice = avgPrice + GetPriceByCurrency(tradeObj.profitTargetAmt);
 					}
-					else if(Position.MarketPosition == MarketPosition.Short) {
+					else if(GetMarketPosition() == MarketPosition.Short) {
 						tradeObj.stopLossPrice = avgPrice + GetPriceByCurrency(tradeObj.stopLossAmt);
 						tradeObj.profitTargetPrice = avgPrice - GetPriceByCurrency(tradeObj.profitTargetAmt);
 					}
@@ -78,11 +78,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 					if(profitFactor > 0)
 						tradeObj.profitTargetTic = 
 							(int)(profitFactor*tradeObj.stopLossTic);
-					if(Position.MarketPosition == MarketPosition.Long) {
+					if(GetMarketPosition() == MarketPosition.Long) {
 						tradeObj.stopLossPrice = avgPrice - GetPriceByTicks(tradeObj.stopLossTic);
 						tradeObj.profitTargetPrice = avgPrice + GetPriceByTicks(tradeObj.profitTargetTic);
 					}
-					else if(Position.MarketPosition == MarketPosition.Short) {
+					else if(GetMarketPosition() == MarketPosition.Short) {
 						tradeObj.stopLossPrice = avgPrice + GetPriceByTicks(tradeObj.stopLossTic);
 						tradeObj.profitTargetPrice = avgPrice - GetPriceByTicks(tradeObj.profitTargetTic);
 					}					
@@ -136,10 +136,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 				tradeObj.trailingPTTic = Math.Max(tradeObj.trailingPTTic, pl_tics-tradeObj.trailingSLTic);
 			
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
-			if(Position.MarketPosition == MarketPosition.Long) {
+			if(GetMarketPosition() == MarketPosition.Long) {
 				tradeObj.trailingSLPrice = MovePriceByTicks(avgPrice, tradeObj.trailingPTTic);
 			}
-			else if(Position.MarketPosition == MarketPosition.Short) {
+			else if(GetMarketPosition() == MarketPosition.Short) {
 				tradeObj.trailingSLPrice = MovePriceByTicks(avgPrice, -tradeObj.trailingPTTic);
 			}
 			
@@ -224,11 +224,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			
 			double newPrc;
-			if(Position.MarketPosition == MarketPosition.Long) {
+			if(GetMarketPosition() == MarketPosition.Long) {
 				newPrc = MovePriceByTicks(avgPrc, tradeObj.trailingPTTic);
 				tradeObj.profitTargetPrice = Math.Max(newPrc, tradeObj.profitTargetPrice);
 			}
-			else if(Position.MarketPosition == MarketPosition.Short) {
+			else if(GetMarketPosition() == MarketPosition.Short) {
 				newPrc = MovePriceByTicks(avgPrc, -tradeObj.trailingPTTic);
 				tradeObj.profitTargetPrice = Math.Min(newPrc, tradeObj.profitTargetPrice);
 			}
@@ -251,11 +251,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		public void LockStopLossAtMinPT(double avgPrc){
 			double newPrc;
-			if(Position.MarketPosition == MarketPosition.Long) {
+			if(GetMarketPosition() == MarketPosition.Long) {
 				newPrc = MovePriceByTicks(avgPrc, tradeObj.profitLockMinTic);
 				tradeObj.stopLossPrice = Math.Max(newPrc, tradeObj.stopLossPrice);
 			} 
-			else if(Position.MarketPosition == MarketPosition.Short) {
+			else if(GetMarketPosition() == MarketPosition.Short) {
 				newPrc = MovePriceByTicks(avgPrc, -tradeObj.profitLockMinTic);				
 				tradeObj.stopLossPrice = Math.Min(newPrc, tradeObj.stopLossPrice);
 			}

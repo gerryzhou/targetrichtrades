@@ -75,10 +75,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if(indicatorSignal == null) return;
 			indicatorProxy.PrintLog(true, !BackTest, CurrentBar + ":CheckExitTradeBySignal"
 			+ ";indicatorSignal.ReversalDir=" + indicatorSignal.ReversalDir.ToString()
-			+ ";Position.MarketPosition=" + Position.MarketPosition
+			+ ";Position.MarketPosition=" + GetMarketPosition()
 			);
-			if((indicatorSignal.ReversalDir == Reversal.Up && Position.MarketPosition == MarketPosition.Short) ||
-				(indicatorSignal.ReversalDir == Reversal.Down && Position.MarketPosition == MarketPosition.Long)) {
+			if((indicatorSignal.ReversalDir == Reversal.Up && GetMarketPosition() == MarketPosition.Short) ||
+				(indicatorSignal.ReversalDir == Reversal.Down && GetMarketPosition() == MarketPosition.Long)) {
 				tradeObj.SetTradeType(TradeType.Liquidate);
 				CloseAllPositions();
 				CancelExitOrders();
@@ -200,7 +200,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 			
 			//indicatorProxy.TraceMessage(this.Name, prtLevel);
-			if (IsTradingTime(170000) && Position.Quantity == 0)
+			if (IsTradingTime(170000) && HasPosition() == 0)
 			{
 				if (tradeObj.BracketOrder.EntryOrder == null || tradeObj.BracketOrder.EntryOrder.OrderState != OrderState.Working || tradeObj.enTrailing)
 				{					
@@ -327,7 +327,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ sigName + "-" + tradeObj.PTCalculationMode 
 			+ "-profitTargetAmt=" + tradeObj.profitTargetAmt
 			+ "-profitTargetTic" + tradeObj.profitTargetTic
-			+ "-profitTargetPrice" + tradeObj.profitTargetPrice + "-avg=" + Position.AveragePrice);
+			+ "-profitTargetPrice" + tradeObj.profitTargetPrice + "-avg=" + GetAvgPrice());
 			try{
 			switch(tradeObj.PTCalculationMode) {
 				case CalculationMode.Currency :
@@ -356,8 +356,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";profitTargetAmt=" + tradeObj.profitTargetAmt
 			+ ";profitTargetTic=" + tradeObj.profitTargetTic
 			+ ";profitTargetPrice=" + tradeObj.profitTargetPrice
-			+ ";avgPrc=" + Position.AveragePrice
-			+ ";Position.Quantity=" + Position.Quantity);
+			+ ";avgPrc=" + GetAvgPrice()
+			+ ";Position.Quantity=" + HasPosition());
 			Order ptOrder = tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder;
 			
 			try{
@@ -386,7 +386,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";stopLossAmt=" + tradeObj.stopLossAmt
 			+ ";stopLossTic=" + tradeObj.stopLossTic
 			+ ";stopLossPrice=" + tradeObj.stopLossPrice
-			+ ";avgPrc=" + Position.AveragePrice);
+			+ ";avgPrc=" + GetAvgPrice());
 			try {
 			switch(tradeObj.SLCalculationMode) {
 				case CalculationMode.Currency :
@@ -416,8 +416,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";stopLossAmt=" + tradeObj.stopLossAmt
 			+ ";stopLossTic=" + tradeObj.stopLossTic
 			+ ";stopLossPrice=" + tradeObj.stopLossPrice
-			+ ";avgPrc=" + Position.AveragePrice
-			+ ";Position.Quantity=" + Position.Quantity);
+			+ ";avgPrc=" + GetAvgPrice()
+			+ ";Position.Quantity=" + HasPosition());
 			
 			Order slOrder = tradeObj.BracketOrder.OCOOrder.StopLossOrder;
 			try{
@@ -475,7 +475,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Print(CurrentBar + ":SetTrailingStopLossOrder-" 
 			+ sigName + "-" + tradeObj.TLSLCalculationMode 
 			+ "-trailingSLAmt=" + tradeObj.trailingSLAmt
-			+ "-trailingSLTic=" + tradeObj.trailingSLTic + "-avg=" + Position.AveragePrice);
+			+ "-trailingSLTic=" + tradeObj.trailingSLTic + "-avg=" + GetAvgPrice());
 			try {
 				switch(tradeObj.TLSLCalculationMode) {
 					case CalculationMode.Ticks :
@@ -501,14 +501,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";trailingSLAmt=" + tradeObj.trailingSLAmt
 			+ ";trailingSLTic=" + tradeObj.trailingSLTic 
 			+ ";GetAvgPrice=" + GetAvgPrice()
-			+ ";Position.Quantity=" + Position.Quantity);
+			+ ";Position.Quantity=" + HasPosition());
 
 			Order tlslOrder = tradeObj.TrailingSLOrder.TLSLOrder;
 			bool isPrcValid = isTLSLPriceValid();
 			try{
 				if(tlslOrder == null || !tlslOrder.Name.Equals(tradeObj.trailingSLSignalName)) {
 					if(isPrcValid)
-						SubmitOrderUnmanaged(0, GetExitOrderAction(), OrderType.StopMarket, Position.Quantity,
+						SubmitOrderUnmanaged(0, GetExitOrderAction(), OrderType.StopMarket, HasPosition(),
 						0, tradeObj.trailingSLPrice, String.Empty, tradeObj.trailingSLSignalName);
 					else {
 						CloseAllPositions();
@@ -541,7 +541,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int prtLevel = 0;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			Print(CurrentBar + ": SetSimpleExitOCO-" 
-			+ sigName + "-avg=" + Position.AveragePrice);
+			+ sigName + "-avg=" + GetAvgPrice());
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			tradeObj.stopLossAmt = MM_StopLossAmt;
 			tradeObj.profitTargetAmt = MM_ProfitTargetAmt;
@@ -558,9 +558,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int prtLevel = 0;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			Print(CurrentBar + ": SetExitOcoUM;" 
-			+ ";avgPrc=" + Position.AveragePrice
+			+ ";avgPrc=" + GetAvgPrice()
 			+ ";ocoID=" + tradeObj.ocoID
-			+ ";Position.Quantity=" + Position.Quantity
+			+ ";Position.Quantity=" + HasPosition()
 			);
 			Order slOrd = tradeObj.BracketOrder.OCOOrder.StopLossOrder;
 			Order ptOrd = tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder;
@@ -577,15 +577,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual bool CloseAllPositions() 
 		{
 			//giParabSAR.PrintLog(true, !backTest, log_file, "CloseAllPosition called");
-			if(Position.MarketPosition == MarketPosition.Long) {
+			if(GetMarketPosition() == MarketPosition.Long) {
 				if(IsUnmanaged)
-					SubmitOrderUnmanaged(0, OrderAction.Sell, OrderType.Market, Position.Quantity);
+					SubmitOrderUnmanaged(0, OrderAction.Sell, OrderType.Market, HasPosition());
 				else
 					ExitLong();
 			}
-			if(Position.MarketPosition == MarketPosition.Short) {
+			if(GetMarketPosition() == MarketPosition.Short) {
 				if(IsUnmanaged)
-					SubmitOrderUnmanaged(0, OrderAction.BuyToCover, OrderType.Market, Position.Quantity);
+					SubmitOrderUnmanaged(0, OrderAction.BuyToCover, OrderType.Market, HasPosition());
 				else				
 					ExitShort();
 			}
@@ -658,14 +658,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			
 			Print(CurrentBar + ":OnExecutionUpdateMG-quant,mktPos,prc, AvgPrc, BarsSinceEx,BarsSinceEn=" 
-			+ quantity + "," + marketPosition + "," + price + "," + Position.AveragePrice + ","
+			+ quantity + "," + marketPosition + "," + price + "," + GetAvgPrice() + ","
 			+ bsx + "," + bse
 			+ ",SL=" + tradeObj.stopLossPrice
 			+ ",Ordername=" + GetOrderName(execution.Order.Name));
 			
 			// Remember to check the underlying IOrder object for null before trying to access its properties
 			if (execution.Order != null && execution.Order.OrderState == OrderState.Filled) {
-				if(Position.Quantity != 0) {
+				if(HasPosition() != 0) {
 					//SetEntryOrder(OrderSignalName.EntryShort, execution.Order);					
 					CalProfitTargetAmt(price, tradeObj.profitFactor);
 					CalExitOcoPrice(GetAvgPrice(), tradeObj.profitFactor);
@@ -708,7 +708,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (execution.Order != null) {
 				string oName = GetOrderName(execution.Order.Name);
 				OrderState oState = execution.Order.OrderState;
-				if(Position.Quantity != 0) {
+				if(HasPosition() != 0) {
 					if(oState == OrderState.Filled 
 						&& oName.Equals(tradeObj.entrySignalName)) {
 					//SetEntryOrder(OrderSignalName.EntryShort, execution.Order);
@@ -1030,11 +1030,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public OrderAction GetExitOrderAction() {
 			OrderAction oAct;
-			if(Position.MarketPosition==MarketPosition.Short)
+			if(GetMarketPosition()==MarketPosition.Short)
 				oAct = OrderAction.BuyToCover;
-			else if(Position.MarketPosition==MarketPosition.Long)
+			else if(GetMarketPosition()==MarketPosition.Long)
 				oAct = OrderAction.Sell;
-			else throw new Exception("GetExitOrderAction error MarketPosition=" + Position.MarketPosition);
+			else throw new Exception("GetExitOrderAction error MarketPosition=" + GetMarketPosition());
 			return oAct;
 		}
 		
