@@ -1,5 +1,6 @@
 Dev plan:
-1) Add spv for trade entry; hook up trade management;
+1) Add spv for trade entry(done), todo: hooo up with entry signal; 
+	1-2)hook up trade management(done);
 2) Multiple markets testing;
 3-1) Breakout Pattern-1: open/morning breakout the overnight range, target vs range as the risk;
 3-2) Breakout Pattern-2: open/mourning breakout, the first pullback evaluation: 38.2/50/61.8

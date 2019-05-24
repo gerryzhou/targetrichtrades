@@ -3,7 +3,7 @@ TradeMgmt-
 
 * Trailinig entry;
 
-* Trailing stop loss after a target is reached;
+* Trailing stop loss after a target is reached; Done: use accountItemUpdate to trail?
 
 * OnBarUpdate: check position, exit trade or entry trade? curStg: check signal;
 baseStg: check performance, check newOrderAllowed? check Exit, check Entry, putTrade;
