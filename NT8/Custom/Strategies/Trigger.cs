@@ -357,10 +357,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region Variables for Properties
 
 		//time=H*10000+M*100+S, S is skipped here;
-        private int tg_TradeStartH = 18; //10100 Default setting for trade Start hour
+        private int tg_TradeStartH = 17; //10100 Default setting for trade Start hour
 		private int tg_TradeStartM = 1; //10100 Default setting for trade Start minute
 		//private int timeStart = -1; //10100 Default setting for timeStart
-        private int tg_TradeEndH = 14; // Default setting for trade End hour
+        private int tg_TradeEndH = 15; // Default setting for trade End hour
 		private int tg_TradeEndM = 59; // Default setting for trade End minute
 		//private int timeEnd = -1; // Default setting for timeEnd
 		private int tg_TradeLiqH = 15; //Time H to liquidate

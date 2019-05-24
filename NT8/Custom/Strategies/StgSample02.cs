@@ -74,8 +74,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		protected override void OnBarUpdate()
 		{
+			try {
 			base.OnBarUpdate();
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			} catch (Exception ex) {
+				indicatorProxy.Log2Disk = true;
+				indicatorProxy.PrintLog(true, true, "Exception: " + ex.StackTrace);
+			}
 		}
 		
 		public override IndicatorSignal GetIndicatorSignal() {
@@ -131,14 +136,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override void PutTrade(){
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			if(tradeObj.GetTradeType() == TradeType.Entry) {
-				indicatorProxy.PrintLog(true, !BackTest, "PutTrade tradeObj.stopLossAmt=" + tradeObj.stopLossAmt + "," + MM_StopLossAmt);
+				indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade tradeObj.stopLossAmt=" + tradeObj.stopLossAmt + "," + MM_StopLossAmt);
 				if(tradeObj.tradeDirection == TradingDirection.Down) {
-					indicatorProxy.PrintLog(true, !BackTest, "PutTrade Down OrderSignalName=" + tradeObj.entrySignalName);
+					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Down OrderSignalName=" + tradeObj.entrySignalName);
 					tradeObj.enLimitPrice = GetTypicalPrice(0);
 					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
 				}
 				else if(tradeObj.tradeDirection == TradingDirection.Up) {
-					indicatorProxy.PrintLog(true, !BackTest, "PutTrade Up OrderSignalName=" + tradeObj.entrySignalName);
+					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + tradeObj.entrySignalName);
 					tradeObj.enLimitPrice = GetTypicalPrice(0);
 					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());
 				}				
@@ -155,7 +160,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             set { barsLookback = Math.Max(1, value); }
         }
 		
-		private int barsLookback = 15;
+		private int barsLookback = 1;// 15;
 		
 		#endregion
 	}

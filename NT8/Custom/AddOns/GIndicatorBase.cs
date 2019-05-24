@@ -51,6 +51,9 @@ namespace NinjaTrader.NinjaScript.Indicators
         // User defined variables (add any user defined variables below)
 		private bool drawTxt = false; // Draw the text on chart
 		protected Text it_gap = null; // The Text object drawn for bar
+		//private List<string> listLogText = new List<string>();
+		private StringBuilder strBldLogText = new StringBuilder();
+		
 		protected double Day_Count = 0;
 		protected double Week_Count = 0;
 		
@@ -419,7 +422,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if(prt_con) Print(text);
 			
 			if(prt_file) {
-				log.Info("Log4Net logging:" + text);
+				strBldLogText.AppendLine(GetCurTime() + "-" + text);
+				//listLogText.Add();
+				if(Log2Disk) {
+					WriteLog2Disk();
+					Log2Disk = false;
+				}
 //				string fpath = GetLogFile();				
 //				using (System.IO.StreamWriter file = 
 //					new System.IO.StreamWriter(@fpath, true))
@@ -427,6 +435,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 //					file.WriteLine(text);
 //				}
 			}
+		}
+		
+		private void WriteLog2Disk() {			
+//			foreach(string text in listLogText) {
+//				strBld.AppendLine(text);				
+//			}
+			if(strBldLogText.Length > 0)
+				log.Warn(strBldLogText.ToString());
 		}
 
 
@@ -539,6 +555,17 @@ namespace NinjaTrader.NinjaScript.Indicators
             get{return printOut;}
 			set{printOut = value;}
         }
+
+		/// <summary>
+		/// Switch to write log to disk
+		/// </summary>		
+        [Browsable(false)]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+        [XmlIgnore()]		// this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+        public bool Log2Disk
+        {
+            get {return log2disk;}
+			set {log2disk = value;}
+        }
 		
 		[NinjaScriptProperty]
 		[XmlIgnore]
@@ -614,7 +641,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		protected int printOut = 1;
 		protected string logFile = ""; //Log file full path
 		protected bool backTest = true;
-
+		private bool log2disk = false;
+		
 		#endregion
 	}	
 }

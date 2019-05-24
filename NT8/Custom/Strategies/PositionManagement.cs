@@ -34,10 +34,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.TraceMessage(this.Name, 0);
 			int pos = 0;
 			if(IsLiveTrading()) {
-				if(PositionAccount != null)
-					return PositionAccount.Quantity;
+				//if(PositionAccount != null)
+					pos = PositionAccount.Quantity;
 			}
-			else if(Position != null)
+			else //if(Position != null)
 				pos = Position.Quantity;
 			return pos;
 		}
@@ -62,5 +62,44 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else
 				return Position.MarketPosition;
 		}
+		
+		#region Event Handlers
+		
+		protected override void OnPositionUpdate(Cbi.Position position, double averagePrice, 
+			int quantity, Cbi.MarketPosition marketPosition)
+		{
+			indicatorProxy.Log2Disk = true;
+			int bsx = BarsSinceExitExecution(0, "", 0);
+			int bse = BarsSinceEntryExecution(0, "", 0);
+			
+			indicatorProxy.PrintLog(true, IsLiveTrading(), 
+				CurrentBar + ":OnPositionUpdate"
+				+ ";BarsSinceExit, BarsSinceEntry="
+				+ bsx + "," + bse
+				+ ";IsUnmanaged=" + IsUnmanaged
+				+ ";IsLiveTrading=" + IsLiveTrading()
+				+ ";GetMarketPosition=" + GetMarketPosition()
+				+ ";marketPosition=" + marketPosition
+				+ ";HasPosition=" + HasPosition()
+				+ ";quantity=" + quantity
+				+ ";GetAvgPrice=" + GetAvgPrice()
+				+ ";averagePrice=" + averagePrice);
+			//Print(position.ToString() + "--MarketPosition=" + position.MarketPosition);
+			if (position.MarketPosition == MarketPosition.Flat)
+			{
+				tradeObj.trailingPTTic = GetTicksByCurrency(tradeObj.profitTargetAmt);
+				tradeObj.trailingSLTic = GetTicksByCurrency(tradeObj.stopLossAmt);
+			}
+			else
+			{
+				CalProfitTargetAmt(averagePrice, tradeObj.profitFactor);
+				CalExitOcoPrice(averagePrice, tradeObj.profitFactor);
+				SetSimpleExitOCO(tradeObj.entrySignalName);
+//				SetBracketOrder.OCOOrder.ProfitTargetOrder(OrderSignalName.EntryShort.ToString());
+//				SetBracketOrder.OCOOrder.StopLossOrder(OrderSignalName.EntryShort.ToString());
+			}
+		}
+		
+		#endregion		
 	}
 }

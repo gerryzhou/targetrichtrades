@@ -32,7 +32,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		#region Time Functions
 		
 		public string GetTimeDate(String str_timedate, int time_date) {
-			char[] delimiterChars = { ' '};
+			char[] delimiterChars = {' '};
 			string[] str_arr = str_timedate.Split(delimiterChars);
 			return str_arr[time_date];
 		}
@@ -42,6 +42,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 			char[] delimiterChars = {' '};
 			string[] str_arr = str_dt.Split(delimiterChars);
 			return str_arr[time_date];
+		}
+		
+		public string GetCurTime() {
+			return DateTime.Now.ToString("HH:mm:ss");
 		}
 		
 		public double GetTimeDiff(DateTime dt_st, DateTime dt_en) {

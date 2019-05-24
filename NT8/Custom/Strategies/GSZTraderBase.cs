@@ -60,7 +60,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				indicatorProxy = GIndicatorProxy(this);//1, Account.Name);
 				indicatorSignal = new IndicatorSignal();
+				CancelAccountOrders();
+				//Account.CancelAllOrders(Instrument);
+				//Account.Flatten(new List<Instrument>{Instrument});
 				//CustomDatsSeries1 = new Series<double>(this);
+			}
+			else if (State == State.Terminated) {
+				if(indicatorProxy != null) {
+					indicatorProxy.Log2Disk = true;
+					indicatorProxy.PrintLog(true, true, CurrentBar + ":" + this.Name + " terminated!");
+				}
 			}
 		}
 		
@@ -82,7 +91,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			StartBehavior								= StartBehavior.WaitUntilFlatSynchronizeAccount;
 			TimeInForce									= TimeInForce.Day;
 			TraceOrders									= true;
-			RealtimeErrorHandling						= RealtimeErrorHandling.StopCancelClose;
+			RealtimeErrorHandling						= RealtimeErrorHandling.IgnoreAllErrors;
 			StopTargetHandling							= StopTargetHandling.ByStrategyPosition;
 			BarsRequiredToTrade							= 100;
 			// Disable this property for performance gains in Strategy Analyzer optimizations
@@ -174,7 +183,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					break;
 				case AlgoModeType.StopTrading: //stop trading
 					indicatorProxy.TraceMessage(this.Name, PrintOut);
-					indicatorProxy.PrintLog(true, !backTest, CurrentBar + "- Stop trading cmd:" + indicatorProxy.Get24HDateTime(Time[0]));
+					indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + "- Stop trading cmd:" + indicatorProxy.Get24HDateTime(Time[0]));
 					break;
 			}
 		}

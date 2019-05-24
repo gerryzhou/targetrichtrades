@@ -210,18 +210,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public override void PutTrade() {
 			if(tradeObj.GetTradeType() == TradeType.Entry) {
-				indicatorProxy.PrintLog(true, !BackTest, "PutTrade tradeObj.stopLossAmt=" + tradeObj.stopLossAmt + "," + MM_StopLossAmt);
+				indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade tradeObj.stopLossAmt=" + tradeObj.stopLossAmt + "," + MM_StopLossAmt);
 				if(tradeObj.tradeDirection == TradingDirection.Down) {
 					//tradeObj.BracketOrder.EntryOrder = 
 					//EnterShort(OrderSignalName.EntryShort.ToString());
 					//EnterShortLimit(Close[0], OrderSignalName.EntryShort.ToString());
 					//tradeObj.entrySignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShort.ToString());
-					indicatorProxy.PrintLog(true, !BackTest, "PutTrade Down OrderSignalName=" + tradeObj.entrySignalName);
+					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Down OrderSignalName=" + tradeObj.entrySignalName);
 					tradeObj.enLimitPrice = Close[0];					
 					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
 				}
 				else if(tradeObj.tradeDirection == TradingDirection.Up) {
-					indicatorProxy.PrintLog(true, !BackTest, "PutTrade Up OrderSignalName=" + tradeObj.entrySignalName);
+					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + tradeObj.entrySignalName);
 					EnterLong(OrderSignalName.EntryLongMkt.ToString());
 					//EnterLongLimit(Low[0]-5, OrderSignalName.EntryLong.ToString());
 				}				
