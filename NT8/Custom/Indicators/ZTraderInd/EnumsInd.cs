@@ -37,7 +37,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	public enum CrossoverType {Above, Below, Both};
 	public enum DivergenceType {Divergent=-1, Convergent=1, UnKnown=0};
 
-    public enum PriceActionType { UpTight, UpWide, DnTight, DnWide, RngTight, RngWide, UnKnown };
+    public enum PriceActionType { UpTight=1, UpWide=2, DnTight=4, DnWide=8, RngTight=16, RngWide=32, UnKnown=64 };
 	public enum PriceSubtype {Close, Open, High, Low, Median};
 	
 	public enum MarketCycleType {
@@ -56,6 +56,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	
 	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4};
 }
+
 
 
 

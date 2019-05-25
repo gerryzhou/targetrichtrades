@@ -55,21 +55,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// Loaded from supervised file;
 		/// Key1=Date; Key2=Time;
 		/// </summary>		
-		protected Dictionary<string,Dictionary<int,PriceAction>> Dict_SpvPR = null;
-		private List<SpvPR> List_SpvPR = null; 
-		protected Dictionary<string, List<MarketContext>> Dict_SpvPR2 =  null;
 		
-		/// <summary>
-		/// Bitwise op to tell which Price Action allowed to be the supervised entry approach
-		/// 0111 1111: [0 UnKnown RngWide RngTight DnWide DnTight UpWide UpTight]
-		/// UnKnown:spvPRBits&0100 000(64)
-		/// RngWide:spvPRBits&0010 0000(32), RngTight:spvPRBits&0001 0000(16)
-		/// DnWide:spvPRBits&0000 1000(8), DnTight:spvPRBits&0000 0100(4)
-		/// UpWide:spvPRBits&0000 0010(2), UpTight:spvPRBits&0000 0001(1)
-		/// </summary>
-
-		private int spvPRBits = 0;
-		
+		protected Dictionary<string, List<MarketContext>> Dict_SpvPR =  null;
+		protected Dictionary<string,Dictionary<int,PriceAction>> Dict_SpvPR_Dep = null;
+		//private List<SpvPR> List_SpvPR = null; 
+		private List<PriceActionType> priceAction_Allowed = new List<PriceActionType>();
+	
 		private int prt_lev = 1;
 		#endregion
 		
@@ -138,52 +129,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 			Print(CurrentBar + ":key=" + key + ",mkt_ctxs.Count=" + mkt_ctxs.Count);
 			return mkt_ctxs;
 		}
-				
-		/// <summary>
-		/// 20170522;9501459:UpTight#10-16-3-5
-		/// </summary>
-		/// <param name="srcDir"></param>
-		/// <param name="symbol"></param>
-		/// <returns></returns>
-		public Dictionary<string,Dictionary<int,PriceAction>> ReadSpvFile(string srcDir, string symbol) {
-			//Dictionary<string,Dictionary<int,PriceActionType>> 
-			Dict_SpvPR = new Dictionary<string,Dictionary<int,PriceAction>>();
-			string src = srcDir + symbol + ".txt";
-			//Print("ReadSpvPRFile src: " + src);
-//			if (!src.Exists)
-//			{
-//				return paraMap;
-//			}
-	
-			int counter = 0;  
-			string line;
-
-			// Read the file and display it line by line.  
-			System.IO.StreamReader file =   
-				new System.IO.StreamReader(src);//@"c:\test.txt");
-			while((line = file.ReadLine()) != null)  
-			{
-				if(line.StartsWith("//")) continue; //comments line, skip it;
-				string key;
-				Dictionary<int,PriceAction> mkt_ctxs = Dep_ReadSpvPRLine(line.Substring(1, line.Length-3), out key);//remove leading " and ending ",
-				//Print(line);
-				if(mkt_ctxs.Count > 0) {
-					Dict_SpvPR.Add(key, mkt_ctxs);
-				}
-				counter++;
-			}
-
-			file.Close();
-
-//			foreach(var pair in Dict_SpvPR) {
-				//Print("mktCtx: key,val=" + pair.Key + "," + pair.Value + "," + pair.ToString());
-//				Dictionary<int,PriceAction> mkcnd = (Dictionary<int,PriceAction>)pair.Value;
-//				foreach(var cnd in mkcnd) {
-//					Print("time,cnd=" + cnd.Key + "," + cnd.Value);
-//				}
-//			}
-			return Dict_SpvPR;
-		}
 		
 		/// <summary>
 		/// 20170522;9501459:UpTight#10-16-3-5
@@ -194,7 +139,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			//Dictionary<string,Dictionary<int,PriceActionType>> 
 			//Dict_SpvPR = new Dictionary<string,Dictionary<int,PriceAction>>();			
 			//List_SpvPR = new List<SpvPR>();
-			Dict_SpvPR2 = new Dictionary<string, List<MarketContext>>();
+			Dict_SpvPR = new Dictionary<string, List<MarketContext>>();
 			
 			int counter = 0;  
 			//string line;
@@ -213,35 +158,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 					foreach(var mkt_ctx in mkt_ctxs){
 						Print("LoadSpvPRList mkt_ctx=" + mkt_ctx.Time + "," + mkt_ctx.Price_Ation);
 					}
-					Dict_SpvPR2.Add(key, mkt_ctxs);
+					Dict_SpvPR.Add(key, mkt_ctxs);
 				}
-				counter++;
-			}
-			//Print("ReadSpvPRList:" + counter);
-			return Dict_SpvPR2;
-		}
-
-		/// <summary>
-		/// 20170522;9501459:UpTight#10-16-3-5
-		/// </summary>
-		/// <param name="srcDir"></param>
-		/// <param name="symbol"></param>
-		/// <returns></returns>
-		public Dictionary<string,Dictionary<int,PriceAction>> ReadSpvPRList() {
-			//Dictionary<string,Dictionary<int,PriceActionType>> 
-			Dict_SpvPR = new Dictionary<string,Dictionary<int,PriceAction>>();			
-			
-			int counter = 0;  
-			//string line;
-			foreach(string dayPR in SpvDailyPattern.spvPRDay) {
-				//Print(dayPR);
-				//ReadSpvPRLine(dayPR);
 				counter++;
 			}
 			//Print("ReadSpvPRList:" + counter);
 			return Dict_SpvPR;
 		}
 
+		/// <summary>
+		/// Get Price Action by datetime from the Spv list
+		/// </summary>
+		/// <param name="dt">Datetime of the bar</param>
+		/// <returns></returns>
 		public PriceAction GetPriceAction(DateTime dt) {
 			
 			PriceAction pa = new PriceAction(PriceActionType.UnKnown, -1, -1, -1, -1);
@@ -254,11 +183,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 //			if(Dict_SpvPR != null)
 //				Dict_SpvPR.TryGetValue(key_date, out mkt_ctxs);
 			TraceMessage(this.Name, prt_lev);
-			if(Dict_SpvPR2 != null)
-				Dict_SpvPR2.TryGetValue(key_date, out mkt_ctxs);
+			if(Dict_SpvPR != null)
+				Dict_SpvPR.TryGetValue(key_date, out mkt_ctxs);
 			TraceMessage(this.Name, prt_lev);
 			Print("key_date, time, Dict_SpvPR, mkt_ctxs=" + key_date 
-			+ "," + t.ToString() + "," + Dict_SpvPR2.Count + "," + mkt_ctxs);
+			+ "," + t.ToString() + "," + Dict_SpvPR.Count + "," + mkt_ctxs);
 			TraceMessage(this.Name, prt_lev);
 			if(mkt_ctxs != null) {
 				foreach(var mkt_ctx in mkt_ctxs) {
@@ -277,44 +206,70 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 
 		/// <summary>
-		/// Check if the price action type allowed for supervised PR 
+		/// Check if the price action type allowed for supervised PR bits
+		/// SpvPRBits set by the command file
 		/// </summary>
 		/// <returns></returns>
-		public bool IsSpvAllowed4PAT(PriceActionType pat) {
-			int i;
-			switch(pat) {
-				case PriceActionType.UpTight: //
-					i = (1 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (1 & SpvPRBits)=" + i);
-					return (1 & SpvPRBits) > 0;
-				case PriceActionType.UpWide: //wide up channel
-					i = (2 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (2 & SpvPRBits)=" + i);
-					return (2 & SpvPRBits) > 0;
-				case PriceActionType.DnTight: //
-					i = (4 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (4 & SpvPRBits)=" + i);
-					return (4 & SpvPRBits) > 0;
-				case PriceActionType.DnWide: //wide dn channel
-					i = (8 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (8 & SpvPRBits)=" + i);
-					return (8 & SpvPRBits) > 0;
-				case PriceActionType.RngTight: //
-					i = (16 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (16 & SpvPRBits)=" + i);
-					return (16 & SpvPRBits) > 0;
-				case PriceActionType.RngWide: //
-					i = (32 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (32 & SpvPRBits)=" + i);
-					return (32 & SpvPRBits) > 0;
-				case PriceActionType.UnKnown: //
-					i = (64 & SpvPRBits);
-					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (64 & SpvPRBits)=" + i);
-					return (64 & SpvPRBits) > 0;					
-				default:
-					return false;
-			}			
-		}		
+		public bool PriceActionAllowedBySpvPRBits(PriceActionType pat) {
+			int i = (int)pat;
+			return (i & SpvPRBits) > 0;
+//			switch(pat) {
+//				case PriceActionType.UpTight: //
+//					i = (1 & SpvPRBits);
+//					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (1 & SpvPRBits)=" + i);
+//					return (1 & SpvPRBits) > 0;
+//				case PriceActionType.UpWide: //wide up channel
+//					i = (2 & SpvPRBits);
+//					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (2 & SpvPRBits)=" + i);
+//					return (2 & SpvPRBits) > 0;
+//				case PriceActionType.DnTight: //
+//					i = (4 & SpvPRBits);
+//					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (4 & SpvPRBits)=" + i);
+//					return (4 & SpvPRBits) > 0;
+//				case PriceActionType.DnWide: //wide dn channel
+//					i = (8 & SpvPRBits);
+//					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (8 & SpvPRBits)=" + i);
+//					return (8 & SpvPRBits) > 0;
+//				case PriceActionType.RngTight: //
+//					i = (16 & SpvPRBits);
+//					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (16 & SpvPRBits)=" + i);
+//					return (16 & SpvPRBits) > 0;
+//				case PriceActionType.RngWide: //
+//					i = (32 & SpvPRBits);
+//					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (32 & SpvPRBits)=" + i);
+//					return (32 & SpvPRBits) > 0;
+//				case PriceActionType.UnKnown: //
+//					i = (64 & SpvPRBits);
+//					//Print("IsSpvAllowed4PAT:" + pat.ToString() + ", (64 & SpvPRBits)=" + i);
+//					return (64 & SpvPRBits) > 0;					
+//				default:
+//					return false;
+//			}			
+		}
+		
+		/// <summary>
+		/// Set SpvPRBits for the list of PriceActionType
+		/// </summary>
+		/// <param name="list_pat"></param>
+		/// <returns></returns>
+		public int SetSpvPRBits(List<PriceActionType> list_pat) {
+			int bits = 0;
+			foreach(PriceActionType p in list_pat) {
+				bits += (int)p;
+			}
+			return bits;
+		}
+		
+		/// <summary>
+		/// Add the price ation type that allowed for trading
+		/// </summary>
+		/// <param name="pat"></param>
+		public void AddPriceActionTypeAllowed(PriceActionType pat) {
+			if(!priceAction_Allowed.Contains(pat))
+				priceAction_Allowed.Add(pat);
+			int p = (int)PriceActionType.DnTight;
+			Print("PriceActionType.DnTight=" + p);
+		}
 		#endregion
 		
 		#region Dep functions
@@ -355,6 +310,73 @@ namespace NinjaTrader.NinjaScript.Indicators
 			key = line_pa[0];
 			return mkt_ctxs;
 		}
+				
+		/// <summary>
+		/// 20170522;9501459:UpTight#10-16-3-5
+		/// </summary>
+		/// <param name="srcDir"></param>
+		/// <param name="symbol"></param>
+		/// <returns></returns>
+		public Dictionary<string,Dictionary<int,PriceAction>> Dep_ReadSpvFile(string srcDir, string symbol) {
+			//Dictionary<string,Dictionary<int,PriceActionType>> 
+			Dict_SpvPR_Dep = new Dictionary<string,Dictionary<int,PriceAction>>();
+			string src = srcDir + symbol + ".txt";
+			//Print("ReadSpvPRFile src: " + src);
+//			if (!src.Exists)
+//			{
+//				return paraMap;
+//			}
+	
+			int counter = 0;  
+			string line;
+
+			// Read the file and display it line by line.  
+			System.IO.StreamReader file =   
+				new System.IO.StreamReader(src);//@"c:\test.txt");
+			while((line = file.ReadLine()) != null)  
+			{
+				if(line.StartsWith("//")) continue; //comments line, skip it;
+				string key;
+				Dictionary<int,PriceAction> mkt_ctxs = Dep_ReadSpvPRLine(line.Substring(1, line.Length-3), out key);//remove leading " and ending ",
+				//Print(line);
+				if(mkt_ctxs.Count > 0) {
+					Dict_SpvPR_Dep.Add(key, mkt_ctxs);
+				}
+				counter++;
+			}
+
+			file.Close();
+
+//			foreach(var pair in Dict_SpvPR) {
+				//Print("mktCtx: key,val=" + pair.Key + "," + pair.Value + "," + pair.ToString());
+//				Dictionary<int,PriceAction> mkcnd = (Dictionary<int,PriceAction>)pair.Value;
+//				foreach(var cnd in mkcnd) {
+//					Print("time,cnd=" + cnd.Key + "," + cnd.Value);
+//				}
+//			}
+			return Dict_SpvPR_Dep;
+		}
+		
+		/// <summary>
+		/// 20170522;9501459:UpTight#10-16-3-5
+		/// </summary>
+		/// <param name="srcDir"></param>
+		/// <param name="symbol"></param>
+		/// <returns></returns>
+		public Dictionary<string,Dictionary<int,PriceAction>> Dep_ReadSpvPRList() {
+			//Dictionary<string,Dictionary<int,PriceActionType>> 
+			Dict_SpvPR_Dep = new Dictionary<string,Dictionary<int,PriceAction>>();			
+			
+			int counter = 0;  
+			//string line;
+			foreach(string dayPR in SpvDailyPattern.spvPRDay) {
+				//Print(dayPR);
+				//ReadSpvPRLine(dayPR);
+				counter++;
+			}
+			//Print("ReadSpvPRList:" + counter);
+			return Dict_SpvPR_Dep;
+		}
 		
 		public PriceAction Dep_GetPriceAction(DateTime dt) {
 			
@@ -386,7 +408,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 //				}
 			}
 			return pa;
-		}		
+		}
+		
 		#endregion
 		
 		#region Properties
@@ -399,6 +422,17 @@ namespace NinjaTrader.NinjaScript.Indicators
             get { return spvPRBits; }
             set { spvPRBits = Math.Max(0, value); }
         }
+		
+		/// <summary>
+		/// Bitwise op to tell which Price Action allowed to be the supervised entry approach
+		/// 0111 1111: [0 UnKnown RngWide RngTight DnWide DnTight UpWide UpTight]
+		/// UnKnown:spvPRBits&0100 000(64)
+		/// RngWide:spvPRBits&0010 0000(32), RngTight:spvPRBits&0001 0000(16)
+		/// DnWide:spvPRBits&0000 1000(8), DnTight:spvPRBits&0000 0100(4)
+		/// UpWide:spvPRBits&0000 0010(2), UpTight:spvPRBits&0000 0001(1)
+		/// </summary>
+
+		private int spvPRBits = 0;
 		#endregion
     }
 }

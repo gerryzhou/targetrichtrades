@@ -118,7 +118,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		protected override void OnAccountItemUpdate(Cbi.Account account, Cbi.AccountItem accountItem, double value)
 		{
-			
+			indicatorProxy.PrintLog(true, IsLiveTrading(), 
+				CurrentBar + ":OnAccountItemUpdate"
+				+ ";accountItem=" + accountItem.ToString()
+				+ ";value=" + value
+				+ ";DailyLossLimit=" + account.DailyLossLimit
+				+ ";DisplayName=" + account.DisplayName
+				+ ";AccountStatus=" + account.AccountStatus.ToString()
+				);
 		}
 
 		protected override void OnConnectionStatusUpdate(ConnectionStatusEventArgs connectionStatusUpdate)
