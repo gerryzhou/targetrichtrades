@@ -36,9 +36,14 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	public enum SupportResistanceType {Support = 1, Resistance = -1, Unknown = 0};
 	public enum CrossoverType {Above, Below, Both};
 	public enum DivergenceType {Divergent=-1, Convergent=1, UnKnown=0};
+	
+	//The size of High-Low of the bar
+	public enum BarRangeType {Doji, Small, Large, Huge};
+	//The size of Close-Open of the bar
+	public enum BarBodyRangeType {Doji, Small, Large, Huge};
 
     public enum PriceActionType { UpTight=1, UpWide=2, DnTight=4, DnWide=8, RngTight=16, RngWide=32, UnKnown=64 };
-	public enum PriceSubtype {Close, Open, High, Low, Median};
+	public enum PriceSubtype {Close, Open, High, Low, Median, Typical};
 	
 	public enum MarketCycleType {
 		W1Early, W1Middle, W1End,
@@ -56,6 +61,10 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	
 	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4};
 }
+
+
+
+
 
 
 

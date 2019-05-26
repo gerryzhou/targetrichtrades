@@ -36,6 +36,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 	public partial class GSZTraderBase : Strategy
 	{
 		private List<Indicator> listIndicator = new List<Indicator>();
+		protected IndicatorSignal indicatorSignal;
+		private Dictionary<int, List<IndicatorSignal>> indicatorSignals = 
+			new Dictionary<int, List<IndicatorSignal>>();
 		
 		protected GIndicatorProxy indicatorProxy;
 		//private IndicatorSignal indSignal;

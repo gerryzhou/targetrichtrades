@@ -36,9 +36,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 	public partial class GSZTraderBase : Strategy
 	{
 		//protected GIndicatorBase indicatorProxy;
-		protected IndicatorSignal indicatorSignal;
-		protected TradeObj tradeObj;
-		
 		private Series<double> CustomDatsSeries1;
 		
 		protected override void OnStateChange()

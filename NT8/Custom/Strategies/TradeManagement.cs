@@ -32,7 +32,9 @@ using NinjaTrader.NinjaScript.AddOns;
 namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class GSZTraderBase : Strategy
-	{		
+	{
+		protected TradeObj tradeObj;
+		
 		#region Trade Mgmt Functions
 		
 		public virtual void InitTradeMgmt() {
