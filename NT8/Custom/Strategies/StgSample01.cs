@@ -76,9 +76,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 		}
 		
-		public override IndicatorSignal GetIndicatorSignal() {
+		public override TradeSignal GetTradeSignal() {
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
-			IndicatorSignal indSignal = new IndicatorSignal();
+			TradeSignal trdSignal = new TradeSignal();
 			Direction dir = new Direction();
 			
 			if(Close[0] > High[1] && Close[0] > High[2])
@@ -86,22 +86,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 			if(Close[0] < Low[1] && Close[0] < Low[2])
 				dir.TrendDir = TrendDirection.Down;
-			indSignal.TrendDir = dir;
+			trdSignal.TrendDir = dir;
 			
-			this.indicatorSignal = indSignal;
-			return indSignal;
+			this.tradeSignal = trdSignal;
+			return trdSignal;
 		}
 		
 		public override TradeObj CheckNewEntryTrade() {
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			tradeObj.InitNewEntryTrade();
-			if(indicatorSignal != null) {
-				if(indicatorSignal.TrendDir.TrendDir == TrendDirection.Down)
+			if(tradeSignal != null) {
+				if(tradeSignal.TrendDir.TrendDir == TrendDirection.Down)
 				{
 					indicatorProxy.TraceMessage(this.Name, PrintOut);
 					tradeObj.tradeDirection = TradingDirection.Down;
 				}
-				else if(indicatorSignal.TrendDir.TrendDir == TrendDirection.Up)
+				else if(tradeSignal.TrendDir.TrendDir == TrendDirection.Up)
 				{
 					indicatorProxy.TraceMessage(this.Name, PrintOut);
 					tradeObj.tradeDirection = TradingDirection.Up;

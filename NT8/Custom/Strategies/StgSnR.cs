@@ -100,7 +100,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.Update();
 			PriceAction pa = indicatorProxy.GetPriceAction(Time[0]);
 			indicatorProxy.PrintLog(true, false, CurrentBar + ":Time=" + Time[0].ToShortDateString() + "-" + Time[0].ToShortTimeString() + ", PriceAction=" + pa.paType.ToString());
-			indicatorSignal = GetIndicatorSignal();
+			tradeSignal = GetTradeSignal();
 
 			base.OnBarUpdate();
 			//SetStopLoss(CalculationMode.Price, tradeObj.stopLossPrice);
@@ -113,12 +113,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return ind.GetDirection();
 		}
 		
-		public override IndicatorSignal GetIndicatorSignal() {
+		public override TradeSignal GetTradeSignal() {
 			giSMI.Update();
 			giSnR.Update();
-			IndicatorSignal indSignal = null; //= new IndicatorSignal();
+			TradeSignal trdSignal = null; //= new IndicatorSignal();
 			
-			if(CurrentBar <= BarsRequiredToTrade) return indSignal;
+			if(CurrentBar <= BarsRequiredToTrade) return trdSignal;
 			
 			int infl = giSMI.GetInflection(giSMI.SMITMA);
 			
@@ -126,57 +126,57 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//Check divergence for CurrentBar with the last infl bar;
 				DivergenceType dvType = CheckDivergence(giSMI);
 				if(infl < 0 && dvType == DivergenceType.Divergent) {
-					indSignal = new IndicatorSignal();
-					indSignal.BarNo = CurrentBar;
-					indSignal.ReversalDir = Reversal.Down;
-					indSignal.SnR = giSMI.GetSupportResistance(CurrentBar-1);
+					trdSignal = new TradeSignal();
+					trdSignal.BarNo = CurrentBar;
+					trdSignal.ReversalDir = Reversal.Down;
+					trdSignal.SnR = giSMI.GetSupportResistance(CurrentBar-1);
 				}//entry short by reversal
 				else if(infl > 0 && dvType == DivergenceType.Convergent) {
-					indSignal = new IndicatorSignal();
-					indSignal.BarNo = CurrentBar;
+					trdSignal = new TradeSignal();
+					trdSignal.BarNo = CurrentBar;
 					Direction dir = new Direction();
 					dir.TrendDir = TrendDirection.Down;
-					indSignal.TrendDir = dir;
-					indSignal.SnR = giSMI.GetSupportResistance(CurrentBar-1);
+					trdSignal.TrendDir = dir;
+					trdSignal.SnR = giSMI.GetSupportResistance(CurrentBar-1);
 				}//entry short following down trend
 				else if(infl < 0 && dvType == DivergenceType.Convergent) {
-					indSignal = new IndicatorSignal();
-					indSignal.BarNo = CurrentBar;
+					trdSignal = new TradeSignal();
+					trdSignal.BarNo = CurrentBar;
 					Direction dir = new Direction();
 					dir.TrendDir = TrendDirection.Up;
-					indSignal.TrendDir = dir;
-					indSignal.SnR = giSMI.GetSupportResistance(CurrentBar-1);
+					trdSignal.TrendDir = dir;
+					trdSignal.SnR = giSMI.GetSupportResistance(CurrentBar-1);
 				}//entry long following up trend
 				else if(infl > 0 && dvType == DivergenceType.Divergent) {
-					indSignal = new IndicatorSignal();
-					indSignal.BarNo = CurrentBar;
-					indSignal.ReversalDir = Reversal.Up;
-					indSignal.SnR = giSMI.GetSupportResistance(CurrentBar-1);
+					trdSignal = new TradeSignal();
+					trdSignal.BarNo = CurrentBar;
+					trdSignal.ReversalDir = Reversal.Up;
+					trdSignal.SnR = giSMI.GetSupportResistance(CurrentBar-1);
 				}//entry long by reversal
 			}
-			return indSignal;
+			return trdSignal;
 		}
 		
 		public override TradeObj CheckNewEntryTrade() {
 			int prtLevel = 1;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
-			if(indicatorSignal != null) {
+			if(tradeSignal != null) {
 				tradeObj.InitNewEntryTrade();
-				if(indicatorSignal.TrendDir != null 
-					&& indicatorSignal.TrendDir.TrendDir == TrendDirection.Down
-					&& indicatorProxy.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
+				if(tradeSignal.TrendDir != null 
+					&& tradeSignal.TrendDir.TrendDir == TrendDirection.Down
+					&& indicatorProxy.GetResistance(tradeSignal.SnR.Resistance) > High[0]) {
 					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					tradeObj.tradeDirection = TradingDirection.Down;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
-					tradeObj.stopLossPrice = indicatorProxy.GetResistance(indicatorSignal.SnR.Resistance);
+					tradeObj.stopLossPrice = indicatorProxy.GetResistance(tradeSignal.SnR.Resistance);
 				}
-				else if(indicatorSignal.TrendDir != null 
-					&& indicatorSignal.TrendDir.TrendDir == TrendDirection.Up
-					&& indicatorProxy.GetSupport(indicatorSignal.SnR.Support) < Low[0]) {
+				else if(tradeSignal.TrendDir != null 
+					&& tradeSignal.TrendDir.TrendDir == TrendDirection.Up
+					&& indicatorProxy.GetSupport(tradeSignal.SnR.Support) < Low[0]) {
 					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					tradeObj.tradeDirection = TradingDirection.Up;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
-					tradeObj.stopLossPrice = indicatorProxy.GetSupport(indicatorSignal.SnR.Support);
+					tradeObj.stopLossPrice = indicatorProxy.GetSupport(tradeSignal.SnR.Support);
 					//Print(CurrentBar + ": GetResistance=" + indicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);
 				}
 			} else {

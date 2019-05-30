@@ -74,13 +74,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public virtual void CheckExitTradeBySignal() {
-			if(indicatorSignal == null) return;
+			if(tradeSignal == null) return;
 			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":CheckExitTradeBySignal"
-			+ ";indicatorSignal.ReversalDir=" + indicatorSignal.ReversalDir.ToString()
+			+ ";indicatorSignal.ReversalDir=" + tradeSignal.ReversalDir.ToString()
 			+ ";Position.MarketPosition=" + GetMarketPosition()
 			);
-			if((indicatorSignal.ReversalDir == Reversal.Up && GetMarketPosition() == MarketPosition.Short) ||
-				(indicatorSignal.ReversalDir == Reversal.Down && GetMarketPosition() == MarketPosition.Long)) {
+			if((tradeSignal.ReversalDir == Reversal.Up && GetMarketPosition() == MarketPosition.Short) ||
+				(tradeSignal.ReversalDir == Reversal.Down && GetMarketPosition() == MarketPosition.Long)) {
 				tradeObj.SetTradeType(TradeType.Liquidate);
 				CloseAllPositions();
 				CancelExitOrders();

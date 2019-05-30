@@ -37,6 +37,9 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	public enum CrossoverType {Above, Below, Both};
 	public enum DivergenceType {Divergent=-1, Convergent=1, UnKnown=0};
 	
+	public enum SignalType {TrendDirection, Breakout, Reversal, SnR, CrossOver,
+							Divergence, Inflection, Unknow};
+	
 	//The size of High-Low of the bar
 	public enum BarRangeType {Doji, Small, Large, Huge};
 	//The size of Close-Open of the bar
@@ -61,6 +64,8 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	
 	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4};
 }
+
+
 
 
 

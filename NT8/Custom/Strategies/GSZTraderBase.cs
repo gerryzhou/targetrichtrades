@@ -56,7 +56,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (State == State.DataLoaded)
 			{
 				indicatorProxy = GIndicatorProxy(this);//1, Account.Name);
-				indicatorSignal = new IndicatorSignal();
+				tradeSignal = new TradeSignal();
 				CancelAccountOrders();
 				//Account.CancelAllOrders(Instrument);
 				//Account.Flatten(new List<Instrument>{Instrument});
@@ -158,7 +158,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
 			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
-			GetIndicatorSignal();
+			GetTradeSignal();
 //			CheckNewEntryTrade();
 //			PutTrade();
 			switch(AlgoMode) {

@@ -103,7 +103,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			int prtLevel = 0;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
-			indicatorSignal = GetIndicatorSignal();
+			tradeSignal = GetTradeSignal();
 			//if(BarsInProgress !=0) return;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			base.OnBarUpdate();
@@ -131,11 +131,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			return null;
 		}
 		
-		public override IndicatorSignal GetIndicatorSignal() {
+		public override TradeSignal GetTradeSignal() {
 			giSMI.Update();
 			awOscillator.Update();
 			giSnR.Update();
-			IndicatorSignal indSignal = new IndicatorSignal(); //= new IndicatorSignal();
+			TradeSignal trdSignal = new TradeSignal(); //= new IndicatorSignal();
 			Print("GetIndicatorSignal - 1");
 			int infl_dn = giSMI.InflectionRecorder.GetLastIndex(CurrentBar, LookbackBarType.Down);//GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarsAgo);
 			int infl_up = giSMI.InflectionRecorder.GetLastIndex(CurrentBar, LookbackBarType.Up);//GetLastInflection(giSMI.GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarsAgo);
@@ -149,7 +149,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					//lookback to the crossover and if that candle is bearish we isolate the open as resistance;
 					// if that candlestick is bullish we isolate the close as resistance
 					//giSMI.LastCrossover = giSMI.GetLastCrossover(giSMI.GetCrossover(), CurrentBar-inft, CrossoverType.Both);
-					indSignal.SnR.Resistance = giSMI.GetSupportResistance(infl, SupportResistanceType.Resistance);
+					trdSignal.SnR.Resistance = giSMI.GetSupportResistance(infl, SupportResistanceType.Resistance);
 					
 				} catch(Exception ex) {
 					Print("GetIndicatorSignal ex=" + ex.Message);
@@ -167,10 +167,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 				if(dir_gismi.TrendDir == TrendDirection.Up && dir_awo.TrendDir == TrendDirection.Up)
 					dir.TrendDir = TrendDirection.Down;
-				indSignal.TrendDir = dir;
+				trdSignal.TrendDir = dir;
 			}
 			
-			return indSignal;
+			return trdSignal;
 		}
 		#endregion
 		
@@ -180,16 +180,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			if(NewOrderAllowed()) {
 			int prtLevel = 0;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);//|| Position.Quantity == 0 giSMI.IsNewInflection(TrendDirection.Down) && 
-			Print("indicatorSignal null=" + (indicatorSignal==null));
+			Print("tradeSignal null=" + (tradeSignal==null));
 			tradeObj.InitNewEntryTrade();
-			if(indicatorSignal != null) {
-				if(indicatorSignal.TrendDir.TrendDir == TrendDirection.Down)
+			if(tradeSignal != null) {
+				if(tradeSignal.TrendDir.TrendDir == TrendDirection.Down)
 				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
 				{
 					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					tradeObj.tradeDirection = TradingDirection.Down;
 				}
-				else if(indicatorSignal.TrendDir.TrendDir == TrendDirection.Up)
+				else if(tradeSignal.TrendDir.TrendDir == TrendDirection.Up)
 				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
 				{
 					indicatorProxy.TraceMessage(this.Name, prtLevel);
@@ -202,7 +202,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				tradeObj.SetTradeType(TradeType.NoTrade);
 			}
 			
-			if(indicatorSignal != null && indicatorSignal.TrendDir.TrendDir == TrendDirection.Down) {
+			if(tradeSignal != null && tradeSignal.TrendDir.TrendDir == TrendDirection.Down) {
 				//Print(CurrentBar + ": GetResistance=" + indicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);
 			}
 			return tradeObj;

@@ -23,6 +23,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -36,7 +37,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 	public partial class GSZTraderBase : Strategy
 	{
 		private List<Indicator> listIndicator = new List<Indicator>();
-		protected IndicatorSignal indicatorSignal;
+		protected TradeSignal tradeSignal;
+		
+		/// <summary>
+		/// The key=BarNo that holds the signal set
+		/// value=the set of signals
+		/// </summary>
 		private Dictionary<int, List<IndicatorSignal>> indicatorSignals = 
 			new Dictionary<int, List<IndicatorSignal>>();
 		
@@ -82,7 +88,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// or modify existing orders for extry/exit;
 		/// </summary>
 		/// <returns></returns>
-		public virtual IndicatorSignal GetIndicatorSignal() {return null;}
+		//public virtual IndicatorSignal GetIndicatorSignal() {return null;}
+
+		/// <summary>
+		/// The trade signal is to trigger entry/exit, 
+		/// or modify existing orders for extry/exit;
+		/// </summary>
+		/// <returns></returns>
+		public virtual TradeSignal GetTradeSignal() {return null;}
 		
 		/// <summary>
 		/// Detect if the market condition has changed or not since last signal
@@ -107,6 +120,39 @@ namespace NinjaTrader.NinjaScript.Strategies
 //		}		
 		public void AddIndicator(Indicator i) {
 			this.listIndicator.Add(i);
+		}
+		
+		/// <summary>
+		/// Add the signal to the list of the bar with barNo
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal"></param>
+		public void AddIndicatorSignals(int barNo, IndicatorSignal signal) {
+			List<IndicatorSignal> list_signal;
+			if(!this.indicatorSignals.TryGetValue(barNo, out list_signal)) {				
+				list_signal = new List<IndicatorSignal>();
+			}
+			list_signal.Add(signal);
+			this.indicatorSignals[barNo] = list_signal;
+		}
+		
+		/// <summary>
+		/// Get the signal from bar with barNo and the signal_name
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal_name"></param>
+		/// <returns></returns>
+		public IndicatorSignal GetIndicatorSignalAtBar(int barNo, string signal_name) {
+			
+			if(this.indicatorSignals.ContainsKey(barNo)) {
+				List<IndicatorSignal> list_signal = this.indicatorSignals[barNo];
+				foreach(IndicatorSignal sig in list_signal) {
+					if(signal_name.Equals(sig.SignalName))
+						return sig;
+				}
+			}
+			
+			return null;			
 		}
 
 		#endregion
