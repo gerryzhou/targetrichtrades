@@ -113,16 +113,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else return false;
 		}
 		
+		/// <summary>
+		/// Only updated on live/sim trading, not triggered at back-testing
+		/// </summary>
+		/// <param name="account"></param>
+		/// <param name="accountItem"></param>
+		/// <param name="value"></param>
 		protected override void OnAccountItemUpdate(Cbi.Account account, Cbi.AccountItem accountItem, double value)
 		{
-			indicatorProxy.PrintLog(true, IsLiveTrading(), 
-				CurrentBar + ":OnAccountItemUpdate"
-				+ ";accountItem=" + accountItem.ToString()
-				+ ";value=" + value
-				+ ";DailyLossLimit=" + account.DailyLossLimit
-				+ ";DisplayName=" + account.DisplayName
-				+ ";AccountStatus=" + account.AccountStatus.ToString()
-				);
+			if(accountItem == AccountItem.UnrealizedProfitLoss)
+				indicatorProxy.PrintLog(true, IsLiveTrading(), 
+					CurrentBar + ":OnAccountItemUpdate"
+					+ ";Name=" + account.DisplayName
+					+ ";Item=" + accountItem.ToString()
+					+ ";value=" + value
+					+ ";DailyLossLmt=" + account.DailyLossLimit
+					+ ";Status=" + account.AccountStatus.ToString()
+					);
 		}
 
 		protected override void OnConnectionStatusUpdate(ConnectionStatusEventArgs connectionStatusUpdate)
@@ -158,6 +165,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
 			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			SetIndicatorSignals();
 			GetTradeSignal();
 //			CheckNewEntryTrade();
 //			PutTrade();

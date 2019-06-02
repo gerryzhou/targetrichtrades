@@ -35,8 +35,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// 1) OnStateChange();
 	/// 2) OnBarUpdate();
 	/// 3) GetIndicatorSignal();
-	/// 4) CheckNewEntryTrade();
-	/// 5) PutTrade();
+	/// 4) GetTradeSignal();
+	/// 5) CheckNewEntryTrade();
+	/// 6) PutTrade();
+	/// Indicator Combination:
+	/// * SnR: daily high/low
+	/// * Breakout: morning breakout of the SnR, big bar cross the SnR
+	/// * Reversal Pivot: 9:00-11 AM morning session high/low
+	/// * Pullback Pivot: left 20+, right 5+, i.e. (20+, 5+)
+	/// * Trending pivot: breakout the pullback pivot, create a new (5+, 5+) pivot
 	/// </summary>
 	public class StgSample03 : GSZTraderBase
 	{
@@ -85,6 +92,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 				indicatorProxy.Log2Disk = true;
 				indicatorProxy.PrintLog(true, true, "Exception: " + ex.StackTrace);
 			}
+		}
+		
+		public override void SetIndicatorSignals(){
+			
 		}
 		
 		public override TradeSignal GetTradeSignal() {

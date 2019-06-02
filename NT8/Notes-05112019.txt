@@ -3,7 +3,7 @@ Dev plan:
 	1-2)hook up trade management(done);
 2) Multiple markets testing;
 3-1) Breakout Pattern-1: open/morning breakout the overnight range(first hour, first 30 minutes range),
- target vs range as the risk;
+ target vs range as the risk; (3-4 bars breakout setup on the SnR line)
 3-2) Breakout Pattern-2: open/morning breakout, the first pullback evaluation: 38.2/50/61.8
 3-3) Breakout Pattern-3: breakout the narrow range: three types of range a) flat range, b) expanding wedge, c) shrinking wedge;
  to find the trade, count the legs in the range, for a) three legs formed before breakout;
@@ -12,6 +12,8 @@ Dev plan:
  combined with volatility measurement to define stop loss and target;
 3-4) Breakout Pattern-: beat the strongest head(false breakout): the breakout from a narrow range got reversed; at the end of the trend, the last breakout got reversed;
 5) Trending/pullback Pattern-1: early-trend pullback, mid-trend pullback, late-trend pullback;
+5-1) Pullback Pivot: left 20+, right 5+, i.e. (20+, 5+)
+5-2) Trending pivot: breakout the pullback pivot, create a new (5+, 5+) pivot
 6) ES noon time range Pattern-1: resume or reversal?
 7) ZiZag: add percentage of the underling ZZ size as the threshold to generate new ZZ/pivot point;
 8) Volatility measurement: ZZ by 25% retracement;

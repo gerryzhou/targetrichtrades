@@ -53,13 +53,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Volatility measurement is for target, stop loss, etc.
 		/// </summary>
 		/// <returns></returns>
-		public Volatility GetVolatility() {return null;}
+		public virtual Volatility GetVolatility() {return null;}
 		
 		/// <summary>
 		/// MarketCycle is for 
 		/// </summary>
 		/// <returns></returns>
-		public MarketCycle GetMarketCycle() {return null;}
+		public virtual MarketCycle GetMarketCycle() {return null;}
 		
 		/// <summary>
 		/// Direction is to tell up/down, buy or sell;
@@ -81,7 +81,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public virtual DivergenceType CheckDivergence(GIndicatorBase indicator) {
 			return DivergenceType.UnKnown;
-		}		
+		}
+		
+		public virtual double GetMomentum() {
+			return 0;
+		}
 		
 		/// <summary>
 		/// The indicator signal is to trigger entry/exit, 
@@ -98,10 +102,29 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual TradeSignal GetTradeSignal() {return null;}
 		
 		/// <summary>
+		/// Set the indicator signals for each bar
+		/// </summary>
+		public virtual void SetIndicatorSignals(){}
+		
+		public virtual void SetVolatility(){}
+		
+		public virtual void SetDirection(){}
+		
+		public virtual void SetMarketCycle(){}
+		
+		public virtual void SetSnP(){}
+		
+		public virtual void SetInflection(){}
+		
+		public virtual void SetDivergence(){}
+		
+		public virtual void SetMomentum(){}
+		
+		/// <summary>
 		/// Detect if the market condition has changed or not since last signal
 		/// </summary>
 		/// <returns></returns>
-		public bool HasMarketContextChanged() {return false;}
+		public virtual bool HasMarketContextChanged() {return false;}
 		
 		
 		#region Variables
@@ -142,7 +165,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="barNo"></param>
 		/// <param name="signal_name"></param>
 		/// <returns></returns>
-		public IndicatorSignal GetIndicatorSignalAtBar(int barNo, string signal_name) {
+		public IndicatorSignal GetIndicatorSignalByName(int barNo, string signal_name) {
 			
 			if(this.indicatorSignals.ContainsKey(barNo)) {
 				List<IndicatorSignal> list_signal = this.indicatorSignals[barNo];
@@ -154,6 +177,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			return null;			
 		}
+		
+		public List<IndicatorSignal> GetIndicatorSignalByType(int barNo, SignalType signal_type) {
+			
+			if(this.indicatorSignals.ContainsKey(barNo)) {
+				List<IndicatorSignal> list_signal = this.indicatorSignals[barNo];
+				List<IndicatorSignal> list_sigByType = new List<IndicatorSignal>();
+				foreach(IndicatorSignal sig in list_signal) {
+					if(signal_type == sig.IndicatorSignalType)
+						list_sigByType.Add(sig);
+				}
+				return list_sigByType;
+			}
+			
+			return null;			
+		}		
 
 		#endregion
 
