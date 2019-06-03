@@ -17,6 +17,7 @@ Dev plan:
 6) ES noon time range Pattern-1: resume or reversal?
 7) ZiZag: add percentage of the underling ZZ size as the threshold to generate new ZZ/pivot point;
 8) Volatility measurement: ZZ by 25% retracement;
+9) Volume: check the first volume burst in the morning as the session start, 8:35 - 9:00;
 
 Meeting minutes 03/01/2019
 Gann: 50%, 75%, 25% instead of Fib ratios;
