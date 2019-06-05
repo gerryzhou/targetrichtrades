@@ -227,6 +227,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			return prc;
 		}
+		
+		public double GetTick4Symbol() {
+			return Instrument.MasterInstrument.TickSize;
+		}
 		#endregion
 		
 		#region Properties

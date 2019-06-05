@@ -19,6 +19,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.AddOns;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -26,80 +27,96 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
 	public class GIKeyReversal : GIndicatorBase
 	{
+		private MAX maxHi;
+		private MIN minLo;
+		private MAX maxLo;
+		private MIN minHi;				
+		
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
 			{
 				Description									= @"Key reversal up and down;";
 				Name										= "GIKeyReversal";
-				BarCount					= 3;
-				BarUp						= true;
-				HigherHigh					= true;
-				HigherLow					= true;
-				IsSuspendedWhileInactive	= true;
-
-				AddPlot(new Stroke(Brushes.DarkCyan, 2), PlotStyle.TriangleDown, NinjaTrader.Custom.Resource.NinjaScriptIndicatorDiff);
+				Calculate									= Calculate.OnBarClose;
+				IsOverlay									= true;
+				DisplayInDataBox							= true;
+				DrawOnPricePanel							= true;
+				DrawHorizontalGridLines						= true;
+				DrawVerticalGridLines						= true;
+				PaintPriceMarkers							= true;
+				ScaleJustification							= NinjaTrader.Gui.Chart.ScaleJustification.Right;
+				//Disable this property if your indicator requires custom values that cumulate with each new market data event. 
+				//See Help Guide for additional information.
+				IsSuspendedWhileInactive					= true;
+				PeriodLeft						= 15;
+				PeriodRight						= 5;
+				AddPlot(new Stroke(Brushes.DarkGreen, 2), PlotStyle.Dot, "KeyUp");
+				AddPlot(new Stroke(Brushes.Crimson, 2), PlotStyle.Dot, "KeyDn");
+			}
+			else if (State == State.Configure)
+			{
+			}
+			else if (State == State.DataLoaded) {
+				maxHi = MAX(High, PeriodLeft);
+				minLo = MIN(Low, PeriodLeft);
+				maxLo = MAX(Low, PeriodRight);
+				minHi = MIN(High, PeriodRight);
 			}
 		}
 
 		protected override void OnBarUpdate()
 		{
-			if (CurrentBar < BarCount)
-			{
-				return;//Value[0] = 0;
-			}
-			else
-			{
-				bool gotBars = false;
-
-				for (int i = 0; i < BarCount + 1; i++)
-				{
-					if (i == BarCount)
-					{
-						gotBars = true;
-						break;
-					}
-
-					if (!(Close[i] > Close[i + 1]))
-						break;
-
-					if (BarUp && !(Close[i] > Open[i]))
-						break;
-
-					if (HigherHigh && !(High[i] > High[i + 1]))
-						break;
-
-					if (HigherLow && !(Low[i] > Low[i + 1]))
-						break;
+			if (CurrentBar < PeriodLeft + 1)
+				return;
+//			if(Low[0] < min[1] && Close[0] > Close[1])
+//				KeyUp[0] =  Low[0] - 4*GetTick4Symbol();
+//			if(High[0] > max[1] && Close[0] < Close[1])
+//				KeyDn[0] = High[0] + 4*GetTick4Symbol();
+			if(Low[PeriodRight] == minLo[PeriodRight] && Low[0] == maxLo[0]){
+				if(KeyUp[PeriodRight+1] > 0) {
+					Print("KeyUp[PeriodRight+1]=" + KeyUp[PeriodRight+1]);
+					KeyUp[PeriodRight+1] = 0;
 				}
-
-				if(gotBars)
-					Value[0] = High[0] + 2; //gotBars ? 1 : 0;
+				KeyUp[PeriodRight] = Low[PeriodRight] - 4*TickSize;
+				Print("KeyUp[PeriodRight]=" + KeyUp[PeriodRight]);
+			}
+			if(High[PeriodRight] == maxHi[PeriodRight] && High[0] == minHi[0]) {
+				if(KeyDn[PeriodRight+1] > 0) {
+					Print("KeyDn[PeriodRight+1]=" + KeyDn[PeriodRight+1]);
+					KeyDn[PeriodRight+1] = 0;
+				}
+				KeyDn[PeriodRight] = High[PeriodRight] + 4*TickSize;
 			}
 		}
 
-
 		#region Properties
-		[Range(2, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarCount", GroupName = "NinjaScriptParameters", Order = 0)]
-		public int BarCount
+		[Range(1, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PeriodLeft", GroupName = "NinjaScriptParameters", Order = 0)]
+		public int PeriodLeft
 		{ get; set; }
 
-		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarUp", GroupName = "NinjaScriptParameters", Order = 1)]
-		public bool BarUp
+		[Range(1, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PeriodRight", GroupName = "NinjaScriptParameters", Order = 1)]
+		
+		public int PeriodRight
 		{ get; set; }
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public Series<double> KeyUp
+		{
+			get { return Values[0]; }
+		}
 
-		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "HigherHigh", GroupName = "NinjaScriptParameters", Order = 2)]
-		public bool HigherHigh
-		{ get; set; }
-
-		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "HigherLow", GroupName = "NinjaScriptParameters", Order = 3)]
-		public bool HigherLow
-		{ get; set; }
+		[Browsable(false)]
+		[XmlIgnore]
+		public Series<double> KeyDn
+		{
+			get { return Values[1]; }
+		}
 		#endregion
+
 	}
 }
 
@@ -110,18 +127,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GIKeyReversal[] cacheGIKeyReversal;
-		public GIKeyReversal GIKeyReversal(int barCount, bool barUp, bool higherHigh, bool higherLow)
+		public GIKeyReversal GIKeyReversal(int periodLeft, int periodRight)
 		{
-			return GIKeyReversal(Input, barCount, barUp, higherHigh, higherLow);
+			return GIKeyReversal(Input, periodLeft, periodRight);
 		}
 
-		public GIKeyReversal GIKeyReversal(ISeries<double> input, int barCount, bool barUp, bool higherHigh, bool higherLow)
+		public GIKeyReversal GIKeyReversal(ISeries<double> input, int periodLeft, int periodRight)
 		{
 			if (cacheGIKeyReversal != null)
 				for (int idx = 0; idx < cacheGIKeyReversal.Length; idx++)
-					if (cacheGIKeyReversal[idx] != null && cacheGIKeyReversal[idx].BarCount == barCount && cacheGIKeyReversal[idx].BarUp == barUp && cacheGIKeyReversal[idx].HigherHigh == higherHigh && cacheGIKeyReversal[idx].HigherLow == higherLow && cacheGIKeyReversal[idx].EqualsInput(input))
+					if (cacheGIKeyReversal[idx] != null && cacheGIKeyReversal[idx].PeriodLeft == periodLeft && cacheGIKeyReversal[idx].PeriodRight == periodRight && cacheGIKeyReversal[idx].EqualsInput(input))
 						return cacheGIKeyReversal[idx];
-			return CacheIndicator<GIKeyReversal>(new GIKeyReversal(){ BarCount = barCount, BarUp = barUp, HigherHigh = higherHigh, HigherLow = higherLow }, input, ref cacheGIKeyReversal);
+			return CacheIndicator<GIKeyReversal>(new GIKeyReversal(){ PeriodLeft = periodLeft, PeriodRight = periodRight }, input, ref cacheGIKeyReversal);
 		}
 	}
 }
@@ -130,14 +147,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GIKeyReversal GIKeyReversal(int barCount, bool barUp, bool higherHigh, bool higherLow)
+		public Indicators.GIKeyReversal GIKeyReversal(int periodLeft, int periodRight)
 		{
-			return indicator.GIKeyReversal(Input, barCount, barUp, higherHigh, higherLow);
+			return indicator.GIKeyReversal(Input, periodLeft, periodRight);
 		}
 
-		public Indicators.GIKeyReversal GIKeyReversal(ISeries<double> input , int barCount, bool barUp, bool higherHigh, bool higherLow)
+		public Indicators.GIKeyReversal GIKeyReversal(ISeries<double> input , int periodLeft, int periodRight)
 		{
-			return indicator.GIKeyReversal(input, barCount, barUp, higherHigh, higherLow);
+			return indicator.GIKeyReversal(input, periodLeft, periodRight);
 		}
 	}
 }
@@ -146,14 +163,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GIKeyReversal GIKeyReversal(int barCount, bool barUp, bool higherHigh, bool higherLow)
+		public Indicators.GIKeyReversal GIKeyReversal(int periodLeft, int periodRight)
 		{
-			return indicator.GIKeyReversal(Input, barCount, barUp, higherHigh, higherLow);
+			return indicator.GIKeyReversal(Input, periodLeft, periodRight);
 		}
 
-		public Indicators.GIKeyReversal GIKeyReversal(ISeries<double> input , int barCount, bool barUp, bool higherHigh, bool higherLow)
+		public Indicators.GIKeyReversal GIKeyReversal(ISeries<double> input , int periodLeft, int periodRight)
 		{
-			return indicator.GIKeyReversal(input, barCount, barUp, higherHigh, higherLow);
+			return indicator.GIKeyReversal(input, periodLeft, periodRight);
 		}
 	}
 }
