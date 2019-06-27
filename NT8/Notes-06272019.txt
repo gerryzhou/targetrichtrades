@@ -54,6 +54,34 @@ Issues:
 1) Exception handling: the expected condition does not exist;
 2) Risk parameters: if it's too large, take the trade or not?
 
+June 27, 2019
+circle for smi (-50, 50), diamond for >50 or <-50
+
+record the cross and level of the cross for SMI;
+the current price - KAMA, if the number is >= 0, we know the price is above KAMA,
+if the corss is <-40, then support defined as 5 candles low (stop level);
+resistance will be the  prior cross and it's the first target;
+** the peaks between (-40, 40) will be circles instead of diamond;
+the target will be high/low of the diamond;
+Only cross over from -40, 40 up/down to 40,-40 will be trigger;
+
+**Perhaps cirles to identify crossovers in SMI between -50 and 50 and use diamonds for crossovers above 50 and below -50
+** Goal to make the SMI less sensiteve for th 1 min chart for scalping
+** Measurement of interest - distance in ticks from the price to the KAMA
+** Record the cross and the level at the cross of the SMI that is (Current price)
+current price - KAMA >=0 then we know the price is above the KAMA and the KAMA gives us relative support
+** If level cross in SMI is <=40 (let's play with that #), we it's an extreme level so it sends us to the second shell
+support then defined as 5 candle low, Ultimate risk threshold there
+Resistance will be the prior cross and the first target
+(let's assume we always move with number of contract 2 or more
+Peaks and valleys give us support and resistance
+Peaks and valleys between -40 and 40 give us new regions of support and resistance
+Candle that holds inflection diamond will give us the target - use the high for long target and the low for short target
+Only positive crossovers in deep oversold territory
+Only negative crossovers in high overbought territory
+We need to work on the SMI some more - change levels...
+
+
 
 
 
