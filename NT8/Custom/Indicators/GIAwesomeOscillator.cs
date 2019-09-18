@@ -118,7 +118,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			Oscillator[0] = oscillatorValue;
 			Brush draw_color = new SolidColorBrush(Color.FromRgb(0, 0, 0));//Color.Black;
 			if(isRising && !IsRising(Oscillator)) {
-				Draw.Text(this, CurrentBar.ToString(), "O", 0, High[1]+10, draw_color);
+				Draw.Text(this, CurrentBar.ToString(), "T", 0, High[1]+10, draw_color);
 			} 
 			if(!isRising && IsRising(Oscillator)) {
 				Draw.Text(this, CurrentBar.ToString(), "B", 0, Low[1]-10, draw_color);

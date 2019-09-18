@@ -39,6 +39,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private Series<double>	hls;
 		private Series<double>	smis;
 		private Series<double>	tma;
+		private KAMA	kama;
 		
 		private GLastIndexRecorder<double> inflectionRecorder;
 		private GLastIndexRecorder<double> crossoverRecorder;
@@ -78,12 +79,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//high low diffs
 				hls		= new Series<double>(this);
 				//stochastic momentum indexes
-				smis	= new Series<double>(this);
-				
+				smis	= new Series<double>(this);				
 				//Time series MA for trend indentification
-				tma	= new Series<double>(this);
+				tma		= new Series<double>(this);
+				//KAMA for trend indentification
+				//kama	= new Series<double>(this);
 				
-			} else if(State == State.DataLoaded)
+			}
+			else if(State == State.DataLoaded)
 			{
 				//Save the inflection bar;
 				inflection = new Series<int>(this, MaximumBarsLookBack.Infinite);
@@ -92,6 +95,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//Save the crossover bar;
 				crossover = new Series<int>(this, MaximumBarsLookBack.Infinite);
 				crossoverRecorder = new GLastIndexRecorder<double>(this);
+				kama = KAMA(2, 10, 30);
 			}
 		}
 
@@ -123,7 +127,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			inflection[0] = 0;
 			crossover[0] = 0;
 			if (CurrentBar > BarsRequiredToPlot) {//BarsRequiredToPlot) {
-				int tr = GetTrendByMA();
+				int tr = GetTrendByKAMA();
 				int infl = GetInflection(SMITMA);
 				
 				if(tr > 0) PlotBrushes[1][0] = Brushes.Green;
@@ -142,18 +146,25 @@ namespace NinjaTrader.NinjaScript.Indicators
 					DrawDiamond(1, "spt"+CurrentBar, (3*Low[1]-High[1])/2, 0, Brushes.Aqua);
 				}
 				
+				string smiCrossTxt = "\r\n";
+				if(Math.Abs(smi[0]) >= 50)
+					smiCrossTxt = smiCrossTxt + "*";
+				else smiCrossTxt = smiCrossTxt + "o";
+				
 				if(CrossAbove(SMITMA, smi, 1)) {
 					crossover[0] = 1;
 					LastCrossover = CurrentBar;
-					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Up));
-					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + "\r\nX", 0, High[0]+5, Brushes.Black);
-				} else if (CrossBelow(SMITMA, smi, 1)) {
+					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Up));			
+					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + smiCrossTxt, 0, High[0]+5, Brushes.Black);
+				}
+				else if (CrossBelow(SMITMA, smi, 1)) {
 					crossover[0] = -1;
 					LastCrossover = CurrentBar;
 					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Down));
-					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + "\r\nX", 0, Low[0]-5, Brushes.Black);
+					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + smiCrossTxt, 0, Low[0]-5, Brushes.Black);
 				}
 			}
+			
 			if(CurrentBar > BarsRequiredToPlot && IsLastBarOnChart() > 0) {
 				Print("BarsRequiredToPlot=" + BarsRequiredToPlot);
 				for(int i=0; i<inflection.Count; i++){
@@ -177,6 +188,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			return tr;
 		}
+
+		/**
+		the current price - KAMA, if the number is >= 0, we know the price is above KAMA,
+		*/
+		private int GetTrendByKAMA(){
+			int tr = 0;			
+			if (CurrentBar > 20) {// BarsRequiredToPlot) {
+				if(kama[0] <= Close[0])
+					tr = 1;
+			else if(kama[0] >= Close[0])
+					tr = -1;
+			}
+			return tr;
+		}
 		
 		public Series<int> GetInflection() {
 			return inflection;
@@ -193,8 +218,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public override Direction GetDirection() {			
 			//Print(CurrentBar.ToString() + " -- GISMI GetDirection called");			
 			Direction dir = new Direction();
-			if(GetTrendByMA() > 0) dir.TrendDir = TrendDirection.Up;
-			else if (GetTrendByMA() < 0) dir.TrendDir = TrendDirection.Down;
+			if(GetTrendByKAMA() > 0) dir.TrendDir = TrendDirection.Up;
+			else if (GetTrendByKAMA() < 0) dir.TrendDir = TrendDirection.Down;
 			//Print(CurrentBar.ToString() + " -- GISMI GetTrendByMA(), GetDirection=" + GetTrendByMA() + "," + dir.TrendDir.ToString());
 			return dir;
 		}
