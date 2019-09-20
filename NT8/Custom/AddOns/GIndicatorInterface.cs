@@ -81,8 +81,16 @@ namespace NinjaTrader.NinjaScript.Indicators
 			this.indicatorSignals[barNo] = list_signal;
 		}
 		
-		public void AddIndicatorSignal(int barNo, string signame, SignalAction sigAction) {
-			
+		public void AddIndicatorSignal(int barNo, string signame, SignalActionType saType, SupportResistanceRange<double> snr) {
+			SignalAction sa = new SignalAction();
+			sa.SignalActionType = saType;
+			sa.SnR = snr;
+			IndicatorSignal isig = new IndicatorSignal();
+			isig.BarNo = barNo;
+			isig.SignalName = signame;
+			isig.IndicatorSignalType = SignalType.SimplePriceAction;
+			isig.Signal_Action = sa;
+			AddIndicatorSignal(barNo, isig);
 		}
 
 		/// <summary>
