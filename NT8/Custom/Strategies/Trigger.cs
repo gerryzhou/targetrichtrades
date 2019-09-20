@@ -13,6 +13,7 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 using NinjaTrader.NinjaScript.AddOns;
 #endregion

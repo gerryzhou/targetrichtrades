@@ -24,6 +24,7 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators.ZTraderPattern;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 using NinjaTrader.NinjaScript.Strategies;
 using NinjaTrader.NinjaScript.AddOns;
 #endregion

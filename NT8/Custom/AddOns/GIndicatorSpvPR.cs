@@ -22,6 +22,7 @@ using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.NinjaScript.Indicators.ZTraderPattern;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -57,7 +58,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// </summary>		
 		
 		protected Dictionary<string, List<MarketContext>> Dict_SpvPR =  null;
-		protected Dictionary<string,Dictionary<int,PriceAction>> Dict_SpvPR_Dep = null;
+		protected Dictionary<string,Dictionary<int, PriceAction>> Dict_SpvPR_Dep = null;
 		//private List<SpvPR> List_SpvPR = null; 
 		private List<PriceActionType> priceAction_Allowed = new List<PriceActionType>();
 	

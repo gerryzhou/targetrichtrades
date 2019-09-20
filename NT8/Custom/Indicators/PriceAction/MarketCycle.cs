@@ -22,9 +22,10 @@ using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
+namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 {
 	public class MarketCycle
 	{
 	}
 }
+

@@ -19,10 +19,11 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
+namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 {
 	public class MarketContext
 	{
@@ -67,6 +68,8 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	*/		
 	}
 }
+
+
 
 
 

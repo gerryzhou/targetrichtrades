@@ -19,6 +19,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 

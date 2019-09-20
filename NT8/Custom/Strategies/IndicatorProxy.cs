@@ -23,6 +23,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 #endregion
 
@@ -38,14 +39,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	{
 		private List<Indicator> listIndicator = new List<Indicator>();
 		protected TradeSignal tradeSignal;
-		
-		/// <summary>
-		/// The key=BarNo that holds the signal set
-		/// value=the set of signals
-		/// </summary>
-		private Dictionary<int, List<IndicatorSignal>> indicatorSignals = 
-			new Dictionary<int, List<IndicatorSignal>>();
-		
+			
 		protected GIndicatorProxy indicatorProxy;
 		//private IndicatorSignal indSignal;
 		
@@ -144,54 +138,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public void AddIndicator(Indicator i) {
 			this.listIndicator.Add(i);
 		}
-		
-		/// <summary>
-		/// Add the signal to the list of the bar with barNo
-		/// </summary>
-		/// <param name="barNo"></param>
-		/// <param name="signal"></param>
-		public void AddIndicatorSignals(int barNo, IndicatorSignal signal) {
-			List<IndicatorSignal> list_signal;
-			if(!this.indicatorSignals.TryGetValue(barNo, out list_signal)) {				
-				list_signal = new List<IndicatorSignal>();
-			}
-			list_signal.Add(signal);
-			this.indicatorSignals[barNo] = list_signal;
-		}
-		
-		/// <summary>
-		/// Get the signal from bar with barNo and the signal_name
-		/// </summary>
-		/// <param name="barNo"></param>
-		/// <param name="signal_name"></param>
-		/// <returns></returns>
-		public IndicatorSignal GetIndicatorSignalByName(int barNo, string signal_name) {
-			
-			if(this.indicatorSignals.ContainsKey(barNo)) {
-				List<IndicatorSignal> list_signal = this.indicatorSignals[barNo];
-				foreach(IndicatorSignal sig in list_signal) {
-					if(signal_name.Equals(sig.SignalName))
-						return sig;
-				}
-			}
-			
-			return null;			
-		}
-		
-		public List<IndicatorSignal> GetIndicatorSignalByType(int barNo, SignalType signal_type) {
-			
-			if(this.indicatorSignals.ContainsKey(barNo)) {
-				List<IndicatorSignal> list_signal = this.indicatorSignals[barNo];
-				List<IndicatorSignal> list_sigByType = new List<IndicatorSignal>();
-				foreach(IndicatorSignal sig in list_signal) {
-					if(signal_type == sig.IndicatorSignalType)
-						list_sigByType.Add(sig);
-				}
-				return list_sigByType;
-			}
-			
-			return null;			
-		}		
 
 		#endregion
 

@@ -90,7 +90,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 	/// Define the range with the support and resistance
 	/// SnR could be two bars, or two lines, which form a range
 	/// </summary>
-	/// <typeparam name="T">SupportResistanceBar or SupportResistanceLine</typeparam>
+	/// <typeparam name="T">SupportResistanceBar, SupportResistanceLine or double</typeparam>
 	public class SupportResistanceRange<T> {
 		[NinjaScriptProperty]
         [Browsable(false)]

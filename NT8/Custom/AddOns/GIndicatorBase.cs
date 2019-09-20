@@ -193,12 +193,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// </summary>
 		/// <param name="barNo"></param>
 		/// <returns>the number of bars ago for last crossover</returns>
-		public int GetLastCrossover(Series<int> crossover, int barNo, CrossoverType crsType, BarIndexType barIdxType) {
+		public int GetLastCrossover(Series<int> crossover, int barNo, LineCrossType crsType, BarIndexType barIdxType) {
 			int crsov = -1;
 			for(int i = 1; i<barNo-BarsRequiredToPlot-1; i++) {
-				if((crossover[i]>0 && crsType == CrossoverType.Above) ||
-					(crossover[i]<0 && crsType == CrossoverType.Below) ||
-					(crossover[i] != 0 && crsType == CrossoverType.Both))
+				if((crossover[i]>0 && crsType == LineCrossType.Above) ||
+					(crossover[i]<0 && crsType == LineCrossType.Below) ||
+					(crossover[i] != 0 && crsType == LineCrossType.Both))
 					crsov = i;
 			}
 			if(barIdxType == BarIndexType.BarNO)

@@ -34,11 +34,13 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
     public enum Breakout { Up = 1, Down = -1, UnKnown = 0 };
     public enum Reversal { Up = 1, Down = -1, UnKnown = 0 };
 	public enum SupportResistanceType {Support = 1, Resistance = -1, Unknown = 0};
-	public enum CrossoverType {Above, Below, Both};
+	public enum LineCrossType {Above, Below, Both}; //over/under or above/below
 	public enum DivergenceType {Divergent=-1, Convergent=1, UnKnown=0};
+
+	public enum SignalType {Direction, Volatility, SnR, SimplePriceMove, Unknown};
 	
-	public enum SignalType {TrendDirection, Breakout, Reversal, SnR, CrossOver,
-							Divergence, Inflection, Unknow};
+	public enum SignalActionType {Breakout, Pullback, Reversal, CrossOver, CrossUnder,
+							Divergence, Convergence, Inflection, Unknown};
 	
 	//The size of High-Low of the bar
 	public enum BarRangeType {Doji, Small, Large, Huge};
@@ -58,12 +60,28 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		WBEarly, WBMiddle, WBEnd,
 		WCEarly, WCMiddle, WCEnd };
 	
-	public enum MovingAvgType {SMA, EMA, TMA};
+	public enum MovingAvgType {SMA, EMA, TMA, KAMA};
 	
 	public enum FibRatioType { R1, R2, R3, R4, R5, E1, E2, E3, E4, E5, E6};
 	
 	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4};
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

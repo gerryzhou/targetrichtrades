@@ -19,22 +19,28 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
+namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 {
-	public class Volatility
+	public class Direction
 	{
-		/// <summary>
-		/// Volatility in a time period: 
-		/// max range;
-		/// max swing;
-		/// average swing size;
-		/// 
-		/// </summary>
-		private double hi;
+		private TrendDirection trendDir = TrendDirection.UnKnown;
 		
+		#region Properties		
+		/// <summary>
+		/// </summary>
+		[Browsable(false)]
+		[XmlIgnore()]
+		[DefaultValueAttribute(TrendDirection.UnKnown)]
+		public TrendDirection TrendDir
+		{
+			get { return trendDir; }
+			set { trendDir = value; }
+		}		
+		#endregion
 	}
 }
 

@@ -19,10 +19,11 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
+namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 {
 	/// <summary>
 	/// Fibonacci ratio: retracement and extensions
@@ -118,6 +119,8 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		}
 	}	
 }
+
+
 
 
 

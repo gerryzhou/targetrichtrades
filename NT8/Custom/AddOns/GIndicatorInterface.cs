@@ -20,6 +20,8 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -32,8 +34,16 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class GIndicatorBase : Indicator
 	{
 		private List<Indicator> listIndicator = new List<Indicator>();
-		private IndicatorSignal indSignal;
-	
+		//private IndicatorSignal indSignal;
+		
+		/// <summary>
+		/// Hold the indicator signal from the underlining indicator
+		/// The key=BarNo that holds the signal set
+		/// value=the set of signals
+		/// </summary>
+		private SortedDictionary<int, List<IndicatorSignal>> indicatorSignals = 
+			new SortedDictionary<int, List<IndicatorSignal>>();
+		
 		#region Methods
 		
 		public Volatility GetVolatility() {return null;}
@@ -52,6 +62,81 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public IndicatorSignal CheckIndicatorSignal() {
 			return null;
 		}
+		
+		public void AddIndicatorSignals(int barNo, List<IndicatorSignal> signals) {
+			this.indicatorSignals.Add(barNo, signals);
+		}
+		
+		/// <summary>
+		/// Add the signal to the list of the bar with barNo
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal"></param>
+		public void AddIndicatorSignal(int barNo, IndicatorSignal signal) {
+			List<IndicatorSignal> list_signal;
+			if(!this.indicatorSignals.TryGetValue(barNo, out list_signal)) {				
+				list_signal = new List<IndicatorSignal>();
+			}
+			list_signal.Add(signal);
+			this.indicatorSignals[barNo] = list_signal;
+		}
+		
+		public void AddIndicatorSignal(int barNo, string signame, SignalAction sigAction) {
+			
+		}
+
+		/// <summary>
+		/// Get the signal list for the bar 
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <returns></returns>
+		public List<IndicatorSignal> GetIndicatorSignals(int barNo) {
+			List<IndicatorSignal> list_signal;
+			if(!this.indicatorSignals.TryGetValue(barNo, out list_signal))			
+				return null;
+			else
+				return list_signal;
+		}
+		
+		/// <summary>
+		/// Get the signal from bar with barNo and the signal_name
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal_name"></param>
+		/// <returns></returns>
+		public IndicatorSignal GetIndicatorSignalByName(int barNo, string signal_name) {
+			
+			if(this.indicatorSignals.ContainsKey(barNo)) {
+				List<IndicatorSignal> list_signal = this.indicatorSignals[barNo];
+				foreach(IndicatorSignal sig in list_signal) {
+					if(signal_name.Equals(sig.SignalName))
+						return sig;
+				}
+			}
+			
+			return null;			
+		}
+		
+		/// <summary>
+		/// Get the signal list for the bar by signal type
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal_type"></param>
+		/// <returns></returns>
+		public List<IndicatorSignal> GetIndicatorSignalByType(int barNo, SignalType signal_type) {
+			
+			if(this.indicatorSignals.ContainsKey(barNo)) {
+				List<IndicatorSignal> list_signal = this.indicatorSignals[barNo];
+				List<IndicatorSignal> list_sigByType = new List<IndicatorSignal>();
+				foreach(IndicatorSignal sig in list_signal) {
+					if(signal_type == sig.IndicatorSignalType)
+						list_sigByType.Add(sig);
+				}
+				return list_sigByType;
+			}
+			
+			return null;			
+		}		
 		
 		public void AddIndicator(Indicator i) {
 			this.listIndicator.Add(i);

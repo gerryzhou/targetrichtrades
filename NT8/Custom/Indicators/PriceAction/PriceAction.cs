@@ -19,17 +19,19 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
+namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 {
     /// <summary>
-    /// This file holds all price action classes.
-    /// </summary>
-    //public enum PriceActionType { UpTight, UpWide, DnTight, DnWide, RngTight, RngWide, UnKnown };
-    /// <summary>
-    /// PriceAction include PriceAtionType and the volatility measurement
+    /// This file holds main price action classes.
+    /// Price action generally refers to the up and down movement of a security's price when it is plotted over time.
+	/// PriceAction includes SimplePriceMove and CombinedPriceMoves;
+    /// enum PriceActionType { UpTight, UpWide, DnTight, DnWide, RngTight, RngWide, UnKnown };
+    ///
+    /// PriceAtion and volatility measurement
     /// min and max ticks of up/down expected
     /// shrinking, expanding, or paralleling motion;
     /// </summary>
@@ -53,6 +55,9 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 }
 	
 	
+
+
+
 
 
 

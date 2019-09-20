@@ -22,6 +22,7 @@ using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.AddOns;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 #endregion
 

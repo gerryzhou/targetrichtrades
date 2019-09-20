@@ -19,6 +19,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -26,14 +27,15 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 {
 	/// <summary>
 	/// This object carry the signal that can trigger a trade (entry or exit)
+	/// It includes:
+	/// * BarNo, SigName, SigType
+	/// * SignalAction: breakout, reversal, pullback, crossOver/Under, inflection, etc.
+	/// * Direction
+	/// * Volatility
+	/// * SnR
 	/// </summary>
 	public class IndicatorSignal
-	{	
-		private Direction trendDir = new Direction();//TrendDirection.UnKnown; //1=up, -1=down, 0=flat/unknown
-		private Breakout breakoutDir = Breakout.UnKnown; //1=bk up, -1=bk down, 0=no bk/unknown
-		private Reversal reversalDir = Reversal.UnKnown; //1=rev up, -1=rev down, 0=no rev/unknown
-		private SupportResistanceRange<SupportResistanceBar> sptRst;
-		
+	{			
 		#region Protperies
 		/// <summary>
 		/// The barNo the signal refer to
@@ -70,35 +72,53 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		[XmlIgnore]
 		//[DefaultValueAttribute(TrendDirection.UnKnown)]
 		public Direction TrendDir {
-			get { return trendDir;}
-			set { trendDir = value;}
+			get; set;
 		}
 
 		[Browsable(false)]
 		[XmlIgnore]
 		[DefaultValueAttribute(Breakout.UnKnown)]
 		public Breakout BreakoutDir {
-			get { return breakoutDir;}
-			set { breakoutDir = value;}
+			get; set;
 		}
 		
 		[Browsable(false)]
 		[XmlIgnore]
 		[DefaultValueAttribute(Reversal.UnKnown)]
 		public Reversal ReversalDir {
-			get { return reversalDir;}
-			set { reversalDir = value;}
+			get; set;
 		}
 		
 		[Browsable(false)]
 		[XmlIgnore]
 		public SupportResistanceRange<SupportResistanceBar> SnR {
-			get { return sptRst;}
-			set { sptRst = value;}
-		}		
+			get; set;
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public SignalAction Signal_Action {
+			get; set;
+		}	
 		#endregion
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

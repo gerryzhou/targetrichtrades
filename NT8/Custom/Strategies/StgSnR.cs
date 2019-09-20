@@ -21,6 +21,7 @@ using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.NinjaScript.Indicators.ZTraderPattern;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Strategies;
 using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
