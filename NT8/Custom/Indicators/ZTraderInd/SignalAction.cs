@@ -33,10 +33,6 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	/// </summary>
 	public class SignalAction
 	{	
-		SignalType signalType = SignalType.Unknown;
-		
-		SupportResistanceRange<double> sptRst;
-		
 		#region Protperies
 		/// <summary>
 		/// The type of the signal
@@ -56,18 +52,3 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		#endregion
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
