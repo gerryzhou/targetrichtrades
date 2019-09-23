@@ -104,6 +104,15 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 	/// </summary>
 	/// <typeparam name="T">SupportResistanceBar, SupportResistanceLine or double</typeparam>
 	public class SupportResistanceRange<T> {
+		
+		public SupportResistanceRange() {
+		}
+		
+		public SupportResistanceRange (T spt, T rst) {
+			Support = spt;
+			Resistance = rst;
+		}
+		
 		[NinjaScriptProperty]
         [Browsable(false)]
 		[XmlIgnore()]
@@ -117,6 +126,11 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 		{ get; set; }
 	}	
 }
+
+
+
+
+
 
 
 

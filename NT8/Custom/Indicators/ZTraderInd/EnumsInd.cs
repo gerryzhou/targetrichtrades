@@ -38,10 +38,11 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	public enum DivergenceType {Divergent=-1, Convergent=1, UnKnown=0};
 
 	public enum SignalType {Direction, Volatility, SnR,
-							SimplePriceAction, CombinedPriceAction, Unknown};
+					SimplePriceAction, CombinedPriceAction, Unknown};
 	
-	public enum SignalActionType {Breakout, Pullback, Reversal, CrossOver, CrossUnder,
-							Divergence, Convergence, Inflection, Unknown};
+	public enum SignalActionType {BreakoutUp, BreakoutDn, PullbackUp, PullbackDn, ReversalUp, ReversalDn,
+					CrossOver, CrossUnder, Divergence, Convergence, InflectionUp, InflectionDn,
+					Flat, Unknown};
 	
 	//The size of High-Low of the bar
 	public enum BarRangeType {Doji, Small, Large, Huge};
@@ -67,6 +68,8 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	
 	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4};
 }
+
+
 
 
 
