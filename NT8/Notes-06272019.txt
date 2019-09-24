@@ -10,7 +10,7 @@ Dev plan:
  for b) at least two points expanding; the first big leg breakout attempt could be false breakout, it happened to morning open breakout; 
  for c) at least shrink to half of the initial range, with two or three points shrinking;
  combined with volatility measurement to define stop loss and target;
-3-4) Breakout Pattern-: beat the strongest head(false breakout): the breakout from a narrow range got reversed; at the end of the trend, the last breakout got reversed;
+3-4) Breakout Pattern-4: beat the strongest head(false breakout): the breakout from a narrow range got reversed; at the end of the trend, the last breakout got reversed;
 5) Trending/pullback Pattern-1: early-trend pullback, mid-trend pullback, late-trend pullback;
 5-1) Pullback Pivot: left 20+, right 5+, i.e. (20+, 5+)
 5-2) Trending pivot: breakout the pullback pivot, create a new (5+, 5+) pivot
@@ -19,7 +19,7 @@ Dev plan:
 8) Volatility measurement: ZZ by 25% retracement;
 9) Volume: check the first volume burst in the morning as the session start, 8:35 - 9:00;
 10) Signal combination: volatility+direction+momentum;
-10-1) Define a list of signals for each bar to look back previous signals;
+10-1) Define a list of signals for each bar to look back previous signals;(done)
 11) Market Context definition for spvPR: 
 12) Reversal pattern:
 12-1) 1-2-3-4 reversal: after the trend lasts at least 30 mins; 1-the first reversal attempt failed; 2-the last trend resumption creat new high/low; 3-two bar reversal or hammer/wick appears; 4-the first pull-back of the reversal swing is the entry point;
