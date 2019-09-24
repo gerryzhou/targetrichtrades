@@ -74,7 +74,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Print(this.Name + " set DataLoaded called....");
 				//indicatorProxy = new GIndicatorBase();
 				//indicatorProxy = GIndicatorProxy(1);
-				giSMI = GISMI(3, 5, 5, 8);
+				giSMI = GISMI(3, 5, 5, 8, 50);
 				giSnR = GISnR(ShowOvernightHL, ShowOpenHL, ShowLastDayHL);
 				//awOscillator = GIAwesomeOscillator(5, 34, 5, MovingAvgType.SMA);
 

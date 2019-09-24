@@ -29,15 +29,13 @@ using NinjaTrader.NinjaScript.AddOns;
 namespace NinjaTrader.NinjaScript.Indicators
 {
 	public class GISMI : GIndicatorBase
-	{
-		public const string SignalName_Inflection = "Inflection";
-		public const string SignalName_LineCross = "LineCross";
-		
+	{	
 		private int	range		= 5;
 		private int	emaperiod1	= 3;
 		private int	emaperiod2	= 5;
 		private int smitmaperiod= 8;
 		private int tmaperiod= 6;
+		private int smiCrossLevel = 50;
 		
 		private Series<double>	sms;
 		private Series<double>	hls;
@@ -155,14 +153,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 				}
 				
 				string smiCrossTxt = "\r\n";
-				if(Math.Abs(smi[0]) >= 50)
+				if(Math.Abs(smi[0]) >= SMICrossLevel)
 					smiCrossTxt = smiCrossTxt + "*";
 				else smiCrossTxt = smiCrossTxt + "o";
 				
 				if(CrossAbove(SMITMA, smi, 1)) {
 					crossover[0] = 1;
 					LastCrossover = CurrentBar;
-					SaveSignal(LastInflection, SignalName_LineCross, SignalActionType.CrossOver,
+					SaveSignal(LastCrossover, SignalName_LineCross, SignalActionType.CrossOver,
 					new SupportResistanceRange<double>(-1, -1));
 					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Up));			
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + smiCrossTxt, 0, High[0]+5, Brushes.Black);
@@ -170,12 +168,26 @@ namespace NinjaTrader.NinjaScript.Indicators
 				else if (CrossBelow(SMITMA, smi, 1)) {
 					crossover[0] = -1;
 					LastCrossover = CurrentBar;
-					SaveSignal(LastInflection, SignalName_LineCross, SignalActionType.CrossUnder,
+					SaveSignal(LastCrossover, SignalName_LineCross, SignalActionType.CrossUnder,
 					new SupportResistanceRange<double>(-1, -1));
 					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Down));
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + smiCrossTxt, 0, Low[0]-5, Brushes.Black);
 				}
 			}
+			IndicatorSignal indSig = GetLastIndicatorSignalByName(CurrentBar, SignalName_Inflection);
+			
+			if(indSig != null && indSig.Signal_Action != null)
+				Print(CurrentBar + ":Last " + SignalName_Inflection + "=" + indSig.BarNo + "," + indSig.Signal_Action.SignalActionType.ToString());
+	
+			IndicatorSignal indSigCrs = GetLastIndicatorSignalByName(CurrentBar, SignalName_LineCross);
+			
+			if(indSigCrs != null && indSigCrs.Signal_Action != null)
+				Print(CurrentBar + ":Last " + SignalName_LineCross + "=" + indSigCrs.BarNo + "," + indSigCrs.Signal_Action.SignalActionType.ToString());
+			
+			List<IndicatorSignal> listSig = GetLastIndicatorSignalByType(CurrentBar, SignalType.SimplePriceAction);
+			if(listSig != null)
+			foreach(IndicatorSignal sig in listSig)
+				Print(CurrentBar + ":LastSimpleSignal=" + sig.BarNo + "," + sig.SignalName + "," + sig.Signal_Action.SignalActionType.ToString());
 			
 			if(CurrentBar > BarsRequiredToPlot && IsLastBarOnChart() > 0) {
 				Print("BarsRequiredToPlot=" + BarsRequiredToPlot);
@@ -390,6 +402,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 			set { smitmaperiod = Math.Max(1, value);}
 		}
 
+		[Range(0, int.MaxValue)]
+		[NinjaScriptProperty]
+		[Display(Name="SMICrossLevel", Description="SMI&TMA Cross Level", Order=5, GroupName="Parameters")]
+		public int SMICrossLevel
+		{
+			get { return smiCrossLevel;}
+			set { smiCrossLevel = Math.Max(0, value);}
+		}
+
 		[Browsable(false)]
 		[XmlIgnore]
 		public Series<double> smi
@@ -430,6 +451,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 			
 			set {lastCrossover = value;}
 		}
+
+		[Browsable(false)]
+		[XmlIgnore]
+		public string SignalName_Inflection
+		{
+			get { return "Inflection";}
+		}
+
+		[Browsable(false)]
+		[XmlIgnore]
+		public string SignalName_LineCross
+		{
+			get { return "LineCross";}
+		}
 		
 		#endregion		
 	}
@@ -442,18 +477,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GISMI[] cacheGISMI;
-		public GISMI GISMI(int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod)
+		public GISMI GISMI(int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod, int sMICrossLevel)
 		{
-			return GISMI(Input, eMAPeriod1, eMAPeriod2, range, sMITMAPeriod);
+			return GISMI(Input, eMAPeriod1, eMAPeriod2, range, sMITMAPeriod, sMICrossLevel);
 		}
 
-		public GISMI GISMI(ISeries<double> input, int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod)
+		public GISMI GISMI(ISeries<double> input, int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod, int sMICrossLevel)
 		{
 			if (cacheGISMI != null)
 				for (int idx = 0; idx < cacheGISMI.Length; idx++)
-					if (cacheGISMI[idx] != null && cacheGISMI[idx].EMAPeriod1 == eMAPeriod1 && cacheGISMI[idx].EMAPeriod2 == eMAPeriod2 && cacheGISMI[idx].Range == range && cacheGISMI[idx].SMITMAPeriod == sMITMAPeriod && cacheGISMI[idx].EqualsInput(input))
+					if (cacheGISMI[idx] != null && cacheGISMI[idx].EMAPeriod1 == eMAPeriod1 && cacheGISMI[idx].EMAPeriod2 == eMAPeriod2 && cacheGISMI[idx].Range == range && cacheGISMI[idx].SMITMAPeriod == sMITMAPeriod && cacheGISMI[idx].SMICrossLevel == sMICrossLevel && cacheGISMI[idx].EqualsInput(input))
 						return cacheGISMI[idx];
-			return CacheIndicator<GISMI>(new GISMI(){ EMAPeriod1 = eMAPeriod1, EMAPeriod2 = eMAPeriod2, Range = range, SMITMAPeriod = sMITMAPeriod }, input, ref cacheGISMI);
+			return CacheIndicator<GISMI>(new GISMI(){ EMAPeriod1 = eMAPeriod1, EMAPeriod2 = eMAPeriod2, Range = range, SMITMAPeriod = sMITMAPeriod, SMICrossLevel = sMICrossLevel }, input, ref cacheGISMI);
 		}
 	}
 }
@@ -462,14 +497,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GISMI GISMI(int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod)
+		public Indicators.GISMI GISMI(int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod, int sMICrossLevel)
 		{
-			return indicator.GISMI(Input, eMAPeriod1, eMAPeriod2, range, sMITMAPeriod);
+			return indicator.GISMI(Input, eMAPeriod1, eMAPeriod2, range, sMITMAPeriod, sMICrossLevel);
 		}
 
-		public Indicators.GISMI GISMI(ISeries<double> input , int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod)
+		public Indicators.GISMI GISMI(ISeries<double> input , int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod, int sMICrossLevel)
 		{
-			return indicator.GISMI(input, eMAPeriod1, eMAPeriod2, range, sMITMAPeriod);
+			return indicator.GISMI(input, eMAPeriod1, eMAPeriod2, range, sMITMAPeriod, sMICrossLevel);
 		}
 	}
 }
@@ -478,14 +513,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GISMI GISMI(int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod)
+		public Indicators.GISMI GISMI(int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod, int sMICrossLevel)
 		{
-			return indicator.GISMI(Input, eMAPeriod1, eMAPeriod2, range, sMITMAPeriod);
+			return indicator.GISMI(Input, eMAPeriod1, eMAPeriod2, range, sMITMAPeriod, sMICrossLevel);
 		}
 
-		public Indicators.GISMI GISMI(ISeries<double> input , int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod)
+		public Indicators.GISMI GISMI(ISeries<double> input , int eMAPeriod1, int eMAPeriod2, int range, int sMITMAPeriod, int sMICrossLevel)
 		{
-			return indicator.GISMI(input, eMAPeriod1, eMAPeriod2, range, sMITMAPeriod);
+			return indicator.GISMI(input, eMAPeriod1, eMAPeriod2, range, sMITMAPeriod, sMICrossLevel);
 		}
 	}
 }
