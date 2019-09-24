@@ -148,6 +148,43 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			return null;			
 		}
+
+		/// <summary>
+		/// Get the signal from bar with barNo and the signalActionType
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signalActionType"></param>
+		/// <returns></returns>
+		public IndicatorSignal GetIndicatorSignalByActionType(int barNo, SignalActionType signal_actiontype) {
+			List<IndicatorSignal> list_signal = GetIndicatorSignals(barNo);
+			if(list_signal != null) {				
+				foreach(IndicatorSignal sig in list_signal) {
+					if(sig.Signal_Action != null && 
+						signal_actiontype.Equals(sig.Signal_Action.SignalActionType))
+						return sig;
+				}
+			}
+			
+			return null;			
+		}
+
+		/// <summary>
+		/// Get the last signal before barNo by signalActionType
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signalActionType"></param>
+		/// <returns></returns>
+		public IndicatorSignal GetLastIndicatorSignalByActionType(int barNo, SignalActionType signal_actiontype) {
+			int k = barNo;
+			foreach(int kk in this.indicatorSignals.Keys.Reverse()) {				
+				if(kk < k) {
+					IndicatorSignal sig = GetIndicatorSignalByActionType(k, signal_actiontype);
+					if(sig != null) return sig;
+					k = kk;
+				}
+			}
+			return null;			
+		}
 		
 		/// <summary>
 		/// Get the signal list for the bar by signal type

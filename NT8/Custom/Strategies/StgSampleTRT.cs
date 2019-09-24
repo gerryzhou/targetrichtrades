@@ -124,7 +124,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override TradeSignal GetTradeSignal() {
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			TradeSignal trdSignal = new TradeSignal();
-			Direction dir = new Direction();
+			Direction dir = giSMI.GetDirection();// new Direction();
 			PatternMatched();
 			c0 = Close[0];
 			
@@ -134,11 +134,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";lo3=" + lo3
 			+ ";BarsLookback=" + BarsLookback);
 			
-			if(c0 > hi3)
-				dir.TrendDir = TrendDirection.Up;
+//			if(c0 > hi3)
+//				dir.TrendDir = TrendDirection.Up;
 
-			if(c0 < lo3)
-				dir.TrendDir = TrendDirection.Down;
+//			if(c0 < lo3)
+//				dir.TrendDir = TrendDirection.Down;
 			trdSignal.TrendDir = dir;
 			
 			this.tradeSignal = trdSignal;

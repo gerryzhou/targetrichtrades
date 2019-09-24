@@ -56,7 +56,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if (State == State.SetDefaults)
 			{
 				Print("GISMI set defaults called....");
-				Description									= @"SMI.";
+				Description									= @"GISMI.";
 				Name										= "GISMI";
 				Calculate					= Calculate.OnBarClose;
 				IsOverlay					= false;
@@ -138,7 +138,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				if(infl < 0) {
 					inflection[1] = -1;
 					LastInflection = CurrentBar - 1;
-					inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastInflection, LookbackBarType.Up));
+					//inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastInflection, LookbackBarType.Up));
 					SaveSignal(LastInflection, SignalName_Inflection, SignalActionType.InflectionUp, 
 					new SupportResistanceRange<double>(-1, -1));
 					DrawDiamond(1, "res"+CurrentBar, (3*High[1]-Low[1])/2, 0, Brushes.Red);
@@ -148,7 +148,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 					LastInflection = CurrentBar - 1;
 					SaveSignal(LastInflection, SignalName_Inflection, SignalActionType.InflectionDn,
 					new SupportResistanceRange<double>(-1, -1));
-					inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastInflection, LookbackBarType.Down));
+					//inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastInflection, LookbackBarType.Down));
 					DrawDiamond(1, "spt"+CurrentBar, (3*Low[1]-High[1])/2, 0, Brushes.Aqua);
 				}
 				
@@ -162,7 +162,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 					LastCrossover = CurrentBar;
 					SaveSignal(LastCrossover, SignalName_LineCross, SignalActionType.CrossOver,
 					new SupportResistanceRange<double>(-1, -1));
-					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Up));			
+					//crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Up));			
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + smiCrossTxt, 0, High[0]+5, Brushes.Black);
 				}
 				else if (CrossBelow(SMITMA, smi, 1)) {
@@ -170,7 +170,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 					LastCrossover = CurrentBar;
 					SaveSignal(LastCrossover, SignalName_LineCross, SignalActionType.CrossUnder,
 					new SupportResistanceRange<double>(-1, -1));
-					crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Down));
+					//crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Down));
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + smiCrossTxt, 0, Low[0]-5, Brushes.Black);
 				}
 			}
@@ -217,11 +217,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 		the current price - KAMA, if the number is >= 0, we know the price is above KAMA,
 		*/
 		private int GetTrendByKAMA(){
-			int tr = 0;			
+			int tr = 0;
+			double k = Math.Round(kama[0], 2);
+			double dif = Close[0] - k;
+			Print(CurrentBar + "-Kama dif=" + dif + ",kama=" + k + ",close=" + Close[0]);
 			if (CurrentBar > 20) {// BarsRequiredToPlot) {
-				if(kama[0] <= Close[0])
+				if(dif > 0)
 					tr = 1;
-			else if(kama[0] >= Close[0])
+			else if(dif < 0)
 					tr = -1;
 			}
 			return tr;
@@ -231,8 +234,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return inflection;
 		}
 		
-		public bool IsNewInflection(TrendDirection trendDir) {
-			return LastInflection == GetLastInflection(GetInflection(), CurrentBar, trendDir, BarIndexType.BarNO);
+		public bool IsNewInflection(SignalActionType sat) {
+			//return LastInflection == GetLastInflection(GetInflection(), CurrentBar, trendDir, BarIndexType.BarNO);
+			IndicatorSignal sig = GetLastIndicatorSignalByActionType(CurrentBar, sat);
+			return LastInflection == sig.BarNo;
 		}
 		
 		public Series<int> GetCrossover() {
@@ -244,7 +249,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			Direction dir = new Direction();
 			if(GetTrendByKAMA() > 0) dir.TrendDir = TrendDirection.Up;
 			else if (GetTrendByKAMA() < 0) dir.TrendDir = TrendDirection.Down;
-			//Print(CurrentBar.ToString() + " -- GISMI GetTrendByMA(), GetDirection=" + GetTrendByMA() + "," + dir.TrendDir.ToString());
+			Print(CurrentBar + " - GISMI GetTrendByKAMA()=" + GetTrendByKAMA() + ", dir=" + dir.TrendDir.ToString());
 			return dir;
 		}
 
@@ -258,14 +263,16 @@ namespace NinjaTrader.NinjaScript.Indicators
 			SupportResistanceBar rst = new SupportResistanceBar();
 			SupportResistanceBar spt = new SupportResistanceBar();
 
-			GLastIndexRecord<double> rec1 = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Down);
-			GLastIndexRecord<double> rec2 = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Up);
+			//GLastIndexRecord<double> rec1 = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Down);
+			//GLastIndexRecord<double> rec2 = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Up);
+			IndicatorSignal rec1 = GetLastIndicatorSignalByActionType(barNo, SignalActionType.InflectionDn);
+			IndicatorSignal rec2 = GetLastIndicatorSignalByActionType(barNo, SignalActionType.InflectionDn);
 			int lcrs1 = -1, lcrs2 = -1;
 			if(rec1 != null) {
-				lcrs1 = rec1.BarNumber;
+				lcrs1 = rec1.BarNo;//.BarNumber;
 			}
 			if(rec2 != null) {
-				lcrs2 = rec2.BarNumber;
+				lcrs2 = rec2.BarNo;//.BarNumber;
 			}
 			if(barNo > 17600 && barNo < 17650)
 				Print(CurrentBar + "-Rst, Spt, barNo=" + lcrs1 + "," + lcrs2 + "," + barNo);
@@ -280,7 +287,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				double close_lcrs = Close.GetValueAt(lcrs1);
 				rst.BarNo = lcrs1;
 				rst.SnRType = SupportResistanceType.Resistance;
-				rst.SnRPriceType = open_lcrs < close_lcrs ? PriceSubtype.Open : PriceSubtype.Close;
+				rst.SnRPriceType = open_lcrs > close_lcrs ? PriceSubtype.Open : PriceSubtype.Close;
 				rng.Resistance = rst;
 			}
 			if (lcrs2 > 0) {
@@ -288,7 +295,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				double close_lcrs = Close.GetValueAt(lcrs2);
 				spt.BarNo = lcrs2;
 				spt.SnRType = SupportResistanceType.Support;
-				spt.SnRPriceType = open_lcrs > close_lcrs ? PriceSubtype.Open : PriceSubtype.Close;
+				spt.SnRPriceType = open_lcrs < close_lcrs ? PriceSubtype.Open : PriceSubtype.Close;
 				rng.Support = spt;
 			}				
 			
@@ -297,29 +304,35 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		public override SupportResistanceBar GetSupportResistance(int barNo, SupportResistanceType srType) {
 			SupportResistanceBar snr = new SupportResistanceBar();
+			IndicatorSignal rec = GetLastIndicatorSignalByName(barNo, SignalName_LineCross);
+			int lcrs = -1;
+			if(rec != null)
+				lcrs = rec.BarNo;//.BarNumber;
+			if(barNo > 17600 && barNo < 17650)
+				Print(CurrentBar + "-LastCrossover, barNo=" + lcrs + "," + barNo);
+
 			
-			if(srType == SupportResistanceType.Resistance) {
-				GLastIndexRecord<double> rec = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Unknown);
-				int lcrs = -1;
-				if(rec != null)
-					lcrs = rec.BarNumber;
-				if(barNo > 17600 && barNo < 17650)
-					Print(CurrentBar + "-LastCrossover, barNo=" + lcrs + "," + barNo);
+				//GLastIndexRecord<double> rec = this.crossoverRecorder.GetLastIndexRecord(barNo, LookbackBarType.Unknown);
 			//isolate the last inflection 
 				//LastInflection = GetLastInflection(GetInflection(), CurrentBar, TrendDirection.Down, BarIndexType.BarNO);
 			
 			//lookback to the crossover and if that candle is bearish we isolate the open as resistance;
 			// if that candlestick is bullish we isolate the close as resistance
-				//LastCrossover = GetLastCrossover(GetCrossover(), LastInflection, CrossoverType.Both, BarIndexType.BarsAgo);
-				if(lcrs > 0) {
-					double open_lcrs = Open.GetValueAt(lcrs);
-					double close_lcrs = Close.GetValueAt(lcrs);
-					snr.BarNo = lcrs;
-					snr.SnRType = SupportResistanceType.Resistance;
+			//LastCrossover = GetLastCrossover(GetCrossover(), LastInflection, CrossoverType.Both, BarIndexType.BarsAgo);
+			if(lcrs > 0) {
+				double open_lcrs = Open.GetValueAt(lcrs);
+				double close_lcrs = Close.GetValueAt(lcrs);
+				snr.BarNo = lcrs;
+				snr.SnRType = srType;
+				if(srType == SupportResistanceType.Resistance) {
 					snr.SnRPriceType = open_lcrs > close_lcrs ? PriceSubtype.Open : PriceSubtype.Close;
-					//snr.SetSptRstValue(Math.Max(open_lcrs,close_lcrs));
 				}
+				else if(srType == SupportResistanceType.Support) {
+					snr.SnRPriceType = open_lcrs < close_lcrs ? PriceSubtype.Open : PriceSubtype.Close;
+				}
+				//snr.SetSptRstValue(Math.Max(open_lcrs,close_lcrs));
 			}
+			
 			return snr;
 		}
 
@@ -334,15 +347,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <returns></returns>
 		public override DivergenceType CheckDivergence() {
 			int infl = GetInflection(SMITMA);
-			if(infl < 0) {
-				int infl_bar = this.GetLastInflection( GetInflection(), CurrentBar-1, TrendDirection.Up, BarIndexType.BarNO);
+			int infl_bar = -1;
+			if(infl < 0) {				
+				IndicatorSignal sig	= GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionDn);
+					//this.GetLastInflection( GetInflection(), CurrentBar-1, TrendDirection.Up, BarIndexType.BarNO);
+				if(sig != null) infl_bar = sig.BarNo;
 				if(infl_bar > 0 && High[CurrentBar-infl_bar] < High[0]) {
 					if(SMITMA[CurrentBar-infl_bar] > SMITMA[0]) return DivergenceType.Divergent;
 					else if (SMITMA[CurrentBar-infl_bar] < SMITMA[0]) return DivergenceType.Convergent;
 				}
 			}
 			else if(infl > 0) {
-				int infl_bar = this.GetLastInflection( GetInflection(), CurrentBar-1, TrendDirection.Down, BarIndexType.BarNO);
+				IndicatorSignal sig	= GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionUp);
+					//this.GetLastInflection( GetInflection(), CurrentBar-1, TrendDirection.Down, BarIndexType.BarNO);
+				if(sig != null) infl_bar = sig.BarNo;
 				if(infl_bar > 0 && Low[CurrentBar-infl_bar] > Low[0]) {
 					if(SMITMA[CurrentBar-infl_bar] < SMITMA[0]) return DivergenceType.Divergent;
 					else if (SMITMA[CurrentBar-infl_bar] > SMITMA[0]) return DivergenceType.Convergent;
