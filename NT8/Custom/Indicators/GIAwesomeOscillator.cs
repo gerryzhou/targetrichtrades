@@ -33,9 +33,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 	/// </summary>
 	public class GIAwesomeOscillator : GIndicatorBase
 	{
-        private int fastPeriod 			= 5;
-        private int slowPeriod 			= 34;
-		private int smooth		 		= 5;
 		private int barWidth			= 5;
 		private int lineWidth			= 2;
 		private double oscillatorValue 	= 0;
@@ -43,14 +40,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private SolidColorBrush upColor 		= Brushes.LimeGreen;
 		private SolidColorBrush downColor 		= Brushes.Red;
 		private SolidColorBrush signalColor		= Brushes.LightSteelBlue;
-		private bool showLines			= false;
+		
 		private SMA fastSMA;
 		private SMA slowSMA;
 		private EMA fastEMA;
 		private EMA slowEMA;
 		private TMA fastTMA;
 		private TMA slowTMA;
-		private MovingAvgType movAvgType = MovingAvgType.SMA;
+		
 
 		protected override void OnStateChange()
 		{
@@ -217,7 +214,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		//[Description("Show Oscillator and Signalline")]
 		//[Gui.Design.DisplayName("Display Lines")]
 		//[Category("Parameters")]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ShowLines", Description = "Set true to display on chart the lines", GroupName = "NinjaScriptGeneral", Order = 5)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ShowLines", Description = "Display on chart the lines", GroupName = GP_CUSTOM_PARAMS, Order = OD_ShowLines)]
 		public bool ShowLines
 		{
 			get { return showLines; }
@@ -229,7 +226,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		//[Description("Period for fast EMA")]
 		//[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "FastPeriod", GroupName = "AOParameters", Order = 2)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "FastPeriod", GroupName = GP_CUSTOM_PARAMS, Order = OD_FastPeriod)]		
 		public int FastPeriod
 		{
 			//get;set;
@@ -242,7 +239,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		//[Description("Period for slow EMA")]
 		//[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "SlowPeriod", GroupName = "AOParameters", Order = 3)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SlowPeriod", GroupName = GP_CUSTOM_PARAMS, Order = OD_SlowPeriod)]
 		public int SlowPeriod
 		{
 			get { return slowPeriod; }
@@ -254,7 +251,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 //		[Description("Period for Smoothing of Signal Line")]
 //		[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "Smooth", GroupName = "AOParameters", Order = 4)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "Smooth", GroupName = GP_CUSTOM_PARAMS, Order = OD_Smooth)]		
 		public int Smooth
 		{
 			get { return smooth; }
@@ -262,7 +259,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MovingAvgType", GroupName = "AOParameters", Order = 1)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MovingAvgType", GroupName = GP_CUSTOM_PARAMS, Order = OD_MovingAvgType)]		
 		public MovingAvgType MovingAverageType
 		{
 			get { return movAvgType; }
@@ -349,7 +346,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 //		{
 //			get { return NinjaTrader.Gui.Serialize.BrushToString(new SolidColorBrush(signalColor));}//.Design.SerializableColor.ToString(signalColor); }
 //			set { signalColor = NinjaTrader.Gui.Serialize.StringToBrush(value);}//.Design.SerializableColor.FromString(value); }
-//		}		
+//		}
+		
+        private int fastPeriod 			= 5;
+        private int slowPeriod 			= 34;
+		private int smooth		 		= 5;
+		private bool showLines			= false;
+		private MovingAvgType movAvgType = MovingAvgType.SMA;
+		
+		public const int OD_FastPeriod = 1;
+		public const int OD_SlowPeriod = 2;
+		public const int OD_Smooth = 3;
+		public const int OD_ShowLines = 5;
+		public const int OD_MovingAvgType = 4;
+		//public const int OD_ = ;
 		#endregion
 		
 //		#region Properties

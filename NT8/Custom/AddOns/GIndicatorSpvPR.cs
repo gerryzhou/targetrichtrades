@@ -417,7 +417,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		[NinjaScriptProperty]
 		[XmlIgnore]
-		[Display(Name="SpvPRBits", Description="Supervised PR Bits", Order=1, GroupName="Parameters")]
+		[Display(Name="SpvPRBits", Description="Supervised PR Bits", Order=OD_SpvPRBits, GroupName=GP_GINDICATOR)]
         public int SpvPRBits
         {
             get { return spvPRBits; }

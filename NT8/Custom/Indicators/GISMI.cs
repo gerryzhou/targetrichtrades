@@ -30,13 +30,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
 	public class GISMI : GIndicatorBase
 	{	
-		private int	range		= 5;
-		private int	emaperiod1	= 3;
-		private int	emaperiod2	= 5;
-		private int smitmaperiod= 8;
-		private int tmaperiod= 6;
-		private int smiCrossLevel = 50;
-		
 		private Series<double>	sms;
 		private Series<double>	hls;
 		private Series<double>	smis;
@@ -103,6 +96,16 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
+			long v0 = CurrentBar>20? CheckVolume(CurrentBar):0,
+				v1 = CurrentBar>20? CheckVolume(CurrentBar-1):0;
+			
+			if(v0 > 4*v1)
+			{
+				Print(CurrentBar + ": v0,v1=" + v0 + "," + v1);
+				Draw.Dot(this, "vol"+CurrentBar, true, 0, High[0] + TickSize, Brushes.BlueViolet);
+				//Draw.Square(this, "vol"+CurrentBar, true, 0, High[0] + TickSize, Brushes.BlueViolet);
+				//DrawDiamond(0, "vol"+CurrentBar, High[0]+5, 0, Brushes.BlueViolet);
+			}
 			//Print(CurrentBar.ToString() + " -- GISMI OnBarUpdate called");
 			if (( CurrentBar < emaperiod2) || ( CurrentBar < emaperiod1)) 
 			{
@@ -117,7 +120,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 			//Stochastic Momentum Index = SMI
 			double denom = 0.5*EMA(EMA(hls,emaperiod1),emaperiod2)[0];
- 			smis[0] = (100*(EMA(EMA(sms,emaperiod1),emaperiod2))[0] / (denom ==0 ? 1 : denom  ));
+ 			smis[0] = (100*(EMA(EMA(sms,emaperiod1),emaperiod2))[0] / (denom ==0 ? 1 : denom));
 			
 			//Set the current SMI line value
 			smi[0] = (smis[0]);
@@ -386,7 +389,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		#region Properties
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="EMAPeriod1", Description="1st ema smothing period. ( R )", Order=1, GroupName="Parameters")]
+		[Display(Name="EMAPeriod1", Description="1st ema smothing period(R)", Order=OD_EMAPeriod1, GroupName=GP_CUSTOM_PARAMS)]
 		public int EMAPeriod1
 		{
 			get { return emaperiod1;}
@@ -395,7 +398,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="EMAPeriod2", Description="2nd ema smoothing period. ( S )", Order=2, GroupName="Parameters")]
+		[Display(Name="EMAPeriod2", Description="2nd ema smoothing period(S)", Order=OD_EMAPeriod2, GroupName=GP_CUSTOM_PARAMS)]
 		public int EMAPeriod2
 		{
 			get { return emaperiod2;}
@@ -404,7 +407,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="Range", Description="Range for momentum Calculation ( Q )", Order=3, GroupName="Parameters")]
+		[Display(Name="Range", Description="Range for momentum Calculation(Q)", Order=OD_Range, GroupName=GP_CUSTOM_PARAMS)]
 		public int Range
 		{
 			get { return range;}
@@ -413,7 +416,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="SMITMAPeriod", Description="SMI TMA smoothing period", Order=4, GroupName="Parameters")]
+		[Display(Name="SMITMAPeriod", Description="SMI TMA smoothing period", Order=OD_SMITMAPeriod, GroupName=GP_CUSTOM_PARAMS)]
 		public int SMITMAPeriod
 		{
 			get { return smitmaperiod;}
@@ -422,7 +425,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[Range(0, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="SMICrossLevel", Description="SMI&TMA Cross Level", Order=5, GroupName="Parameters")]
+		[Display(Name="SMICrossLevel", Description="SMI&TMA Cross Level", Order=OD_SMICrossLevel, GroupName=GP_CUSTOM_PARAMS)]
 		public int SMICrossLevel
 		{
 			get { return smiCrossLevel;}
@@ -484,6 +487,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 			get { return "LineCross";}
 		}
 		
+		private int	range		= 5;
+		private int	emaperiod1	= 3;
+		private int	emaperiod2	= 5;
+		private int smitmaperiod= 8;
+		private int tmaperiod= 6;
+		private int smiCrossLevel = 50;
+		
+		public const int OD_EMAPeriod1 = 1;
+		public const int OD_EMAPeriod2 = 2;
+		public const int OD_Range = 3;
+		public const int OD_SMITMAPeriod = 4;
+		public const int OD_SMICrossLevel = 5;
 		#endregion		
 	}
 }

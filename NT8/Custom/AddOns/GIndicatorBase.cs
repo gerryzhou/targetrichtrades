@@ -31,13 +31,7 @@ using NinjaTrader.NinjaScript.AddOns;
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators
-{
-	[Gui.CategoryOrder("CustomParams", 1)] // display "CP" first
-	[Gui.CategoryOrder("GIndicator", 2)] // then "GStrategy"
-	[Gui.CategoryOrder("OSI", 3)] // then "MM"
-	[Gui.CategoryOrder("MA", 4)] // and then "TM"
-	[Gui.CategoryOrder("Timming", 5)] // and finally "TG"
-	
+{	
 	/// <summary>
 	/// It defined a set of interfaces to talk with strategy;
 	/// The derived indicators should override the methods to be able be combined with other indicators; 
@@ -519,20 +513,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 		#endregion
 		
         #region Properties
-        [Browsable(false)]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
-        [XmlIgnore()]		// this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
-        public Series<double> StartHM
-        {
-            get { return Values[0]; }
-        }
-
-        [Browsable(false)]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
-        [XmlIgnore()]		// this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
-        public Series<double> EndHM
-        {
-            get { return Values[1]; }
-        }
-
 		/// <summary>
 		/// If it runs for backtesting
 		/// </summary>		
@@ -542,18 +522,6 @@ namespace NinjaTrader.NinjaScript.Indicators
         {
             get {return backTest;}
 			set {backTest = value;}
-        }
-		
-		/// <summary>
-		/// The print out level
-		/// </summary>
-		/// <returns></returns>
-		[Display(Name="PrintOut", Description="The print out level", Order=0, GroupName="GIndicator")]
-        [XmlIgnore()] // ensures that the property will NOT be saved/recovered as part of a chart template or workspace
-        public int PrintOut
-        {
-            get{return printOut;}
-			set{printOut = value;}
         }
 
 		/// <summary>
@@ -567,9 +535,22 @@ namespace NinjaTrader.NinjaScript.Indicators
 			set {log2disk = value;}
         }
 		
+		
+		/// <summary>
+		/// The print out level
+		/// </summary>
+		/// <returns></returns>
+		[Display(Name="PrintOut", Description="The print out level", Order=0, GroupName=GP_GINDICATOR)]
+        [XmlIgnore()] // ensures that the property will NOT be saved/recovered as part of a chart template or workspace
+        public int PrintOut
+        {
+            get{return printOut;}
+			set{printOut = value;}
+        }
+		
 		[NinjaScriptProperty]
 		[XmlIgnore]
-		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName="GIndicator")]
+		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName=GP_GINDICATOR)]
 		public Brush CustomColor1
 		{ get; set; }
 
@@ -582,18 +563,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[NinjaScriptProperty]
 		[Range(0, double.MaxValue)]
-		[Display(Name="CustomPrc1", Description="CustomPrc-1", Order=2, GroupName="GIndicator")]
+		[Display(Name="CustomPrc1", Description="CustomPrc-1", Order=2, GroupName=GP_GINDICATOR)]
 		public double CustomPrc1
 		{ get; set; }
 
 		[NinjaScriptProperty]
-		[Display(Name="CustomStr1", Description="CustomStr-1", Order=3, GroupName="GIndicator")]
+		[Display(Name="CustomStr1", Description="CustomStr-1", Order=3, GroupName=GP_GINDICATOR)]
 		public string CustomStr1
 		{ get; set; }
 
 		[NinjaScriptProperty]
 		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
-		[Display(Name="CustomTime1", Description="CustomTime-1", Order=4, GroupName="GIndicator")]
+		[Display(Name="CustomTime1", Description="CustomTime-1", Order=4, GroupName=GP_GINDICATOR)]
 		public DateTime CustomTime1
 		{ get; set; }
 		#endregion

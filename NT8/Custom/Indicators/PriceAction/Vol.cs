@@ -24,15 +24,17 @@ using NinjaTrader.NinjaScript.DrawingTools;
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 {
-	public class Vol
+	public class Volatility
 	{
 		/// <summary>
-		/// Volume in a time period: 
-		/// Volume burst at the open;
+		/// Volatility in a time period: 
+		/// max range;
+		/// max swing;
+		/// average swing size;
+		/// Two types: barVolatility, indicatorVolatility
 		/// </summary>
 		private double hi;
 		
 	}
 }
-
 

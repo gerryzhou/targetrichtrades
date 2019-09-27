@@ -35,7 +35,8 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	/// * SnR
 	/// </summary>
 	public class IndicatorSignal
-	{			
+	{
+		
 		#region Protperies
 		/// <summary>
 		/// The barNo the signal refer to
@@ -99,8 +100,10 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		[XmlIgnore]
 		public SignalAction Signal_Action {
 			get; set;
-		}	
+		}
+		
 		#endregion
 	}
 }
+
 

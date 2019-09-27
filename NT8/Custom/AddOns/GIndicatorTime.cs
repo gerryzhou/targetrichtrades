@@ -231,25 +231,25 @@ namespace NinjaTrader.NinjaScript.Indicators
 		#region Properties
 		[Description("Hour of opening start")]
  		[Range(0, 23), NinjaScriptProperty]		
-		[Display(Name="OpenStartH", Order=0, GroupName="Timming")]
+		[Display(Name="OpenStartH", Order=OD_OpenStartH, GroupName=GP_TIMING)]
 		public int TM_OpenStartH
 		{ get; set; }
 
 		[Description("Minute of opening start")]
 		[Range(0, 59), NinjaScriptProperty]
-		[Display(Name="OpenStartM", Order=1, GroupName="Timming")]
+		[Display(Name="OpenStartM", Order=OD_OpenStartM, GroupName=GP_TIMING)]
 		public int TM_OpenStartM
 		{ get; set; }
 
 		[Description("Hour of opening end")]
  		[Range(0, 23), NinjaScriptProperty]		
-		[Display(Name="OpenEndH", Order=2, GroupName="Timming")]
+		[Display(Name="OpenEndH", Order=OD_OpenEndH, GroupName=GP_TIMING)]
 		public int TM_OpenEndH
 		{ get; set; }
 
 		[Description("Minute of opening end")]
 		[Range(0, 59), NinjaScriptProperty]
-		[Display(Name="OpenEndM", Order=3, GroupName="Timming")]
+		[Display(Name="OpenEndM", Order=OD_OpenEndM, GroupName=GP_TIMING)]
 		public int TM_OpenEndM
 		{ get; set; }
 			
@@ -263,64 +263,4 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private int tm_OpenEndM = 30; //Default setting for open End minute
 		#endregion
 	}
-
 }
-
-/*
-#region NinjaScript generated code. Neither change nor remove.
-
-namespace NinjaTrader.NinjaScript.Indicators
-{
-	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
-	{
-		private GIndicatorBase[] cacheGIndicatorBase;
-		public GIndicatorBase GIndicatorBase()
-		{
-			return GIndicatorBase(Input);
-		}
-
-		public GIndicatorBase GIndicatorBase(ISeries<double> input)
-		{
-			if (cacheGIndicatorBase != null)
-				for (int idx = 0; idx < cacheGIndicatorBase.Length; idx++)
-					if (cacheGIndicatorBase[idx] != null &&  cacheGIndicatorBase[idx].EqualsInput(input))
-						return cacheGIndicatorBase[idx];
-			return CacheIndicator<GIndicatorBase>(new GIndicatorBase(), input, ref cacheGIndicatorBase);
-		}
-	}
-}
-
-namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
-{
-	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
-	{
-		public Indicators.GIndicatorBase GIndicatorBase()
-		{
-			return indicator.GIndicatorBase(Input);
-		}
-
-		public Indicators.GIndicatorBase GIndicatorBase(ISeries<double> input )
-		{
-			return indicator.GIndicatorBase(input);
-		}
-	}
-}
-
-namespace NinjaTrader.NinjaScript.Strategies
-{
-	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
-	{
-		public Indicators.GIndicatorBase GIndicatorBase()
-		{
-			return indicator.GIndicatorBase(Input);
-		}
-
-		public Indicators.GIndicatorBase GIndicatorBase(ISeries<double> input )
-		{
-			return indicator.GIndicatorBase(input);
-		}
-	}
-}
-
-#endregion
-*/

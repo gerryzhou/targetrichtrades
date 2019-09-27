@@ -103,7 +103,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 				return list_signal;
 		}
 
-
 		/// <summary>
 		/// Get the last signal list before the barNo
 		/// </summary>

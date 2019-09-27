@@ -39,6 +39,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private List<SupportResistanceLine> SnRLines;
 		
 		private List<SupportResistanceRange<SupportResistanceLine>> SnRRanges;
+
+		#region Methods
 		
 		public void AddSupport(int barNo, double price) {
 			SupportResistanceBar snrBar = new SupportResistanceBar();
@@ -91,16 +93,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			snrRange.Support = sptLine;
 			return snrRange;
 		}
-		
-		#region Properties
-//		public SupportResistanceType GetSupportResistanceType() {
-//			return null;//sptRestType;
-//		}
-//		public SupportResistanceType SetSupportResistanceType(SupportResistanceType value) {
-//			return null;//sptRestType = value;
-//		}		
-		#endregion
-
+		#endregion Methods
 	}
 }
 
