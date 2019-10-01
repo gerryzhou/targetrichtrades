@@ -143,25 +143,25 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		[Range(0,23)]
 		[NinjaScriptProperty]
-		[Display(Name="Start hour", Description = "Enter start hour, Military time format 0 - 23", Order=1, GroupName="Parameters")]
+		[Display(Name="Start hour", Description = "Enter start hour, Military time format 0 - 23", Order=1, GroupName=GPI_CUSTOM_PARAMS)]
 		public int StartHour
 		{ get; set; }
 
 		[Range(0, 59)]
 		[NinjaScriptProperty]
-		[Display(Name="Start minute", Description = "Enter start minute(s) 0 - 59",Order=2, GroupName="Parameters")]
+		[Display(Name="Start minute", Description = "Enter start minute(s) 0 - 59",Order=2, GroupName=GPI_CUSTOM_PARAMS)]
 		public int StartMinute
 		{ get; set; }
 
 		[Range(0, 23)]
 		[NinjaScriptProperty]
-		[Display(Name="End hour", Description = "Enter end hour, Military time format 0 - 23",Order=3, GroupName="Parameters")]
+		[Display(Name="End hour", Description = "Enter end hour, Military time format 0 - 23",Order=3, GroupName=GPI_CUSTOM_PARAMS)]
 		public int EndHour
 		{ get; set; }
 
 		[Range(0, 59)]
 		[NinjaScriptProperty]
-		[Display(Name="End minute",Description = " Enter end minute(s) 0 - 59", Order=4, GroupName="Parameters")]
+		[Display(Name="End minute",Description = " Enter end minute(s) 0 - 59", Order=4, GroupName=GPI_CUSTOM_PARAMS)]
 		public int EndMinute
 		{ get; set; }
 

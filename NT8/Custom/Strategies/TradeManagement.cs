@@ -31,7 +31,7 @@ using NinjaTrader.NinjaScript.AddOns;
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	public partial class GSZTraderBase : Strategy
+	public partial class GStrategyBase : Strategy
 	{
 		protected TradeObj tradeObj;
 		
@@ -1067,7 +1067,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		//(e.g., saving workspace, or running Strategy Optimizations). 
         [Description("Short, Long or both directions for entry")]
  		[XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TradingDirection", GroupName = "TradeMgmt", Order = 0)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TradingDirection", GroupName = GPS_TRADE_MGMT, Order = ODG_TradingDirection)]		
         public TradingDirection TM_TradingDirection
         {
             get { return tm_TradingDirection; }
@@ -1076,7 +1076,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Trading style: trend following, counter trend, scalp")]
  		[XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TradingStyle", GroupName = "TradeMgmt", Order = 1)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TradingStyle", GroupName = GPS_TRADE_MGMT, Order = ODG_TradingStyle)]
         public TradingStyle TM_TradingStyle
         {
             get { return tm_TradingStyle; }
@@ -1085,7 +1085,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Use trailing entry every bar")]
  		[NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnTrailing", GroupName = "TradeMgmt", Order = 2)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnTrailing", GroupName = GPS_TRADE_MGMT, Order = ODG_EnTrailing)]
         public bool TM_EnTrailing
         {
             get{return tm_EnTrailing;}
@@ -1094,7 +1094,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Offeset points for limit price entry")]
 		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnOffsetPnts", GroupName = "TradeMgmt", Order = 3)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnOffsetPnts", GroupName = GPS_TRADE_MGMT, Order = ODG_EnOffsetPnts)]
         public double TM_EnOffsetPnts
         {
             get{return tm_EnOffsetPnts;}
@@ -1103,7 +1103,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("How long to check entry order filled or not")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkEnOrder", GroupName = "TradeMgmt", Order = 4)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkEnOrder", GroupName = GPS_TRADE_MGMT, Order = ODG_MinutesChkEnOrder)]
         public int TM_MinutesChkEnOrder
         {
             get{return tm_MinutesChkEnOrder;}
@@ -1112,7 +1112,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("How long to check P&L")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkPnL", GroupName = "TradeMgmt", Order = 5)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MinutesChkPnL", GroupName = GPS_TRADE_MGMT, Order = ODG_MinutesChkPnL)]
         public int TM_MinutesChkPnL
         {
             get{return tm_MinutesChkPnL;}
@@ -1121,7 +1121,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Bar count before checking P&L")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsToCheckPL", GroupName = "TradeMgmt", Order = 6)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsToCheckPL", GroupName = GPS_TRADE_MGMT, Order = ODG_BarsToCheckPL)]
         public int TM_BarsToCheckPnL
         {
             get{return tm_BarsToCheckPnL;}
@@ -1130,7 +1130,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("How many bars to hold entry order before cancel it")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsHoldEnOrd", GroupName = "TradeMgmt", Order = 7)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsHoldEnOrd", GroupName = GPS_TRADE_MGMT, Order = ODG_BarsHoldEnOrd)]
         public int TM_BarsHoldEnOrd
         {
             get{return tm_BarsHoldEnOrd;}
@@ -1139,7 +1139,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Bar count for en order counter pullback")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnCounterPBBars", GroupName = "TradeMgmt", Order = 8)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnCounterPBBars", GroupName = GPS_TRADE_MGMT, Order = ODG_EnCounterPBBars)]
         public int TM_EnCounterPBBars
         {
             get{return tm_EnCounterPBBars;}
@@ -1148,7 +1148,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				
 		[Description("Bar count since last filled PT or SL")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsSincePTSL", GroupName = "TradeMgmt", Order = 9)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsSincePTSL", GroupName = GPS_TRADE_MGMT, Order = ODG_BarsSincePTSL)]
         public int TM_BarsSincePTSL
         {
             get{return tm_BarsSincePtSl;}

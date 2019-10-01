@@ -28,7 +28,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 	}
 	
-	public partial class GSZTraderBase : Strategy
+	public partial class GStrategyBase : Strategy
 	{
 		#region Trigger Trade Functions
 		
@@ -230,7 +230,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Min swing size for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnSwingMinPnts", GroupName = "Trigger", Order = 2)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnSwingMinPnts", GroupName = GPS_TRIGGER, Order = ODG_EnSwingMinPnts)]
         public double TG_EnSwingMinPnts
         {
             get { return tg_EnSwingMinPnts; }
@@ -239,7 +239,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Max swing size for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnSwingMaxPnts", GroupName = "Trigger", Order = 3)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnSwingMaxPnts", GroupName = GPS_TRIGGER, Order = ODG_EnSwingMaxPnts)]
         public double TG_EnSwingMaxPnts
         {
             get { return tg_EnSwingMaxPnts; }
@@ -248,7 +248,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Description("Min pullback size for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnPullbackMinPnts", GroupName = "Trigger", Order = 4)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnPullbackMinPnts", GroupName = GPS_TRIGGER, Order = ODG_EnPullbackMinPnts)]
         public double TG_EnPullbackMinPnts
         {
             get { return tg_EnPullbackMinPnts; }
@@ -257,7 +257,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Max pullback size for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnPullbackMaxPnts", GroupName = "Trigger", Order = 5)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnPullbackMaxPnts", GroupName = GPS_TRIGGER, Order = ODG_EnPullbackMaxPnts)]
         public double TG_EnPullbackMaxPnts
         {
             get { return tg_EnPullbackMaxPnts; }
@@ -266,7 +266,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Trade start hour")]
  		[Range(0, 23), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeStartH", GroupName = "Trigger", Order = 6)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeStartH", GroupName = GPS_TRIGGER, Order = ODG_TimeStartH)]
         public int TG_TradeStartH
         {
             get { return tg_TradeStartH; }
@@ -275,7 +275,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Trade start minute")]
  		[Range(0, 59), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeStartM", GroupName = "Trigger", Order = 7)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeStartM", GroupName = GPS_TRIGGER, Order = ODG_TimeStartM)]
         public int TG_TradeStartM
         {
             get { return tg_TradeStartM; }
@@ -284,7 +284,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Trade end hour")]
  		[Range(0, 23), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeEndH", GroupName = "Trigger", Order = 8)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeEndH", GroupName = GPS_TRIGGER, Order = ODG_TimeEndH)]
         public int TG_TradeEndH
         {
             get { return tg_TradeEndH; }
@@ -293,7 +293,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Trade end minute")]
  		[Range(0, 59), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeEndM", GroupName = "Trigger", Order = 9)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeEndM", GroupName = GPS_TRIGGER, Order = ODG_TimeEndM)]
         public int TG_TradeEndM
         {
             get { return tg_TradeEndM; }
@@ -302,7 +302,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Liquidate hour")]
  		[Range(0, 23), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeLiqH", GroupName = "Trigger", Order = 10)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeLiqH", GroupName = GPS_TRIGGER, Order = ODG_TimeLiqH)]
         public int TG_TradeLiqH
         {
             get { return tg_TradeLiqH; }
@@ -311,7 +311,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Liquidate minute")]
  		[Range(0, 59), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeLiqM", GroupName = "Trigger", Order = 11)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TimeLiqM", GroupName = GPS_TRIGGER, Order = ODG_TimeLiqM)]
         public int TG_TradeLiqM
         {
             get { return tg_TradeLiqM; }
@@ -320,7 +320,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Open start hour")]
  		[Range(0, 23), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenStartH", GroupName = "Trigger", Order = 12)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenStartH", GroupName = GPS_TRIGGER, Order = ODG_OpenStartH)]
         public int TG_OpenStartH
         {
             get { return tg_OpenStartH; }
@@ -329,7 +329,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Open start minute")]
  		[Range(0, 59), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenStartM", GroupName = "Trigger", Order = 13)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenStartM", GroupName = GPS_TRIGGER, Order = ODG_OpenStartM)]
         public int TG_OpenStartM
         {
             get { return tg_OpenStartM; }
@@ -338,7 +338,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Open end hour")]
  		[Range(0, 23), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenEndH", GroupName = "Trigger", Order = 14)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenEndH", GroupName = GPS_TRIGGER, Order = ODG_OpenEndH)]
         public int TG_OpenEndH
         {
             get { return tg_OpenEndH; }
@@ -347,7 +347,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Open end minute")]
  		[Range(0, 59), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenEndM", GroupName = "Trigger", Order = 15)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "OpenEndM", GroupName = GPS_TRIGGER, Order = ODG_OpenEndM)]
         public int TG_OpenEndM
         {
             get { return tg_OpenEndM; }

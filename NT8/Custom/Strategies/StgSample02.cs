@@ -37,7 +37,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// 4) CheckNewEntryTrade();
 	/// 5) PutTrade();
 	/// </summary>
-	public class StgSample02 : GSZTraderBase
+	public class StgSample02 : GStrategyBase
 	{
 		private double c0 = 0, hi3 = Double.MaxValue, lo3 = Double.MinValue;
 		

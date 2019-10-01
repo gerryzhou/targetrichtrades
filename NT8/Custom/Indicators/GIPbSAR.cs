@@ -24,7 +24,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators
 {
-	public class GIPbSAR : Indicator
+	public class GIPbSAR : GIndicatorBase
 	{
 		private double 			af;				// Acceleration factor
 		private bool 			afIncreased;
@@ -265,17 +265,17 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		#region Properties
 		[Range(0.00, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "Acceleration", GroupName = "NinjaScriptParameters", Order = 0)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "Acceleration", GroupName = GPI_CUSTOM_PARAMS, Order = 0)]
 		public double Acceleration
 		{ get; set; }
 
 		[Range(0.001, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "AccelerationMax", GroupName = "NinjaScriptParameters", Order = 1)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AccelerationMax", GroupName = GPI_CUSTOM_PARAMS, Order = 1)]
 		public double AccelerationMax
 		{ get; set; }
 
 		[Range(0.001, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "AccelerationStep", GroupName = "NinjaScriptParameters", Order = 2)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AccelerationStep", GroupName = GPI_CUSTOM_PARAMS, Order = 2)]
 		public double AccelerationStep
 		{ get; set; }
 		#endregion

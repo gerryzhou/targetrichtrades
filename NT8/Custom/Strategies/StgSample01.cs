@@ -37,7 +37,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// 4) CheckNewEntryTrade();
 	/// 5) PutTrade();
 	/// </summary>
-	public class StgSample01 : GSZTraderBase
+	public class StgSample01 : GStrategyBase
 	{		
 		protected override void OnStateChange()
 		{

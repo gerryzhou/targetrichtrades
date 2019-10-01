@@ -35,7 +35,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// This interface needs to work with multiple indicators in the strategy
 	/// to generate the signal or get the value of the functions 
 	/// </summary>
-	public partial class GSZTraderBase : Strategy
+	public partial class GStrategyBase : Strategy
 	{
 		private List<Indicator> listIndicator = new List<Indicator>();
 		protected TradeSignal tradeSignal;
