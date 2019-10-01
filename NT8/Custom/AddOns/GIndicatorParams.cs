@@ -36,19 +36,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 	/// Display "CP" first, the entry defined in individual indicators
 	/// </summary>
 	[Gui.CategoryOrder(GPI_CUSTOM_PARAMS, 1)] //"CustomParams"
-<<<<<<< HEAD
 //	[Gui.CategoryOrder(GPI_NJSCRIPT_PARAMS, 6)] //"NinjaScriptParameters"	
-=======
-	
->>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503
 	[Gui.CategoryOrder(GPI_GINDICATOR, 2)] // "GIndicator", Indicator general
 	[Gui.CategoryOrder(GPI_TIMING, 3)] // "Timming"
 	[Gui.CategoryOrder(GPI_MA, 4)] // "MovingAverage"
 	[Gui.CategoryOrder(GPI_OUTPUT, 5)] // "Output"
-<<<<<<< HEAD
-=======
-	[Gui.CategoryOrder(GPI_NJSCRIPT_PARAMS, 6)] //"NinjaScriptParameters"
->>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503
 	
 	/// <summary>
 	/// The class to manage parameters for indicator
@@ -63,14 +55,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// The order for each entry is defined in the class of individual indicator 
 		/// </summary>
 		public const string GPI_CUSTOM_PARAMS = "CustomParams";
-<<<<<<< HEAD
 		#endregion
 
 
 		#region NinjaScriptParameters
 //		public const string GPI_NJSCRIPT_PARAMS = "NinjaScriptParameters";
-=======
->>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503
 		#endregion
 		
 		#region GIndicator
@@ -92,13 +81,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		#region Output
 		public const string GPI_OUTPUT = "Output";
-<<<<<<< HEAD
-=======
-		#endregion
-
-		#region NinjaScriptParameters
-		public const string GPI_NJSCRIPT_PARAMS = "NinjaScriptParameters";
->>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503
 		#endregion
 		
 		private const int IndParamOrder = 0;

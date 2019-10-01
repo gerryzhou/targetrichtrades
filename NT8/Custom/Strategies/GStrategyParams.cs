@@ -28,20 +28,12 @@ using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 namespace NinjaTrader.NinjaScript.Strategies
 {
 	[Gui.CategoryOrder(GPS_CUSTOM_PARAMS, 1)] // "CustomParams", display "CP" first
-<<<<<<< HEAD
 	//[Gui.CategoryOrder(GPS_GSTRATEGY, 2)] // then "GStrategy"
 	[Gui.CategoryOrder(GPS_NJSCRIPTST_PARAMS, 2)] //"NinjaScriptStrategyParameters"	
-=======
-	[Gui.CategoryOrder(GPS_GSTRATEGY, 2)] // then "GStrategy"
->>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503
 	[Gui.CategoryOrder(GPS_MONEY_MGMT, 3)] // then "MoneyMgmt"
 	[Gui.CategoryOrder(GPS_TRADE_MGMT, 4)] // and then "TradeMgmt"
 	[Gui.CategoryOrder(GPS_TRIGGER, 5)] // and then "Trigger"
 	[Gui.CategoryOrder(GPS_OUTPUT, 6)] // and finally "Output"
-<<<<<<< HEAD
-=======
-	[Gui.CategoryOrder(GPS_NJSTSCRIPT_PARAMS, 7)] //"NinjaScriptStrategyParameters"
->>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503
 	
 	public partial class GStrategyBase : Strategy
 	{
@@ -52,17 +44,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		public const string GPS_CUSTOM_PARAMS = "CustomParams";
 		#endregion
-<<<<<<< HEAD
 
 		
 		#region NinjaScriptStrategyParameters
 		public const string GPS_NJSCRIPTST_PARAMS = "NinjaScriptStrategyParameters";
 
-=======
-		
-		#region GStrategy
-		public const string GPS_GSTRATEGY = "GStrategy";
->>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503
 		public const int ODG_AccName = 1;
 		public const int ODG_AlgoMode = 2;
 		public const int ODG_BackTest = 3;		
@@ -74,10 +60,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#region MoneyMgmt
 		public const string GPS_MONEY_MGMT = "MoneyMgmt";
-<<<<<<< HEAD
 		
-=======
->>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503
 		public const int ODG_ProfitTgtAmt = 1;
 		public const int ODG_ProfitTgtTic = 2;
 		public const int ODG_ProfitTgtIncTic = 3;
@@ -104,10 +87,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#region TradeMgmt
 		public const string GPS_TRADE_MGMT = "TradeMgmt";
-<<<<<<< HEAD
 		
-=======
->>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503
 		public const int ODG_TradingDirection = 1;
 		public const int ODG_TradingStyle = 2;
 		public const int ODG_EnTrailing = 3;
@@ -124,10 +104,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#region Trigger
 		public const string GPS_TRIGGER = "Trigger";
-<<<<<<< HEAD
 		
-=======
->>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503
 		public const int ODG_EnSwingMinPnts = 1;
 		public const int ODG_EnSwingMaxPnts = 2;
 		public const int ODG_EnPullbackMinPnts = 3;
@@ -150,13 +127,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public const string GPS_OUTPUT = "Output";
 //		public const int ODG_ = ;
 		
-<<<<<<< HEAD
-=======
-		#region NinjaScriptParameters
-		public const string GPS_NJSTSCRIPT_PARAMS = "NinjaScriptStrategyParameters";
-		#endregion
-		
->>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503
 		#endregion		
 	}
 }
