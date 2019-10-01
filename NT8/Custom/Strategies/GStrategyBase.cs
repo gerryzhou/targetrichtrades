@@ -28,7 +28,11 @@ using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 namespace NinjaTrader.NinjaScript.Strategies
 {
 //	[Gui.CategoryOrder("CustomParams", 1)] // display "CP" first
+<<<<<<< HEAD:NT8/Custom/Strategies/GStrategyBase.cs
 //	[Gui.CategoryOrder(GPS_NJSCRIPTST_PARAMS, 2)] // then GPS_NJSCRIPTST_PARAMS
+=======
+//	[Gui.CategoryOrder(GPS_GSTRATEGY, 2)] // then GPS_GSTRATEGY
+>>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503:NT8/Custom/Strategies/GStrategyBase.cs
 //	[Gui.CategoryOrder("MoneyMgmt", 3)] // then "MM"
 //	[Gui.CategoryOrder("TradeMgmt", 4)] // and then "TM"
 //	[Gui.CategoryOrder("Trigger", 5)] // and finally "TG"
@@ -208,7 +212,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Account Name")]
 		[NinjaScriptProperty]
+<<<<<<< HEAD:NT8/Custom/Strategies/GStrategyBase.cs
 		[Display(ResourceType = typeof(Custom.Resource), Name = "AccName", GroupName = GPS_NJSCRIPTST_PARAMS, Order = ODG_AccName)]		
+=======
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AccName", GroupName = GPS_GSTRATEGY, Order = ODG_AccName)]		
+>>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503:NT8/Custom/Strategies/GStrategyBase.cs
         public string AccName
         {
             get { return accName; }
@@ -226,7 +234,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Description("Algo mode")]
 //		[NinjaScriptProperty]
 		[XmlIgnore]
+<<<<<<< HEAD:NT8/Custom/Strategies/GStrategyBase.cs
 		[Display(ResourceType = typeof(Custom.Resource), Name = "AlgoMode", GroupName = GPS_NJSCRIPTST_PARAMS, Order = ODG_AlgoMode)]			
+=======
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AlgoMode", GroupName = GPS_GSTRATEGY, Order = ODG_AlgoMode)]			
+>>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503:NT8/Custom/Strategies/GStrategyBase.cs
 		public AlgoModeType AlgoMode
         {
             get { return algoMode; }
@@ -235,7 +247,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("BackTesting mode or not")]
 		[NinjaScriptProperty]
+<<<<<<< HEAD:NT8/Custom/Strategies/GStrategyBase.cs
 		[Display(ResourceType = typeof(Custom.Resource), Name = "BackTest", GroupName = GPS_NJSCRIPTST_PARAMS, Order = ODG_BackTest)]		
+=======
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BackTest", GroupName = GPS_GSTRATEGY, Order = ODG_BackTest)]		
+>>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503:NT8/Custom/Strategies/GStrategyBase.cs
         public bool BackTest
         {
             get { return backTest; }
@@ -244,7 +260,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Print out level: large # print out more")]
 		[Range(-5, 5), NinjaScriptProperty]
+<<<<<<< HEAD:NT8/Custom/Strategies/GStrategyBase.cs
 		[Display(ResourceType = typeof(Custom.Resource), Name = "PrintOut", GroupName = GPS_NJSCRIPTST_PARAMS, Order = ODG_PrintOut)]		
+=======
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PrintOut", GroupName = GPS_GSTRATEGY, Order = ODG_PrintOut)]		
+>>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503:NT8/Custom/Strategies/GStrategyBase.cs
         public int PrintOut
         {
             get { return printOut; }
@@ -266,8 +286,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Description("Time to Start Strategy")]
 		[NinjaScriptProperty]
+<<<<<<< HEAD:NT8/Custom/Strategies/GStrategyBase.cs
 		//[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
 		[Display(Name="StartH", Description="StartH", Order=ODG_StartH, GroupName=GPS_NJSCRIPTST_PARAMS)]
+=======
+		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
+		[Display(Name="StartH", Description="StartH", Order=ODG_StartH, GroupName=GPS_GSTRATEGY)]
+>>>>>>> 7b0fc315bf601b4b69a10d4879094eef2ea42503:NT8/Custom/Strategies/GStrategyBase.cs
 		public DateTime StartH
 		{ get; set; }
 
