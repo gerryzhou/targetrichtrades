@@ -26,7 +26,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 {
 	public class TradeObj {
-		private GSZTraderBase instStrategy = null;
+		private GStrategyBase instStrategy = null;
 		private TradeType tradeType = TradeType.NoTrade;
 
 		#region Order Objects
@@ -111,7 +111,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		#endregion
 		
-		public TradeObj(GSZTraderBase inst_strategy) {
+		public TradeObj(GStrategyBase inst_strategy) {
 			this.instStrategy = inst_strategy;
 			InitParams();
 		}

@@ -46,7 +46,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// * Pullback Pivot: left 20+, right 5+, i.e. (20+, 5+)
 	/// * Trending pivot: breakout the pullback pivot, create a new (5+, 5+) pivot
 	/// </summary>
-	public class StgSample03 : GSZTraderBase
+	public class StgSample03 : GStrategyBase
 	{
 		private double c0 = 0, hi3 = Double.MaxValue, lo3 = Double.MinValue;
 		

@@ -60,7 +60,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="Param1", Description="Param1", Order=1, GroupName="Parameters")]
+		[Display(Name="Param1", Description="Param1", Order=1, GroupName=GPI_CUSTOM_PARAMS)]
 		public int Param1
 		{ get; set; }
 		

@@ -231,25 +231,25 @@ namespace NinjaTrader.NinjaScript.Indicators
 		#region Properties
 		[Description("Hour of opening start")]
  		[Range(0, 23), NinjaScriptProperty]		
-		[Display(Name="OpenStartH", Order=OD_OpenStartH, GroupName=GP_TIMING)]
+		[Display(Name="OpenStartH", Order=ODI_OpenStartH, GroupName=GPI_TIMING)]
 		public int TM_OpenStartH
 		{ get; set; }
 
 		[Description("Minute of opening start")]
 		[Range(0, 59), NinjaScriptProperty]
-		[Display(Name="OpenStartM", Order=OD_OpenStartM, GroupName=GP_TIMING)]
+		[Display(Name="OpenStartM", Order=ODI_OpenStartM, GroupName=GPI_TIMING)]
 		public int TM_OpenStartM
 		{ get; set; }
 
 		[Description("Hour of opening end")]
  		[Range(0, 23), NinjaScriptProperty]		
-		[Display(Name="OpenEndH", Order=OD_OpenEndH, GroupName=GP_TIMING)]
+		[Display(Name="OpenEndH", Order=ODI_OpenEndH, GroupName=GPI_TIMING)]
 		public int TM_OpenEndH
 		{ get; set; }
 
 		[Description("Minute of opening end")]
 		[Range(0, 59), NinjaScriptProperty]
-		[Display(Name="OpenEndM", Order=OD_OpenEndM, GroupName=GP_TIMING)]
+		[Display(Name="OpenEndM", Order=ODI_OpenEndM, GroupName=GPI_TIMING)]
 		public int TM_OpenEndM
 		{ get; set; }
 			

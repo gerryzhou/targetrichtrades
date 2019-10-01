@@ -107,7 +107,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		//[Browsable(false)]
 		[XmlIgnore]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "VolPeriod", GroupName = GP_CUSTOM_PARAMS, Order = OD_VolPeriod)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "VolPeriod", GroupName = GPI_CUSTOM_PARAMS, Order = OD_VolPeriod)]
 		public int VolPeriod
 		{ 
 			get {return volPeriod;}
@@ -117,7 +117,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		//[Browsable(false)]
 		[XmlIgnore]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "VolWPRPeriod", GroupName = GP_CUSTOM_PARAMS, Order = OD_VolWPRPeriod)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "VolWPRPeriod", GroupName = GPI_CUSTOM_PARAMS, Order = OD_VolWPRPeriod)]
 		public int VolWPRPeriod
 		{ 
 			get {return volwprPeriod;}

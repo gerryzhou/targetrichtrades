@@ -112,37 +112,37 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		#region Properties
 		[Range(2, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarCount", GroupName = "NinjaScriptParameters", Order = 0)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarCount", GroupName = GPI_CUSTOM_PARAMS, Order = 0)]
 		public int BarCount
 		{ get; set; }
 
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarUp", GroupName = "NinjaScriptParameters", Order = 1)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarUp", GroupName = GPI_CUSTOM_PARAMS, Order = 1)]
 		public bool BarUp
 		{ get; set; }
 
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "HigherHigh", GroupName = "NinjaScriptParameters", Order = 2)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "HigherHigh", GroupName = GPI_CUSTOM_PARAMS, Order = 2)]
 		public bool HigherHigh
 		{ get; set; }
 
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "HigherLow", GroupName = "NinjaScriptParameters", Order = 3)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "HigherLow", GroupName = GPI_CUSTOM_PARAMS, Order = 3)]
 		public bool HigherLow
 		{ get; set; }
 		
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarDown", GroupName = "NinjaScriptParameters", Order = 1)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarDown", GroupName = GPI_CUSTOM_PARAMS, Order = 4)]
 		public bool BarDown
 		{ get; set; }
 
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "LowerHigh", GroupName = "NinjaScriptParameters", Order = 2)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "LowerHigh", GroupName = GPI_CUSTOM_PARAMS, Order = 5)]
 		public bool LowerHigh
 		{ get; set; }
 
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "LowerLow", GroupName = "NinjaScriptParameters", Order = 3)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "LowerLow", GroupName = GPI_CUSTOM_PARAMS, Order = 6)]
 		public bool LowerLow
 		{ get; set; }		
 		#endregion

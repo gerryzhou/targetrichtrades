@@ -214,7 +214,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		//[Description("Show Oscillator and Signalline")]
 		//[Gui.Design.DisplayName("Display Lines")]
 		//[Category("Parameters")]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ShowLines", Description = "Display on chart the lines", GroupName = GP_CUSTOM_PARAMS, Order = OD_ShowLines)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ShowLines", Description = "Display on chart the lines", GroupName = GPI_CUSTOM_PARAMS, Order = ODI_ShowLines)]
 		public bool ShowLines
 		{
 			get { return showLines; }
@@ -226,7 +226,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		//[Description("Period for fast EMA")]
 		//[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "FastPeriod", GroupName = GP_CUSTOM_PARAMS, Order = OD_FastPeriod)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "FastPeriod", GroupName = GPI_CUSTOM_PARAMS, Order = ODI_FastPeriod)]		
 		public int FastPeriod
 		{
 			//get;set;
@@ -239,7 +239,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		//[Description("Period for slow EMA")]
 		//[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "SlowPeriod", GroupName = GP_CUSTOM_PARAMS, Order = OD_SlowPeriod)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SlowPeriod", GroupName = GPI_CUSTOM_PARAMS, Order = ODI_SlowPeriod)]
 		public int SlowPeriod
 		{
 			get { return slowPeriod; }
@@ -251,7 +251,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 //		[Description("Period for Smoothing of Signal Line")]
 //		[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "Smooth", GroupName = GP_CUSTOM_PARAMS, Order = OD_Smooth)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "Smooth", GroupName = GPI_CUSTOM_PARAMS, Order = ODI_Smooth)]		
 		public int Smooth
 		{
 			get { return smooth; }
@@ -259,7 +259,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MovingAvgType", GroupName = GP_CUSTOM_PARAMS, Order = OD_MovingAvgType)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MovingAvgType", GroupName = GPI_CUSTOM_PARAMS, Order = ODI_MovingAvgType)]		
 		public MovingAvgType MovingAverageType
 		{
 			get { return movAvgType; }
@@ -354,12 +354,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private bool showLines			= false;
 		private MovingAvgType movAvgType = MovingAvgType.SMA;
 		
-		public const int OD_FastPeriod = 1;
-		public const int OD_SlowPeriod = 2;
-		public const int OD_Smooth = 3;
-		public const int OD_ShowLines = 5;
-		public const int OD_MovingAvgType = 4;
-		//public const int OD_ = ;
+		public const int ODI_FastPeriod = 1;
+		public const int ODI_SlowPeriod = 2;
+		public const int ODI_Smooth = 3;
+		public const int ODI_ShowLines = 5;
+		public const int ODI_MovingAvgType = 4;
+		//public const int ODI_ = ;
 		#endregion
 		
 //		#region Properties

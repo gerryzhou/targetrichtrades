@@ -389,7 +389,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		#region Properties
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="EMAPeriod1", Description="1st ema smothing period(R)", Order=OD_EMAPeriod1, GroupName=GP_CUSTOM_PARAMS)]
+		[Display(Name="EMAPeriod1", Description="1st ema smothing period(R)", Order=ODI_EMAPeriod1, GroupName=GPI_CUSTOM_PARAMS)]
 		public int EMAPeriod1
 		{
 			get { return emaperiod1;}
@@ -398,7 +398,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="EMAPeriod2", Description="2nd ema smoothing period(S)", Order=OD_EMAPeriod2, GroupName=GP_CUSTOM_PARAMS)]
+		[Display(Name="EMAPeriod2", Description="2nd ema smoothing period(S)", Order=ODI_EMAPeriod2, GroupName=GPI_CUSTOM_PARAMS)]
 		public int EMAPeriod2
 		{
 			get { return emaperiod2;}
@@ -407,7 +407,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="Range", Description="Range for momentum Calculation(Q)", Order=OD_Range, GroupName=GP_CUSTOM_PARAMS)]
+		[Display(Name="Range", Description="Range for momentum Calculation(Q)", Order=ODI_Range, GroupName=GPI_CUSTOM_PARAMS)]
 		public int Range
 		{
 			get { return range;}
@@ -416,7 +416,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="SMITMAPeriod", Description="SMI TMA smoothing period", Order=OD_SMITMAPeriod, GroupName=GP_CUSTOM_PARAMS)]
+		[Display(Name="SMITMAPeriod", Description="SMI TMA smoothing period", Order=ODI_SMITMAPeriod, GroupName=GPI_CUSTOM_PARAMS)]
 		public int SMITMAPeriod
 		{
 			get { return smitmaperiod;}
@@ -425,7 +425,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[Range(0, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="SMICrossLevel", Description="SMI&TMA Cross Level", Order=OD_SMICrossLevel, GroupName=GP_CUSTOM_PARAMS)]
+		[Display(Name="SMICrossLevel", Description="SMI&TMA Cross Level", Order=ODI_SMICrossLevel, GroupName=GPI_CUSTOM_PARAMS)]
 		public int SMICrossLevel
 		{
 			get { return smiCrossLevel;}
@@ -494,11 +494,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private int tmaperiod= 6;
 		private int smiCrossLevel = 50;
 		
-		public const int OD_EMAPeriod1 = 1;
-		public const int OD_EMAPeriod2 = 2;
-		public const int OD_Range = 3;
-		public const int OD_SMITMAPeriod = 4;
-		public const int OD_SMICrossLevel = 5;
+		public const int ODI_EMAPeriod1 = 1;
+		public const int ODI_EMAPeriod2 = 2;
+		public const int ODI_Range = 3;
+		public const int ODI_SMITMAPeriod = 4;
+		public const int ODI_SMICrossLevel = 5;
 		#endregion		
 	}
 }

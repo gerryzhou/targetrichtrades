@@ -540,7 +540,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// The print out level
 		/// </summary>
 		/// <returns></returns>
-		[Display(Name="PrintOut", Description="The print out level", Order=0, GroupName=GP_GINDICATOR)]
+		[Display(Name="PrintOut", Description="The print out level", Order=0, GroupName=GPI_GINDICATOR)]
         [XmlIgnore()] // ensures that the property will NOT be saved/recovered as part of a chart template or workspace
         public int PrintOut
         {
@@ -550,7 +550,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		[NinjaScriptProperty]
 		[XmlIgnore]
-		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName=GP_GINDICATOR)]
+		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName=GPI_GINDICATOR)]
 		public Brush CustomColor1
 		{ get; set; }
 
@@ -563,18 +563,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[NinjaScriptProperty]
 		[Range(0, double.MaxValue)]
-		[Display(Name="CustomPrc1", Description="CustomPrc-1", Order=2, GroupName=GP_GINDICATOR)]
+		[Display(Name="CustomPrc1", Description="CustomPrc-1", Order=2, GroupName=GPI_GINDICATOR)]
 		public double CustomPrc1
 		{ get; set; }
 
 		[NinjaScriptProperty]
-		[Display(Name="CustomStr1", Description="CustomStr-1", Order=3, GroupName=GP_GINDICATOR)]
+		[Display(Name="CustomStr1", Description="CustomStr-1", Order=3, GroupName=GPI_GINDICATOR)]
 		public string CustomStr1
 		{ get; set; }
 
 		[NinjaScriptProperty]
 		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
-		[Display(Name="CustomTime1", Description="CustomTime-1", Order=4, GroupName=GP_GINDICATOR)]
+		[Display(Name="CustomTime1", Description="CustomTime-1", Order=4, GroupName=GPI_GINDICATOR)]
 		public DateTime CustomTime1
 		{ get; set; }
 		#endregion

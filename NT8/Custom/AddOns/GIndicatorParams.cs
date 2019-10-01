@@ -35,12 +35,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 	/// <summary>
 	/// Display "CP" first, the entry defined in individual indicators
 	/// </summary>
-	[Gui.CategoryOrder("CustomParams", 1)]
+	[Gui.CategoryOrder(GPI_CUSTOM_PARAMS, 1)] //"CustomParams"
 	
-	[Gui.CategoryOrder("GIndicator", 2)] // Indicator general
-	[Gui.CategoryOrder("Timming", 3)] //
-	[Gui.CategoryOrder("MA", 4)] // "Moving Average"
-	[Gui.CategoryOrder("OSI", 5)] // ""
+	[Gui.CategoryOrder(GPI_GINDICATOR, 2)] // "GIndicator", Indicator general
+	[Gui.CategoryOrder(GPI_TIMING, 3)] // "Timming"
+	[Gui.CategoryOrder(GPI_MA, 4)] // "MovingAverage"
+	[Gui.CategoryOrder(GPI_OUTPUT, 5)] // "Output"
+	[Gui.CategoryOrder(GPI_NJSCRIPT_PARAMS, 6)] //"NinjaScriptParameters"
 	
 	/// <summary>
 	/// The class to manage parameters for indicator
@@ -54,31 +55,34 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// The group for individual indicators parameters
 		/// The order for each entry is defined in the class of individual indicator 
 		/// </summary>
-		public const string GP_CUSTOM_PARAMS = "CustomParams";
+		public const string GPI_CUSTOM_PARAMS = "CustomParams";
 		#endregion
 		
 		#region GIndicator
-		public const string GP_GINDICATOR = "GIndicator";
+		public const string GPI_GINDICATOR = "GIndicator";
 		public const int OD_SpvPRBits = 1;
 		#endregion
 		
 		#region Timming
-		public const string GP_TIMING = "Timming";
-		public const int OD_OpenStartH = 1;
-		public const int OD_OpenStartM = 2;
-		public const int OD_OpenEndH = 3;
-		public const int OD_OpenEndM = 4;
+		public const string GPI_TIMING = "Timming";
+		public const int ODI_OpenStartH = 1;
+		public const int ODI_OpenStartM = 2;
+		public const int ODI_OpenEndH = 3;
+		public const int ODI_OpenEndM = 4;
 		#endregion
 		
 		#region MovingAverage
-		public const string GP_MA = "MovingAverage";
+		public const string GPI_MA = "MovingAverage";
 		#endregion
 		
 		#region Output
-		public const string GP_OUTPUT = "Output";
+		public const string GPI_OUTPUT = "Output";
+		#endregion
+
+		#region NinjaScriptParameters
+		public const string GPI_NJSCRIPT_PARAMS = "NinjaScriptParameters";
 		#endregion
 		
 		private const int IndParamOrder = 0;
 	}
 }
-		

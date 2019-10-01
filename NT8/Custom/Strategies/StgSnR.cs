@@ -32,7 +32,7 @@ using NinjaTrader.NinjaScript.AddOns;
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	public class StgSnR : GSZTraderBase
+	public class StgSnR : GStrategyBase
 	{
 		private GISMI giSMI;
 		private GISnR giSnR;

@@ -28,7 +28,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// <summary>
 	/// @"Manage position size, scale in/out, etc.";
 	/// </summary>
-	public partial class GSZTraderBase : Strategy
+	public partial class GStrategyBase : Strategy
 	{
 		public int HasPosition() {
 			indicatorProxy.TraceMessage(this.Name, 0);

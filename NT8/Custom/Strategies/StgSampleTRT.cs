@@ -46,7 +46,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// * Pullback Pivot: left 20+, right 5+, i.e. (20+, 5+)
 	/// * Trending pivot: breakout the pullback pivot, create a new (5+, 5+) pivot
 	/// </summary>
-	public class StgSampleTRT : GSZTraderBase
+	public class StgSampleTRT : GStrategyBase
 	{
 		private GISMI giSMI;
 		private GIAwesomeOscillator awOscillator;
@@ -209,7 +209,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Bars count before inflection for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "EnBarsBeforeInflection", GroupName = "CustomParams", Order = 0)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "EnBarsBeforeInflection", GroupName = GPS_CUSTOM_PARAMS, Order = 0)]
         public int CP_EnBarsBeforeInflection
         {
             get { return cp_EnBarsBeforeInflection; }
@@ -218,7 +218,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Bars lookback period")]
  		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsLookback", GroupName = "CustomParams", Order = 1)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsLookback", GroupName = GPS_CUSTOM_PARAMS, Order = 1)]
         public int BarsLookback
         {
             get { return barsLookback; }
@@ -227,7 +227,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="EMAPeriod1(SMI)", Description="1st ema smothing period. ( R )", Order=2, GroupName="CustomParams")]
+		[Display(Name="EMAPeriod1(SMI)", Description="1st ema smothing period. ( R )", Order=2, GroupName=GPS_CUSTOM_PARAMS)]
 		public int EMAPeriod1
 		{
 			get { return emaperiod1;}
@@ -236,7 +236,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="EMAPeriod2(SMI)", Description="2nd ema smoothing period. ( S )", Order=3, GroupName="CustomParams")]
+		[Display(Name="EMAPeriod2(SMI)", Description="2nd ema smoothing period. ( S )", Order=3, GroupName=GPS_CUSTOM_PARAMS)]
 		public int EMAPeriod2
 		{
 			get { return emaperiod2;}
@@ -245,7 +245,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="Range(SMI)", Description="Range for momentum Calculation ( Q )", Order=4, GroupName="CustomParams")]
+		[Display(Name="Range(SMI)", Description="Range for momentum Calculation ( Q )", Order=4, GroupName=GPS_CUSTOM_PARAMS)]
 		public int Range
 		{
 			get { return range;}
@@ -254,7 +254,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="SMITMAPeriod", Description="SMI TMA smoothing period", Order=5, GroupName="CustomParams")]
+		[Display(Name="SMITMAPeriod", Description="SMI TMA smoothing period", Order=5, GroupName=GPS_CUSTOM_PARAMS)]
 		public int SMITMAPeriod
 		{
 			get { return smitmaperiod;}
@@ -263,7 +263,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Range(0, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="SMICrossLevel", Description="SMI&TMA Cross Level", Order=6, GroupName="CustomParams")]
+		[Display(Name="SMICrossLevel", Description="SMI&TMA Cross Level", Order=6, GroupName=GPS_CUSTOM_PARAMS)]
 		public int SMICrossLevel
 		{
 			get { return smiCrossLevel;}
@@ -275,7 +275,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		//[Description("Period for fast EMA")]
 		//[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "FastPeriod(AO)", GroupName = "CustomParams", Order = 7)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "FastPeriod(AO)", GroupName = GPS_CUSTOM_PARAMS, Order = 7)]		
 		public int FastPeriod
 		{
 			//get;set;
@@ -288,7 +288,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		//[Description("Period for slow EMA")]
 		//[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "SlowPeriod(AO)", GroupName = "CustomParams", Order = 8)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SlowPeriod(AO)", GroupName = GPS_CUSTOM_PARAMS, Order = 8)]
 		public int SlowPeriod
 		{
 			get { return slowPeriod; }
@@ -300,7 +300,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //		[Description("Period for Smoothing of Signal Line")]
 //		[Category("Parameters")]
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "Smooth(AO)", GroupName = "CustomParams", Order = 9)]		
+		[Display(ResourceType = typeof(Custom.Resource), Name = "Smooth(AO)", GroupName = GPS_CUSTOM_PARAMS, Order = 9)]		
 		public int Smooth
 		{
 			get { return smooth; }

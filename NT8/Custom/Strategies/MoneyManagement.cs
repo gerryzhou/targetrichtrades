@@ -28,7 +28,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	public partial class GSZTraderBase : Strategy
+	public partial class GStrategyBase : Strategy
 	{		
 		#region Money Mgmt Functions
 		
@@ -662,7 +662,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region MM Properties
         [Description("Money amount of profit target")]
  		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]		
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtAmt", GroupName = "MoneyMgmt", Order = 0)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtAmt", GroupName = GPS_MONEY_MGMT, Order = ODG_ProfitTgtAmt)]	
         public double MM_ProfitTargetAmt
         {
             get{return mm_ProfitTargetAmt;}
@@ -671,7 +671,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Ticks amount for profit target")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtTic", GroupName = "MoneyMgmt", Order = 1)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtTic", GroupName = GPS_MONEY_MGMT, Order = ODG_ProfitTgtTic)]	
         public int MM_ProfitTgtTic
         {
             get{return mm_ProfitTgtTic;}
@@ -680,7 +680,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Money amount for profit target increasement")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtIncTic", GroupName = "MoneyMgmt", Order = 2)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitTgtIncTic", GroupName = GPS_MONEY_MGMT, Order = ODG_ProfitTgtIncTic)]	
         public int MM_ProfitTgtIncTic
         {
             get{return mm_ProfitTgtIncTic;}
@@ -689,7 +689,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Tick amount for min profit locking")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitLockMinTic", GroupName = "MoneyMgmt", Order = 3)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitLockMinTic", GroupName = GPS_MONEY_MGMT, Order = ODG_ProfitLockMinTic)]	
         public int MM_ProfitLockMinTic
         {
             get{return mm_ProfitLockMinTic;}
@@ -698,7 +698,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Description("Tick amount for max profit locking")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitLockMaxTic", GroupName = "MoneyMgmt", Order = 4)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitLockMaxTic", GroupName = GPS_MONEY_MGMT, Order = ODG_ProfitLockMaxTic)]	
         public int MM_ProfitLockMaxTic
         {
             get{return mm_ProfitLockMaxTic;}
@@ -707,7 +707,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Money amount of stop loss")]
  		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossAmt", GroupName = "MoneyMgmt", Order = 5)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossAmt", GroupName = GPS_MONEY_MGMT, Order = ODG_StopLossAmt)]	
         public double MM_StopLossAmt
         {
             get{return mm_StopLossAmt;}
@@ -716,7 +716,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Ticks amount for stop loss")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossTic", GroupName = "MoneyMgmt", Order = 6)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossTic", GroupName = GPS_MONEY_MGMT, Order = ODG_StopLossTic)]	
         public int MM_StopLossTic
         {
             get{return mm_StopLossTic;}
@@ -725,7 +725,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Money amount for stop loss increasement")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossIncTic", GroupName = "MoneyMgmt", Order = 7)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "StopLossIncTic", GroupName = GPS_MONEY_MGMT, Order = ODG_StopLossIncTic)]	
         public int MM_StopLossIncTic
         {
             get{return mm_StopLossIncTic;}
@@ -734,7 +734,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Break Even amount")]
  		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BreakEvenAmt", GroupName = "MoneyMgmt", Order = 8)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BreakEvenAmt", GroupName = GPS_MONEY_MGMT, Order = ODG_BreakEvenAmt)]	
         public double MM_BreakEvenAmt
         {
             get{return mm_BreakEvenAmt;}
@@ -743,7 +743,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
         [Description("Money amount of trailing stop loss")]
  		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossAmt", GroupName = "MoneyMgmt", Order = 9)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossAmt", GroupName = GPS_MONEY_MGMT, Order = ODG_TrailingStopLossAmt)]	
         public double MM_TrailingStopLossAmt
         {
             get{return mm_TrailingStopLossAmt;}
@@ -752,7 +752,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         
 		[Description("Ticks amount of trailing stop loss")]
  		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossTic", GroupName = "MoneyMgmt", Order = 10)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossTic", GroupName = GPS_MONEY_MGMT, Order = ODG_TrailingStopLossTic)]	
         public int MM_TrailingStopLossTic
         {
             get{return mm_TrailingStopLossTic;}
@@ -761,7 +761,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [Description("Percent amount of trailing stop loss")]
  		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossPercent", GroupName = "MoneyMgmt", Order = 11)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TrailingStopLossPercent", GroupName = GPS_MONEY_MGMT, Order = ODG_TrailingStopLossPercent)]	
         public double MM_TrailingStopLossPercent
         {
             get{return mm_TrailingStopLossPercent;}
@@ -770,7 +770,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Use trailing stop loss every bar")]
  		[NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "SLTrailing", GroupName = "MoneyMgmt", Order = 12)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SLTrailing", GroupName = GPS_MONEY_MGMT, Order = ODG_SLTrailing)]	
         public bool MM_SLTrailing
         {
             get{return mm_SLTrailing;}
@@ -779,7 +779,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Use trailing profit target every bar")]
  		[NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "PTTrailing", GroupName = "MoneyMgmt", Order = 13)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PTTrailing", GroupName = GPS_MONEY_MGMT, Order = ODG_PTTrailing)]	
         public bool MM_PTTrailing
         {
             get{return mm_PTTrailing;}
@@ -788,7 +788,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Description("Calculation mode for profit target")]
  		[NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "PTCalculationMode", GroupName = "MoneyMgmt", Order = 14)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PTCalculationMode", GroupName = GPS_MONEY_MGMT, Order = ODG_PTCalculationMode)]	
         public CalculationMode MM_PTCalculationMode
         {
             get{return mm_PTCalculationMode;}
@@ -797,7 +797,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Description("Calculation mode for stop loss")]
  		[NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "SLCalculationMode", GroupName = "MoneyMgmt", Order = 15)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SLCalculationMode", GroupName = GPS_MONEY_MGMT, Order = ODG_SLCalculationMode)]	
         public CalculationMode MM_SLCalculationMode
         {
             get{return mm_SLCalculationMode;}
@@ -806,7 +806,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Description("Calculation mode for break even")]
  		[NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BECalculationMode", GroupName = "MoneyMgmt", Order = 16)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BECalculationMode", GroupName = GPS_MONEY_MGMT, Order = ODG_BECalculationMode)]	
         public CalculationMode MM_BECalculationMode
         {
             get{return mm_BECalculationMode;}
@@ -815,7 +815,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Calculation mode for trailing stop loss")]
  		[NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "TLSLCalculationMode", GroupName = "MoneyMgmt", Order = 17)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TLSLCalculationMode", GroupName = GPS_MONEY_MGMT, Order = ODG_TLSLCalculationMode)]	
         public CalculationMode MM_TLSLCalculationMode
         {
             get{return mm_TLSLCalculationMode;}
@@ -824,7 +824,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Description("Daily Loss Limit amount")]
  		[Range(double.MinValue, double.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "DailyLossLmt", GroupName = "MoneyMgmt", Order = 18)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "DailyLossLmt", GroupName = GPS_MONEY_MGMT, Order = ODG_DailyLossLmt)]	
         public double MM_DailyLossLmt
         {
             get{return mm_DailyLossLmt;}
@@ -833,7 +833,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[Description("Profit Factor")]
  		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitFactor", GroupName = "MoneyMgmt", Order = 19)]	
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitFactor", GroupName = GPS_MONEY_MGMT, Order = ODG_ProfitFactor)]	
         public double MM_ProfitFactor
         {
             get{return mm_ProfitFactor;}

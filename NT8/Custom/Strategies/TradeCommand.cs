@@ -36,7 +36,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 	}
 	
-	public partial class GSZTraderBase : Strategy
+	public partial class GStrategyBase : Strategy
 	{
 		protected CmdObject cmdObj = null;
 

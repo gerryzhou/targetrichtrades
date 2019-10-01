@@ -103,7 +103,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		#region Properties
 		[NinjaScriptProperty]
 		[Display(Name="GSZTrader", Description="GSZTrader instance for indicator proxy")]
-		public GSZTraderBase GSZTrader
+		public GStrategyBase GSZTrader
 		{ get; set; }
 		
 		//[NinjaScriptProperty]
@@ -148,12 +148,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private ZTraderInd.GIndicatorProxy[] cacheGIndicatorProxy;
-		public ZTraderInd.GIndicatorProxy GIndicatorProxy(GSZTraderBase gSZTrader)
+		public ZTraderInd.GIndicatorProxy GIndicatorProxy(GStrategyBase gSZTrader)
 		{
 			return GIndicatorProxy(Input, gSZTrader);
 		}
 
-		public ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input, GSZTraderBase gSZTrader)
+		public ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input, GStrategyBase gSZTrader)
 		{
 			if (cacheGIndicatorProxy != null)
 				for (int idx = 0; idx < cacheGIndicatorProxy.Length; idx++)
@@ -168,12 +168,12 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(GSZTraderBase gSZTrader)
+		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(GStrategyBase gSZTrader)
 		{
 			return indicator.GIndicatorProxy(Input, gSZTrader);
 		}
 
-		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input , GSZTraderBase gSZTrader)
+		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input , GStrategyBase gSZTrader)
 		{
 			return indicator.GIndicatorProxy(input, gSZTrader);
 		}
@@ -184,12 +184,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(GSZTraderBase gSZTrader)
+		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(GStrategyBase gSZTrader)
 		{
 			return indicator.GIndicatorProxy(Input, gSZTrader);
 		}
 
-		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input , GSZTraderBase gSZTrader)
+		public Indicators.ZTraderInd.GIndicatorProxy GIndicatorProxy(ISeries<double> input , GStrategyBase gSZTrader)
 		{
 			return indicator.GIndicatorProxy(input, gSZTrader);
 		}

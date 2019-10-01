@@ -92,12 +92,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		#region Properties
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "PeriodLeft", GroupName = "NinjaScriptParameters", Order = 0)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PeriodLeft", GroupName = GPI_CUSTOM_PARAMS, Order = 0)]
 		public int PeriodLeft
 		{ get; set; }
 
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "PeriodRight", GroupName = "NinjaScriptParameters", Order = 1)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PeriodRight", GroupName = GPI_CUSTOM_PARAMS, Order = 1)]
 		
 		public int PeriodRight
 		{ get; set; }

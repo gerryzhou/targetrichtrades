@@ -155,19 +155,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 		#region Properties
 		[Description("Show Overnight HL")]
 		[NinjaScriptProperty]
-		[Display(Name="ShowOvernightHL", Order=0, GroupName="CustomParams")]
+		[Display(Name="ShowOvernightHL", Order=0, GroupName=GPI_CUSTOM_PARAMS)]
 		public bool ShowOvernightHL
 		{ get; set; }
 		
 		[Description("Show Open HL")]
 		[NinjaScriptProperty]
-		[Display(Name="ShowOpenHL", Order=1, GroupName="CustomParams")]
+		[Display(Name="ShowOpenHL", Order=1, GroupName=GPI_CUSTOM_PARAMS)]
 		public bool ShowOpenHL
 		{ get; set; }
 		
 		[Description("Show Lastday HL")]
 		[NinjaScriptProperty]
-		[Display(Name="ShowLastdayHL", Order=2, GroupName="CustomParams")]
+		[Display(Name="ShowLastdayHL", Order=2, GroupName=GPI_CUSTOM_PARAMS)]
 		public bool ShowLastdayHL
 		{ get; set; }
 		
