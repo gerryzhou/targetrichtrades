@@ -32,7 +32,7 @@ using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 namespace NinjaTrader.NinjaScript.Strategies
 {
 	/// <summary>
-	/// Sample strategy fro GSZTrader:
+	/// Sample strategy fro GStrategy:
 	/// 1) OnStateChange();
 	/// 2) OnBarUpdate();
 	/// 3) GetIndicatorSignal();
@@ -46,7 +46,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// * Pullback Pivot: left 20+, right 5+, i.e. (20+, 5+)
 	/// * Trending pivot: breakout the pullback pivot, create a new (5+, 5+) pivot
 	/// </summary>
-	public class StgSampleTRT : GStrategyBase
+	
+	/// Open Breakout Trade
+	/// OBK-1) Engulfing the largest bar after opening, which breakout the opening range and failed;
+	/// OBK-2) Failed breakout:
+	public class StgSampleOBK : GStrategyBase
 	{
 		private GISMI giSMI;
 		private GIAwesomeOscillator awOscillator;
@@ -60,7 +64,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				Print(this.Name + " set defaults called....");
 				Description									= @"The sample strategy for GSZTrader.";
-				Name										= "StgSampleTRT";
+				Name										= "StgSampleOBK";
 				Calculate									= Calculate.OnBarClose;
 				IsFillLimitOnTouch							= false;
 				TraceOrders									= false;
@@ -201,7 +205,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + tradeObj.entrySignalName);
 					tradeObj.enLimitPrice = GetTypicalPrice(0);
 					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());
-				}				
+				}
 			}
 		}
 

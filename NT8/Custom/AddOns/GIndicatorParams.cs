@@ -36,7 +36,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 	/// Display "CP" first, the entry defined in individual indicators
 	/// </summary>
 	[Gui.CategoryOrder(GPI_CUSTOM_PARAMS, 1)] //"CustomParams"
-//	[Gui.CategoryOrder(GPI_NJSCRIPT_PARAMS, 6)] //"NinjaScriptParameters"	
+//	[Gui.CategoryOrder(GPI_NJSCRIPT_PARAMS, 1)] //"NinjaScriptParameters"
 	[Gui.CategoryOrder(GPI_GINDICATOR, 2)] // "GIndicator", Indicator general
 	[Gui.CategoryOrder(GPI_TIMING, 3)] // "Timming"
 	[Gui.CategoryOrder(GPI_MA, 4)] // "MovingAverage"
@@ -57,14 +57,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public const string GPI_CUSTOM_PARAMS = "CustomParams";
 		#endregion
 
-
 		#region NinjaScriptParameters
-//		public const string GPI_NJSCRIPT_PARAMS = "NinjaScriptParameters";
+//		public const string GPI_CUSTOM_PARAMS = "Parameters";//"NinjaScriptParameters";
 		#endregion
 		
 		#region GIndicator
 		public const string GPI_GINDICATOR = "GIndicator";
-		public const int OD_SpvPRBits = 1;
+		public const int ODI_SpvPRBits = 1;
+		public const int ODI_PrintOut = 2;
 		#endregion
 		
 		#region Timming

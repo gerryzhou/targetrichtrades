@@ -389,7 +389,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		#region Properties
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="EMAPeriod1", Description="1st ema smothing period(R)", GroupName=GPI_CUSTOM_PARAMS, Order=ODI_EMAPeriod1)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="EMAPeriod1", Description="1st ema smothing period(R)", GroupName=GPI_CUSTOM_PARAMS, Order=ODI_EMAPeriod1)]
 		public int EMAPeriod1
 		{
 			get { return emaperiod1;}
@@ -398,7 +398,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="EMAPeriod2", Description="2nd ema smoothing period(S)", GroupName=GPI_CUSTOM_PARAMS, Order=ODI_EMAPeriod2)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="EMAPeriod2", Description="2nd ema smoothing period(S)", GroupName=GPI_CUSTOM_PARAMS, Order=ODI_EMAPeriod2)]
 		public int EMAPeriod2
 		{
 			get { return emaperiod2;}
@@ -407,7 +407,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="Range", Description="Range for momentum Calculation(Q)", GroupName=GPI_CUSTOM_PARAMS, Order=ODI_Range)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="Range", Description="Range for momentum Calculation(Q)", GroupName=GPI_CUSTOM_PARAMS, Order=ODI_Range)]
 		public int Range
 		{
 			get { return range;}
@@ -416,7 +416,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="SMITMAPeriod", Description="SMI TMA smoothing period", GroupName=GPI_CUSTOM_PARAMS, Order=ODI_SMITMAPeriod)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="SMITMAPeriod", Description="SMI TMA smoothing period", GroupName=GPI_CUSTOM_PARAMS, Order=ODI_SMITMAPeriod)]
 		public int SMITMAPeriod
 		{
 			get { return smitmaperiod;}
@@ -425,7 +425,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[Range(0, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="SMICrossLevel", Description="SMI&TMA Cross Level", GroupName=GPI_CUSTOM_PARAMS, Order=ODI_SMICrossLevel)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="SMICrossLevel", Description="SMI&TMA Cross Level", GroupName=GPI_CUSTOM_PARAMS, Order=ODI_SMICrossLevel)]
 		public int SMICrossLevel
 		{
 			get { return smiCrossLevel;}

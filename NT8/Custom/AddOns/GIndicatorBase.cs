@@ -540,7 +540,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// The print out level
 		/// </summary>
 		/// <returns></returns>
-		[Display(Name="PrintOut", Description="The print out level", Order=0, GroupName=GPI_GINDICATOR)]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name="PrintOut", Description="The print out level", Order=ODI_PrintOut, GroupName=GPI_GINDICATOR)]
         [XmlIgnore()] // ensures that the property will NOT be saved/recovered as part of a chart template or workspace
         public int PrintOut
         {
@@ -550,7 +551,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		[NinjaScriptProperty]
 		[XmlIgnore]
-		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName=GPI_GINDICATOR)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="CustomColor1", Description="Color-1", Order=ODI_PrintOut+1, GroupName=GPI_GINDICATOR)]
 		public Brush CustomColor1
 		{ get; set; }
 
@@ -561,20 +562,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 			set { CustomColor1 = Serialize.StringToBrush(value); }
 		}			
 
-		[NinjaScriptProperty]
-		[Range(0, double.MaxValue)]
-		[Display(Name="CustomPrc1", Description="CustomPrc-1", Order=2, GroupName=GPI_GINDICATOR)]
+		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name="CustomPrc1", Description="CustomPrc-1", Order=3, GroupName=GPI_GINDICATOR)]
 		public double CustomPrc1
 		{ get; set; }
 
 		[NinjaScriptProperty]
-		[Display(Name="CustomStr1", Description="CustomStr-1", Order=3, GroupName=GPI_GINDICATOR)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="CustomStr1", Description="CustomStr-1", Order=4, GroupName=GPI_GINDICATOR)]
 		public string CustomStr1
 		{ get; set; }
 
 		[NinjaScriptProperty]
 		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
-		[Display(Name="CustomTime1", Description="CustomTime-1", Order=4, GroupName=GPI_GINDICATOR)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="CustomTime1", Description="CustomTime-1", Order=5, GroupName=GPI_GINDICATOR)]
 		public DateTime CustomTime1
 		{ get; set; }
 		#endregion

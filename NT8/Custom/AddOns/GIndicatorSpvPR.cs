@@ -417,7 +417,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		[NinjaScriptProperty]
 		[XmlIgnore]
-		[Display(Name="SpvPRBits", Description="Supervised PR Bits", Order=OD_SpvPRBits, GroupName=GPI_GINDICATOR)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="SpvPRBits", Description="Supervised PR Bits", Order=ODI_SpvPRBits, GroupName=GPI_GINDICATOR)]
         public int SpvPRBits
         {
             get { return spvPRBits; }
