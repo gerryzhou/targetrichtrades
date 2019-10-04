@@ -28,7 +28,7 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 	public class SnR
 	{
 		/// <summary>
-		/// SnR in a time period:
+		/// SnR in a period:
 		/// Support;
 		/// Resistance;
 		///
@@ -46,20 +46,17 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 		}
 		
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-        [Browsable(false)]
-		[XmlIgnore()]
+        [Browsable(false), XmlIgnore()]
 		public int BarNo
 		{ get; set; }		
 
 		[NinjaScriptProperty]
-        [Browsable(false)]
-		[XmlIgnore()]
+        [Browsable(false), XmlIgnore()]
 		public SupportResistanceType SnRType
 		{ get; set; }
 		
 		[NinjaScriptProperty]
-        [Browsable(false)]
-		[XmlIgnore()]
+        [Browsable(false), XmlIgnore()]
 		public PriceSubtype SnRPriceType
 		{ get; set; }
 	}
@@ -72,10 +69,20 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 			SnRType = snrType;
 			SnRPrice = snrPrice;
 		}
+
+		public void NewSupportResistanceLine(Period period, SupportResistanceType snrType, double snrPrice) {
+			LinePeriod = period;
+			SnRType = snrType;
+			SnRPrice = snrPrice;
+		}
+
+		[NinjaScriptProperty]
+        [Browsable(false), XmlIgnore()]
+		public Period LinePeriod
+		{ get; set; }
 		
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-        [Browsable(false)]
-		[XmlIgnore()]
+        [Browsable(false), XmlIgnore()]
 		public int BarNoStart
 		{ get; set; }
 		
@@ -86,14 +93,12 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 		{ get; set; }
 		
 		[NinjaScriptProperty]
-        [Browsable(false)]
-		[XmlIgnore()]
+        [Browsable(false), XmlIgnore()]
 		public SupportResistanceType SnRType
 		{ get; set; }
 		
 		[Range(0, double.MaxValue), NinjaScriptProperty]
-        [Browsable(false)]
-		[XmlIgnore()]
+        [Browsable(false), XmlIgnore()]
 		public double SnRPrice
 		{ get; set; }
 	}
@@ -126,6 +131,13 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 		{ get; set; }
 	}	
 }
+
+
+
+
+
+
+
 
 
 

@@ -36,6 +36,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	public enum SupportResistanceType {Support = 1, Resistance = -1, Unknown = 0};
 	public enum LineCrossType {Above, Below, Both}; //over/under or above/below
 	public enum DivergenceType {Divergent=-1, Convergent=1, UnKnown=0};
+	public enum SignalBarByType {ByTime=1, ByVolume=2, ByPrice=3, ByBarNo=4}; // Identify singal bar by time/vol/price/barNo
 
 	public enum SignalType {Direction, Volatility, SnR,
 					SimplePriceAction, CombinedPriceAction, Unknown};
@@ -68,6 +69,13 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	
 	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4};
 }
+
+
+
+
+
+
+
 
 
 

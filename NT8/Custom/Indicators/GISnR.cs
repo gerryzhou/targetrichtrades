@@ -28,8 +28,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public class GISnR : GIndicatorBase
 	{
 		private Series<double> CustmSeries;
-		private double overnight_hi;
-		private double overnight_lo;
+
 		private GIGetHighLowByTimeRange getHLByTimeRange;
 
 		protected override void OnStateChange()
@@ -153,21 +152,25 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		#region Properties
+		private const int ODI_ShowOvernightHL = 1;
+		private const int ODI_ShowOpenHL = 2;
+		private const int ODI_ShowLastdayHL = 3;
+		
 		[Description("Show Overnight HL")]
 		[NinjaScriptProperty]
-		[Display(Name="ShowOvernightHL", Order=0, GroupName=GPI_CUSTOM_PARAMS)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="ShowOvernightHL", Order=ODI_ShowOvernightHL, GroupName=GPI_CUSTOM_PARAMS)]
 		public bool ShowOvernightHL
 		{ get; set; }
 		
 		[Description("Show Open HL")]
 		[NinjaScriptProperty]
-		[Display(Name="ShowOpenHL", Order=1, GroupName=GPI_CUSTOM_PARAMS)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="ShowOpenHL", Order=ODI_ShowOpenHL, GroupName=GPI_CUSTOM_PARAMS)]
 		public bool ShowOpenHL
 		{ get; set; }
 		
 		[Description("Show Lastday HL")]
 		[NinjaScriptProperty]
-		[Display(Name="ShowLastdayHL", Order=2, GroupName=GPI_CUSTOM_PARAMS)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="ShowLastdayHL", Order=ODI_ShowLastdayHL, GroupName=GPI_CUSTOM_PARAMS)]
 		public bool ShowLastdayHL
 		{ get; set; }
 		
@@ -182,6 +185,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 //		[Display(Name="OpenStartM", Order=1, GroupName="Timming")]
 //		public int OpenStartM
 //		{ get; set; }
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public SignalBarByType OpenStartBy
+		{
+			get; set;
+		}
+
+		[Browsable(false)]
+		[XmlIgnore]
+		public SignalBarByType OpenEndBy
+		{
+			get; set;
+		}
 		
 		[Browsable(false)]
 		[XmlIgnore]
@@ -224,6 +241,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			get { return Values[5]; }			
 		}
+		
+		private double overnight_hi;
+		private double overnight_lo;
+		
 		#endregion
 
 	}

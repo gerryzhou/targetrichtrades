@@ -223,6 +223,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			return null;		
 		}		
-		#endregion				
+		#endregion
 	}
 }

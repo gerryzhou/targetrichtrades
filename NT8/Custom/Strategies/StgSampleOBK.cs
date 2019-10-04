@@ -49,11 +49,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 	
 	/// Open Breakout Trade
 	/// OBK-1) Engulfing the largest bar after opening, which breakout the opening range and failed;
-	/// OBK-2) Failed breakout:
+	/// OBK-2) Failed breakout: the day expected as range day, breakout beyond the opening range will pullback
+	/// 						into the range, that may test the other side of the range;
+	/// 						the extension to the breakout side may goes as far as 2x the range size;
+	///
 	public class StgSampleOBK : GStrategyBase
 	{
 		private GISMI giSMI;
 		private GIAwesomeOscillator awOscillator;
+		private GISnR giSnR;
 		
 		private double c0 = 0, hi3 = Double.MaxValue, lo3 = Double.MinValue;
 		
