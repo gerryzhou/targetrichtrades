@@ -64,7 +64,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private DateTime endDateTime;
 		private List<SupportResistanceRange<SupportResistanceLine>> snrRanges;
 		private SupportResistanceRange<SupportResistanceLine> snrRange;
+		private Period period;
 		
+		/// <summary>
+		/// 1) Check current bar is in period, if yes, do nothing and go next bar;
+		/// 2) If current bar is out of current period and CurrentBar = period.EndBar + 1,
+		/// 	then calculate the Hi/Lo of current period, 
+		/// 	if CurrentBar > period.EndBar + 1, do nothing and go next bar;
+		/// 3) how to calculate each period? ByTime is done; ByVol, 
+		/// </summary>
 		protected override void OnBarUpdate()
 		{
 			// Check to make sure the end time is not earlier than the start time
@@ -85,8 +93,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 
 			// Calculate the number of bars ago for the start and end bars of the specified time range
-			int startBarsAgo = Bars.GetBar(startDateTime);
-			int endBarsAgo = Bars.GetBar(endDateTime);
+			int startBarsAgo = GetBarNoByDateTime(startDateTime);//Bars.GetBar(startDateTime);
+			int endBarsAgo = GetBarNoByDateTime(endDateTime);//Bars.GetBar(endDateTime);
 
 			/* Now that we have the start and end bars ago values for the specified time range we can calculate the highest high for this range
 			 
@@ -113,10 +121,26 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		
 		#region Properties
-		private const int ODI_StartHour = 1;
-		private const int ODI_StartMinute = 2;
-		private const int ODI_EndHour = 3;
-		private const int ODI_EndMinute = 4;
+		private const int ODI_PeriodStartBy = 1;
+		private const int ODI_PeriodEndBy = 2;
+		private const int ODI_StartHour = 3;
+		private const int ODI_StartMinute = 4;
+		private const int ODI_EndHour = 5;
+		private const int ODI_EndMinute = 6;
+
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name="PeriodStartBy", Description = "The ByType for PeriodStart bar", Order=ODI_PeriodStartBy, GroupName=GPI_CUSTOM_PARAMS)]
+		public SignalBarByType PeriodStartBy
+		{
+			get; set;
+		}
+
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name="PeriodEndBy", Description = "The ByType for PeriodEnd bar", Order=ODI_PeriodEndBy, GroupName=GPI_CUSTOM_PARAMS)]
+		public SignalBarByType PeriodEndBy
+		{
+			get; set;
+		}
 		
 		[Range(0,23)]
 		[NinjaScriptProperty]
@@ -181,18 +205,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GIGetHighLowByPeriod[] cacheGIGetHighLowByPeriod;
-		public GIGetHighLowByPeriod GIGetHighLowByPeriod(int startHour, int startMinute, int endHour, int endMinute)
+		public GIGetHighLowByPeriod GIGetHighLowByPeriod(SignalBarByType periodStartBy, SignalBarByType periodEndBy, int startHour, int startMinute, int endHour, int endMinute)
 		{
-			return GIGetHighLowByPeriod(Input, startHour, startMinute, endHour, endMinute);
+			return GIGetHighLowByPeriod(Input, periodStartBy, periodEndBy, startHour, startMinute, endHour, endMinute);
 		}
 
-		public GIGetHighLowByPeriod GIGetHighLowByPeriod(ISeries<double> input, int startHour, int startMinute, int endHour, int endMinute)
+		public GIGetHighLowByPeriod GIGetHighLowByPeriod(ISeries<double> input, SignalBarByType periodStartBy, SignalBarByType periodEndBy, int startHour, int startMinute, int endHour, int endMinute)
 		{
 			if (cacheGIGetHighLowByPeriod != null)
 				for (int idx = 0; idx < cacheGIGetHighLowByPeriod.Length; idx++)
-					if (cacheGIGetHighLowByPeriod[idx] != null && cacheGIGetHighLowByPeriod[idx].StartHour == startHour && cacheGIGetHighLowByPeriod[idx].StartMinute == startMinute && cacheGIGetHighLowByPeriod[idx].EndHour == endHour && cacheGIGetHighLowByPeriod[idx].EndMinute == endMinute && cacheGIGetHighLowByPeriod[idx].EqualsInput(input))
+					if (cacheGIGetHighLowByPeriod[idx] != null && cacheGIGetHighLowByPeriod[idx].PeriodStartBy == periodStartBy && cacheGIGetHighLowByPeriod[idx].PeriodEndBy == periodEndBy && cacheGIGetHighLowByPeriod[idx].StartHour == startHour && cacheGIGetHighLowByPeriod[idx].StartMinute == startMinute && cacheGIGetHighLowByPeriod[idx].EndHour == endHour && cacheGIGetHighLowByPeriod[idx].EndMinute == endMinute && cacheGIGetHighLowByPeriod[idx].EqualsInput(input))
 						return cacheGIGetHighLowByPeriod[idx];
-			return CacheIndicator<GIGetHighLowByPeriod>(new GIGetHighLowByPeriod(){ StartHour = startHour, StartMinute = startMinute, EndHour = endHour, EndMinute = endMinute }, input, ref cacheGIGetHighLowByPeriod);
+			return CacheIndicator<GIGetHighLowByPeriod>(new GIGetHighLowByPeriod(){ PeriodStartBy = periodStartBy, PeriodEndBy = periodEndBy, StartHour = startHour, StartMinute = startMinute, EndHour = endHour, EndMinute = endMinute }, input, ref cacheGIGetHighLowByPeriod);
 		}
 	}
 }
@@ -201,14 +225,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GIGetHighLowByPeriod GIGetHighLowByPeriod(int startHour, int startMinute, int endHour, int endMinute)
+		public Indicators.GIGetHighLowByPeriod GIGetHighLowByPeriod(SignalBarByType periodStartBy, SignalBarByType periodEndBy, int startHour, int startMinute, int endHour, int endMinute)
 		{
-			return indicator.GIGetHighLowByPeriod(Input, startHour, startMinute, endHour, endMinute);
+			return indicator.GIGetHighLowByPeriod(Input, periodStartBy, periodEndBy, startHour, startMinute, endHour, endMinute);
 		}
 
-		public Indicators.GIGetHighLowByPeriod GIGetHighLowByPeriod(ISeries<double> input , int startHour, int startMinute, int endHour, int endMinute)
+		public Indicators.GIGetHighLowByPeriod GIGetHighLowByPeriod(ISeries<double> input , SignalBarByType periodStartBy, SignalBarByType periodEndBy, int startHour, int startMinute, int endHour, int endMinute)
 		{
-			return indicator.GIGetHighLowByPeriod(input, startHour, startMinute, endHour, endMinute);
+			return indicator.GIGetHighLowByPeriod(input, periodStartBy, periodEndBy, startHour, startMinute, endHour, endMinute);
 		}
 	}
 }
@@ -217,14 +241,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GIGetHighLowByPeriod GIGetHighLowByPeriod(int startHour, int startMinute, int endHour, int endMinute)
+		public Indicators.GIGetHighLowByPeriod GIGetHighLowByPeriod(SignalBarByType periodStartBy, SignalBarByType periodEndBy, int startHour, int startMinute, int endHour, int endMinute)
 		{
-			return indicator.GIGetHighLowByPeriod(Input, startHour, startMinute, endHour, endMinute);
+			return indicator.GIGetHighLowByPeriod(Input, periodStartBy, periodEndBy, startHour, startMinute, endHour, endMinute);
 		}
 
-		public Indicators.GIGetHighLowByPeriod GIGetHighLowByPeriod(ISeries<double> input , int startHour, int startMinute, int endHour, int endMinute)
+		public Indicators.GIGetHighLowByPeriod GIGetHighLowByPeriod(ISeries<double> input , SignalBarByType periodStartBy, SignalBarByType periodEndBy, int startHour, int startMinute, int endHour, int endMinute)
 		{
-			return indicator.GIGetHighLowByPeriod(input, startHour, startMinute, endHour, endMinute);
+			return indicator.GIGetHighLowByPeriod(input, periodStartBy, periodEndBy, startHour, startMinute, endHour, endMinute);
 		}
 	}
 }

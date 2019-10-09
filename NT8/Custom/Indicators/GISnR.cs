@@ -188,20 +188,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		[Browsable(false)]
 		[XmlIgnore]
-		public SignalBarByType OpenStartBy
-		{
-			get; set;
-		}
-
-		[Browsable(false)]
-		[XmlIgnore]
-		public SignalBarByType OpenEndBy
-		{
-			get; set;
-		}
-		
-		[Browsable(false)]
-		[XmlIgnore]
 		public Series<double> OverNightSpt
 		{
 			get { return Values[0]; }

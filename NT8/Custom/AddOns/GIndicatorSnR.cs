@@ -93,6 +93,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 			snrRange.Support = sptLine;
 			return snrRange;
 		}
+		
+		//public 
 		#endregion Methods
 	}
 }

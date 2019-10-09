@@ -205,6 +205,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 			Print("[start_hour,start_min]=[" + start_hour + "," + start_min + "], [end_hour,end_min]=[" + end_hour + "," + end_min + "]");
 			return t-t0;
 		}
+		
+		public int GetBarNoByDateTime(DateTime dt) {
+			return Bars.GetBar(dt);
+		}
 
 		/// <summary>
 		/// Check if now is the time allowed to put trade

@@ -81,6 +81,12 @@ Only positive crossovers in deep oversold territory
 Only negative crossovers in high overbought territory
 We need to work on the SMI some more - change levels...
 
+Hook up signal with trading:
+** 8,8,8,8,12
+** Red diamond sell, cyan diamond buy;
+** KAMA as trending indicator;
+** 
+
 
 
 

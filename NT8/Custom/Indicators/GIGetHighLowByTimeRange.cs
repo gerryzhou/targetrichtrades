@@ -37,7 +37,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if (State == State.SetDefaults)
 			{
 				Description					= @"Determines the highest high and lowest low in a specified time range";
-				Name						= "GIGetHighLowByTimeRange";
+				Name						= "GIGetHighLowByPeriod";
 				Calculate					= Calculate.OnBarClose;
 				IsOverlay					= true;
 				DisplayInDataBox			= true;

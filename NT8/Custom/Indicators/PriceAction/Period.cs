@@ -11,6 +11,8 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 	/// The period of chart being investigated
 	/// The start bar and end bar can be different "By-Type":
 	/// ByTime, ByVolume, ByPrice, ByBarNo
+	/// There is no overlap for periods
+	/// Match the start bar first, then match 
 	/// </summary>
 	public class Period
 	{
@@ -70,4 +72,6 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 		#endregion
 	}
 }
+
+
 

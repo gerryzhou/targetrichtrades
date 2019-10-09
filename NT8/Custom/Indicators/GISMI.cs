@@ -34,7 +34,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private Series<double>	hls;
 		private Series<double>	smis;
 		private Series<double>	tma;
-		private KAMA	kama;
+		//private KAMA	kama;
 		
 		private GLastIndexRecorder<double> inflectionRecorder;
 		private GLastIndexRecorder<double> crossoverRecorder;
@@ -90,7 +90,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//Save the crossover bar;
 				crossover = new Series<int>(this, MaximumBarsLookBack.Infinite);
 				crossoverRecorder = new GLastIndexRecorder<double>(this);
-				kama = KAMA(2, 10, 30);
+				//kama = KAMA(2, 10, 30);
 			}
 		}
 
@@ -132,7 +132,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			inflection[0] = 0;
 			crossover[0] = 0;
 			if (CurrentBar > BarsRequiredToPlot) {//BarsRequiredToPlot) {
-				int tr = GetTrendByKAMA();
+				int tr = GetTrendByMA();
 				int infl = GetInflection(SMITMA);
 				
 				if(tr > 0) PlotBrushes[1][0] = Brushes.Green;
@@ -215,23 +215,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			return tr;
 		}
-
-		/**
-		the current price - KAMA, if the number is >= 0, we know the price is above KAMA,
-		*/
-		private int GetTrendByKAMA(){
-			int tr = 0;
-			double k = Math.Round(kama[0], 2);
-			double dif = Close[0] - k;
-			Print(CurrentBar + "-Kama dif=" + dif + ",kama=" + k + ",close=" + Close[0]);
-			if (CurrentBar > 20) {// BarsRequiredToPlot) {
-				if(dif > 0)
-					tr = 1;
-			else if(dif < 0)
-					tr = -1;
-			}
-			return tr;
-		}
 		
 		public Series<int> GetInflection() {
 			return inflection;
@@ -250,9 +233,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public override Direction GetDirection() {			
 			//Print(CurrentBar.ToString() + " -- GISMI GetDirection called");			
 			Direction dir = new Direction();
-			if(GetTrendByKAMA() > 0) dir.TrendDir = TrendDirection.Up;
-			else if (GetTrendByKAMA() < 0) dir.TrendDir = TrendDirection.Down;
-			Print(CurrentBar + " - GISMI GetTrendByKAMA()=" + GetTrendByKAMA() + ", dir=" + dir.TrendDir.ToString());
+			if(GetTrendByMA() > 0) dir.TrendDir = TrendDirection.Up;
+			else if (GetTrendByMA() < 0) dir.TrendDir = TrendDirection.Down;
+			Print(CurrentBar + " - GISMI GetTrendByMA()=" + GetTrendByMA() + ", dir=" + dir.TrendDir.ToString());
 			return dir;
 		}
 

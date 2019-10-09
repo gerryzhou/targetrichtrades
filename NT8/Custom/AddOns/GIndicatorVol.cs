@@ -47,6 +47,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return volumeValue;
 		}
 		
+		/// <summary>
+		/// Get the Williams %R for the volume
+		/// </summary>
+		/// <param name="period"></param>
+		/// <returns></returns>
 		public virtual double GetVolWPR(int period) {
 			double r = -1;
 			double max = MAX(Volume, period)[0];
