@@ -39,9 +39,10 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 		{
 			get { return trendDir; }
 			set { trendDir = value; }
-		}		
+		}
 		#endregion
 	}
 }
+
 
 

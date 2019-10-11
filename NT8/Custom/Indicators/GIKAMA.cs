@@ -109,7 +109,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 					tr.TrendDir = TrendDirection.Down;
 			}
 			return tr;
-		}		
+		}
 
 		#region Properties
 		[Range(1, 125), NinjaScriptProperty]

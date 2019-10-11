@@ -45,6 +45,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// * Reversal Pivot: 9:00-11 AM morning session high/low
 	/// * Pullback Pivot: left 20+, right 5+, i.e. (20+, 5+)
 	/// * Trending pivot: breakout the pullback pivot, create a new (5+, 5+) pivot
+	/// Long/Short rules:
+	/// * KAMA indicates trend;
+	/// * Long: cyan diamond, Short: red diamond;
+	/// * Trend-following long/short entry;
+	/// * Stop loss: last n (five?) bars hi/lo;
+	/// * Profit Target: next support/resistance, cyan/red diamond;
+	/// * Breakeven, or KAMA/EMA did not moving towards target in a period of time, exit?
+	/// * Use cyan/red diamond find key reversal: 
+	/// 	look back n bars, find the highest/lowest bar as KR; It's leading key reversal;
+	/// 
 	/// </summary>
 	public class StgSampleTRT : GStrategyBase
 	{
@@ -237,8 +247,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsLookback", GroupName = GPS_CUSTOM_PARAMS, Order = ODG_BarsLookback)]
         public int BarsLookback
         {
-            get { return barsLookback; }
-            set { barsLookback = Math.Max(1, value); }
+            get { return barsLookback;}
+            set { barsLookback = Math.Max(1, value);}
         }
 
 		[Range(1, int.MaxValue)]
