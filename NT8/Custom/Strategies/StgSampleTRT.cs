@@ -118,9 +118,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		
-		public override void SetIndicatorSignals(){
+		public override void CheckIndicatorSignals(){
 			giSMI.Update();
-			Print(CurrentBar + ":SetIndicatorSignals called ---------------------");
+			Print(CurrentBar + ":CheckIndicatorSignals called -----------" + giSMI.LastInflection);
 			
 			IndicatorSignal indSig = giSMI.GetLastIndicatorSignalByName(CurrentBar, giSMI.SignalName_Inflection);
 			
@@ -154,13 +154,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				dir.TrendDir = TrendDirection.Down;
 			trdSignal.TrendDir = dir;
 			
-			this.tradeSignal = trdSignal;
+			this.AddTradeSignal(CurrentBar, trdSignal);
 			hi3 = GetHighestPrice(BarsLookback);
 			lo3 = GetLowestPrice(BarsLookback);
 			
 			return trdSignal;
 		}
 		
+		public override void SetTradeSignal() {
+			
+		}
 				
 		protected override bool PatternMatched()
 		{
@@ -181,13 +184,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override TradeObj CheckNewEntryTrade() {
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			tradeObj.InitNewEntryTrade();
-			if(tradeSignal != null) {
-				if(tradeSignal.TrendDir.TrendDir == TrendDirection.Down)
+			if(GetTradeSignal(CurrentBar) != null) {
+				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
 				{
 					indicatorProxy.TraceMessage(this.Name, PrintOut);
 					tradeObj.tradeDirection = TradingDirection.Down;
 				}
-				else if(tradeSignal.TrendDir.TrendDir == TrendDirection.Up)
+				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
 				{
 					indicatorProxy.TraceMessage(this.Name, PrintOut);
 					tradeObj.tradeDirection = TradingDirection.Up;

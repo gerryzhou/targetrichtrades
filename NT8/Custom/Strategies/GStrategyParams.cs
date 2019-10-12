@@ -44,7 +44,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		public const string GPS_CUSTOM_PARAMS = "CustomParams";
 		#endregion
-
 		
 		#region NinjaScriptStrategyParameters
 		public const string GPS_GSTRATEGY = "NinjaScriptStrategyParameters";

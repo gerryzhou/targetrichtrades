@@ -40,12 +40,24 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	
 	public enum TradeType {Entry=1, Exit=-1, Liquidate=-2, Reverse=2, NoTrade=0};
 	
+	/// <summary>
+	/// BracketSignal, entry+exit OCO, which is default TradeSignalType 
+	/// EntrySimpleSignal, simple limit, market or stop entry
+	/// EntryOcoSignal, OCO order for entry
+	/// EntryTrailingSignal, trailing entry
+	/// ExitSimpleSignal, simple limit or market exit
+	/// ExitOcoSignal, OCO SL/PT exit
+	/// ExitTrailingSignal, Trailing stop loss exit
+	/// </summary>
+	public enum TradeSignalType {BracketSignal, EntrySimpleSignal, EntryOcoSignal, EntryTrailingSignal, 
+		ExitSimpleSignal, ExitOcoSignal, ExitTrailingSignal, UnKnown};
+	
 	public enum OrderSignalName {EntryLongLmt, EntryShortLmt, EntryLongMkt, EntryShortMkt, EntryLongStopMkt, EntryShortStopMkt, 
-		ExitLong, ExitShort, Profittarget, Stoploss, Trailstop, Exitonsessionclose, UnKnown};
+		ExitLong, ExitShort, ProfitTarget, StopLoss, TrailStop, ExitOnSessionClose, UnKnown};
 	
 	public enum BracketOrderSubType {Entry, ProfitTarget, StoppLoss, UnKnown};
 	
+	public enum EntryExitOrderType {Limit, Market, TrailingEntry, SimpleOCO, BreakEven, LockMinProfit, TrailingStopLoss};
+		
 	public enum MoneyMgmtPolicy {SimpleSLPT, TrailingSLPT, PositionScaleInOut};
-	
-	public enum ExitOrderType {SimpleOCO, BreakEven, LockMinProfit, TrailingStopLoss};
 }

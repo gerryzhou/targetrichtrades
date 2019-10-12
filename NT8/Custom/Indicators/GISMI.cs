@@ -127,7 +127,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			
 			//Set the line value for the SMIEMA by taking the EMA of the SMI
 			//SMIEMA[0] = (EMA(smis, smiemaperiod)[0]);
-			SMITMA[0] = TSF(smis, 3, smitmaperiod)[0];
+			SMITMA[0] = TSF(smis, 3, SMITMAPeriod)[0];
 			tma[0] = TSF(Close, 3, tmaperiod)[0];
 			inflection[0] = 0;
 			crossover[0] = 0;
@@ -142,14 +142,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 					inflection[1] = -1;
 					LastInflection = CurrentBar - 1;
 					//inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastInflection, LookbackBarType.Up));
-					SaveSignal(LastInflection, SignalName_Inflection, SignalActionType.InflectionUp, 
+					AddIndicatorSignal(LastInflection, SignalName_Inflection, SignalActionType.InflectionUp, 
 					new SupportResistanceRange<double>(-1, -1));
 					DrawDiamond(1, "res"+CurrentBar, (3*High[1]-Low[1])/2, 0, Brushes.Red);
 				}
 				else if (infl > 0) {
 					inflection[1] = 1;
 					LastInflection = CurrentBar - 1;
-					SaveSignal(LastInflection, SignalName_Inflection, SignalActionType.InflectionDn,
+					AddIndicatorSignal(LastInflection, SignalName_Inflection, SignalActionType.InflectionDn,
 					new SupportResistanceRange<double>(-1, -1));
 					//inflectionRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastInflection, LookbackBarType.Down));
 					DrawDiamond(1, "spt"+CurrentBar, (3*Low[1]-High[1])/2, 0, Brushes.Aqua);
@@ -163,7 +163,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				if(CrossAbove(SMITMA, smi, 1)) {
 					crossover[0] = 1;
 					LastCrossover = CurrentBar;
-					SaveSignal(LastCrossover, SignalName_LineCross, SignalActionType.CrossOver,
+					AddIndicatorSignal(LastCrossover, SignalName_LineCross, SignalActionType.CrossOver,
 					new SupportResistanceRange<double>(-1, -1));
 					//crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Up));			
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + smiCrossTxt, 0, High[0]+5, Brushes.Black);
@@ -171,7 +171,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				else if (CrossBelow(SMITMA, smi, 1)) {
 					crossover[0] = -1;
 					LastCrossover = CurrentBar;
-					SaveSignal(LastCrossover, SignalName_LineCross, SignalActionType.CrossUnder,
+					AddIndicatorSignal(LastCrossover, SignalName_LineCross, SignalActionType.CrossUnder,
 					new SupportResistanceRange<double>(-1, -1));
 					//crossoverRecorder.AddLastIndexRecord(new GLastIndexRecord<double>(LastCrossover, LookbackBarType.Down));
 					Draw.Text(this, CurrentBar.ToString(), CurrentBar.ToString() + smiCrossTxt, 0, Low[0]-5, Brushes.Black);
@@ -356,10 +356,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return DivergenceType.UnKnown;
 		}
 		
-		private void SaveSignal(int barNo, string signame,
-			SignalActionType saType, SupportResistanceRange<double> snr) {
-			this.AddIndicatorSignal(barNo, signame, saType, snr);
-		}
+//		private void SaveSignal(int barNo, string signame,
+//			SignalActionType saType, SupportResistanceRange<double> snr) {
+//			this.AddIndicatorSignal(barNo, signame, saType, snr);
+//		}
 		
 		private void DrawDiamond(int barsBack, string tag, double prc, double offset, SolidColorBrush brush) {				
 			// Instantiates a red diamond on the current bar 1 tick below the low
@@ -470,10 +470,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 			get { return "LineCross";}
 		}
 		
-		private int	range		= 5;
-		private int	emaperiod1	= 3;
-		private int	emaperiod2	= 5;
-		private int smitmaperiod= 8;
+		private int	range		= 8;//5;
+		private int	emaperiod1	= 8;//3;
+		private int	emaperiod2	= 8;//5;
+		private int smitmaperiod= 12;//8;
 		private int tmaperiod= 6;
 		private int smiCrossLevel = 50;
 		

@@ -56,11 +56,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (State == State.DataLoaded)
 			{
 				indicatorProxy = GIndicatorProxy(this);//1, Account.Name);
-				tradeSignal = new TradeSignal();
+				//tradeSignal = new TradeSignal();
 				CancelAccountOrders();
 				//Account.CancelAllOrders(Instrument);
-				//Account.Flatten(new List<Instrument>{Instrument});
-				//CustomDatsSeries1 = new Series<double>(this);
+				//Account.Flatten(new List<Instrument>{Instrument});				
 			}
 			else if (State == State.Terminated) {
 				if(indicatorProxy != null) {
@@ -101,7 +100,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			//CustomColor1					= Brushes.Orange;
 			StartH						= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
-			//CustomPrc1					= 1;
 			// Use Unmanaged order methods
         	IsUnmanaged = true;
 			AlgoMode = AlgoModeType.Trading;
@@ -165,17 +163,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
 			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
-			SetIndicatorSignals();
-			GetTradeSignal();
-//			CheckNewEntryTrade();
-//			PutTrade();
+			CheckIndicatorSignals();
+
 			switch(AlgoMode) {
 				case AlgoModeType.Liquidate: //liquidate
 					indicatorProxy.TraceMessage(this.Name, PrintOut);
 					CloseAllPositions();
 					break;
 				case AlgoModeType.Trading: //trading
-					//PutTrade(); break;
+					//SetTradeSignal(); called from CheckExitTrade() or CheckNewEntryTrade();
+					//PutTrade(); first GetTradeSignal() and then put exit or entry trade;
 					indicatorProxy.TraceMessage(this.Name, PrintOut);
 					if(HasPosition() != 0) {
 						CheckExitTrade();
@@ -185,9 +182,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 						indicatorProxy.TraceMessage(this.Name, PrintOut);
 						CheckNewEntryTrade();
 						
-						indicatorProxy.TraceMessage(this.Name, PrintOut);
-						PutTrade();
+						indicatorProxy.TraceMessage(this.Name, PrintOut);						
 					}
+					PutTrade();
 					break;
 				case AlgoModeType.CancelOrders: //cancel order
 					indicatorProxy.TraceMessage(this.Name, PrintOut);

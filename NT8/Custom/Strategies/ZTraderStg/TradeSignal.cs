@@ -62,7 +62,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		/// </summary>		
 		[Browsable(false)]
 		[XmlIgnore]
-		public SignalType IndicatorSignalType
+		[DefaultValueAttribute(TradeSignalType.BracketSignal)]
+		public TradeSignalType TradeSignalType
 		{
 			get; set;
 		}		

@@ -101,7 +101,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.Update();
 			PriceAction pa = indicatorProxy.GetPriceAction(Time[0]);
 			indicatorProxy.PrintLog(true, false, CurrentBar + ":Time=" + Time[0].ToShortDateString() + "-" + Time[0].ToShortTimeString() + ", PriceAction=" + pa.paType.ToString());
-			tradeSignal = GetTradeSignal();
+			//tradeSignal = GetTradeSignal();
 
 			base.OnBarUpdate();
 			//SetStopLoss(CalculationMode.Price, tradeObj.stopLossPrice);
@@ -161,23 +161,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override TradeObj CheckNewEntryTrade() {
 			int prtLevel = 1;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
-			if(tradeSignal != null) {
+			if(GetTradeSignal(CurrentBar) != null) {
 				tradeObj.InitNewEntryTrade();
-				if(tradeSignal.TrendDir != null 
-					&& tradeSignal.TrendDir.TrendDir == TrendDirection.Down
-					&& indicatorProxy.GetResistance(tradeSignal.SnR.Resistance) > High[0]) {
+				if(GetTradeSignal(CurrentBar).TrendDir != null 
+					&& GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down
+					&& indicatorProxy.GetResistance(GetTradeSignal(CurrentBar).SnR.Resistance) > High[0]) {
 					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					tradeObj.tradeDirection = TradingDirection.Down;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
-					tradeObj.stopLossPrice = indicatorProxy.GetResistance(tradeSignal.SnR.Resistance);
+					tradeObj.stopLossPrice = indicatorProxy.GetResistance(GetTradeSignal(CurrentBar).SnR.Resistance);
 				}
-				else if(tradeSignal.TrendDir != null 
-					&& tradeSignal.TrendDir.TrendDir == TrendDirection.Up
-					&& indicatorProxy.GetSupport(tradeSignal.SnR.Support) < Low[0]) {
+				else if(GetTradeSignal(CurrentBar).TrendDir != null 
+					&& GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up
+					&& indicatorProxy.GetSupport(GetTradeSignal(CurrentBar).SnR.Support) < Low[0]) {
 					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					tradeObj.tradeDirection = TradingDirection.Up;
 					tradeObj.tradeStyle = TradingStyle.TrendFollowing;
-					tradeObj.stopLossPrice = indicatorProxy.GetSupport(tradeSignal.SnR.Support);
+					tradeObj.stopLossPrice = indicatorProxy.GetSupport(GetTradeSignal(CurrentBar).SnR.Support);
 					//Print(CurrentBar + ": GetResistance=" + indicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);
 				}
 			} else {

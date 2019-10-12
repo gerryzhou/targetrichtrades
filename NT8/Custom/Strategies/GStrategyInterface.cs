@@ -38,10 +38,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 	public partial class GStrategyBase : Strategy
 	{
 		private List<Indicator> listIndicator = new List<Indicator>();
-		protected TradeSignal tradeSignal;
 			
 		protected GIndicatorProxy indicatorProxy;
-		//private IndicatorSignal indSignal;
 		
 		/// <summary>
 		/// Volatility measurement is for target, stop loss, etc.
@@ -80,25 +78,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual double GetMomentum() {
 			return 0;
 		}
-		
+
 		/// <summary>
 		/// The indicator signal is to trigger entry/exit, 
 		/// or modify existing orders for extry/exit;
+		/// Set the indicator signals for each bar/indicator
 		/// </summary>
-		/// <returns></returns>
-		//public virtual IndicatorSignal GetIndicatorSignal() {return null;}
+		public virtual void CheckIndicatorSignals(){}
 
-		/// <summary>
-		/// The trade signal is to trigger entry/exit, 
-		/// or modify existing orders for extry/exit;
-		/// </summary>
-		/// <returns></returns>
-		public virtual TradeSignal GetTradeSignal() {return null;}
-		
-		/// <summary>
-		/// Set the indicator signals for each bar
-		/// </summary>
-		public virtual void SetIndicatorSignals(){}
+		//public virtual GetIndicatorSignals(){}
 		
 		public virtual void SetVolatility(){}
 		

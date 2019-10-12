@@ -58,7 +58,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <param name="signal"></param>
 		public void AddIndicatorSignal(int barNo, IndicatorSignal signal) {
 			List<IndicatorSignal> list_signal;
-			if(!this.indicatorSignals.TryGetValue(barNo, out list_signal)) {				
+			if(!this.indicatorSignals.TryGetValue(barNo, out list_signal)) {
 				list_signal = new List<IndicatorSignal>();
 			}
 			list_signal.Add(signal);
@@ -97,7 +97,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <returns></returns>
 		public List<IndicatorSignal> GetIndicatorSignals(int barNo) {
 			List<IndicatorSignal> list_signal;
-			if(!this.indicatorSignals.TryGetValue(barNo, out list_signal))			
+			if(!this.indicatorSignals.TryGetValue(barNo, out list_signal))
 				return null;
 			else
 				return list_signal;
@@ -120,7 +120,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <returns></returns>
 		public IndicatorSignal GetIndicatorSignalByName(int barNo, string signal_name) {
 			List<IndicatorSignal> list_signal = GetIndicatorSignals(barNo);
-			if(list_signal != null) {				
+			if(list_signal != null) {
 				foreach(IndicatorSignal sig in list_signal) {
 					if(signal_name.Equals(sig.SignalName))
 						return sig;
@@ -138,7 +138,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <returns></returns>
 		public IndicatorSignal GetLastIndicatorSignalByName(int barNo, string signal_name) {
 			int k = barNo;
-			foreach(int kk in this.indicatorSignals.Keys.Reverse()) {				
+			foreach(int kk in this.indicatorSignals.Keys.Reverse()) {
 				if(kk < k) {
 					IndicatorSignal sig = GetIndicatorSignalByName(k, signal_name);
 					if(sig != null) return sig;
@@ -156,7 +156,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <returns></returns>
 		public IndicatorSignal GetIndicatorSignalByActionType(int barNo, SignalActionType signal_actiontype) {
 			List<IndicatorSignal> list_signal = GetIndicatorSignals(barNo);
-			if(list_signal != null) {				
+			if(list_signal != null) {
 				foreach(IndicatorSignal sig in list_signal) {
 					if(sig.Signal_Action != null && 
 						signal_actiontype.Equals(sig.Signal_Action.SignalActionType))

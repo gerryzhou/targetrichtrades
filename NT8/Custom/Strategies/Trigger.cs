@@ -45,7 +45,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				CloseAllPositions();
 			}
 			else {
-				tradeSignal = GetTradeSignal();
+				//tradeSignal = GetTradeSignal();
 				if (GetMarketPosition() != MarketPosition.Flat) { //There are positions
 					CheckExitTrade();
 				}
@@ -157,6 +157,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#endregion Trigger Functions
 		
+		#region Pattern Functions
+		
 		protected virtual bool PatternMatched()
 		{
 			//Print("CurrentBar, barsMaxLastCross, barsAgoMaxPbSAREn,=" + CurrentBar + "," + barsAgoMaxPbSAREn + "," + barsSinceLastCross);
@@ -225,6 +227,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			return tbr_count;
 		}
+		
+		#endregion Pattern Functions
 		
         #region Trigger Properties
 		

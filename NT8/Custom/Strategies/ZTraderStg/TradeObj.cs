@@ -38,7 +38,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		private BracketOrderBase bracketOrder = new BracketOrderBase();
 		private TrailingSLOrderBase trailingSLOrder = new TrailingSLOrderBase();
-		public ExitOrderType exitOrderType = ExitOrderType.SimpleOCO;
+		public EntryExitOrderType exitOrderType = EntryExitOrderType.SimpleOCO;
 
 		#endregion
 		
@@ -168,13 +168,13 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public void InitNewEntryTrade() {
 			InitParams();
 			SetTradeType(TradeType.Entry);
-			exitOrderType = ExitOrderType.SimpleOCO;
+			exitOrderType = EntryExitOrderType.SimpleOCO;
 		}
 
 		public void InitNewTLSL() {
 			//InitParams();
 			SetTradeType(TradeType.Exit);
-			exitOrderType = ExitOrderType.TrailingStopLoss;
+			exitOrderType = EntryExitOrderType.TrailingStopLoss;
 			this.trailingPTTic = 0;
 			switch(TLSLCalculationMode) {
 				case CalculationMode.Currency:

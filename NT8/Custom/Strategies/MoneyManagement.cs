@@ -207,23 +207,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			
 			switch(tradeObj.exitOrderType) {
-				case ExitOrderType.TrailingStopLoss: // start trailing SL
+				case EntryExitOrderType.TrailingStopLoss: // start trailing SL
 					indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":isOverMaxLockPT, pl_tics=" + pl_tics);
 					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					CalTLSLPrice(avgPrc, pl_tics);
 					SetTrailingStopLossOrder(tradeObj.entrySignalName.ToString());
 					break;
-				case ExitOrderType.LockMinProfit: // move PT, lock SL at MinPT
+				case EntryExitOrderType.LockMinProfit: // move PT, lock SL at MinPT
 					indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":isOverMinLockPT, pl_tics=" + pl_tics);
 					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					LockMinProfitTarget(avgPrc);
 					break;
-				case ExitOrderType.BreakEven: // PT no change, BE SL
+				case EntryExitOrderType.BreakEven: // PT no change, BE SL
 					indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":isOverBreakeven, pl_tics=" + pl_tics);
 					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					SetBreakEvenOrder(avgPrc);
 					break;
-				case ExitOrderType.SimpleOCO: // set simple PT, SL
+				case EntryExitOrderType.SimpleOCO: // set simple PT, SL
 					indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":isBelowBreakeven, pl_tics=" + pl_tics);
 					indicatorProxy.TraceMessage(this.Name, prtLevel);
 					SetSimpleExitOCO(tradeObj.entrySignalName.ToString());
@@ -338,24 +338,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		public virtual void GetExitOrderType(double pl, int pl_tics) {
 			switch(tradeObj.exitOrderType) {
-				case ExitOrderType.LockMinProfit: // move PT, lock SL at MinPT
+				case EntryExitOrderType.LockMinProfit: // move PT, lock SL at MinPT
 					if(isOverMaxLockPT(pl_tics) > 0)
 						tradeObj.InitNewTLSL();
-						//tradeObj.exitOrderType = ExitOrderType.TrailingStopLoss;			
+						//tradeObj.exitOrderType = EntryExitOrderType.TrailingStopLoss;			
 					break;
-				case ExitOrderType.BreakEven: // PT no change, BE SL
+				case EntryExitOrderType.BreakEven: // PT no change, BE SL
 					if(isOverMaxLockPT(pl_tics) > 0)
-						tradeObj.exitOrderType = ExitOrderType.TrailingStopLoss;
+						tradeObj.exitOrderType = EntryExitOrderType.TrailingStopLoss;
 					else if (isOverMinLockPT(pl_tics) > 0)
-						tradeObj.exitOrderType = ExitOrderType.LockMinProfit;
+						tradeObj.exitOrderType = EntryExitOrderType.LockMinProfit;
 					break;
-				case ExitOrderType.SimpleOCO: // set simple PT, SL
+				case EntryExitOrderType.SimpleOCO: // set simple PT, SL
 					if(isOverMaxLockPT(pl_tics) > 0)
-						tradeObj.exitOrderType = ExitOrderType.TrailingStopLoss;
+						tradeObj.exitOrderType = EntryExitOrderType.TrailingStopLoss;
 					else if (isOverMinLockPT(pl_tics) > 0)
-						tradeObj.exitOrderType = ExitOrderType.LockMinProfit;
+						tradeObj.exitOrderType = EntryExitOrderType.LockMinProfit;
 					else if (isOverBreakeven(pl) > 0)
-						tradeObj.exitOrderType = ExitOrderType.BreakEven;
+						tradeObj.exitOrderType = EntryExitOrderType.BreakEven;
 					break;
 			}
 		}

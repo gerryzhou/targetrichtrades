@@ -74,13 +74,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public virtual void CheckExitTradeBySignal() {
-			if(tradeSignal == null) return;
+			if(GetTradeSignal(CurrentBar) == null) return;
 			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":CheckExitTradeBySignal"
-			+ ";indicatorSignal.ReversalDir=" + tradeSignal.ReversalDir.ToString()
+			+ ";indicatorSignal.ReversalDir=" + GetTradeSignal(CurrentBar).ReversalDir.ToString()
 			+ ";Position.MarketPosition=" + GetMarketPosition()
 			);
-			if((tradeSignal.ReversalDir == Reversal.Up && GetMarketPosition() == MarketPosition.Short) ||
-				(tradeSignal.ReversalDir == Reversal.Down && GetMarketPosition() == MarketPosition.Long)) {
+			if((GetTradeSignal(CurrentBar).ReversalDir == Reversal.Up && GetMarketPosition() == MarketPosition.Short) ||
+				(GetTradeSignal(CurrentBar).ReversalDir == Reversal.Down && GetMarketPosition() == MarketPosition.Long)) {
 				tradeObj.SetTradeType(TradeType.Liquidate);
 				CloseAllPositions();
 				CancelExitOrders();
@@ -738,7 +738,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 						tradeObj.TrailingSLOrder.EntryOrder = execution.Order;
 					}
 				}
-				else if (oName.Equals(OrderSignalName.Exitonsessionclose.ToString())) {
+				else if (oName.Equals(OrderSignalName.ExitOnSessionClose.ToString())) {
 					CancelExitOrders();
 				}
 			}
@@ -831,7 +831,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					indicatorProxy.PrintLog(true, IsLiveTrading(), "Entry Order Name=" + GetOrderName(order.Name));
 					tradeObj.BracketOrder.EntryOrder = order;
 				}
-				if(GetOrderName(order.Name) == OrderSignalName.Profittarget.ToString()) {
+				if(GetOrderName(order.Name) == OrderSignalName.ProfitTarget.ToString()) {
 					indicatorProxy.PrintLog(true, IsLiveTrading(), "order.Name == OrderSignalName.Profittarget");
 					tradeObj.BracketOrder.OCOOrder.ProfitTargetOrder = order;
 				}				
@@ -840,7 +840,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
-			if(GetOrderName(order.Name) == OrderSignalName.Stoploss.ToString() &&
+			if(GetOrderName(order.Name) == OrderSignalName.StopLoss.ToString() &&
 				(order.OrderState == OrderState.Accepted || order.OrderState == OrderState.Working)) {
 				tradeObj.BracketOrder.OCOOrder.StopLossOrder = order;
 			}
