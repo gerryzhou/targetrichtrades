@@ -26,22 +26,19 @@ using NinjaTrader.NinjaScript.Indicators.PriceActions;
 namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 {
 	/// <summary>
-	/// This object carry the signal that can trigger a trade (entry or exit)
+	/// This object carry the signal that can trigger a trade (file an order)
+	/// It provides the essentials for SubmitOrderUnmanaged
+	/// (OrderAction orderAction, OrderType orderType, 
+	/// int quantity, double limitPrice, double stopPrice)
 	/// </summary>
 	public class TradeSignal
-	{	
-		private Direction trendDir = new Direction();//TrendDirection.UnKnown; //1=up, -1=down, 0=flat/unknown
-		private Breakout breakoutDir = Breakout.UnKnown; //1=bk up, -1=bk down, 0=no bk/unknown
-		private Reversal reversalDir = Reversal.UnKnown; //1=rev up, -1=rev down, 0=no rev/unknown
-		private SupportResistanceRange<SupportResistanceBar> sptRst;
-		
+	{		
 		#region Protperies
 		/// <summary>
 		/// The barNo the signal refer to
 		/// </summary>
 		[Range(0, int.MaxValue)]
-		[Browsable(false)]
-		[XmlIgnore]
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		public int BarNo
 		{
 			get; set;
@@ -50,8 +47,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		/// <summary>
 		/// The name of the signal
 		/// </summary>
-		[Browsable(false)]
-		[XmlIgnore]
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		public string SignalName
 		{
 			get; set;
@@ -60,44 +56,69 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		/// <summary>
 		/// The type of the signal
 		/// </summary>		
-		[Browsable(false)]
-		[XmlIgnore]
-		[DefaultValueAttribute(TradeSignalType.BracketSignal)]
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		[DefaultValueAttribute(TradeSignalType.Entry)]
 		public TradeSignalType TradeSignalType
 		{
 			get; set;
-		}		
-		
-		[Browsable(false)]
-		[XmlIgnore]
-		//[DefaultValueAttribute(TrendDirection.UnKnown)]
-		public Direction TrendDir {
-			get { return trendDir;}
-			set { trendDir = value;}
-		}
-
-		[Browsable(false)]
-		[XmlIgnore]
-		[DefaultValueAttribute(Breakout.UnKnown)]
-		public Breakout BreakoutDir {
-			get { return breakoutDir;}
-			set { breakoutDir = value;}
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore]
-		[DefaultValueAttribute(Reversal.UnKnown)]
-		public Reversal ReversalDir {
-			get { return reversalDir;}
-			set { reversalDir = value;}
-		}
+		[Description("Calculation mode for orders")]
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		[DefaultValueAttribute(CalculationMode.Price)]
+        public CalculationMode OrderCalculationMode
+        {
+            get; set;
+        }
+				
+		[Description("Action for orders:OrderAction.Buy,BuyToCover,Sell,SellShort")]
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		[DefaultValueAttribute(null)]
+        public OrderAction Action
+        {
+            get; set;
+        }
 		
-		[Browsable(false)]
-		[XmlIgnore]
-		public SupportResistanceRange<SupportResistanceBar> SnR {
-			get { return sptRst;}
-			set { sptRst = value;}
-		}		
+		[Description("Type for orders:Limit,Market,MIT,StopMarket,StopLimit")]
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		[DefaultValueAttribute(null)]
+        public OrderType OrderType
+        {
+            get; set;
+        }
+		
+		[Description("Quantity for orders")]
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		[DefaultValueAttribute(1)]
+        public int Quantity
+        {
+            get; set;
+        }
+		
+		[Description("Limit Price for orders")]
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		[DefaultValueAttribute(0)]
+        public double LimitPrice
+        {
+            get; set;
+        }
+		
+		[Description("Stop Price for orders")]
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		[DefaultValueAttribute(0)]
+        public double StopPrice
+        {
+            get; set;
+        }
+		
+		[Description("Price offset by currency/ticks/pips/percent")]
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		[DefaultValueAttribute(0)]
+        public int PriceOffset
+        {
+            get; set;
+        }
+		
 		#endregion
 	}
 }

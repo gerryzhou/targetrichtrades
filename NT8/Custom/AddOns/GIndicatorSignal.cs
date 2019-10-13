@@ -75,7 +75,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			isig.BarNo = barNo;
 			isig.SignalName = signame;
 			isig.IndicatorSignalType = SignalType.SimplePriceAction;
-			isig.Signal_Action = sa;
+			isig.SignalAction = sa;
 			AddIndicatorSignal(barNo, isig);
 		}
 
@@ -158,8 +158,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 			List<IndicatorSignal> list_signal = GetIndicatorSignals(barNo);
 			if(list_signal != null) {
 				foreach(IndicatorSignal sig in list_signal) {
-					if(sig.Signal_Action != null && 
-						signal_actiontype.Equals(sig.Signal_Action.SignalActionType))
+					if(sig.SignalAction != null && 
+						signal_actiontype.Equals(sig.SignalAction.SignalActionType))
 						return sig;
 				}
 			}

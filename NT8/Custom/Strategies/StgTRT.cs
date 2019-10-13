@@ -150,7 +150,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					//lookback to the crossover and if that candle is bearish we isolate the open as resistance;
 					// if that candlestick is bullish we isolate the close as resistance
 					//giSMI.LastCrossover = giSMI.GetLastCrossover(giSMI.GetCrossover(), CurrentBar-inft, CrossoverType.Both);
-					trdSignal.SnR.Resistance = giSMI.GetSupportResistance(infl, SupportResistanceType.Resistance);
+//					trdSignal.SnR.Resistance = giSMI.GetSupportResistance(infl, SupportResistanceType.Resistance);
 					
 				} catch(Exception ex) {
 					Print("GetIndicatorSignal ex=" + ex.Message);
@@ -168,7 +168,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 				if(dir_gismi.TrendDir == TrendDirection.Up && dir_awo.TrendDir == TrendDirection.Up)
 					dir.TrendDir = TrendDirection.Down;
-				trdSignal.TrendDir = dir;
+//				trdSignal.TrendDir = dir;
 			}
 			
 			return trdSignal;
@@ -184,18 +184,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Print("tradeSignal null=" + (GetTradeSignal(CurrentBar)==null));
 			tradeObj.InitNewEntryTrade();
 			if(GetTradeSignal(CurrentBar) != null) {
-				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
+//				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
 				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
-				{
-					indicatorProxy.TraceMessage(this.Name, prtLevel);
-					tradeObj.tradeDirection = TradingDirection.Down;
-				}
-				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
-				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
-				{
-					indicatorProxy.TraceMessage(this.Name, prtLevel);
-					tradeObj.tradeDirection = TradingDirection.Up;
-				}
+//				{
+//					indicatorProxy.TraceMessage(this.Name, prtLevel);
+//					tradeObj.tradeDirection = TradingDirection.Down;
+//				}
+//				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
+//				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
+//				{
+//					indicatorProxy.TraceMessage(this.Name, prtLevel);
+//					tradeObj.tradeDirection = TradingDirection.Up;
+//				}
 				
 				tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 				
@@ -203,9 +203,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				tradeObj.SetTradeType(TradeType.NoTrade);
 			}
 			
-			if(GetTradeSignal(CurrentBar) != null && GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down) {
+//			if(GetTradeSignal(CurrentBar) != null && GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down) {
 				//Print(CurrentBar + ": GetResistance=" + indicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);
-			}
+//			}
 			return tradeObj;
 		}
 		

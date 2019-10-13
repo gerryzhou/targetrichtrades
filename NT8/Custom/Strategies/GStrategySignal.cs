@@ -51,8 +51,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public virtual TradeSignal GetTradeSignal() {return null;}
-
-		public virtual void SetTradeSignal() {}
+		
+		//public virtual void SetTradeSignal() {}
+		
+		/// <summary>
+		/// The indicator signal is to trigger entry/exit, 
+		/// or modify existing orders for extry/exit;
+		/// Set the indicator signals for each bar/indicator
+		/// </summary>
+		public virtual void CheckIndicatorSignals(){}
 		
 		#region Variables
 
@@ -89,7 +96,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			TradeSignal tsig = new TradeSignal();
 			tsig.BarNo = barNo;
 			tsig.SignalName = signame;
-			tsig.TradeSignalType = TradeSignalType.BracketSignal;
+			tsig.TradeSignalType = TradeSignalType.Entry;
 			//tsig.Signal_Action = sa;
 			AddTradeSignal(barNo, tsig);
 		}

@@ -25,6 +25,9 @@ using NinjaTrader.NinjaScript.DrawingTools;
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 {
+	/// <summary>
+	/// The class holds current trade, including positions, orders, etc.
+	/// </summary>
 	public class TradeObj {
 		private GStrategyBase instStrategy = null;
 		private TradeType tradeType = TradeType.NoTrade;

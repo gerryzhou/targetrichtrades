@@ -179,18 +179,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			IndicatorSignal indSig = GetLastIndicatorSignalByName(CurrentBar, SignalName_Inflection);
 			
-			if(indSig != null && indSig.Signal_Action != null)
-				Print(CurrentBar + ":Last " + SignalName_Inflection + "=" + indSig.BarNo + "," + indSig.Signal_Action.SignalActionType.ToString());
+			if(indSig != null && indSig.SignalAction != null)
+				Print(CurrentBar + ":Last " + SignalName_Inflection + "=" + indSig.BarNo + "," + indSig.SignalAction.SignalActionType.ToString());
 	
 			IndicatorSignal indSigCrs = GetLastIndicatorSignalByName(CurrentBar, SignalName_LineCross);
 			
-			if(indSigCrs != null && indSigCrs.Signal_Action != null)
-				Print(CurrentBar + ":Last " + SignalName_LineCross + "=" + indSigCrs.BarNo + "," + indSigCrs.Signal_Action.SignalActionType.ToString());
+			if(indSigCrs != null && indSigCrs.SignalAction != null)
+				Print(CurrentBar + ":Last " + SignalName_LineCross + "=" + indSigCrs.BarNo + "," + indSigCrs.SignalAction.SignalActionType.ToString());
 			
 			List<IndicatorSignal> listSig = GetLastIndicatorSignalByType(CurrentBar, SignalType.SimplePriceAction);
 			if(listSig != null)
 			foreach(IndicatorSignal sig in listSig)
-				Print(CurrentBar + ":LastSimpleSignal=" + sig.BarNo + "," + sig.SignalName + "," + sig.Signal_Action.SignalActionType.ToString());
+				Print(CurrentBar + ":LastSimpleSignal=" + sig.BarNo + "," + sig.SignalName + "," + sig.SignalAction.SignalActionType.ToString());
 			
 			if(CurrentBar > BarsRequiredToPlot && IsLastBarOnChart() > 0) {
 				Print("BarsRequiredToPlot=" + BarsRequiredToPlot);

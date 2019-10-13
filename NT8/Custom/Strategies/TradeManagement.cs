@@ -75,18 +75,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public virtual void CheckExitTradeBySignal() {
 			if(GetTradeSignal(CurrentBar) == null) return;
-			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":CheckExitTradeBySignal"
-			+ ";indicatorSignal.ReversalDir=" + GetTradeSignal(CurrentBar).ReversalDir.ToString()
-			+ ";Position.MarketPosition=" + GetMarketPosition()
-			);
-			if((GetTradeSignal(CurrentBar).ReversalDir == Reversal.Up && GetMarketPosition() == MarketPosition.Short) ||
-				(GetTradeSignal(CurrentBar).ReversalDir == Reversal.Down && GetMarketPosition() == MarketPosition.Long)) {
-				tradeObj.SetTradeType(TradeType.Liquidate);
-				CloseAllPositions();
-				CancelExitOrders();
-			} else {
+//			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":CheckExitTradeBySignal"
+//			+ ";indicatorSignal.ReversalDir=" + GetTradeSignal(CurrentBar).ReversalDir.ToString()
+//			+ ";Position.MarketPosition=" + GetMarketPosition()
+//			);
+//			if((GetTradeSignal(CurrentBar).ReversalDir == Reversal.Up && GetMarketPosition() == MarketPosition.Short) ||
+//				(GetTradeSignal(CurrentBar).ReversalDir == Reversal.Down && GetMarketPosition() == MarketPosition.Long)) {
+//				tradeObj.SetTradeType(TradeType.Liquidate);
+//				CloseAllPositions();
+//				CancelExitOrders();
+//			} else {
 
-			}			
+//			}			
 		}
 		
 		/// <summary>
@@ -94,10 +94,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public virtual TradeObj CheckNewEntryTrade() {
-//			if(NewOrderAllowed()) {
-//			}
 			indicatorProxy.PrintLog(true, IsLiveTrading(), 
-				CurrentBar + "::CheckNewEntryTrade()--" + this.ToString());
+				CurrentBar + "::=======Virtual CheckNewEntryTrade()===========" + this.ToString());
 			return null;
 		}
 

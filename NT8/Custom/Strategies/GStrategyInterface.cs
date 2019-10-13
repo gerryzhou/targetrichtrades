@@ -79,13 +79,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return 0;
 		}
 
-		/// <summary>
-		/// The indicator signal is to trigger entry/exit, 
-		/// or modify existing orders for extry/exit;
-		/// Set the indicator signals for each bar/indicator
-		/// </summary>
-		public virtual void CheckIndicatorSignals(){}
-
 		//public virtual GetIndicatorSignals(){}
 		
 		public virtual void SetVolatility(){}

@@ -65,8 +65,8 @@ resistance will be the  prior cross and it's the first target;
 the target will be high/low of the diamond;
 Only cross over from -40, 40 up/down to 40,-40 will be trigger;
 
-**Perhaps cirles to identify crossovers in SMI between -50 and 50 and use diamonds for crossovers above 50 and below -50
-** Goal to make the SMI less sensiteve for th 1 min chart for scalping
+**Perhaps circles to identify crossovers in SMI between -50 and 50 and use diamonds for crossovers above 50 and below -50
+** Goal to make the SMI less sensitive for th 1 min chart for scalping
 ** Measurement of interest - distance in ticks from the price to the KAMA
 ** Record the cross and the level at the cross of the SMI that is (Current price)
 current price - KAMA >=0 then we know the price is above the KAMA and the KAMA gives us relative support
@@ -86,6 +86,22 @@ Hook up signal with trading:
 ** Red diamond sell, cyan diamond buy;
 ** KAMA as trending indicator; 2,10,30?
 ** 
+
+Plan for the next few months(priority?):
+** Sim and Live TRT strategy;
+** Results publishing;
+** Results analysis, bug fixing, improvement of the framework;
+** Position size scaling, 2 or more contracts entry,exit,scaling in/out;
+
+Longer term(priority?):
+** Ninjatrader Add-on selling;
+** Managed futures program; Form a group?
+** Development of Ninjatrader Algo trading course for beginners;
+** 
+
+
+
+
 
 
 

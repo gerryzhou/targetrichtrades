@@ -98,12 +98,13 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		
 		[Browsable(false)]
 		[XmlIgnore]
-		public SignalAction Signal_Action {
+		public SignalAction SignalAction {
 			get; set;
 		}
 		
 		#endregion
 	}
 }
+
 
 

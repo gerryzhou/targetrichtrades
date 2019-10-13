@@ -119,13 +119,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			IndicatorSignal indSig = giSMI.GetLastIndicatorSignalByName(CurrentBar, giSMI.SignalName_Inflection);
 			
-			if(indSig != null && indSig.Signal_Action != null)
-				Print(CurrentBar + ":stg-Last " + giSMI.SignalName_Inflection + "=" + indSig.BarNo + "," + indSig.Signal_Action.SignalActionType.ToString());
+			if(indSig != null && indSig.SignalAction != null)
+				Print(CurrentBar + ":stg-Last " + giSMI.SignalName_Inflection + "=" + indSig.BarNo + "," + indSig.SignalAction.SignalActionType.ToString());
 
 			IndicatorSignal indSigCrs = giSMI.GetLastIndicatorSignalByName(CurrentBar, giSMI.SignalName_LineCross);
 			
-			if(indSigCrs != null && indSigCrs.Signal_Action != null)
-				Print(CurrentBar + ":stg-Last " + giSMI.SignalName_LineCross + "=" + indSigCrs.BarNo + "," + indSigCrs.Signal_Action.SignalActionType.ToString());
+			if(indSigCrs != null && indSigCrs.SignalAction != null)
+				Print(CurrentBar + ":stg-Last " + giSMI.SignalName_LineCross + "=" + indSigCrs.BarNo + "," + indSigCrs.SignalAction.SignalActionType.ToString());
 			
 		}
 		
@@ -147,7 +147,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 //			if(c0 < lo3)
 //				dir.TrendDir = TrendDirection.Down;
-			trdSignal.TrendDir = dir;
+//			trdSignal.TrendDir = dir;
 			
 			this.AddTradeSignal(CurrentBar, trdSignal);
 			hi3 = GetHighestPrice(BarsLookback);
@@ -177,16 +177,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			tradeObj.InitNewEntryTrade();
 			if(GetTradeSignal(CurrentBar) != null) {
-				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
-				{
-					indicatorProxy.TraceMessage(this.Name, PrintOut);
-					tradeObj.tradeDirection = TradingDirection.Down;
-				}
-				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
-				{
-					indicatorProxy.TraceMessage(this.Name, PrintOut);
-					tradeObj.tradeDirection = TradingDirection.Up;
-				}
+//				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
+//				{
+//					indicatorProxy.TraceMessage(this.Name, PrintOut);
+//					tradeObj.tradeDirection = TradingDirection.Down;
+//				}
+//				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
+//				{
+//					indicatorProxy.TraceMessage(this.Name, PrintOut);
+//					tradeObj.tradeDirection = TradingDirection.Up;
+//				}
 				
 				tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 				

@@ -162,8 +162,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			CheckPerformance();
 			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
 			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
-			indicatorProxy.TraceMessage(this.Name, PrintOut);
-			CheckIndicatorSignals();
+			indicatorProxy.TraceMessage(this.Name, PrintOut);			
 
 			switch(AlgoMode) {
 				case AlgoModeType.Liquidate: //liquidate
@@ -171,8 +170,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 					CloseAllPositions();
 					break;
 				case AlgoModeType.Trading: //trading
-					//SetTradeSignal(); called from CheckExitTrade() or CheckNewEntryTrade();
-					//PutTrade(); first GetTradeSignal() and then put exit or entry trade;
+					//SetTradeAction(); called from CheckExitTrade() or CheckNewEntryTrade();
+					//CheckIndicatorSignals(); called from SetTradeAction(); save trade signals into the trade action;
+					//PutTrade(); first GetTradeAction() and then put exit or entry trade;
 					indicatorProxy.TraceMessage(this.Name, PrintOut);
 					if(HasPosition() != 0) {
 						CheckExitTrade();

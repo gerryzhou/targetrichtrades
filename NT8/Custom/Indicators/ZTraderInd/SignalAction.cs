@@ -42,13 +42,14 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		public SignalActionType SignalActionType
 		{
 			get; set;
-		}		
+		}
 		
 		[Browsable(false)]
 		[XmlIgnore]
 		public SupportResistanceRange<double> SnR {
 			get; set;
-		}		
+		}
 		#endregion
 	}
 }
+

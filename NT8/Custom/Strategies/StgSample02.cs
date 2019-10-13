@@ -102,7 +102,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 			if(c0 < lo3)
 				dir.TrendDir = TrendDirection.Down;
-			trdSignal.TrendDir = dir;
+//			trdSignal.TrendDir = dir;
 			
 			this.AddTradeSignal(CurrentBar, trdSignal);
 			hi3 = GetHighestPrice(BarsLookback);
@@ -115,16 +115,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			tradeObj.InitNewEntryTrade();
 			if(GetTradeSignal(CurrentBar) != null) {
-				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
-				{
-					indicatorProxy.TraceMessage(this.Name, PrintOut);
-					tradeObj.tradeDirection = TradingDirection.Down;
-				}
-				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
-				{
-					indicatorProxy.TraceMessage(this.Name, PrintOut);
-					tradeObj.tradeDirection = TradingDirection.Up;
-				}
+//				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
+//				{
+//					indicatorProxy.TraceMessage(this.Name, PrintOut);
+//					tradeObj.tradeDirection = TradingDirection.Down;
+//				}
+//				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
+//				{
+//					indicatorProxy.TraceMessage(this.Name, PrintOut);
+//					tradeObj.tradeDirection = TradingDirection.Up;
+//				}
 				
 				tradeObj.tradeStyle = TradingStyle.TrendFollowing;
 				
