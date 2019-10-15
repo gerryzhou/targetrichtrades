@@ -87,7 +87,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
             get; set;
         }
 		
-		[Description("Quantity for orders")]
+		[Description("Quantity for each order from the signal")]
  		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		[DefaultValueAttribute(1)]
         public int Quantity

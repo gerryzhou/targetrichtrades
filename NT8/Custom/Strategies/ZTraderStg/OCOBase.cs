@@ -25,16 +25,24 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		private Order profitTargetOrder;
 		
 		#region Properites
-		[Browsable(false)]
-		[XmlIgnore()]
+		/// <summary>
+		/// The OCO id for bracket or OCO trade
+		/// </summary>		
+		[Browsable(false), XmlIgnore]
+		[DefaultValueAttribute(null)]
+		public string OcoID
+		{
+			get; set;
+		}
+		
+		[Browsable(false), XmlIgnore]
 		public Order StopLossOrder
 		{
 			get { return stopLossOrder;	}
 			set { stopLossOrder= value; }
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore()]
+		[Browsable(false), XmlIgnore]
 		public Order ProfitTargetOrder
 		{
 			get { return profitTargetOrder;	}

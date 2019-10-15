@@ -38,16 +38,14 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double enOffsetPnts = 1.25;//Price offset for entry
 		
 		#region Properites
-		[Browsable(false)]
-		[XmlIgnore()]
+		[Browsable(false), XmlIgnore]
 		public Order EntryOrder
 		{
 			get { return entryOrder; }
 			set { entryOrder= value; }
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore()]
+		[Browsable(false), XmlIgnore]
 		public OCOBase OCOOrder
 		{
 			get { return ocoOrder;	}

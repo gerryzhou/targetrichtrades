@@ -87,14 +87,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//Print(position.ToString() + "--MarketPosition=" + position.MarketPosition);
 			if (position.MarketPosition == MarketPosition.Flat)
 			{
-				tradeObj.trailingPTTic = GetTicksByCurrency(tradeObj.profitTargetAmt);
-				tradeObj.trailingSLTic = GetTicksByCurrency(tradeObj.stopLossAmt);
+				CurrentTrade.TradeAction.TrailingProfitTargetTics = GetTicksByCurrency(CurrentTrade.profitTargetAmt);
+				CurrentTrade.trailingSLTic = GetTicksByCurrency(CurrentTrade.stopLossAmt);
 			}
 			else
 			{
-				CalProfitTargetAmt(averagePrice, tradeObj.profitFactor);
-				CalExitOcoPrice(averagePrice, tradeObj.profitFactor);
-				SetSimpleExitOCO(tradeObj.entrySignalName);
+				CalProfitTargetAmt(averagePrice, CurrentTrade.profitFactor);
+				CalExitOcoPrice(averagePrice, CurrentTrade.profitFactor);
+				SetSimpleExitOCO(CurrentTrade.TradeAction.EntrySignal.SignalName);
 //				SetBracketOrder.OCOOrder.ProfitTargetOrder(OrderSignalName.EntryShort.ToString());
 //				SetBracketOrder.OCOOrder.StopLossOrder(OrderSignalName.EntryShort.ToString());
 			}

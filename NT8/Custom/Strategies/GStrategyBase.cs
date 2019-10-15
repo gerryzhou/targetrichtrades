@@ -50,6 +50,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.Configure)
 			{
+				CurrentTrade = new CurrentTrade(this);
 				//InitTradeMgmt();
 				//AddDataSeries("@SPX500", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
 			}
@@ -204,7 +205,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region Properties
 		
 		[Description("Account Name")]
-		[NinjaScriptProperty]
+		[NinjaScriptProperty, XmlIgnore]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "AccName", GroupName = GPS_GSTRATEGY, Order = ODG_AccName)]		
         public string AccName
         {
@@ -274,15 +275,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 //		public double CustomPrc1
 //		{ get; set; }
 
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public Series<double> CustomPlot1
 		{
 			get { return Values[0]; }
 		}
 
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public Series<double> CustomPlot2
 		{
 			get { return Values[1]; }

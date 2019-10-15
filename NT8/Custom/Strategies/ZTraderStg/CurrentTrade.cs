@@ -26,19 +26,23 @@ using NinjaTrader.NinjaScript.DrawingTools;
 namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 {
 	/// <summary>
-	/// The class holds current trade, including positions, orders, etc.
+	/// The class holds current trade, including positions, orders, tradeAction etc.
+	/// All the trading parameters from strategy are held in the CurrentTrade;
+	/// All the parameters from the signal are held in TradeAction 
+	/// CurrentTrade->TradeAction->TradeSignal;
+	/// 
 	/// </summary>
-	public class TradeObj {
+	public class CurrentTrade {
 		private GStrategyBase instStrategy = null;
 		private TradeType tradeType = TradeType.NoTrade;
 
 		#region Order Objects
-		public string entrySignalName = String.Empty;
-		public string stopLossSignalName = String.Empty;
-		public string profitTargetSignalName = String.Empty;
-		public string ocoID = String.Empty;
-		public string trailingSLSignalName = String.Empty;
+//		public string entrySignalName = String.Empty;
+//		public string stopLossSignalName = String.Empty;
+//		public string profitTargetSignalName = String.Empty;
+//		public string trailingSLSignalName = String.Empty;
 		
+		public string ocoID = String.Empty;
 		private BracketOrderBase bracketOrder = new BracketOrderBase();
 		private TrailingSLOrderBase trailingSLOrder = new TrailingSLOrderBase();
 		public EntryExitOrderType exitOrderType = EntryExitOrderType.SimpleOCO;
@@ -46,6 +50,12 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		#endregion
 		
 		#region Trade Mgmt variables
+		[Description("Trade action for current trade")]
+		[NinjaScriptProperty, Browsable(false), XmlIgnore]
+		public TradeAction TradeAction
+		{
+			get; set;
+		}
 		
 		public TradingDirection tradeDirection = TradingDirection.Both;
 		public TradingStyle tradeStyle = TradingStyle.TrendFollowing;
@@ -55,8 +65,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double enOffsetPnts = 1;//The offset for price of entry limite order
 
 		//Set at runtime
-		public double enStopPrice = 0;//The stop market price for entry order
-		public double enLimitPrice = 0;//The limit price for entry order
+//		public double enStopPrice = 0;//The stop market price for entry order
+//		public double enLimitPrice = 0;//The limit price for entry order
 		
 		public int minutesChkEnOrder = 20;//How long before checking an entry order filled or not
 		public int minutesChkPnL = 30;//How long before checking P&L
@@ -105,16 +115,16 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		public double dailyLossLmt = -200;//-300 the daily loss limit amount
 		public double profitFactor = 0.5;//PT/SL ratio
-		public int quantity = 1; //Quantity of the contracts traded
+		public int quantity = 1; //Quantity of the total contracts allowed to trade
 
-		public double profitTargetPrice = 0;//Runtime var. For trailing PT using the price to set OCO order
-		public double stopLossPrice = 0;//Runtime var; Using price to set OCO order, since Amt could be negative		
-		public double trailingSLPrice = 0;//Runtime var. Price for trailing stoploss price
-		public int trailingPTTic = 16;//Runtime var. Ticks for trailing ProfitTarget, using ticks to record current PT	
+//		public double profitTargetPrice = 0;//Runtime var. For trailing PT using the price to set OCO order
+//		public double stopLossPrice = 0;//Runtime var; Using price to set OCO order, since Amt could be negative		
+//		public double trailingSLPrice = 0;//Runtime var. Price for trailing stoploss price
+//		public int trailingPTTic = 16;//Runtime var. Ticks for trailing ProfitTarget, using ticks to record current PT	
 		
 		#endregion
 		
-		public TradeObj(GStrategyBase inst_strategy) {
+		public CurrentTrade(GStrategyBase inst_strategy) {
 			this.instStrategy = inst_strategy;
 			InitParams();
 		}
@@ -152,7 +162,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			trailingSLTic = instStrategy.MM_TrailingStopLossTic;
 			traillingSLPercent = instStrategy.MM_TrailingStopLossPercent;
 			
-			trailingPTTic = profitLockMinTic;						
+//			trailingPTTic = profitLockMinTic;
 
 			slTrailing = instStrategy.MM_SLTrailing;
 			ptTrailing = instStrategy.MM_PTTrailing;
@@ -178,7 +188,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			//InitParams();
 			SetTradeType(TradeType.Exit);
 			exitOrderType = EntryExitOrderType.TrailingStopLoss;
-			this.trailingPTTic = 0;
+			this.TradeAction.TrailingProfitTargetTics = 0;
 			switch(TLSLCalculationMode) {
 				case CalculationMode.Currency:
 					this.trailingSLTic = instStrategy.GetTicksByCurrency(this.trailingSLAmt);

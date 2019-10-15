@@ -33,40 +33,35 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		private Order tlslOrder = null;
 		
 		#region Properites
-		[Browsable(false)]
-		[XmlIgnore()]
+		[Browsable(false), XmlIgnore]
 		public double HighestPrice
 		{
 			get { return highestPrice; }
 			set { highestPrice = value; }
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore()]
+		[Browsable(false), XmlIgnore]
 		public double LowestPrice
 		{
 			get { return lowestPrice; }
 			set { lowestPrice = value; }
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore()]
+		[Browsable(false), XmlIgnore]
 		public double MaxProfitAmt
 		{
 			get { return maxProfitAmt; }
 			set { maxProfitAmt = value; }
 		}		
 		
-		[Browsable(false)]
-		[XmlIgnore()]
+		[Browsable(false), XmlIgnore]
 		public Order EntryOrder
 		{
 			get { return entryOrder; }
 			set { entryOrder = value; }
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore()]
+		[Browsable(false), XmlIgnore]
 		public Order TLSLOrder
 		{
 			get { return tlslOrder; }

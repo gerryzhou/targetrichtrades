@@ -41,6 +41,10 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 //		private Reversal reversalDir = Reversal.UnKnown; //1=rev up, -1=rev down, 0=no rev/unknown
 //		private SupportResistanceRange<SupportResistanceBar> sptRst;
 		
+		#region Methods
+		
+		#endregion Methods
+		
 		#region Protperies
 		/// <summary>
 		/// The barNo the trade action refers to
@@ -70,35 +74,64 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		{
 			get; set;
 		}
-		
-		/// <summary>
-		/// The OCO id for bracket or OCO trade
-		/// </summary>		
-		[Browsable(false), XmlIgnore]
-		[DefaultValueAttribute(null)]
-		public string OcoID
-		{
-			get; set;
-		}
-		
-		[Browsable(false), XmlIgnore]
+				
+		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		[DefaultValueAttribute(null)]
 		public TradeSignal EntrySignal {
 			get; set;
 		}
 		
-		[Browsable(false), XmlIgnore]
+		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		[DefaultValueAttribute(null)]
 		public TradeSignal StopLossSignal {
 			get; set;
 		}
 		
-		[Browsable(false), XmlIgnore]
+		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		[DefaultValueAttribute(null)]
 		public TradeSignal ProfitTargetSignal {
 			get; set;
 		}
-				
+		
+		/// <summary>
+		/// Entry price
+		/// </summary>
+		public double EntryPrice {
+			get{
+				if(OrderType.StopMarket.Equals(EntrySignal.OrderType))
+					return EntrySignal.StopPrice;
+				else return EntrySignal.LimitPrice;
+			}
+			set {
+				if(OrderType.StopMarket.Equals(EntrySignal.OrderType))
+					EntrySignal.StopPrice = value;
+				else EntrySignal.LimitPrice = value;
+			}
+		}
+		
+		/// <summary>
+		/// StopLoss price, stop price only
+		/// </summary>
+		public double StopLossPrice {
+			get{ return StopLossSignal.StopPrice; }
+			set { StopLossSignal.StopPrice = value;	}
+		}
+		
+		/// <summary>
+		/// ProfitTarget price, limit price only
+		/// </summary>
+		public double ProfitTargetPrice {
+			get{ return ProfitTargetSignal.LimitPrice; }
+			set { ProfitTargetSignal.LimitPrice = value; }
+		}
+		
+		/// <summary>
+		/// Trailing ProfitTarget tics
+		/// </summary>
+		public int TrailingProfitTargetTics {
+			get{ return ProfitTargetSignal.PriceOffset; }
+			set { ProfitTargetSignal.PriceOffset = value; }
+		}
 		#endregion
 	}
 }
