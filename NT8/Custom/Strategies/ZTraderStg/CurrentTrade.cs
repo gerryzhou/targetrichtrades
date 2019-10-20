@@ -115,7 +115,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		public double dailyLossLmt = -200;//-300 the daily loss limit amount
 		public double profitFactor = 0.5;//PT/SL ratio
-		public int quantity = 1; //Quantity of the total contracts allowed to trade
+		public int quantity = 1; //Quantity of the total contracts allowed to trade for the strategy
 
 //		public double profitTargetPrice = 0;//Runtime var. For trailing PT using the price to set OCO order
 //		public double stopLossPrice = 0;//Runtime var; Using price to set OCO order, since Amt could be negative		
@@ -180,13 +180,13 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		public void InitNewEntryTrade() {
 			InitParams();
-			SetTradeType(TradeType.Entry);
+			CurrentTradeType = TradeType.Entry;
 			exitOrderType = EntryExitOrderType.SimpleOCO;
 		}
 
 		public void InitNewTLSL() {
 			//InitParams();
-			SetTradeType(TradeType.Exit);
+			CurrentTradeType = TradeType.Exit;
 			exitOrderType = EntryExitOrderType.TrailingStopLoss;
 			this.TradeAction.TrailingProfitTargetTics = 0;
 			switch(TLSLCalculationMode) {
@@ -200,29 +200,24 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		}
 		
 		#region Properties
-		[Browsable(false)]
-		[XmlIgnore()]
+		[Browsable(false), XmlIgnore]
 		public BracketOrderBase BracketOrder
 		{
 			get { return bracketOrder; }
 			set { bracketOrder = value; }
 		}
 
-		[Browsable(false)]
-		[XmlIgnore()]
+		[Browsable(false), XmlIgnore]
 		public TrailingSLOrderBase TrailingSLOrder
 		{
 			get { return trailingSLOrder; }
 			set { trailingSLOrder = value; }
 		}
-		#endregion
 		
-		#region Other Properties
-		public TradeType GetTradeType() {
-			return tradeType;
-		}
-		public void SetTradeType(TradeType t) {
-			tradeType = t;
+		[Browsable(false), XmlIgnore]
+		public TradeType CurrentTradeType {
+			get{ return tradeType;}
+			set { tradeType = value;}
 		}
 		#endregion
 	}

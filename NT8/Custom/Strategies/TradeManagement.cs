@@ -48,7 +48,47 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public virtual void PutTrade() {
-			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + "::PutTrade()--" + this.ToString());
+			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + 
+				"::PutTrade()--" + this.ToString());
+			switch(CurrentTrade.CurrentTradeType) {
+				case TradeType.Entry:
+					PutEntryTrade();
+					break;
+				case TradeType.Exit:
+					PutExitTrade();
+					break;
+				case TradeType.Liquidate:
+					PutLiquidateTrade();
+					break;
+			}
+		}
+		
+		public virtual void PutEntryTrade() {
+			if(CurrentTrade.TradeAction == null || 
+				CurrentTrade.TradeAction.EntrySignal == null ||
+				CurrentTrade.TradeAction.EntrySignal.BarNo != CurrentBar) return;
+			
+			switch(CurrentTrade.TradeAction.TradeActionType) {
+				case TradeActionType.EntrySimple:
+					NewEntrySimpleOrder();
+					break;
+			}
+		}
+		
+		public virtual void PutExitTrade() {
+			if(CurrentTrade.TradeAction == null) return;
+			
+			switch(CurrentTrade.TradeAction.TradeActionType) {
+				case TradeActionType.ExitOCO:
+					break;
+				case TradeActionType.ExitTrailingSL:
+					break;
+				case TradeActionType.UnKnown:
+					break;
+			}
+		}
+		
+		public virtual void PutLiquidateTrade() {
 		}
 		
 		/// <summary>
@@ -275,7 +315,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			CurrentTrade.barsSinceEnOrd = 0;
 		}
 		
-		public virtual void NewLongLimitOrder(string msg, double zzGap, double curGap)
+		public virtual void NewLongLimitOrder(string msg)//, double zzGap, double curGap)
 		{
 			double prc = (CurrentTrade.enTrailing && CurrentTrade.enCounterPBBars>0) ? Close[0]-CurrentTrade.enOffsetPnts :  Low[0]-CurrentTrade.enOffsetPnts;
 			
@@ -316,6 +356,33 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			CurrentTrade.barsSinceEnOrd = 0;
 		}
+		
+		#region Entry Order functions
+		public virtual void NewEntrySimpleOrder() {
+			if (CurrentTrade.BracketOrder.EntryOrder !=null &&
+				CurrentTrade.BracketOrder.EntryOrder.OrderState == OrderState.Working) {
+					CancelEntryOrders();
+			}
+			if(IsUnmanaged) {
+				NewEntrySimpleOrderUM();
+			} else {
+				NewEntrySimpleOrderMG();
+			}
+			CurrentTrade.barsSinceEnOrd = 0;
+		}
+		
+		public virtual void NewEntrySimpleOrderMG() {
+		}
+		
+		public virtual void NewEntrySimpleOrderUM() {
+			CurrentTrade.TradeAction.EntrySignal.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
+			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewLongLimitOrderUM"
+			+";CurrentTrade.TradeAction.EntrySignal.SignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
+			SubmitOrderUnmanaged(0, OrderAction.Buy, OrderType.Limit, 
+			CurrentTrade.quantity, CurrentTrade.TradeAction.EntryPrice, 0, "", CurrentTrade.TradeAction.EntrySignal.SignalName);
+		}
+		
+		#endregion Entry Order functions
 		
 		#region Exit Order functions
 		public virtual void SetProfitTargetOrder(string sigName) {

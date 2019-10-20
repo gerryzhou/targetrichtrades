@@ -181,13 +181,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 					//Print(CurrentBar + ": GetResistance=" + indicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);
 //				}
 			} else {
-				CurrentTrade.SetTradeType(TradeType.NoTrade);
+				CurrentTrade.CurrentTradeType = TradeType.NoTrade;
 			}
 			return CurrentTrade;
 		}
 
 		public override void PutTrade() {
-			if(CurrentTrade.GetTradeType() == TradeType.Entry) {
+			if(CurrentTrade.CurrentTradeType == TradeType.Entry) {
 				indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade CurrentTrade.stopLossAmt=" + CurrentTrade.stopLossAmt + "," + MM_StopLossAmt);
 				if(CurrentTrade.tradeDirection == TradingDirection.Down) {
 					//CurrentTrade.TradeAction.EntrySignal.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShort.ToString());

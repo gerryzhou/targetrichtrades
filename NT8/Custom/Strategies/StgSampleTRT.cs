@@ -99,9 +99,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.Configure)
 			{
-				Print(this.Name + " set Configure called....");
-				if(CurrentTrade == null)
-					CurrentTrade = new CurrentTrade(this);
+				Print(this.Name + " set Configure called.... CurrentTrade=" + CurrentTrade);
+//				if(CurrentTrade == null)
+//					CurrentTrade = new CurrentTrade(this);
 			}
 		}
 
@@ -200,14 +200,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
 				
 //			} else {
-//				CurrentTrade.SetTradeType(TradeType.NoTrade);
+//				CurrentTrade.CurrentTradeType = TradeType.NoTrade);
 //			}
 			return CurrentTrade;
 		}
 		
 		public override void PutTrade(){
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
-			if(CurrentTrade.GetTradeType() == TradeType.Entry) {
+			if(CurrentTrade.CurrentTradeType == TradeType.Entry) {
 				indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade CurrentTrade.stopLossAmt=" + CurrentTrade.stopLossAmt + "," + MM_StopLossAmt);
 				if(CurrentTrade.tradeDirection == TradingDirection.Down) {
 					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Down OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);

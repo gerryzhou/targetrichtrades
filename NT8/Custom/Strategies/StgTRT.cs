@@ -200,7 +200,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
 				
 			} else {
-				CurrentTrade.SetTradeType(TradeType.NoTrade);
+				CurrentTrade.CurrentTradeType = TradeType.NoTrade;
 			}
 			
 //			if(GetTradeSignal(CurrentBar) != null && GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down) {
@@ -210,7 +210,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public override void PutTrade() {
-			if(CurrentTrade.GetTradeType() == TradeType.Entry) {
+			if(CurrentTrade.CurrentTradeType == TradeType.Entry) {
 				indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade CurrentTrade.stopLossAmt=" + CurrentTrade.stopLossAmt + "," + MM_StopLossAmt);
 				if(CurrentTrade.tradeDirection == TradingDirection.Down) {
 					//CurrentTrade.BracketOrder.EntryOrder = 
