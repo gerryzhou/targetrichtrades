@@ -175,17 +175,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 					//CheckIndicatorSignals(); called from SetTradeAction(); save trade signals into the trade action;
 					//PutTrade(); first GetTradeAction() and then put exit or entry trade;
 					indicatorProxy.TraceMessage(this.Name, PrintOut);
-					if(HasPosition() != 0) {
-						CheckExitTrade();
+					if(CheckTradeSignals()) {
+						PutTrade();
 					}
-					else if(NewOrderAllowed())
-					{
-						indicatorProxy.TraceMessage(this.Name, PrintOut);
-						CheckNewEntryTrade();
-						
-						indicatorProxy.TraceMessage(this.Name, PrintOut);						
-					}
-					PutTrade();
 					break;
 				case AlgoModeType.CancelOrders: //cancel order
 					indicatorProxy.TraceMessage(this.Name, PrintOut);

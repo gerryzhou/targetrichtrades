@@ -124,6 +124,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		#endregion
 		
+		#region Trade Methods
+		
 		public CurrentTrade(GStrategyBase inst_strategy) {
 			this.instStrategy = inst_strategy;
 			InitParams();
@@ -198,6 +200,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 					break;				
 			}
 		}
+		
+		#endregion Trade Methods
 		
 		#region Properties
 		[Browsable(false), XmlIgnore]

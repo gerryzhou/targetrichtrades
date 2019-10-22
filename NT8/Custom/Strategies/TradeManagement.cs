@@ -50,6 +50,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual void PutTrade() {
 			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + 
 				"::PutTrade()--" + this.ToString());
+			CurrentTrade.TradeAction = GetTradeAction(CurrentBar);
 			switch(CurrentTrade.CurrentTradeType) {
 				case TradeType.Entry:
 					PutEntryTrade();
@@ -114,7 +115,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public virtual void CheckExitTradeBySignal() {
-			if(GetTradeSignal(CurrentBar) == null) return;
+//			if(GetTradeSignal(CurrentBar) == null) return;
 //			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":CheckExitTradeBySignal"
 //			+ ";indicatorSignal.ReversalDir=" + GetTradeSignal(CurrentBar).ReversalDir.ToString()
 //			+ ";Position.MarketPosition=" + GetMarketPosition()
@@ -378,8 +379,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			CurrentTrade.TradeAction.EntrySignal.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
 			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewLongLimitOrderUM"
 			+";CurrentTrade.TradeAction.EntrySignal.SignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
-			SubmitOrderUnmanaged(0, OrderAction.Buy, OrderType.Limit, 
-			CurrentTrade.quantity, CurrentTrade.TradeAction.EntryPrice, 0, "", CurrentTrade.TradeAction.EntrySignal.SignalName);
+			SubmitOrderUnmanaged(0, OrderAction.Buy, OrderType.Limit, CurrentTrade.TradeAction.EntrySignal.Quantity,
+			CurrentTrade.TradeAction.EntryPrice, 0, "", CurrentTrade.TradeAction.EntrySignal.SignalName);
 		}
 		
 		#endregion Entry Order functions

@@ -119,7 +119,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				dir.TrendDir = TrendDirection.Down;
 //			trdSignal.TrendDir = dir;
 			
-			this.AddTradeSignal(CurrentBar, trdSignal);
+//			this.AddTradeSignal(CurrentBar, trdSignal);
 			hi3 = GetHighestPrice(BarsLookback);
 			lo3 = GetLowestPrice(BarsLookback);
 			
@@ -146,7 +146,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override CurrentTrade CheckNewEntryTrade() {
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			CurrentTrade.InitNewEntryTrade();
-			if(GetTradeSignal(CurrentBar) != null) {
+//			if(GetTradeSignal(CurrentBar) != null) {
 //				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
 //				{
 //					indicatorProxy.TraceMessage(this.Name, PrintOut);
@@ -158,11 +158,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 //					CurrentTrade.tradeDirection = TradingDirection.Up;
 //				}
 				
-				CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
+//				CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
 				
-			} else {
-				CurrentTrade.CurrentTradeType = TradeType.NoTrade;
-			}
+//			} else {
+//				CurrentTrade.CurrentTradeType = TradeType.NoTrade;
+//			}
 			return CurrentTrade;
 		}
 		

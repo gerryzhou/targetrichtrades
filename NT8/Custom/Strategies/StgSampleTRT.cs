@@ -134,8 +134,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Print(CurrentBar + ":stg-Last " + giSMI.SignalName_LineCross + "=" + indSigCrs.BarNo + "," + indSigCrs.SignalAction.SignalActionType.ToString());
 		}
 		
-		public override TradeSignal GetTradeSignal() {
+		public override bool CheckTradeSignals() {
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			List<TradeSignal> sigList = new List<TradeSignal>();
 			TradeSignal trdSignal = new TradeSignal();
 			Direction dir = giKAMA.GetDirection();// new Direction();
 			PatternMatched();
@@ -154,15 +155,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				dir.TrendDir = TrendDirection.Down;
 //			trdSignal.TrendDir = dir;
 			
-			this.AddTradeSignal(CurrentBar, trdSignal);
+//			this.AddTradeSignal(CurrentBar, trdSignal);
 			hi3 = GetHighestPrice(BarsLookback);
 			lo3 = GetLowestPrice(BarsLookback);
 			
-			return trdSignal;
+			return false;
 		}
 		
 		public override void SetTradeAction() {
-			
+			CheckIndicatorSignals();
 		}
 				
 		protected override bool PatternMatched()
@@ -185,6 +186,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.PrintLog(true, IsLiveTrading(), "===========CheckNewEntryTrade()===" + this.Name);
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			CurrentTrade.InitNewEntryTrade();
+			SetTradeAction();
 //			if(GetTradeSignal(CurrentBar) != null) {
 //				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
 //				{
@@ -205,22 +207,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return CurrentTrade;
 		}
 		
-		public override void PutTrade(){
-			indicatorProxy.TraceMessage(this.Name, PrintOut);
-			if(CurrentTrade.CurrentTradeType == TradeType.Entry) {
-				indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade CurrentTrade.stopLossAmt=" + CurrentTrade.stopLossAmt + "," + MM_StopLossAmt);
-				if(CurrentTrade.tradeDirection == TradingDirection.Down) {
-					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Down OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
-					CurrentTrade.TradeAction.EntryPrice = GetTypicalPrice(0);
-					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
-				}
-				else if(CurrentTrade.tradeDirection == TradingDirection.Up) {
-					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
-					CurrentTrade.TradeAction.EntryPrice = GetTypicalPrice(0);
-					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());
-				}				
-			}
-		}
+//		public override void PutTrade(){
+//			indicatorProxy.TraceMessage(this.Name, PrintOut);
+//			if(CurrentTrade.CurrentTradeType == TradeType.Entry) {
+//				indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade CurrentTrade.stopLossAmt=" + CurrentTrade.stopLossAmt + "," + MM_StopLossAmt);
+//				if(CurrentTrade.tradeDirection == TradingDirection.Down) {
+//					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Down OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
+//					CurrentTrade.TradeAction.EntryPrice = GetTypicalPrice(0);
+//					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
+//				}
+//				else if(CurrentTrade.tradeDirection == TradingDirection.Up) {
+//					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
+//					CurrentTrade.TradeAction.EntryPrice = GetTypicalPrice(0);
+//					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());
+//				}				
+//			}
+//		}
 
         #region Custom Properties
 		private const int ODG_EnBarsBeforeInflection = 1;

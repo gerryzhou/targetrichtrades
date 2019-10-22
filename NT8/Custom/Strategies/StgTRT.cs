@@ -181,9 +181,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			if(NewOrderAllowed()) {
 			int prtLevel = 0;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);//|| Position.Quantity == 0 giSMI.IsNewInflection(TrendDirection.Down) && 
-			Print("tradeSignal null=" + (GetTradeSignal(CurrentBar)==null));
+//			Print("tradeSignal null=" + (GetTradeSignal(CurrentBar)==null));
 			CurrentTrade.InitNewEntryTrade();
-			if(GetTradeSignal(CurrentBar) != null) {
+//			if(GetTradeSignal(CurrentBar) != null) {
 //				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
 				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
 //				{
@@ -197,11 +197,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 //					CurrentTrade.tradeDirection = TradingDirection.Up;
 //				}
 				
-				CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
+//				CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
 				
-			} else {
-				CurrentTrade.CurrentTradeType = TradeType.NoTrade;
-			}
+//			} else {
+//				CurrentTrade.CurrentTradeType = TradeType.NoTrade;
+//			}
 			
 //			if(GetTradeSignal(CurrentBar) != null && GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down) {
 				//Print(CurrentBar + ": GetResistance=" + indicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);

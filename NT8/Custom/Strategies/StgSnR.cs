@@ -161,8 +161,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override CurrentTrade CheckNewEntryTrade() {
 			int prtLevel = 1;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
-			if(GetTradeSignal(CurrentBar) != null) {
-				CurrentTrade.InitNewEntryTrade();
+//			if(GetTradeSignal(CurrentBar) != null) {
+//				CurrentTrade.InitNewEntryTrade();
 //				if(GetTradeSignal(CurrentBar).TrendDir != null 
 //					&& GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down
 //					&& indicatorProxy.GetResistance(GetTradeSignal(CurrentBar).SnR.Resistance) > High[0]) {
@@ -180,9 +180,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 //					CurrentTrade.stopLossPrice = indicatorProxy.GetSupport(GetTradeSignal(CurrentBar).SnR.Support);
 					//Print(CurrentBar + ": GetResistance=" + indicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);
 //				}
-			} else {
-				CurrentTrade.CurrentTradeType = TradeType.NoTrade;
-			}
+//			} else {
+//				CurrentTrade.CurrentTradeType = TradeType.NoTrade;
+//			}
 			return CurrentTrade;
 		}
 

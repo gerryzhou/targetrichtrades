@@ -91,13 +91,14 @@ Plan for the next few months(priority?):
 ** Sim and Live TRT strategy;
 ** Results publishing;
 ** Results analysis, bug fixing, improvement of the framework;
+** Supervised Algo: input from human(web, mobile), real time parameters adjustment;
 ** Position size scaling, 2 or more contracts entry,exit,scaling in/out;
 
 Longer term(priority?):
 ** Ninjatrader Add-on selling;
 ** Managed futures program; Form a group?
 ** Development of Ninjatrader Algo trading course for beginners;
-** 
+** More ....
 
 
 
