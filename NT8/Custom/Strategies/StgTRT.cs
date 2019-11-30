@@ -177,7 +177,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#region Trade functions
 		
-		public override CurrentTrade CheckNewEntryTrade() {
+		public override bool CheckNewEntryTrade() {
 //			if(NewOrderAllowed()) {
 			int prtLevel = 0;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);//|| Position.Quantity == 0 giSMI.IsNewInflection(TrendDirection.Down) && 
@@ -206,7 +206,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			if(GetTradeSignal(CurrentBar) != null && GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down) {
 				//Print(CurrentBar + ": GetResistance=" + indicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);
 //			}
-			return CurrentTrade;
+			return false;
 		}
 		
 		public override void PutTrade() {

@@ -37,7 +37,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// 2) OnBarUpdate();
 	/// 3) GetIndicatorSignal();
 	/// 4) GetTradeSignal();
-	/// 5) CheckNewEntryTrade();
+	/// 5) CheckExitTrade() or CheckNewEntryTrade();
 	/// 6) PutTrade();
 	/// Indicator Combination:
 	/// * SnR: daily high/low
@@ -46,7 +46,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// * Pullback Pivot: left 20+, right 5+, i.e. (20+, 5+)
 	/// * Trending pivot: breakout the pullback pivot, create a new (5+, 5+) pivot
 	/// Long/Short rules:
-	/// * KAMA indicates trend;
+	/// * KAMA indicates trend(not helpful); Use ParabolicSAR(0.002,0.1,0.002) as trending indicator; 
 	/// * Long: cyan diamond, Short: red diamond;
 	/// * Trend-following long/short entry;
 	/// * Stop loss: last n (five?) bars hi/lo;
@@ -61,6 +61,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private GISMI giSMI;
 		private GIAwesomeOscillator awOscillator;
 		private GIKAMA giKAMA;
+		private GIPbSAR giPbSAR;
 		
 		private double c0 = 0, hi3 = Double.MaxValue, lo3 = Double.MinValue;
 		
@@ -91,10 +92,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 				giSMI = GISMI(EMAPeriod1, EMAPeriod2, Range, SMITMAPeriod, SMICrossLevel);//(3, 5, 5, 8);
 				awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
 				giKAMA = GIKAMA(FastKAMA, PeriodKAMA, SlowKAMA);
+				giPbSAR = GIPbSAR(AccPbSAR, AccMaxPbSAR, AccStepPbSAR);
 				
 				AddChartIndicator(giSMI);
 				AddChartIndicator(awOscillator);
 				AddChartIndicator(giKAMA);
+				AddChartIndicator(giPbSAR);
 				Print("GISMI called:" + "EMAPeriod1=" + EMAPeriod1 + "EMAPeriod2=" + EMAPeriod2 + "Range=" + Range + "SMITMAPeriod=" + SMITMAPeriod);
 			}
 			else if (State == State.Configure)
@@ -118,10 +121,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 				indicatorProxy.PrintLog(true, true, "Exception: " + ex.StackTrace);
 			}
 		}
-		
-		public override void CheckIndicatorSignals(){
+				
+		public override bool CheckNewEntrySignals(){
 			giSMI.Update();
-			Print(CurrentBar + ":CheckIndicatorSignals called -----------" + giSMI.LastInflection);
+			Print(CurrentBar + ":CheckNewEntrySignals called -----------" + giSMI.LastInflection);
 			
 			IndicatorSignal indSig = giSMI.GetLastIndicatorSignalByName(CurrentBar, giSMI.SignalName_Inflection);
 			
@@ -132,6 +135,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			if(indSigCrs != null && indSigCrs.SignalAction != null)
 				Print(CurrentBar + ":stg-Last " + giSMI.SignalName_LineCross + "=" + indSigCrs.BarNo + "," + indSigCrs.SignalAction.SignalActionType.ToString());
+			return false;			
+		}
+		
+		public override bool CheckExitSignals(){
+			return false;
 		}
 		
 		public override bool CheckTradeSignals() {
@@ -163,7 +171,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public override void SetTradeAction() {
-			CheckIndicatorSignals();
+			//CheckIndicatorSignals();
 		}
 				
 		protected override bool PatternMatched()
@@ -182,7 +190,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//barsAgoMaxPbSAREn Bars Since PbSAR reversal. Enter the amount of the bars ago maximum for PbSAR entry allowed
 		}
 		
-		public override CurrentTrade CheckNewEntryTrade() {
+		public override bool CheckNewEntryTrade() {
 			indicatorProxy.PrintLog(true, IsLiveTrading(), "===========CheckNewEntryTrade()===" + this.Name);
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			CurrentTrade.InitNewEntryTrade();
@@ -204,7 +212,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			} else {
 //				CurrentTrade.CurrentTradeType = TradeType.NoTrade);
 //			}
-			return CurrentTrade;
+			return false;
 		}
 		
 //		public override void PutTrade(){
@@ -238,6 +246,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private const int ODG_FastKAMA = 11;
 		private const int ODG_SlowKAMA = 12;
 		private const int ODG_PeriodKAMA = 13;
+		private const int ODG_AccPbSAR = 14;
+		private const int ODG_AccMaxPbSAR = 15;
+		private const int ODG_AccStepPbSAR = 16;
 		
         [Description("Bars count before inflection for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
@@ -362,6 +373,30 @@ namespace NinjaTrader.NinjaScript.Strategies
 			get {return slowKAMA;}
 			set {slowKAMA = Math.Max(1, value);}
 		}
+
+		[Range(0, 1), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "Accelerate(PbSAR)", GroupName = GPS_CUSTOM_PARAMS, Order = ODG_AccPbSAR)]
+		public double AccPbSAR
+		{ 
+			get {return accPbSAR;}
+			set {accPbSAR = value;}
+		}
+		
+		[Range(0, 1), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AccelerateMax(PbSAR)", GroupName = GPS_CUSTOM_PARAMS, Order = ODG_AccMaxPbSAR)]
+		public double AccMaxPbSAR
+		{ 
+			get {return accMaxPbSAR;}
+			set {accMaxPbSAR = value;}
+		}
+		
+		[Range(0, 1), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AccelerateStep(PbSAR)", GroupName = GPS_CUSTOM_PARAMS, Order = ODG_AccStepPbSAR)]
+		public double AccStepPbSAR
+		{ 
+			get {return accStepPbSAR;}
+			set {accStepPbSAR = value;}
+		}
 		
 		private int cp_EnBarsBeforeInflection = 2;
 				
@@ -384,6 +419,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private int fastKAMA 			= 2;
         private int slowKAMA 			= 10;
 		private int periodKAMA	 		= 30;
+		
+		//PbSAR parameters
+		private double accPbSAR			= 0.002;
+		private double accMaxPbSAR		= 0.1;
+		private double accStepPbSAR		= 0.002;
 
 		#endregion
 	}

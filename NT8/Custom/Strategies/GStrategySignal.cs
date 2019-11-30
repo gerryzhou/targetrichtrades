@@ -39,6 +39,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// </summary>
 	public partial class GStrategyBase : Strategy
 	{		
+		
+		#region Variables
+
 		/// <summary>
 		/// Hold the trade signal from the underlining strategy
 		/// The key=BarNo that holds the signal set
@@ -46,10 +49,50 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 //		private SortedDictionary<int, TradeSignal> tradeSignals = 
 //			new SortedDictionary<int, TradeSignal>();
+		#endregion
+		
+		#region Methods
+		/// <summary>
+		/// The indicator signal is to trigger trade actions
+		/// Set the indicator signals for each bar/indicator
+		/// </summary>
+		public virtual bool CheckIndicatorSignals(TradeSignalType tdSigType){
+			switch(tdSigType) {
+				case TradeSignalType.Entry:
+					return CheckNewEntrySignals();
+				case TradeSignalType.Exit: 
+					return CheckExitSignals();
+				case TradeSignalType.ExitOCO:
+					return CheckExitOCOSignals();
+				case TradeSignalType.ProfitTarget:
+					return CheckProfitTargetSignals();
+				case TradeSignalType.StopLoss:
+					return CheckStopLossSignals();
+				case TradeSignalType.TrailingStopLoss:
+					return CheckTrailingStopLossSignals();
+				case TradeSignalType.ScaleIn:
+					return CheckScaleInSignals();
+				case TradeSignalType.ScaleOut:
+					return CheckScaleOutSignals();
+				default:
+					return false;
+			}
+		}
 
+		public virtual bool CheckNewEntrySignals(){return false;}
+		public virtual bool CheckExitSignals(){return false;}
+		public virtual bool CheckExitOCOSignals(){return false;}
+		public virtual bool CheckStopLossSignals(){return false;}
+		public virtual bool CheckProfitTargetSignals(){return false;}
+		public virtual bool CheckTrailingStopLossSignals(){return false;}
+		public virtual bool CheckScaleInSignals(){return false;}
+		public virtual bool CheckScaleOutSignals(){return false;}
+		
 		/// <summary>
 		/// The trade signal is to trigger entry/exit, 
 		/// or modify existing orders for extry/exit;
+		/// The trade signals are generated from indicator signals
+		/// and stored in TradeActions so no need to save it again bar by bar;
 		/// </summary>
 		/// <returns></returns>
 		public virtual TradeSignal GetTradeSignal() {return null;}
@@ -63,30 +106,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual void SetProfitTargetSignal() {}
 		
 		/// <summary>
-		/// The indicator signal is to trigger trade actions
-		/// Set the indicator signals for each bar/indicator
-		/// </summary>
-		public virtual void CheckIndicatorSignals(){
-		}
-		
-		#region Variables
-
-		#endregion
-		
-		#region Methods
-		/// <summary>
 		/// Check trade signals from indicator signals
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool CheckTradeSignals() {
-			if(HasPosition() != 0) {
-				CheckExitTrade();
+			if(HasPosition() != 0 && CheckIndicatorSignals(TradeSignalType.Exit)) {
+				return SetExitTradeAction();
 			}
-			else if(NewOrderAllowed())
+			else if(NewOrderAllowed() && CheckIndicatorSignals(TradeSignalType.Entry))
 			{
 				indicatorProxy.TraceMessage(this.Name, PrintOut);
-				CheckNewEntryTrade();
+				return SetNewEntryTradeAction();
 			}
+
 			return false;
 		}
 		

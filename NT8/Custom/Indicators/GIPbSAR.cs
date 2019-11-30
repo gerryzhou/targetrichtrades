@@ -19,6 +19,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -52,8 +53,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 			{
 				Description					= @"GI Parabolic SAR";//NinjaTrader.Custom.Resource.NinjaScriptIndicatorDescriptionParabolicSAR;
 				Name						= "GIPbSAR";//NinjaTrader.Custom.Resource.NinjaScriptIndicatorNameParabolicSAR;
-				Acceleration				= 0.02;
-				AccelerationStep			= 0.02;
+				Acceleration				= 0.002;
+				AccelerationStep			= 0.002;
 				AccelerationMax				= 0.2;
 				Calculate 					= Calculate.OnPriceChange;
 				IsSuspendedWhileInactive	= true;
@@ -157,6 +158,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 						xp = High[0];
 						AfIncrease();
 					}
+					AddIndicatorSignal(CurrentBar, SignalName_Long, SignalActionType.TrendUp, null);
 				}
 
 				// Holding short position
@@ -176,6 +178,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 						xp = Low[0];
 						AfIncrease();
 					}
+					AddIndicatorSignal(CurrentBar, SignalName_Short, SignalActionType.TrendDn, null);
 				}
 			}
 
@@ -198,8 +201,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 			// Reverse position
 			if ((longPosition && (Low[0] < todaySAR || Low[1] < todaySAR))
-				|| (!longPosition && (High[0] > todaySAR || High[1] > todaySAR)))
+				|| (!longPosition && (High[0] > todaySAR || High[1] > todaySAR))) {
 				Value[0] = Reverse();
+				if(longPosition)
+					AddIndicatorSignal(CurrentBar, SignalName_RevLong, SignalActionType.ReversalUp, null);
+				else
+					AddIndicatorSignal(CurrentBar, SignalName_RevShort, SignalActionType.ReversalDn, null);
+			}
 
 			if (BarsArray[0].BarsType.IsRemoveLastBarSupported)
 			{
@@ -278,6 +286,34 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[Display(ResourceType = typeof(Custom.Resource), Name = "AccelerationStep", GroupName = GPI_CUSTOM_PARAMS, Order = 2)]
 		public double AccelerationStep
 		{ get; set; }
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public string SignalName_Long
+		{
+			get { return "Long";}
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public string SignalName_Short
+		{
+			get { return "Short";}
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public string SignalName_RevLong
+		{
+			get { return "RevLong";}
+		}
+
+		[Browsable(false)]
+		[XmlIgnore]
+		public string SignalName_RevShort
+		{
+			get { return "RevShort";}
+		}		
 		#endregion
 	
 	}

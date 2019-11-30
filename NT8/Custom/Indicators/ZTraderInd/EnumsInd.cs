@@ -41,7 +41,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	public enum SignalType {Direction, Volatility, SnR,
 					SimplePriceAction, CombinedPriceAction, Unknown};
 	
-	public enum SignalActionType {BreakoutUp, BreakoutDn, PullbackUp, PullbackDn, ReversalUp, ReversalDn,
+	public enum SignalActionType {TrendUp, TrendDn, BreakoutUp, BreakoutDn, PullbackUp, PullbackDn, ReversalUp, ReversalDn,
 					CrossOver, CrossUnder, Divergence, Convergence, InflectionUp, InflectionDn,
 					Flat, Unknown};
 	
@@ -69,6 +69,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	
 	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4};
 }
+
 
 
 

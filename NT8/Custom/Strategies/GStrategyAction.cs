@@ -35,7 +35,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// or modify existing orders for extry/exit;
 	/// </summary>
 	public partial class GStrategyBase : Strategy
-	{		
+	{
+		#region Variables
 		/// <summary>
 		/// Hold the trade action from the underlining strategy
 		/// The key=BarNo that holds the action
@@ -43,8 +44,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		private SortedDictionary<int, TradeAction> tradeActions = 
 			new SortedDictionary<int, TradeAction>();
-		
-		#region Variables
 
 		#endregion
 		

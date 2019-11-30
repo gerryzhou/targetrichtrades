@@ -27,12 +27,6 @@ using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-//	[Gui.CategoryOrder("CustomParams", 1)] // display "CP" first
-//	[Gui.CategoryOrder(GPS_GSTRATEGY, 2)] // then GPS_GSTRATEGY
-//	[Gui.CategoryOrder("MoneyMgmt", 3)] // then "MM"
-//	[Gui.CategoryOrder("TradeMgmt", 4)] // and then "TM"
-//	[Gui.CategoryOrder("Trigger", 5)] // and finally "TG"
-	
 	public partial class GStrategyBase : Strategy
 	{
 		//protected GIndicatorBase indicatorProxy;

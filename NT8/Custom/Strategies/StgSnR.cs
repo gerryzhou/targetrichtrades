@@ -158,7 +158,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return trdSignal;
 		}
 		
-		public override CurrentTrade CheckNewEntryTrade() {
+		public override bool CheckNewEntryTrade() {
 			int prtLevel = 1;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
 //			if(GetTradeSignal(CurrentBar) != null) {
@@ -183,7 +183,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			} else {
 //				CurrentTrade.CurrentTradeType = TradeType.NoTrade;
 //			}
-			return CurrentTrade;
+			return false;
 		}
 
 		public override void PutTrade() {

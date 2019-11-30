@@ -98,7 +98,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// liquidate, reverse, or scale in/out;
 		/// </summary>
 		/// <returns></returns>
-		public virtual CurrentTrade CheckExitTrade() {
+		public virtual bool CheckExitTrade() {
 			int prtLevel = 1;
 			//CurrentTrade.SetTradeType(TradeType.Exit);
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
@@ -107,7 +107,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			CheckExitTradeBySignal();
 			
-			return CurrentTrade;
+			return false;
 		}
 		
 		/// <summary>
@@ -134,10 +134,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Check if new entry trade could be generated
 		/// </summary>
 		/// <returns></returns>
-		public virtual CurrentTrade CheckNewEntryTrade() {
+		public virtual bool CheckNewEntryTrade() {
 			indicatorProxy.PrintLog(true, IsLiveTrading(), 
 				CurrentBar + "::=======Virtual CheckNewEntryTrade()===========" + this.ToString());
-			return null;
+			return false;
 		}
 
 		public virtual bool CheckEnOrder(double cur_gap)
@@ -357,8 +357,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			CurrentTrade.barsSinceEnOrd = 0;
 		}
+		#endregion
+		
+		#region Set TradeActions
+		public virtual bool SetNewEntryTradeAction() {
+			return false;
+		}
+		
+		public virtual bool SetExitTradeAction() {
+			return false;
+		}
+		
+		#endregion
 		
 		#region Entry Order functions
+		
 		public virtual void NewEntrySimpleOrder() {
 			if (CurrentTrade.BracketOrder.EntryOrder !=null &&
 				CurrentTrade.BracketOrder.EntryOrder.OrderState == OrderState.Working) {
@@ -383,9 +396,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			CurrentTrade.TradeAction.EntryPrice, 0, "", CurrentTrade.TradeAction.EntrySignal.SignalName);
 		}
 		
-		#endregion Entry Order functions
+		#endregion
 		
 		#region Exit Order functions
+		
 		public virtual void SetProfitTargetOrder(string sigName) {
 			if(IsUnmanaged) {
 				SetProfitTargetOrderUM();
@@ -641,6 +655,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}		
 		//SetParabolicStop(string fromEntrySignal, CalculationMode mode, double value, bool isSimulatedStop, double acceleration, double accelerationMax, double accelerationStep)
 		#endregion
+		
+		#region Cancel & Close Functions
 		
 		public virtual bool CloseAllPositions() 
 		{
@@ -1033,7 +1049,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#endregion
 		
-		#region Order utilities functions
+		#region Order Utilities Functions
 		
 		/// <summary>
 		/// Entry order Signal name with timestamp:

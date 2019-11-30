@@ -113,7 +113,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		
-		public override void CheckIndicatorSignals(){
+		public override bool CheckIndicatorSignals(TradeSignalType tdSigType){
 			giSMI.Update();
 			Print(CurrentBar + ":SetIndicatorSignals called ---------------------");
 			
@@ -126,7 +126,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			if(indSigCrs != null && indSigCrs.SignalAction != null)
 				Print(CurrentBar + ":stg-Last " + giSMI.SignalName_LineCross + "=" + indSigCrs.BarNo + "," + indSigCrs.SignalAction.SignalActionType.ToString());
-			
+			return false;
 		}
 		
 		public override TradeSignal GetTradeSignal() {
@@ -173,7 +173,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//barsAgoMaxPbSAREn Bars Since PbSAR reversal. Enter the amount of the bars ago maximum for PbSAR entry allowed
 		}
 		
-		public override CurrentTrade CheckNewEntryTrade() {
+		public override bool CheckNewEntryTrade() {
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			CurrentTrade.InitNewEntryTrade();
 //			if(GetTradeSignal(CurrentBar) != null) {
@@ -193,7 +193,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			} else {
 //				CurrentTrade.CurrentTradeType = TradeType.NoTrade;
 //			}
-			return CurrentTrade;
+			return false;
 		}
 		
 		public override void PutTrade(){

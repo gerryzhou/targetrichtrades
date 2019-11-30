@@ -43,7 +43,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		#region Methods
 		
-		#endregion Methods
+		#endregion
 		
 		#region Protperies
 		/// <summary>

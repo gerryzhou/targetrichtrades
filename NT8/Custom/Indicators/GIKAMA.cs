@@ -47,7 +47,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if (State == State.SetDefaults)
 			{
 				Description					= NinjaTrader.Custom.Resource.NinjaScriptIndicatorDescriptionKAMA;
-				Name						= NinjaTrader.Custom.Resource.NinjaScriptIndicatorNameKAMA;
+				Name						= "GIKAMA";//NinjaTrader.Custom.Resource.NinjaScriptIndicatorNameKAMA;
 				Fast						= 2;
 				IsSuspendedWhileInactive	= true;
 				IsOverlay					= true;
