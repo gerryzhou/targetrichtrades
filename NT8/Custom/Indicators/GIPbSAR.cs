@@ -20,6 +20,7 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -203,10 +204,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if ((longPosition && (Low[0] < todaySAR || Low[1] < todaySAR))
 				|| (!longPosition && (High[0] > todaySAR || High[1] > todaySAR))) {
 				Value[0] = Reverse();
-				if(longPosition)
+				if(longPosition) {
 					AddIndicatorSignal(CurrentBar, SignalName_RevLong, SignalActionType.ReversalUp, null);
-				else
+					RemoveIndicatorSignal(CurrentBar, this.SignalName_Short);
+				}
+				else {
 					AddIndicatorSignal(CurrentBar, SignalName_RevShort, SignalActionType.ReversalDn, null);
+					RemoveIndicatorSignal(CurrentBar, this.SignalName_Long);
+				}
 			}
 
 			if (BarsArray[0].BarsType.IsRemoveLastBarSupported)
@@ -221,6 +226,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 				todaySARSeries[0]		= todaySAR;
 				xpSeries[0]				= xp;
 			}
+			
+			if(IsLastBarOnChart() > 0)
+				PrintIndicatorSignal();
 		}
 		
 		#region Miscellaneous
@@ -268,6 +276,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 			else
 				todaySAR = prevSAR;
 			return todaySAR;
+		}
+		
+		public override Direction GetDirection() {
+			Direction dir = new Direction();
+			if(longPosition)
+				dir.TrendDir = TrendDirection.Up;
+			else
+				dir.TrendDir = TrendDirection.Down;
+			return dir;
 		}
 		#endregion
 

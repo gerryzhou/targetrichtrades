@@ -32,6 +32,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		//protected GIndicatorBase indicatorProxy;
 		private Series<double> CustomDatsSeries1;
 		
+		#region Init Functions
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
@@ -99,45 +100,13 @@ namespace NinjaTrader.NinjaScript.Strategies
         	IsUnmanaged = true;
 			AlgoMode = AlgoModeType.Trading;
 		}
+		#endregion
 		
+		#region OnBarUpdate Function
 		public bool IsLiveTrading() {
 			if(State == State.Realtime)
 				return true;
 			else return false;
-		}
-		
-		/// <summary>
-		/// Only updated on live/sim trading, not triggered at back-testing
-		/// </summary>
-		/// <param name="account"></param>
-		/// <param name="accountItem"></param>
-		/// <param name="value"></param>
-		protected override void OnAccountItemUpdate(Cbi.Account account, Cbi.AccountItem accountItem, double value)
-		{
-			if(accountItem == AccountItem.UnrealizedProfitLoss)
-				indicatorProxy.PrintLog(true, IsLiveTrading(), 
-					CurrentBar + ":OnAccountItemUpdate"
-					+ ";Name=" + account.DisplayName
-					+ ";Item=" + accountItem.ToString()
-					+ ";value=" + value
-					+ ";DailyLossLmt=" + account.DailyLossLimit
-					+ ";Status=" + account.AccountStatus.ToString()
-					);
-		}
-
-		protected override void OnConnectionStatusUpdate(ConnectionStatusEventArgs connectionStatusUpdate)
-		{
-			
-		}
-
-		protected override void OnMarketData(MarketDataEventArgs marketDataUpdate)
-		{
-			
-		}
-
-		protected override void OnMarketDepth(MarketDepthEventArgs marketDepthUpdate)
-		{
-			
 		}
 
 		protected override void OnBarUpdate()
@@ -182,6 +151,42 @@ namespace NinjaTrader.NinjaScript.Strategies
 					indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + "- Stop trading cmd:" + indicatorProxy.Get24HDateTime(Time[0]));
 					break;
 			}
+		}
+		
+		#endregion
+		
+		/// <summary>
+		/// Only updated on live/sim trading, not triggered at back-testing
+		/// </summary>
+		/// <param name="account"></param>
+		/// <param name="accountItem"></param>
+		/// <param name="value"></param>
+		protected override void OnAccountItemUpdate(Cbi.Account account, Cbi.AccountItem accountItem, double value)
+		{
+			if(accountItem == AccountItem.UnrealizedProfitLoss)
+				indicatorProxy.PrintLog(true, IsLiveTrading(), 
+					CurrentBar + ":OnAccountItemUpdate"
+					+ ";Name=" + account.DisplayName
+					+ ";Item=" + accountItem.ToString()
+					+ ";value=" + value
+					+ ";DailyLossLmt=" + account.DailyLossLimit
+					+ ";Status=" + account.AccountStatus.ToString()
+					);
+		}
+
+		protected override void OnConnectionStatusUpdate(ConnectionStatusEventArgs connectionStatusUpdate)
+		{
+			
+		}
+
+		protected override void OnMarketData(MarketDataEventArgs marketDataUpdate)
+		{
+			
+		}
+
+		protected override void OnMarketDepth(MarketDepthEventArgs marketDepthUpdate)
+		{
+			
 		}
 
 		public void SetPrintOut(int i) {

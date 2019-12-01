@@ -46,13 +46,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 			new SortedDictionary<int, TradeAction>();
 
 		#endregion
-		
-		#region Methods
+		#region Set/Check TradeActions
 		public virtual void SetTradeAction() {}
+		
+		public virtual bool SetNewEntryTradeAction() {
+			return false;
+		}
+		
+		public virtual bool SetExitTradeAction() {
+			return false;
+		}
 		
 		public virtual TradeAction CheckTradeAction() {
 			return null;
 		}
+		
+		#endregion
+		
+		#region Manage TradeActions
 		
 		public void AddTradeAction(int barNo, TradeAction action) {
 			this.tradeActions.Add(barNo, action);

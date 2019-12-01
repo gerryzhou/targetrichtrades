@@ -220,10 +220,40 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return inflection;
 		}
 		
+		public IndicatorSignal GetInflectionUp(int barNo) {
+			IndicatorSignal sig = GetLastIndicatorSignalByActionType(barNo, SignalActionType.InflectionUp);			
+			return sig;
+		}
+
+		public IndicatorSignal GetInflectionDown(int barNo) {
+			IndicatorSignal sig = GetLastIndicatorSignalByActionType(barNo, SignalActionType.InflectionDn);			
+			return sig;
+		}
+		
+		public SignalActionType IsLastBarInflection() {
+			SignalActionType sat = SignalActionType.Unknown;
+			IndicatorSignal sig = GetInflectionUp(CurrentBar);
+			if(CurrentBar == sig.BarNo + 1)
+				sat = SignalActionType.InflectionUp;
+			sig = GetInflectionDown(CurrentBar);
+			if(CurrentBar == sig.BarNo + 1)
+				sat = SignalActionType.InflectionDn;
+						
+			return sat;
+		}
+
 		public bool IsNewInflection(SignalActionType sat) {
 			//return LastInflection == GetLastInflection(GetInflection(), CurrentBar, trendDir, BarIndexType.BarNO);
 			IndicatorSignal sig = GetLastIndicatorSignalByActionType(CurrentBar, sat);
 			return LastInflection == sig.BarNo;
+		}
+		
+		public bool IsPullBack(double threshold) {
+			double smi_tma = SMITMA[1];
+			if((smi_tma*threshold > 0) && (Math.Abs(smi_tma) >= Math.Abs(threshold)))
+				return true;
+			else
+				return false;
 		}
 		
 		public Series<int> GetCrossover() {
@@ -415,22 +445,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 			set { smiCrossLevel = Math.Max(0, value);}
 		}
 
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public Series<double> smi
 		{
 			get { return Values[0]; }
 		}
 
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public Series<double> SMITMA
 		{
 			get { return Values[1];}
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public int LastInflection
 		{
 			get { return lastInflection;}
@@ -438,8 +465,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			set {lastInflection = value;}
 		}
 
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public GLastIndexRecorder<double> InflectionRecorder
 		{
 			get { return inflectionRecorder;}
@@ -447,8 +473,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			set {inflectionRecorder = value;}
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public int LastCrossover
 		{
 			get { return lastCrossover;}
@@ -456,15 +481,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 			set {lastCrossover = value;}
 		}
 
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public string SignalName_Inflection
 		{
 			get { return "Inflection";}
 		}
 
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public string SignalName_LineCross
 		{
 			get { return "LineCross";}

@@ -124,6 +124,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				
 		public override bool CheckNewEntrySignals(){
 			giSMI.Update();
+			giPbSAR.Update();
 			Print(CurrentBar + ":CheckNewEntrySignals called -----------" + giSMI.LastInflection);
 			
 			IndicatorSignal indSig = giSMI.GetLastIndicatorSignalByName(CurrentBar, giSMI.SignalName_Inflection);
@@ -135,14 +136,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			if(indSigCrs != null && indSigCrs.SignalAction != null)
 				Print(CurrentBar + ":stg-Last " + giSMI.SignalName_LineCross + "=" + indSigCrs.BarNo + "," + indSigCrs.SignalAction.SignalActionType.ToString());
-			return false;			
+
+			return PatternMatched();
 		}
 		
 		public override bool CheckExitSignals(){
 			return false;
 		}
 		
-		public override bool CheckTradeSignals() {
+		//public override bool CheckTradeSignals() {
+		public bool CheckTradeSignals1() {
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			List<TradeSignal> sigList = new List<TradeSignal>();
 			TradeSignal trdSignal = new TradeSignal();
@@ -170,8 +173,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return false;
 		}
 		
-		public override void SetTradeAction() {
+		public override bool SetNewEntryTradeAction() {
 			//CheckIndicatorSignals();
+			Print(CurrentBar + ": SetNewEntryTradeAction called....");
+			return false;
 		}
 				
 		protected override bool PatternMatched()
@@ -186,12 +191,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 				+ ";paType=" + pa.paType.ToString()
 				+ ";maxDownTicks=" + pa.maxDownTicks
 				);
-			return false;
+			SignalActionType sat = giSMI.IsLastBarInflection();
+			Direction dir = GetDirection(giPbSAR);
+
+			if((sat == SignalActionType.InflectionDn && dir.TrendDir == TrendDirection.Up) && giSMI.IsPullBack(-40) ||
+				(sat == SignalActionType.InflectionUp && dir.TrendDir == TrendDirection.Down && giSMI.IsPullBack(40)))
+				return true;
+			else
+				return false;
 			//barsAgoMaxPbSAREn Bars Since PbSAR reversal. Enter the amount of the bars ago maximum for PbSAR entry allowed
 		}
 		
 		public override bool CheckNewEntryTrade() {
-			indicatorProxy.PrintLog(true, IsLiveTrading(), "===========CheckNewEntryTrade()===" + this.Name);
+			indicatorProxy.PrintLog(true, IsLiveTrading(), "====CheckNewEntryTrade()===" + this.Name);
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			CurrentTrade.InitNewEntryTrade();
 			SetTradeAction();
@@ -215,6 +227,33 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return false;
 		}
 		
+		public override bool NewOrderAllowed() {
+			return true;
+		}
+		
+		public override Direction GetDirection(GIndicatorBase indicator) {
+			
+			IndicatorSignal lnSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_Long);
+			IndicatorSignal stSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_Short);
+			IndicatorSignal revlnSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_RevLong);
+			IndicatorSignal revstSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_RevShort);
+			
+			int lnSigBarNo = lnSig == null? -1:lnSig.BarNo;
+			int stSigBarNo = stSig == null? -1:stSig.BarNo;
+			int revlnSigBarNo = revlnSig == null? -1:revlnSig.BarNo;
+			int revstSigBarNo = revstSig == null? -1:revstSig.BarNo;
+			Direction dir = indicator.GetDirection();
+			
+			Print(CurrentBar + ":Dir=" + dir.TrendDir.ToString() + ",LastLn=" + lnSigBarNo + ", LastSt=" + stSigBarNo + ", LastRevLn=" + revlnSigBarNo + ", LastRevSt=" + revstSigBarNo);
+
+//			if(revlnSigBarNo == CurrentBar || revstSigBarNo == CurrentBar)
+//				dir.TrendDir = TrendDirection.UnKnown;
+//			else if (stSigBarNo == CurrentBar)
+//				dir.TrendDir = TrendDirection.Down;
+//			else if (lnSigBarNo == CurrentBar)
+//				dir.TrendDir = TrendDirection.Up;
+			return dir;
+		}
 //		public override void PutTrade(){
 //			indicatorProxy.TraceMessage(this.Name, PrintOut);
 //			if(CurrentTrade.CurrentTradeType == TradeType.Entry) {
@@ -403,10 +442,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private int barsLookback = 1;// 15;
 		
 		//SMI parameters
-		private int	range		= 5;
-		private int	emaperiod1	= 3;
-		private int	emaperiod2	= 5;
-		private int smitmaperiod= 8;
+		private int	range		= 8;
+		private int	emaperiod1	= 8;
+		private int	emaperiod2	= 8;
+		private int smitmaperiod= 12;
 		private int tmaperiod= 6;
 		private int smiCrossLevel = 50;
 		
@@ -421,9 +460,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private int periodKAMA	 		= 30;
 		
 		//PbSAR parameters
-		private double accPbSAR			= 0.002;
-		private double accMaxPbSAR		= 0.1;
-		private double accStepPbSAR		= 0.002;
+		private double accPbSAR			= 0.001;
+		private double accMaxPbSAR		= 0.2;
+		private double accStepPbSAR		= 0.0015;
 
 		#endregion
 	}

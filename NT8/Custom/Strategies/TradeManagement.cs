@@ -358,18 +358,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			CurrentTrade.barsSinceEnOrd = 0;
 		}
 		#endregion
-		
-		#region Set TradeActions
-		public virtual bool SetNewEntryTradeAction() {
-			return false;
-		}
-		
-		public virtual bool SetExitTradeAction() {
-			return false;
-		}
-		
-		#endregion
-		
+			
 		#region Entry Order functions
 		
 		public virtual void NewEntrySimpleOrder() {

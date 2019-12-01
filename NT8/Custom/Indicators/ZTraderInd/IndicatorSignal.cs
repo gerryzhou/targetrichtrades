@@ -42,8 +42,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		/// The barNo the signal refer to
 		/// </summary>
 		[Range(0, int.MaxValue)]
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public int BarNo
 		{
 			get; set;
@@ -52,8 +51,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		/// <summary>
 		/// The name of the signal
 		/// </summary>
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public string SignalName
 		{
 			get; set;
@@ -62,42 +60,36 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		/// <summary>
 		/// The type of the signal
 		/// </summary>		
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public SignalType IndicatorSignalType
 		{
 			get; set;
 		}		
 		
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		//[DefaultValueAttribute(TrendDirection.UnKnown)]
 		public Direction TrendDir {
 			get; set;
 		}
 
-		[Browsable(false)]
-		[XmlIgnore]
-		[DefaultValueAttribute(Breakout.UnKnown)]
-		public Breakout BreakoutDir {
+		[Browsable(false), XmlIgnore]
+		[DefaultValueAttribute(BreakoutDirection.UnKnown)]
+		public BreakoutDirection BreakoutDir {
 			get; set;
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore]
-		[DefaultValueAttribute(Reversal.UnKnown)]
+		[Browsable(false), XmlIgnore]
+		//[DefaultValueAttribute(Reversal.UnKnown)]
 		public Reversal ReversalDir {
 			get; set;
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public SupportResistanceRange<SupportResistanceBar> SnR {
 			get; set;
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public SignalAction SignalAction {
 			get; set;
 		}
@@ -105,6 +97,9 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		#endregion
 	}
 }
+
+
+
 
 
 

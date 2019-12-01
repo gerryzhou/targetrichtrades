@@ -79,6 +79,21 @@ namespace NinjaTrader.NinjaScript.Indicators
 			AddIndicatorSignal(barNo, isig);
 		}
 
+		public void RemoveIndicatorSignal(int barNo, string signame) { //SignalActionType saType, SupportResistanceRange<double> snr
+			List<IndicatorSignal> list_signal;
+			if(this.indicatorSignals.TryGetValue(barNo, out list_signal)) {				
+				foreach(IndicatorSignal s in list_signal) {
+					if(signame.Equals(s.SignalName)) {
+						Print(CurrentBar + ": Removed--" + s.BarNo + "," + s.SignalName);
+						list_signal.Remove(s);
+						break;
+					}
+				}
+			}		
+
+			this.indicatorSignals[barNo] = list_signal;
+		}
+			
 		public int GetLastIndSignalBarNo(int barNo) {
 			int k = -1;
 			foreach(int kk in this.indicatorSignals.Keys.Reverse()) {
@@ -222,7 +237,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 				}
 			}
 			return null;		
-		}		
+		}
+		
+		public void PrintIndicatorSignal() {
+			foreach(KeyValuePair<int, List<IndicatorSignal>> sig in this.indicatorSignals) {
+				List<IndicatorSignal> list_signal = sig.Value;
+				int key = sig.Key;
+				if(list_signal != null) {
+					foreach(IndicatorSignal s in list_signal) {
+						Print(key + ":" + s.BarNo + "," + s.SignalName + "," + s.SignalAction);
+					}
+				}
+			}
+		}
+		
 		#endregion
 	}
 }

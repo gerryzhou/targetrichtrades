@@ -107,12 +107,20 @@ Notes for implementation:
 ** Range chart vs Time chart: range chart fits trend/wave, time chart fits range/volatility;
 ** Stop loss set as being beyond the entry bar instead of the diamond bar;
 ** Still too much lagging for 8 ticks range chart;
+** SMITMA >= 40 for entry short, <= -40 for entry long; also needs upper bound: 80?
 ** Profit target using 2*StopLoss instead of diamond; 
 	Reason: this setup is based on momentum, it's good for scaling other than betting for swing (lower down the winning rate),
 	so the momey management strategy should match this feature;
 ** ExitBy: Signal, RRR (Risk/Reward Ratio), Time, BarCount, HoldWinner, TrailingStopLoss
-
-
+** Way to win by the algo: 1) figure out context(human knowledge, AI);
+	2) use/evaluate the specific appoache to trade under the specific market condition;
+	3) Goal: win as much as possible if mached; lose at a fixed controllable level if mis-mached; Increase the winning rate;
+** When diamond detected, find the real inflection back n bars, and the previous diamond as support/resistance (also can find the real one back n bars),
+	calculate the distance from the current entry price to the real inflection (risk), 
+	and the distance from current entry price to the previous support/resistance (reward);
+** Best Setup: after a well-established trend enterting the late stage, 
+	the first big pullback will be fade(close to the trend line), take the diamond there; not good for tight channel;
+** Overall, the diamond is good for wide channel; not good for tight channel(very few indicators are good for tight channel);
 
 
 
