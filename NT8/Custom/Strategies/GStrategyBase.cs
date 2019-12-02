@@ -103,12 +103,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 		
 		#region OnBarUpdate Function
-		public bool IsLiveTrading() {
-			if(State == State.Realtime)
-				return true;
-			else return false;
-		}
-
 		protected override void OnBarUpdate()
 		{
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
@@ -155,43 +149,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#endregion
 		
-		/// <summary>
-		/// Only updated on live/sim trading, not triggered at back-testing
-		/// </summary>
-		/// <param name="account"></param>
-		/// <param name="accountItem"></param>
-		/// <param name="value"></param>
-		protected override void OnAccountItemUpdate(Cbi.Account account, Cbi.AccountItem accountItem, double value)
-		{
-			if(accountItem == AccountItem.UnrealizedProfitLoss)
-				indicatorProxy.PrintLog(true, IsLiveTrading(), 
-					CurrentBar + ":OnAccountItemUpdate"
-					+ ";Name=" + account.DisplayName
-					+ ";Item=" + accountItem.ToString()
-					+ ";value=" + value
-					+ ";DailyLossLmt=" + account.DailyLossLimit
-					+ ";Status=" + account.AccountStatus.ToString()
-					);
+		#region Utilities Functions
+		public bool IsLiveTrading() {
+			if(State == State.Realtime)
+				return true;
+			else return false;
 		}
-
-		protected override void OnConnectionStatusUpdate(ConnectionStatusEventArgs connectionStatusUpdate)
-		{
-			
-		}
-
-		protected override void OnMarketData(MarketDataEventArgs marketDataUpdate)
-		{
-			
-		}
-
-		protected override void OnMarketDepth(MarketDepthEventArgs marketDepthUpdate)
-		{
-			
-		}
-
+		
 		public void SetPrintOut(int i) {
 			PrintOut = indicatorProxy.PrintOut + i;
 		}
+		#endregion
 		
 		#region Properties
 		

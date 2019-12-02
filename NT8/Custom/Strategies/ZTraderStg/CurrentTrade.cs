@@ -201,7 +201,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			}
 		}
 		
-		#endregion Trade Methods
+		#endregion
 		
 		#region Properties
 		[Browsable(false), XmlIgnore]

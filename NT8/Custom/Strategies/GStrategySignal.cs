@@ -62,8 +62,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 					return CheckNewEntrySignals();
 				case TradeSignalType.Exit: 
 					return CheckExitSignals();
-				case TradeSignalType.ExitOCO:
-					return CheckExitOCOSignals();
 				case TradeSignalType.ProfitTarget:
 					return CheckProfitTargetSignals();
 				case TradeSignalType.StopLoss:
@@ -99,11 +97,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public virtual void SetTradeSignal() {}
 		
-		public virtual void SetEntrySignal() {}
+		public virtual TradeSignal SetEntrySignal() {return null;}
 		
-		public virtual void SetStopLossSignal() {}
+		public virtual TradeSignal SetStopLossSignal() {return null;}
 		
-		public virtual void SetProfitTargetSignal() {}
+		public virtual TradeSignal SetProfitTargetSignal() {return null;}
 		
 		/// <summary>
 		/// Check trade signals from indicator signals

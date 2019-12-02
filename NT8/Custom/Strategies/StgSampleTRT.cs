@@ -176,9 +176,43 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override bool SetNewEntryTradeAction() {
 			//CheckIndicatorSignals();
 			Print(CurrentBar + ": SetNewEntryTradeAction called....");
+			TradeAction ta = new TradeAction();
+			ta.BarNo = CurrentBar;
+			ta.ActionName = "SampleTRT-Entry";
+			ta.TradeActionType = TradeActionType.Bracket;
+			ta.EntrySignal = SetEntrySignal();
+		
 			return false;
 		}
-				
+
+		public override TradeSignal SetEntrySignal() {
+			Direction dir = GetDirection(giPbSAR);
+			TradeSignal enSig = new TradeSignal();
+			enSig.BarNo = CurrentBar;
+			enSig.TradeSignalType = TradeSignalType.Entry;
+			
+			if(dir.TrendDir==TrendDirection.Up) 
+				enSig.Action = OrderAction.Buy;
+			else if(dir.TrendDir==TrendDirection.Down) 
+				enSig.Action = OrderAction.Sell;
+			enSig.OrderType = OrderType.Market;
+			
+			return enSig;
+		}
+		
+		public override TradeSignal SetStopLossSignal() {
+			Direction dir = GetDirection(giPbSAR);
+			TradeSignal slSig = new TradeSignal();
+			slSig.BarNo = CurrentBar;
+			slSig.TradeSignalType = TradeSignalType.StopLoss;
+			slSig.OrderType = OrderType.Market;
+			if(dir.TrendDir==TrendDirection.Up) 
+				slSig.Action = OrderAction.Sell;
+			else if(dir.TrendDir==TrendDirection.Down) 
+				slSig.Action = OrderAction.Buy;
+			return slSig;
+		}
+		
 		protected override bool PatternMatched()
 		{
 			//Print("CurrentBar, barsMaxLastCross, barsAgoMaxPbSAREn,=" + CurrentBar + "," + barsAgoMaxPbSAREn + "," + barsSinceLastCross);
@@ -194,8 +228,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			SignalActionType sat = giSMI.IsLastBarInflection();
 			Direction dir = GetDirection(giPbSAR);
 
-			if((sat == SignalActionType.InflectionDn && dir.TrendDir == TrendDirection.Up) && giSMI.IsPullBack(-40) ||
-				(sat == SignalActionType.InflectionUp && dir.TrendDir == TrendDirection.Down && giSMI.IsPullBack(40)))
+			if((sat == SignalActionType.InflectionDn && dir.TrendDir == TrendDirection.Up) && giSMI.IsPullBack(-SMITmaUp, -SMITmaLow) ||
+				(sat == SignalActionType.InflectionUp && dir.TrendDir == TrendDirection.Down && giSMI.IsPullBack(SMITmaLow, SMITmaUp)))
 				return true;
 			else
 				return false;
@@ -279,15 +313,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private const int ODG_Range = 5;
 		private const int ODG_SMITMAPeriod = 6;
 		private const int ODG_SMICrossLevel = 7;
-		private const int ODG_FastPeriod = 8;
-		private const int ODG_SlowPeriod = 9;
-		private const int ODG_Smooth = 10;
-		private const int ODG_FastKAMA = 11;
-		private const int ODG_SlowKAMA = 12;
-		private const int ODG_PeriodKAMA = 13;
-		private const int ODG_AccPbSAR = 14;
-		private const int ODG_AccMaxPbSAR = 15;
-		private const int ODG_AccStepPbSAR = 16;
+		private const int ODG_SMITmaUp = 8;
+		private const int ODG_SMITmaLow = 9;
+		private const int ODG_FastPeriod = 10;
+		private const int ODG_SlowPeriod = 11;
+		private const int ODG_Smooth = 12;
+		private const int ODG_FastKAMA = 13;
+		private const int ODG_SlowKAMA = 14;
+		private const int ODG_PeriodKAMA = 15;
+		private const int ODG_AccPbSAR = 16;
+		private const int ODG_AccMaxPbSAR = 17;
+		private const int ODG_AccStepPbSAR = 18;
 		
         [Description("Bars count before inflection for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
@@ -350,6 +386,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			get { return smiCrossLevel;}
 			set { smiCrossLevel = Math.Max(0, value);}
+		}
+		
+		[NinjaScriptProperty]
+		[Display(Name="SMITmaUp", Description="SMITMA Up Bound", Order=ODG_SMITmaUp, GroupName=GPS_CUSTOM_PARAMS)]
+		public int SMITmaUp
+		{
+			get { return smiTmaUp;}
+			set { smiTmaUp = value;}
+		}
+
+		[NinjaScriptProperty]
+		[Display(Name="SMITmaLow", Description="SMITMA Low Bound", Order=ODG_SMITmaLow, GroupName=GPS_CUSTOM_PARAMS)]
+		public int SMITmaLow
+		{
+			get { return smiTmaLow;}
+			set { smiTmaLow = value;}
 		}
 		
 		/// <summary>
@@ -442,12 +494,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private int barsLookback = 1;// 15;
 		
 		//SMI parameters
-		private int	range		= 8;
-		private int	emaperiod1	= 8;
-		private int	emaperiod2	= 8;
-		private int smitmaperiod= 12;
-		private int tmaperiod= 6;
-		private int smiCrossLevel = 50;
+		private int	range			= 8;
+		private int	emaperiod1		= 8;
+		private int	emaperiod2		= 8;
+		private int smitmaperiod	= 12;
+		private int tmaperiod		= 6;
+		private int smiCrossLevel	= 50;
+		private int smiTmaUp		= 80; //or -80
+		private int smiTmaLow		= 45; //or -45
 		
 		//AWO parameters
 		private int fastPeriod 			= 5;

@@ -248,9 +248,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return LastInflection == sig.BarNo;
 		}
 		
-		public bool IsPullBack(double threshold) {
+		public bool IsPullBack(int lowBound, int upBound) {
 			double smi_tma = SMITMA[1];
-			if((smi_tma*threshold > 0) && (Math.Abs(smi_tma) >= Math.Abs(threshold)))
+			if(smi_tma >= lowBound && smi_tma <= upBound)
 				return true;
 			else
 				return false;
