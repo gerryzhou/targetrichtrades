@@ -33,29 +33,17 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// 
 	/// </summary>
 	public class CurrentTrade {
-		private GStrategyBase instStrategy = null;
-		private TradeType tradeType = TradeType.NoTrade;
 
 		#region Order Objects
-//		public string entrySignalName = String.Empty;
-//		public string stopLossSignalName = String.Empty;
-//		public string profitTargetSignalName = String.Empty;
-//		public string trailingSLSignalName = String.Empty;
 		
 		public string ocoID = String.Empty;
 		private BracketOrderBase bracketOrder = new BracketOrderBase();
 		private TrailingSLOrderBase trailingSLOrder = new TrailingSLOrderBase();
 		public EntryExitOrderType exitOrderType = EntryExitOrderType.SimpleOCO;
-
+		
 		#endregion
 		
 		#region Trade Mgmt variables
-		[Description("Trade action for current trade")]
-		[NinjaScriptProperty, Browsable(false), XmlIgnore]
-		public TradeAction TradeAction
-		{
-			get; set;
-		}
 		
 		public TradingDirection tradeDirection = TradingDirection.Both;
 		public TradingStyle tradeStyle = TradingStyle.TrendFollowing;
@@ -182,13 +170,13 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		public void InitNewEntryTrade() {
 			InitParams();
-			CurrentTradeType = TradeType.Entry;
+			//CurrentTradeType = TradeType.Entry;
 			exitOrderType = EntryExitOrderType.SimpleOCO;
 		}
 
 		public void InitNewTLSL() {
 			//InitParams();
-			CurrentTradeType = TradeType.Exit;
+			//CurrentTradeType = TradeType.Exit;
 			exitOrderType = EntryExitOrderType.TrailingStopLoss;
 			this.TradeAction.TrailingProfitTargetTics = 0;
 			switch(TLSLCalculationMode) {
@@ -197,13 +185,41 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 					break;
 				
 				case CalculationMode.Percent:
-					break;				
+					break;
 			}
 		}
 		
 		#endregion
 		
+		public void OnCurPositionUpdate(Cbi.Position position, double averagePrice, 
+			int quantity, Cbi.MarketPosition marketPosition)
+		{
+			PosAvgPrice = averagePrice;
+			PosQuantity = quantity;
+			MktPosition = marketPosition;
+			PosUnrealizedPnL = position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, instStrategy.Close[0]);
+			//Position pos = position.MemberwiseClone();
+		}
 		#region Properties
+		
+		/// <summary>
+		/// Removed since the type is defined at TradeAction;
+		/// TradeType is not clear concept, a trade includs entry, exit, etc.
+		/// The tradeAction will define the type of action
+		/// </summary>
+//		[Browsable(false), XmlIgnore]
+//		public TradeType CurrentTradeType {
+//			get{ return tradeType;}
+//			set { tradeType = value;}
+//		}
+
+		[Description("Trade action for current trade")]
+		[NinjaScriptProperty, Browsable(false), XmlIgnore]
+		public TradeAction TradeAction
+		{
+			get; set;
+		}
+		
 		[Browsable(false), XmlIgnore]
 		public BracketOrderBase BracketOrder
 		{
@@ -218,11 +234,36 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			set { trailingSLOrder = value; }
 		}
 		
+		[DefaultValueAttribute(MarketPosition.Flat)]
 		[Browsable(false), XmlIgnore]
-		public TradeType CurrentTradeType {
-			get{ return tradeType;}
-			set { tradeType = value;}
+		public MarketPosition MktPosition
+		{
+			get; set;
 		}
+		
+		[DefaultValueAttribute(0)]
+		[Browsable(false), XmlIgnore]
+		public int PosQuantity
+		{
+			get; set;
+		}
+		
+		[DefaultValueAttribute(0)]
+		[Browsable(false), XmlIgnore]
+		public double PosAvgPrice
+		{
+			get; set;
+		}
+		
+		[DefaultValueAttribute(0)]
+		[Browsable(false), XmlIgnore]
+		public double PosUnrealizedPnL
+		{
+			get; set;
+		}
+		
+		private GStrategyBase instStrategy = null;
+		
 		#endregion
 	}
 }

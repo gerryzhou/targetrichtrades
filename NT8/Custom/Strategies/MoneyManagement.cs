@@ -520,7 +520,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#endregion
 
-		#region Dep methods
+		#region Depricated methods
 		/// <summary>
 		/// Trailing max and min profits then converted to trailing stop after over the max
 		/// </summary>

@@ -119,6 +119,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 			return false;
 		}
+		
+		public virtual double GetEntryPrice(SupportResistanceType srt) {
+			return 0;
+		}
+		
+		public virtual double GetStopLossPrice(SupportResistanceType srt) {
+			return 0;
+		}
+		
+		public virtual double GetProfitTargetPrice(SupportResistanceType srt) {
+			return 0;
+		}
+		
 		#endregion
 
         #region Properties

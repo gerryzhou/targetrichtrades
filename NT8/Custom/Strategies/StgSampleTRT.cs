@@ -58,6 +58,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// </summary>
 	public class StgSampleTRT : GStrategyBase
 	{
+		#region Variables
 		private GISMI giSMI;
 		private GIAwesomeOscillator awOscillator;
 		private GIKAMA giKAMA;
@@ -65,6 +66,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		private double c0 = 0, hi3 = Double.MaxValue, lo3 = Double.MinValue;
 		
+		#endregion
+		
+		#region Init Functions
 		protected override void OnStateChange()
 		{
 			base.OnStateChange();
@@ -109,7 +113,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 
 		/// <summary>
-		/// 
+		/// Call the base as default implementation
 		/// </summary>
 		protected override void OnBarUpdate()
 		{
@@ -121,7 +125,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				indicatorProxy.PrintLog(true, true, "Exception: " + ex.StackTrace);
 			}
 		}
-				
+		#endregion
+
+		#region Signal Functions
 		public override bool CheckNewEntrySignals(){
 			giSMI.Update();
 			giPbSAR.Update();
@@ -144,6 +150,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return false;
 		}
 		
+		/// Unused
 		//public override bool CheckTradeSignals() {
 		public bool CheckTradeSignals1() {
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
@@ -173,23 +180,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return false;
 		}
 		
-		public override bool SetNewEntryTradeAction() {
-			//CheckIndicatorSignals();
-			Print(CurrentBar + ": SetNewEntryTradeAction called....");
-			TradeAction ta = new TradeAction();
-			ta.BarNo = CurrentBar;
-			ta.ActionName = "SampleTRT-Entry";
-			ta.TradeActionType = TradeActionType.Bracket;
-			ta.EntrySignal = SetEntrySignal();
-		
-			return false;
-		}
-
 		public override TradeSignal SetEntrySignal() {
 			Direction dir = GetDirection(giPbSAR);
 			TradeSignal enSig = new TradeSignal();
 			enSig.BarNo = CurrentBar;
 			enSig.TradeSignalType = TradeSignalType.Entry;
+			enSig.OrderCalculationMode = CalculationMode.Price;
+			enSig.Quantity = 1;
 			
 			if(dir.TrendDir==TrendDirection.Up) 
 				enSig.Action = OrderAction.Buy;
@@ -206,10 +203,33 @@ namespace NinjaTrader.NinjaScript.Strategies
 			slSig.BarNo = CurrentBar;
 			slSig.TradeSignalType = TradeSignalType.StopLoss;
 			slSig.OrderType = OrderType.Market;
-			if(dir.TrendDir==TrendDirection.Up) 
+			if(dir.TrendDir==TrendDirection.Up) {
 				slSig.Action = OrderAction.Sell;
-			else if(dir.TrendDir==TrendDirection.Down) 
+				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Support);
+			}
+			else if(dir.TrendDir==TrendDirection.Down) {
 				slSig.Action = OrderAction.Buy;
+				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Resistance);
+			}
+
+			return slSig;
+		}
+
+		public override TradeSignal SetProfitTargetSignal() {
+			Direction dir = GetDirection(giPbSAR);
+			TradeSignal slSig = new TradeSignal();
+			slSig.BarNo = CurrentBar;
+			slSig.TradeSignalType = TradeSignalType.ProfitTarget;
+			slSig.OrderType = OrderType.Limit;
+			if(dir.TrendDir==TrendDirection.Up) {
+				slSig.Action = OrderAction.Sell;
+				slSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Resistance);
+			}
+			else if(dir.TrendDir==TrendDirection.Down) {
+				slSig.Action = OrderAction.Buy;
+				slSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Support);
+			}
+
 			return slSig;
 		}
 		
@@ -234,6 +254,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else
 				return false;
 			//barsAgoMaxPbSAREn Bars Since PbSAR reversal. Enter the amount of the bars ago maximum for PbSAR entry allowed
+		}
+
+		#endregion
+		
+		#region Trade Actions
+		public override bool SetNewEntryTradeAction() {
+			//CheckIndicatorSignals();
+			Print(CurrentBar + ": SetNewEntryTradeAction called....");
+			TradeAction ta = new TradeAction();
+			ta.BarNo = CurrentBar;
+			ta.ActionName = "SampleTRT-Entry";
+			ta.TradeActionType = TradeActionType.Bracket;
+			ta.EntrySignal = SetEntrySignal();
+			ta.StopLossSignal = SetStopLossSignal();
+			ta.ProfitTargetSignal = SetProfitTargetSignal();
+			AddTradeAction(CurrentBar, ta);
+		
+			return true;
 		}
 		
 		public override bool CheckNewEntryTrade() {
@@ -263,8 +301,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public override bool NewOrderAllowed() {
 			return true;
-		}
+		}		
+		#endregion
 		
+		#region Indicator Functions
 		public override Direction GetDirection(GIndicatorBase indicator) {
 			
 			IndicatorSignal lnSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_Long);
@@ -288,22 +328,35 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				dir.TrendDir = TrendDirection.Up;
 			return dir;
 		}
-//		public override void PutTrade(){
-//			indicatorProxy.TraceMessage(this.Name, PrintOut);
-//			if(CurrentTrade.CurrentTradeType == TradeType.Entry) {
-//				indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade CurrentTrade.stopLossAmt=" + CurrentTrade.stopLossAmt + "," + MM_StopLossAmt);
-//				if(CurrentTrade.tradeDirection == TradingDirection.Down) {
-//					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Down OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
-//					CurrentTrade.TradeAction.EntryPrice = GetTypicalPrice(0);
-//					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
-//				}
-//				else if(CurrentTrade.tradeDirection == TradingDirection.Up) {
-//					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
-//					CurrentTrade.TradeAction.EntryPrice = GetTypicalPrice(0);
-//					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());
-//				}				
-//			}
-//		}
+		
+		public override double GetStopLossPrice(SupportResistanceType srt) {
+			double prc = 0;
+			switch(srt) {
+				case SupportResistanceType.Support:
+					prc = GetLowestPrice(BarsLookback);
+					break;
+				case SupportResistanceType.Resistance:
+					prc = GetHighestPrice(BarsLookback);
+					break;
+			}
+			Print(CurrentBar + ": GetStopLossPrice=" + prc);
+			return prc;
+		}
+		
+		public override double GetProfitTargetPrice(SupportResistanceType srt) {
+			double prc = 0;
+			switch(srt) {
+				case SupportResistanceType.Support:
+					prc = GetLowestPrice(BarsLookback);
+					break;
+				case SupportResistanceType.Resistance:
+					prc = GetHighestPrice(BarsLookback);
+					break;
+			}
+			Print(CurrentBar + ": GetProfitTargetPrice=" + prc);
+			return prc;
+		}
+		#endregion
 
         #region Custom Properties
 		private const int ODG_EnBarsBeforeInflection = 1;

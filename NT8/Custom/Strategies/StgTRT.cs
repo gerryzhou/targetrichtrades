@@ -210,7 +210,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public override void PutTrade() {
-			if(CurrentTrade.CurrentTradeType == TradeType.Entry) {
+			if(CurrentTrade.TradeAction.TradeActionType == TradeActionType.EntrySimple) {
 				indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade CurrentTrade.stopLossAmt=" + CurrentTrade.stopLossAmt + "," + MM_StopLossAmt);
 				if(CurrentTrade.tradeDirection == TradingDirection.Down) {
 					//CurrentTrade.BracketOrder.EntryOrder = 

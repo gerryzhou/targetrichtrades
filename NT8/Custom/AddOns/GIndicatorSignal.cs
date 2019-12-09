@@ -192,6 +192,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			int k = barNo;
 			foreach(int kk in this.indicatorSignals.Keys.Reverse()) {				
 				if(kk < k) {
+					Print(CurrentBar + ": kk,k=" + kk + "," + k);
 					IndicatorSignal sig = GetIndicatorSignalByActionType(k, signal_actiontype);
 					if(sig != null) return sig;
 					k = kk;

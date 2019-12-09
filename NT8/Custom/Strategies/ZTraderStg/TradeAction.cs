@@ -31,16 +31,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// it is stored by bar and trigger the strategy to put orders when conditions met
 	/// </summary>
 	public class TradeAction
-	{
-//		private TradeSignal entrySignal = null;
-//		private TradeSignal stopLossSignal = null;
-//		private TradeSignal profitTargetSignal = null;
-		
-//		private Direction trendDir = new Direction();//TrendDirection.UnKnown; //1=up, -1=down, 0=flat/unknown
-//		private Breakout breakoutDir = Breakout.UnKnown; //1=bk up, -1=bk down, 0=no bk/unknown
-//		private Reversal reversalDir = Reversal.UnKnown; //1=rev up, -1=rev down, 0=no rev/unknown
-//		private SupportResistanceRange<SupportResistanceBar> sptRst;
-		
+	{		
 		#region Methods
 		
 		#endregion

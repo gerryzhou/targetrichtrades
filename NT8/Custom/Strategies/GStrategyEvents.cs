@@ -28,7 +28,53 @@ using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class GStrategyBase : Strategy
-	{	
+	{
+		#region OnBarUpdate Function
+		protected override void OnBarUpdate()
+		{
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			//Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
+			if(CurrentBar <= BarsRequiredToTrade)
+				return;
+			int bsx = BarsSinceExitExecution(0, "", 0);
+			int bse = BarsSinceEntryExecution(0, "", 0);
+			SetPrintOut(-1);
+			
+			//Print(CurrentBar + ":" + this.Name + " OnBarUpdate, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			indicatorProxy.Update();
+			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			CheckPerformance();
+			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
+			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
+			indicatorProxy.TraceMessage(this.Name, PrintOut);			
+
+			switch(AlgoMode) {
+				case AlgoModeType.Liquidate: //liquidate
+					indicatorProxy.TraceMessage(this.Name, PrintOut);
+					CloseAllPositions();
+					break;
+				case AlgoModeType.Trading: //trading
+					//SetTradeAction(); called from CheckExitTrade() or CheckNewEntryTrade();
+					//CheckIndicatorSignals(); called from SetTradeAction(); save trade signals into the trade action;
+					//PutTrade(); first GetTradeAction() and then put exit or entry trade;
+					indicatorProxy.TraceMessage(this.Name, PrintOut);
+					if(CheckTradeSignals()) {
+						PutTrade();
+					}
+					break;
+				case AlgoModeType.CancelOrders: //cancel order
+					indicatorProxy.TraceMessage(this.Name, PrintOut);
+					CancelAllOrders();
+					break;
+				case AlgoModeType.StopTrading: //stop trading
+					indicatorProxy.TraceMessage(this.Name, PrintOut);
+					indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + "- Stop trading cmd:" + indicatorProxy.Get24HDateTime(Time[0]));
+					break;
+			}
+		}		
+		#endregion
+		
 		/// <summary>
 		/// Only updated on live/sim trading, not triggered at back-testing
 		/// </summary>

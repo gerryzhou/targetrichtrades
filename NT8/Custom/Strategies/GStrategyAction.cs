@@ -46,6 +46,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			new SortedDictionary<int, TradeAction>();
 
 		#endregion
+		
 		#region Set/Check TradeActions
 		public virtual void SetTradeAction() {}
 		
@@ -163,46 +164,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			return null;			
 		}
-
-		/// <summary>
-		/// Get the trade action from bar with barNo and the actionActionType ???
-		/// </summary>
-		/// <param name="barNo"></param>
-		/// <param name="actionActionType"></param>
-		/// <returns></returns>
-		public TradeAction GetTradeActionByActionType(int barNo, TradeActionType action_actiontype) {
-			TradeAction list_action = GetTradeAction(barNo);
-			if(list_action != null) {
-//				foreach(TradeAction sig in list_action) {
-//					if(sig.Action_Action != null && 
-//						action_actiontype.Equals(sig.Action_Action.TradeActionType))
-//						return sig;
-//				}
-			}
-			
-			return null;			
-		}
-
-		/// <summary>
-		/// Get the last action before barNo by actionActionType ???
-		/// </summary>
-		/// <param name="barNo"></param>
-		/// <param name="actionActionType"></param>
-		/// <returns></returns>
-		public TradeAction GetLastTradeActionByActionType(int barNo, TradeActionType action_actiontype) {
-			int k = barNo;
-			foreach(int kk in this.tradeActions.Keys.Reverse()) {				
-				if(kk < k) {
-					TradeAction sig = GetTradeActionByActionType(k, action_actiontype);
-					if(sig != null) return sig;
-					k = kk;
-				}
-			}
-			return null;			
-		}
 		
 		/// <summary>
 		/// Get the action list for the bar by action type ???
+		///  Get the trade action from bar with barNo and the actionActionType ???
 		/// </summary>
 		/// <param name="barNo"></param>
 		/// <param name="action_type"></param>
@@ -224,6 +189,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		/// <summary>
 		/// Get last action list before barNo by action type ???
+		/// Get the last action before barNo by actionActionType ???
 		/// </summary>
 		/// <param name="barNo"></param>
 		/// <param name="action_type"></param>

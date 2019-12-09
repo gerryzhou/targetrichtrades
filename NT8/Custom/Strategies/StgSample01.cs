@@ -118,7 +118,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public override void PutTrade(){
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
-			if(CurrentTrade.CurrentTradeType == TradeType.Entry) {
+			if(CurrentTrade.TradeAction.TradeActionType == TradeActionType.EntrySimple) {
 				indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade CurrentTrade.stopLossAmt=" + CurrentTrade.stopLossAmt + "," + MM_StopLossAmt);
 				if(CurrentTrade.tradeDirection == TradingDirection.Down) {
 					indicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Down OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);

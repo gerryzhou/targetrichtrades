@@ -231,15 +231,17 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		public SignalActionType IsLastBarInflection() {
-			SignalActionType sat = SignalActionType.Unknown;
-			IndicatorSignal sig = GetInflectionUp(CurrentBar);
-			if(CurrentBar == sig.BarNo + 1)
-				sat = SignalActionType.InflectionUp;
-			sig = GetInflectionDown(CurrentBar);
-			if(CurrentBar == sig.BarNo + 1)
-				sat = SignalActionType.InflectionDn;
-						
-			return sat;
+			IndicatorSignal sigUp = GetInflectionUp(CurrentBar);
+			IndicatorSignal sigDn = GetInflectionDown(CurrentBar);
+			Print(CurrentBar + ": IsLastBarInflection=" + sigUp + "," + sigDn);
+			
+			if((sigUp != null) && (CurrentBar == sigUp.BarNo + 1)) {				
+					return SignalActionType.InflectionUp;
+			}
+			if((sigDn != null) && (CurrentBar == sigDn.BarNo + 1)) {				
+					return SignalActionType.InflectionDn;
+			}
+			return SignalActionType.Unknown;
 		}
 
 		public bool IsNewInflection(SignalActionType sat) {
