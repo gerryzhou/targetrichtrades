@@ -122,6 +122,8 @@ Notes for implementation:
 	2) use/evaluate the specific appoache to trade under the specific market condition;
 	3) Goal: win as much as possible if mached; lose at a fixed controllable level if mis-mached; Increase the winning rate;
 ** Win by Logic+Math, using contradiction+MoneyManagement to have a pair of hedged algos;
+	1) Hedge two instruments;
+	2) Game theory: increase size after a series of losses;
 
 
 

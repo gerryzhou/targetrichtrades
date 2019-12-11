@@ -32,7 +32,12 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// CurrentTrade->TradeAction->TradeSignal;
 	/// 
 	/// </summary>
-	public class CurrentTrade {
+	public class CurrentTradeBase {
+		
+		public CurrentTradeBase(GStrategyBase instStg) {
+			InstStrategy = instStg;
+			InitNewTrade();
+		}
 
 		#region Order Objects
 		
@@ -114,62 +119,62 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		#region Trade Methods
 		
-		public CurrentTrade(GStrategyBase inst_strategy) {
-			this.instStrategy = inst_strategy;
-			InitParams();
+		private string GetNewTradeID() {
+			return "TD-" + InstStrategy.GetBarTimestampStr(0);
 		}
 		
-		private void InitParams() {
+		private void InitNewTrade() {
+			TradeID = GetNewTradeID();
 			//TM variables
-			tradeDirection = instStrategy.TM_TradingDirection;
-			tradeStyle = instStrategy.TM_TradingStyle;
+			tradeDirection = InstStrategy.TM_TradingDirection;
+			tradeStyle = InstStrategy.TM_TradingStyle;
 			
-			enCounterPBBars = instStrategy.TM_EnCounterPBBars;
-			enTrailing = instStrategy.TM_EnTrailing;
-			enOffsetPnts = instStrategy.TM_EnOffsetPnts;
+			enCounterPBBars = InstStrategy.TM_EnCounterPBBars;
+			enTrailing = InstStrategy.TM_EnTrailing;
+			enOffsetPnts = InstStrategy.TM_EnOffsetPnts;
 			
-			minutesChkEnOrder = instStrategy.TM_MinutesChkEnOrder;
-			minutesChkPnL = instStrategy.TM_MinutesChkPnL;
+			minutesChkEnOrder = InstStrategy.TM_MinutesChkEnOrder;
+			minutesChkPnL = InstStrategy.TM_MinutesChkPnL;
 			
-			barsHoldEnOrd = instStrategy.TM_BarsHoldEnOrd;
-	        barsSincePTSL = instStrategy.TM_BarsSincePTSL;
-			barsToCheckPnL = instStrategy.TM_BarsToCheckPnL;
+			barsHoldEnOrd = InstStrategy.TM_BarsHoldEnOrd;
+	        barsSincePTSL = InstStrategy.TM_BarsSincePTSL;
+			barsToCheckPnL = InstStrategy.TM_BarsToCheckPnL;
 			
 			//MM variables
-			profitTargetAmt = instStrategy.MM_ProfitTargetAmt;
-			profitTargetTic = instStrategy.MM_ProfitTgtTic;
-			profitTgtIncTic = instStrategy.MM_ProfitTgtIncTic;
-			profitLockMinTic = instStrategy.MM_ProfitLockMinTic;
-			profitLockMaxTic = instStrategy.MM_ProfitLockMaxTic;
+			profitTargetAmt = InstStrategy.MM_ProfitTargetAmt;
+			profitTargetTic = InstStrategy.MM_ProfitTgtTic;
+			profitTgtIncTic = InstStrategy.MM_ProfitTgtIncTic;
+			profitLockMinTic = InstStrategy.MM_ProfitLockMinTic;
+			profitLockMaxTic = InstStrategy.MM_ProfitLockMaxTic;
 			
-	        stopLossAmt = instStrategy.MM_StopLossAmt;
-			stopLossTic = instStrategy.MM_StopLossTic;
-			stopLossIncTic = instStrategy.MM_StopLossIncTic;
+	        stopLossAmt = InstStrategy.MM_StopLossAmt;
+			stopLossTic = InstStrategy.MM_StopLossTic;
+			stopLossIncTic = InstStrategy.MM_StopLossIncTic;
 
-			breakEvenAmt = instStrategy.MM_BreakEvenAmt;
+			breakEvenAmt = InstStrategy.MM_BreakEvenAmt;
 
-			trailingSLAmt = instStrategy.MM_TrailingStopLossAmt;			
-			trailingSLTic = instStrategy.MM_TrailingStopLossTic;
-			traillingSLPercent = instStrategy.MM_TrailingStopLossPercent;
+			trailingSLAmt = InstStrategy.MM_TrailingStopLossAmt;			
+			trailingSLTic = InstStrategy.MM_TrailingStopLossTic;
+			traillingSLPercent = InstStrategy.MM_TrailingStopLossPercent;
 			
 //			trailingPTTic = profitLockMinTic;
 
-			slTrailing = instStrategy.MM_SLTrailing;
-			ptTrailing = instStrategy.MM_PTTrailing;
+			slTrailing = InstStrategy.MM_SLTrailing;
+			ptTrailing = InstStrategy.MM_PTTrailing;
 							
-			PTCalculationMode = instStrategy.MM_PTCalculationMode;
-			SLCalculationMode = instStrategy.MM_SLCalculationMode;
-			BECalculationMode = instStrategy.MM_BECalculationMode;
-			TLSLCalculationMode = instStrategy.MM_TLSLCalculationMode;
+			PTCalculationMode = InstStrategy.MM_PTCalculationMode;
+			SLCalculationMode = InstStrategy.MM_SLCalculationMode;
+			BECalculationMode = InstStrategy.MM_BECalculationMode;
+			TLSLCalculationMode = InstStrategy.MM_TLSLCalculationMode;
 			
-			profitFactor = instStrategy.MM_ProfitFactor;
-			dailyLossLmt = instStrategy.MM_DailyLossLmt;
+			profitFactor = InstStrategy.MM_ProfitFactor;
+			dailyLossLmt = InstStrategy.MM_DailyLossLmt;
 			
-			quantity = instStrategy.DefaultQuantity;
+			quantity = InstStrategy.DefaultQuantity;
 		}
 		
 		public void InitNewEntryTrade() {
-			InitParams();
+			//InitParams();
 			//CurrentTradeType = TradeType.Entry;
 			exitOrderType = EntryExitOrderType.SimpleOCO;
 		}
@@ -181,7 +186,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			this.TradeAction.TrailingProfitTargetTics = 0;
 			switch(TLSLCalculationMode) {
 				case CalculationMode.Currency:
-					this.trailingSLTic = instStrategy.GetTicksByCurrency(this.trailingSLAmt);
+					this.trailingSLTic = InstStrategy.GetTicksByCurrency(this.trailingSLAmt);
 					break;
 				
 				case CalculationMode.Percent:
@@ -191,15 +196,38 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		#endregion
 		
+		#region Event Handler Methods
 		public void OnCurPositionUpdate(Cbi.Position position, double averagePrice, 
 			int quantity, Cbi.MarketPosition marketPosition)
 		{
 			PosAvgPrice = averagePrice;
 			PosQuantity = quantity;
 			MktPosition = marketPosition;
-			PosUnrealizedPnL = position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, instStrategy.Close[0]);
+			PosUnrealizedPnL = position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, InstStrategy.Close[0]);
+			InstStrategy.Print(InstStrategy.CurrentBar + ": OnCurPositionUpdate--");
+			try{
+			InstStrategy.Print(String.Format("{0}, AvgPrc: {1}, Quant={2}, MktPos={3}, PnL={4}",
+					InstStrategy.CurrentBar, PosAvgPrice, PosQuantity, MktPosition, PosUnrealizedPnL));
 			//Position pos = position.MemberwiseClone();
+			if (MktPosition == MarketPosition.Flat)
+			{
+				//TradeAction.TrailingProfitTargetTics = InstStrategy.GetTicksByCurrency(TradeAction.profitTargetAmt);
+				//trailingSLTic = GetTicksByCurrency(CurrentTrade.stopLossAmt);
+			}
+			else
+			{
+				InstStrategy.CalProfitTargetAmt(PosAvgPrice, InstStrategy.MM_ProfitFactor);
+				InstStrategy.CalExitOcoPrice(PosAvgPrice, InstStrategy.MM_ProfitFactor);
+				InstStrategy.SetSimpleExitOCO(TradeAction.EntrySignal.SignalName);
+//				SetBracketOrder.OCOOrder.ProfitTargetOrder(OrderSignalName.EntryShort.ToString());
+//				SetBracketOrder.OCOOrder.StopLossOrder(OrderSignalName.EntryShort.ToString());
+			}
+			}catch(Exception ex) {
+				InstStrategy.Print("Exception=" + ex.StackTrace);
+			}
 		}
+		#endregion
+		
 		#region Properties
 		
 		/// <summary>
@@ -212,9 +240,22 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 //			get{ return tradeType;}
 //			set { tradeType = value;}
 //		}
-
+		/// <summary>
+		/// The unique ID for each trade
+		/// TD-yyyyMMddHHmmssfff
+		/// The ocoId could use the TradeID
+		/// The timestamp could be removed from:
+		/// Entry, StopLoss, PT, and TLSL Signal Names
+		/// </summary>
+		[Description("The ID for current trade")]
+		[Browsable(false), XmlIgnore]
+		public string TradeID
+		{
+			get; set;
+		}
+		
 		[Description("Trade action for current trade")]
-		[NinjaScriptProperty, Browsable(false), XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public TradeAction TradeAction
 		{
 			get; set;
@@ -260,9 +301,16 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double PosUnrealizedPnL
 		{
 			get; set;
+		}		
+
+		[Display(Name="InstStg", Description="Strategy instance for Current Trade")]
+		[Browsable(false), XmlIgnore]
+		public GStrategyBase InstStrategy
+		{ 
+			get;set;
 		}
 		
-		private GStrategyBase instStrategy = null;
+		//private GStrategyBase InstStrategy = null;
 		
 		#endregion
 	}

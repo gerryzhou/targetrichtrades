@@ -88,7 +88,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Print(this.Name + " set Configure called....");
 				AddDataSeries(Data.BarsPeriodType.Day, 1);
 				//IncludeCommission = true;
-				CurrentTrade = new CurrentTrade(this);
+				//CurrentTrade = new CurrentTrade(this);
 				CurrentTrade.barsSincePTSL = TM_BarsSincePTSL;
 			}			
 		}

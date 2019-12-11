@@ -268,7 +268,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="msg"></param>
 		public virtual void NewLongLimitOrderUM(string msg)
 		{
-			CurrentTrade.TradeAction.EntrySignal.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
+			//CurrentTrade.TradeAction.EntrySignal.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
 			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewLongLimitOrderUM"
 			+";CurrentTrade.TradeAction.EntrySignal.SignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 			SubmitOrderUnmanaged(0, OrderAction.Buy, OrderType.Limit, 
@@ -282,7 +282,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="msg"></param>
 		public virtual void NewShortLimitOrderUM(string msg)
 		{
-			CurrentTrade.TradeAction.EntrySignal.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShortLmt.ToString());
+			//CurrentTrade.TradeAction.EntrySignal.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShortLmt.ToString());
 			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewShortLimitOrderUM"
 			+";CurrentTrade.TradeAction.EntrySignal.SignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 			SubmitOrderUnmanaged(0, OrderAction.SellShort, OrderType.Limit,
@@ -381,17 +381,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public virtual void NewEntrySimpleOrderUM() {
 			TradeSignal tSig = CurrentTrade.TradeAction.EntrySignal;
-			tSig.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
+			//tSig.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
 			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewEntrySimpleOrderUM"
 			+";EntrySignal.SignalName=" + tSig.SignalName
 			+";EntrySignal.Action=" + tSig.Action.ToString()
-			+";EntrySignal.OrderType=" + tSig.OrderType.ToString()
+			+";EntrySignal.OrderType=" + tSig.Order_Type.ToString()
 			+";EntrySignal.Quantity=" + tSig.Quantity
 			+";EntrySignal.OrderCalculationMode=" + tSig.OrderCalculationMode.ToString()
 			+";EntrySignal.LimitPrice=" + tSig.LimitPrice
 			+";EntrySignal.StopPrice=" + tSig.StopPrice);
 			try {
-				SubmitOrderUnmanaged(0, tSig.Action, tSig.OrderType, tSig.Quantity,
+				SubmitOrderUnmanaged(0, tSig.Action, tSig.Order_Type, tSig.Quantity,
 				tSig.LimitPrice, tSig.StopPrice, "", tSig.SignalName);
 			} catch(Exception ex) {
 				Print(CurrentBar + ": Ex fired:" + ex.StackTrace);
@@ -836,7 +836,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.Log2Disk = true;
 			
 			Print(CurrentBar + ":OnOrderUpdate IsUnmanaged=" + IsUnmanaged);
-			return;
+			
 			if(IsUnmanaged)
 				OnOrderUpdateUM(order, limitPrice, stopPrice, quantity, filled, 
 				averageFillPrice, orderState, time, error, comment);
@@ -862,7 +862,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";" + order.OrderState.ToString() + ";" + order.OrderAction.ToString()
 			+ ";SP=" + order.StopPrice + ";LP=" + order.LimitPrice
 			+ "; BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
-			return;
+			
 			GetBracketOrderSubType(order);
 			
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
@@ -958,7 +958,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";BarsSinceExit=" + bsx
 			+ ";BarsSinceEntry=" + bse
 			+ ";FromEntrySignal=" + order.FromEntrySignal);
-			return;
+			//return;
 			GetBracketOrderSubType(order);
 						
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
@@ -1061,7 +1061,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public string GetNewEnOrderSignalName(string nameTag) {
 			string timeStr = GetBarTimestampStr(0);
-			CurrentTrade.TradeAction.EntrySignal.SignalName = nameTag + "-" + timeStr;
+			//CurrentTrade.TradeAction.EntrySignal.SignalName = nameTag + "-" + timeStr;
 			SetNewOcoOrderSignalName(nameTag, timeStr);
 			SetNewTLSLOrderSignalName(nameTag, timeStr);
 			return CurrentTrade.TradeAction.EntrySignal.SignalName;
@@ -1074,8 +1074,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="nameTag"></param>
 		/// <returns></returns>
 		public void SetNewOcoOrderSignalName(string nameTag, string timeStr) {
-			CurrentTrade.TradeAction.StopLossSignal.SignalName = nameTag + "-SL-" + timeStr;
-			CurrentTrade.TradeAction.ProfitTargetSignal.SignalName = nameTag + "-PT-" + timeStr;			
+			//CurrentTrade.TradeAction.StopLossSignal.SignalName = nameTag + "-SL-" + timeStr;
+			//CurrentTrade.TradeAction.ProfitTargetSignal.SignalName = nameTag + "-PT-" + timeStr;			
 		}
 
 		/// <summary>
@@ -1085,7 +1085,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="nameTag"></param>
 		/// <returns></returns>
 		public void SetNewTLSLOrderSignalName(string nameTag, string timeStr) {
-			CurrentTrade.TradeAction.StopLossSignal.SignalName = nameTag + "-TLSL-" + timeStr;
+			//CurrentTrade.TradeAction.StopLossSignal.SignalName = nameTag + "-TLSL-" + timeStr;
 		}
 		
 		/// <summary>
@@ -1105,17 +1105,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		//Clear order name
 		public void ClearOrderName(string oName) {
-			if(oName == null) return;
-			else if(oName.Equals(CurrentTrade.TradeAction.EntrySignal.SignalName)) CurrentTrade.TradeAction.EntrySignal.SignalName = String.Empty;
-			else if(oName.Equals(CurrentTrade.TradeAction.StopLossSignal.SignalName)) {
-				CurrentTrade.TradeAction.StopLossSignal.SignalName = String.Empty;
-				CurrentTrade.ocoID = String.Empty;
-			}
-			else if(oName.Equals(CurrentTrade.TradeAction.ProfitTargetSignal.SignalName)) {
-				CurrentTrade.TradeAction.ProfitTargetSignal.SignalName = String.Empty;
-				CurrentTrade.ocoID = String.Empty;
-			}
-			else if(oName.Equals(CurrentTrade.TradeAction.StopLossSignal.SignalName)) CurrentTrade.TradeAction.StopLossSignal.SignalName = String.Empty;
+//			if(oName == null) return;
+//			else if(oName.Equals(CurrentTrade.TradeAction.EntrySignal.SignalName)) CurrentTrade.TradeAction.EntrySignal.SignalName = String.Empty;
+//			else if(oName.Equals(CurrentTrade.TradeAction.StopLossSignal.SignalName)) {
+//				CurrentTrade.TradeAction.StopLossSignal.SignalName = String.Empty;
+//				CurrentTrade.ocoID = String.Empty;
+//			}
+//			else if(oName.Equals(CurrentTrade.TradeAction.ProfitTargetSignal.SignalName)) {
+//				CurrentTrade.TradeAction.ProfitTargetSignal.SignalName = String.Empty;
+//				CurrentTrade.ocoID = String.Empty;
+//			}
+//			else if(oName.Equals(CurrentTrade.TradeAction.StopLossSignal.SignalName)) CurrentTrade.TradeAction.StopLossSignal.SignalName = String.Empty;
 		}
 		
 		/// <summary>
@@ -1147,7 +1147,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region TM Properties
 		
 		[XmlIgnore, Browsable(false)]
-		public CurrentTrade CurrentTrade
+		public CurrentTradeBase CurrentTrade
 		{
 			get; set;
 		}

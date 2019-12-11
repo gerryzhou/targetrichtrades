@@ -120,6 +120,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			try {
 			base.OnBarUpdate();
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			Print(String.Format("{0}: Stg={1}, GSZTraer={2}", CurrentBar, CurrentTrade.InstStrategy, indicatorProxy.GSZTrader));
 			} catch (Exception ex) {
 				indicatorProxy.Log2Disk = true;
 				indicatorProxy.PrintLog(true, true, "Exception: " + ex.StackTrace);
@@ -182,7 +183,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public override TradeSignal SetEntrySignal() {
 			Direction dir = GetDirection(giPbSAR);
-			TradeSignal enSig = new TradeSignal();
+			TradeSignal enSig = new TradeSignal();			
 			enSig.BarNo = CurrentBar;
 			enSig.TradeSignalType = TradeSignalType.Entry;
 			enSig.OrderCalculationMode = CalculationMode.Price;
@@ -192,7 +193,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				enSig.Action = OrderAction.Buy;
 			else if(dir.TrendDir==TrendDirection.Down) 
 				enSig.Action = OrderAction.Sell;
-			enSig.OrderType = OrderType.Market;
+			enSig.Order_Type = OrderType.Market;
 			
 			return enSig;
 		}
@@ -202,7 +203,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			TradeSignal slSig = new TradeSignal();
 			slSig.BarNo = CurrentBar;
 			slSig.TradeSignalType = TradeSignalType.StopLoss;
-			slSig.OrderType = OrderType.Market;
+			slSig.Order_Type = OrderType.Market;
 			if(dir.TrendDir==TrendDirection.Up) {
 				slSig.Action = OrderAction.Sell;
 				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Support);
@@ -220,7 +221,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			TradeSignal slSig = new TradeSignal();
 			slSig.BarNo = CurrentBar;
 			slSig.TradeSignalType = TradeSignalType.ProfitTarget;
-			slSig.OrderType = OrderType.Limit;
+			slSig.Order_Type = OrderType.Limit;
 			if(dir.TrendDir==TrendDirection.Up) {
 				slSig.Action = OrderAction.Sell;
 				slSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Resistance);

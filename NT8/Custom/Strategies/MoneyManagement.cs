@@ -32,7 +32,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	{		
 		#region Money Mgmt Functions
 		
-		protected double CalProfitTargetAmt(double price, double profitFactor) {
+		public double CalProfitTargetAmt(double price, double profitFactor) {
 			indicatorProxy.PrintLog(true, true, 
 				CurrentBar + ":CalProfitTargetAmt;IsLiveTrading=" + IsLiveTrading() +
 				";=GetMarketPosition()" + GetMarketPosition().ToString() +
@@ -73,7 +73,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <param name="avgPrice">Avg entry price</param>
 		/// <param name="profitFactor">PT/SL>0</param>
-		protected void CalExitOcoPrice(double avgPrice, double profitFactor) {
+		public void CalExitOcoPrice(double avgPrice, double profitFactor) {
 			int prtLevel = 0;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			indicatorProxy.PrintLog(true, true, 
@@ -196,7 +196,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		///
 		/// </summary>
 		/// <returns></returns>
-		protected bool ChangeSLPT()
+		public bool ChangeSLPT()
 		{
 			int prtLevel = 0;
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
@@ -589,7 +589,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		///
 		/// </summary>
 		/// <returns></returns>
-		protected bool Dep_ChangeSLPT()
+		public bool Dep_ChangeSLPT()
 		{
 //			int bse = BarsSinceEntry();
 //			double timeSinceEn = -1;

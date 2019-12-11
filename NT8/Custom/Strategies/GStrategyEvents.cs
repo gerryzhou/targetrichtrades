@@ -39,7 +39,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			SetPrintOut(-1);
-			
 			//Print(CurrentBar + ":" + this.Name + " OnBarUpdate, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
 			indicatorProxy.TraceMessage(this.Name, PrintOut);
 			indicatorProxy.Update();

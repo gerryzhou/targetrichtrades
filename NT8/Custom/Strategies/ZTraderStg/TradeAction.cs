@@ -89,12 +89,12 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		/// </summary>
 		public double EntryPrice {
 			get{
-				if(OrderType.StopMarket.Equals(EntrySignal.OrderType))
+				if(OrderType.StopMarket.Equals(EntrySignal.Order_Type))
 					return EntrySignal.StopPrice;
 				else return EntrySignal.LimitPrice;
 			}
 			set {
-				if(OrderType.StopMarket.Equals(EntrySignal.OrderType))
+				if(OrderType.StopMarket.Equals(EntrySignal.Order_Type))
 					EntrySignal.StopPrice = value;
 				else EntrySignal.LimitPrice = value;
 			}

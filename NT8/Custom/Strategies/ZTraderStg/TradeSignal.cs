@@ -46,11 +46,17 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 
 		/// <summary>
 		/// The name of the signal
+		/// Assign the Ordername with this name
 		/// </summary>
  		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		public string SignalName
 		{
-			get; set;
+			get{
+				return TradeSignalType.ToString() +"-"
+					+ Action.ToString() + "-"
+					+ Order_Type.ToString();
+			}
+			//set;
 		}
 
 		/// <summary>
@@ -82,7 +88,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		[Description("Type for orders:Limit,Market,MIT,StopMarket,StopLimit")]
  		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		[DefaultValueAttribute(null)]
-        public OrderType OrderType
+        public OrderType Order_Type
         {
             get; set;
         }

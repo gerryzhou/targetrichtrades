@@ -30,12 +30,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// </summary>
 	public partial class GStrategyBase : Strategy
 	{
+		#region Utils Functions
 		public int HasPosition() {
 			indicatorProxy.TraceMessage(this.Name, 0);
 			int pos = 0;
 			if(IsLiveTrading()) {
 				//if(PositionAccount != null)
-					pos = PositionAccount.Quantity;
+				pos = PositionAccount.Quantity;
 			}
 			else //if(Position != null)
 				pos = Position.Quantity;
@@ -63,6 +64,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return Position.MarketPosition;
 		}
 		
+		public double GetUnrealizedPnL() {
+			if(IsLiveTrading())
+				return PositionAccount.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
+			else return
+				Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
+		}
+		#endregion
+		
 		#region Event Handlers
 		
 		protected override void OnPositionUpdate(Cbi.Position position, double averagePrice, 
@@ -85,21 +94,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 				+ ";GetAvgPrice=" + GetAvgPrice()
 				+ ";averagePrice=" + averagePrice);
 			//Print(position.ToString() + "--MarketPosition=" + position.MarketPosition);
-			if (position.MarketPosition == MarketPosition.Flat)
-			{
-				CurrentTrade.TradeAction.TrailingProfitTargetTics = GetTicksByCurrency(CurrentTrade.profitTargetAmt);
-				CurrentTrade.trailingSLTic = GetTicksByCurrency(CurrentTrade.stopLossAmt);
-			}
-			else
-			{
-				CalProfitTargetAmt(averagePrice, CurrentTrade.profitFactor);
-				CalExitOcoPrice(averagePrice, CurrentTrade.profitFactor);
-				SetSimpleExitOCO(CurrentTrade.TradeAction.EntrySignal.SignalName);
-//				SetBracketOrder.OCOOrder.ProfitTargetOrder(OrderSignalName.EntryShort.ToString());
-//				SetBracketOrder.OCOOrder.StopLossOrder(OrderSignalName.EntryShort.ToString());
-			}
+			CurrentTrade.OnCurPositionUpdate(position, averagePrice, quantity, marketPosition);
+			if(CurrentTrade.MktPosition != null && CurrentTrade.PosAvgPrice != null
+				&& CurrentTrade.PosQuantity != null && CurrentTrade.PosUnrealizedPnL != null)
+			indicatorProxy.PrintLog(true, IsLiveTrading(),			
+			String.Format("{0}, AvgPrc: {1}, Quant={2}, MktPos={3}, PnL={4}",
+					CurrentBar, CurrentTrade.PosAvgPrice, CurrentTrade.PosQuantity, CurrentTrade.MktPosition, CurrentTrade.PosUnrealizedPnL));
 		}
 		
-		#endregion		
+		#endregion
 	}
 }

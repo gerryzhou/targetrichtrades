@@ -44,8 +44,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.HLine, "CustomPlot2");
 			}
 			else if (State == State.Configure)
-			{
-				CurrentTrade = new CurrentTrade(this);
+			{				
 				//CurrentTrade.OnCurPositionUpdate += this.OnPositionUpdate;
 				//InitTradeMgmt();
 				//AddDataSeries("@SPX500", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
@@ -53,6 +52,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (State == State.DataLoaded)
 			{
 				indicatorProxy = GIndicatorProxy(this);//1, Account.Name);
+				CurrentTrade = new CurrentTradeBase(this);
+				
+//				CurrentTrade.InstStrategy = ;
 				//tradeSignal = new TradeSignal();
 				CancelAccountOrders();
 				//Account.CancelAllOrders(Instrument);

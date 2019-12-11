@@ -77,7 +77,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (State == State.Configure)
 			{
 				Print(this.Name + " set Configure called....");
-				CurrentTrade = new CurrentTrade(this);
+				//CurrentTrade = new CurrentTrade(this);
 			}
 		}
 
