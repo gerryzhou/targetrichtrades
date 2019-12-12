@@ -151,8 +151,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public string GetBarTimestampStr(int barsAgo) {
-			return Time[barsAgo].ToString("yyyyMMddHHmmssfff") 
-				+ GZUtils.GetRandomNumber(1000, 9999).ToString();
+			return Time[barsAgo].ToString("yyyyMMddHHmmssfff");
+				//+ GZUtils.GetRandomNumber(1, 9).ToString();
 		}
 		
 		#endregion Trigger Functions

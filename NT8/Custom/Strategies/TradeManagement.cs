@@ -261,7 +261,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			return false;
 		}
-	
+		
 		/// <summary>
 		/// Submit unmanaged long limit order, set the order object in OnOrderUpdate handler
 		/// </summary>
@@ -276,6 +276,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			CurrentTrade.barsSinceEnOrd = 0;
 		}
+		
 		/// <summary>
 		/// Submit unmanaged short limit order, set the order object in OnOrderUpdate handler
 		/// </summary>
@@ -379,22 +380,28 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual void NewEntrySimpleOrderMG() {
 		}
 		
+		/// <summary>
+		/// Submit unmanaged entry simple order, set the order object in OnOrderUpdate handler
+		/// </summary>
 		public virtual void NewEntrySimpleOrderUM() {
 			TradeSignal tSig = CurrentTrade.TradeAction.EntrySignal;
-			//tSig.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
-			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewEntrySimpleOrderUM"
-			+";EntrySignal.SignalName=" + tSig.SignalName
-			+";EntrySignal.Action=" + tSig.Action.ToString()
-			+";EntrySignal.OrderType=" + tSig.Order_Type.ToString()
-			+";EntrySignal.Quantity=" + tSig.Quantity
-			+";EntrySignal.OrderCalculationMode=" + tSig.OrderCalculationMode.ToString()
-			+";EntrySignal.LimitPrice=" + tSig.LimitPrice
-			+";EntrySignal.StopPrice=" + tSig.StopPrice);
 			try {
+				//tSig.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
+				indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewEntrySimpleOrderUM"
+				+";EntrySignal.SignalName=" + tSig.SignalName
+				+";EntrySignal.Action=" + tSig.Action.ToString()
+				+";EntrySignal.OrderType=" + tSig.Order_Type.ToString()
+				+";EntrySignal.Quantity=" + tSig.Quantity
+				+";EntrySignal.OrderCalculationMode=" + tSig.OrderCalculationMode.ToString()
+				+";EntrySignal.LimitPrice=" + tSig.LimitPrice
+				+";EntrySignal.StopPrice=" + tSig.StopPrice);
+
 				SubmitOrderUnmanaged(0, tSig.Action, tSig.Order_Type, tSig.Quantity,
 				tSig.LimitPrice, tSig.StopPrice, "", tSig.SignalName);
+				
+				CurrentTrade.barsSinceEnOrd = 0;
 			} catch(Exception ex) {
-				Print(CurrentBar + ": Ex fired:" + ex.StackTrace);
+				indicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}:NewEntrySimpleOrderUM EX={1}", CurrentBar, ex.StackTrace));
 			}
 		}
 		
@@ -435,6 +442,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual void SetProfitTargetOrderUM() {
 			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":SetProfitTargetOrderUM"
 			+ ";CurrentTrade.TradeAction.EntrySignal.SignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName
+			+ ";CurrentTrade.TDID=" + CurrentTrade.TradeID
 			+ ";CurrentTrade.ocoID=" + CurrentTrade.ocoID
 			+ ";GetExitOrderAction()=" + GetExitOrderAction().ToString()
 			+ ";profitTargetAmt=" + CurrentTrade.profitTargetAmt
@@ -465,6 +473,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":SetStopLossOrder"
 			+ ";CurrentTrade.TradeAction.EntrySignal.SignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName
+			+ ";CurrentTrade.TDID=" + CurrentTrade.TradeID
 			+ ";CurrentTrade.ocoID=" + CurrentTrade.ocoID
 			+ ";CurrentTrade.SLCalculationMode=" + CurrentTrade.SLCalculationMode
 			+ ";stopLossAmt=" + CurrentTrade.stopLossAmt
@@ -494,6 +503,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual void SetStopLossOrderUM() {
 			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":SetStopLossOrderUM" 
 			+ ";CurrentTrade.TradeAction.EntrySignal.SignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName
+			+ ";CurrentTrade.TDID=" + CurrentTrade.TradeID
 			+ ";CurrentTrade.ocoID=" + CurrentTrade.ocoID
 			+ ";GetExitOrderAction()=" + GetExitOrderAction().ToString()			
 			+ ";CurrentTrade.SLCalculationMode=" + CurrentTrade.SLCalculationMode
@@ -643,6 +653,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indicatorProxy.TraceMessage(this.Name, prtLevel);
 			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ": SetExitOcoUM;" 
 			+ ";avgPrc=" + GetAvgPrice()
+			+ ";CurrentTrade.TDID=" + CurrentTrade.TradeID
 			+ ";ocoID=" + CurrentTrade.ocoID
 			+ ";Position.Quantity=" + HasPosition()
 			);
@@ -802,6 +813,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";price=" + price
 			+ ";Ordername=" + GetOrderName(execution.Order.Name)
 			+ ";entrySignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName
+			+ ";CurrentTrade.TDID=" + CurrentTrade.TradeID
 			+ ";ocoID=" + CurrentTrade.ocoID
 			+ ";OCO=" + execution.Order.Oco			
 			+ ";bsx=" + bsx
@@ -953,6 +965,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";LP=" + order.LimitPrice			
 			+ ";State=" + orderState.ToString()
 			+ ";Action=" + order.OrderAction.ToString()
+			+ ";CurrentTrade.TDID=" + CurrentTrade.TradeID
 			+ ";ocoID=" + CurrentTrade.ocoID
 			+ ";OCO=" + order.Oco
 			+ ";BarsSinceExit=" + bsx
