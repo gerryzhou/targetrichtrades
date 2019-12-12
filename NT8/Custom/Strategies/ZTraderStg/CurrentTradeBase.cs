@@ -40,8 +40,6 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		}
 
 		#region Order Objects
-		
-		public string ocoID = String.Empty;
 		private BracketOrderBase bracketOrder = new BracketOrderBase();
 		private TrailingSLOrderBase trailingSLOrder = new TrailingSLOrderBase();
 		public EntryExitOrderType exitOrderType = EntryExitOrderType.SimpleOCO;
@@ -125,6 +123,11 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		private void InitNewTrade() {
 			TradeID = GetNewTradeID();
+			PosAvgPrice = 0;
+			PosQuantity = 0;
+			MktPosition = MarketPosition.Flat;
+			PosUnrealizedPnL = 0;
+			
 			//TM variables
 			tradeDirection = InstStrategy.TM_TradingDirection;
 			tradeStyle = InstStrategy.TM_TradingStyle;
@@ -173,6 +176,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			quantity = InstStrategy.DefaultQuantity;
 		}
 		
+		//unused, newEntryTrade=newTrade, replaced by InitNewTrade
 		public void InitNewEntryTrade() {
 			//InitParams();
 			//CurrentTradeType = TradeType.Entry;
@@ -200,31 +204,36 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public void OnCurPositionUpdate(Cbi.Position position, double averagePrice, 
 			int quantity, Cbi.MarketPosition marketPosition)
 		{
+			InstStrategy.Print(InstStrategy.CurrentBar + ": OnCurPositionUpdate--");
+			try{
+				InstStrategy.Print(String.Format("{0}, AvgPrc: {1}, Quant={2}, MktPos={3}, marketPosition={4}, PnL={5}",
+						InstStrategy.CurrentBar, PosAvgPrice, PosQuantity, MktPosition, marketPosition, PosUnrealizedPnL));
+				//Position pos = position.MemberwiseClone();
+				if (MktPosition == MarketPosition.Flat)
+				{
+					//TradeAction.TrailingProfitTargetTics = InstStrategy.GetTicksByCurrency(TradeAction.profitTargetAmt);
+					//trailingSLTic = GetTicksByCurrency(CurrentTrade.stopLossAmt);
+				}
+				else if (marketPosition == MarketPosition.Flat) { //Positions were closed, trade is done, init a new trade;
+					InstStrategy.Print("InitNewTrade called");
+					InitNewTrade();
+				}
+				else
+				{
+					InstStrategy.CalProfitTargetAmt(PosAvgPrice, InstStrategy.MM_ProfitFactor);
+					InstStrategy.CalExitOcoPrice(PosAvgPrice, InstStrategy.MM_ProfitFactor);
+					InstStrategy.SetSimpleExitOCO(TradeAction.EntrySignal.SignalName);
+	//				SetBracketOrder.OCOOrder.ProfitTargetOrder(OrderSignalName.EntryShort.ToString());
+	//				SetBracketOrder.OCOOrder.StopLossOrder(OrderSignalName.EntryShort.ToString());
+				}
+			} catch(Exception ex) {
+				InstStrategy.Print("Exception=" + ex.StackTrace);
+			}
+			
 			PosAvgPrice = averagePrice;
 			PosQuantity = quantity;
 			MktPosition = marketPosition;
 			PosUnrealizedPnL = position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, InstStrategy.Close[0]);
-			InstStrategy.Print(InstStrategy.CurrentBar + ": OnCurPositionUpdate--");
-			try{
-			InstStrategy.Print(String.Format("{0}, AvgPrc: {1}, Quant={2}, MktPos={3}, PnL={4}",
-					InstStrategy.CurrentBar, PosAvgPrice, PosQuantity, MktPosition, PosUnrealizedPnL));
-			//Position pos = position.MemberwiseClone();
-			if (MktPosition == MarketPosition.Flat)
-			{
-				//TradeAction.TrailingProfitTargetTics = InstStrategy.GetTicksByCurrency(TradeAction.profitTargetAmt);
-				//trailingSLTic = GetTicksByCurrency(CurrentTrade.stopLossAmt);
-			}
-			else
-			{
-				InstStrategy.CalProfitTargetAmt(PosAvgPrice, InstStrategy.MM_ProfitFactor);
-				InstStrategy.CalExitOcoPrice(PosAvgPrice, InstStrategy.MM_ProfitFactor);
-				InstStrategy.SetSimpleExitOCO(TradeAction.EntrySignal.SignalName);
-//				SetBracketOrder.OCOOrder.ProfitTargetOrder(OrderSignalName.EntryShort.ToString());
-//				SetBracketOrder.OCOOrder.StopLossOrder(OrderSignalName.EntryShort.ToString());
-			}
-			}catch(Exception ex) {
-				InstStrategy.Print("Exception=" + ex.StackTrace);
-			}
 		}
 		#endregion
 		
@@ -259,6 +268,19 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public TradeAction TradeAction
 		{
 			get; set;
+		}
+
+		[Description("The ocoID for BracketOrder exit leg")]
+		[Browsable(false), XmlIgnore]
+		public string OcoID
+		{
+			get {
+				if(TradeID != null) {
+					string[] str = TradeID.Split('-');
+					return "OCO-" + str[1];
+				} else
+					return String.Empty;
+			}
 		}
 		
 		[Browsable(false), XmlIgnore]
