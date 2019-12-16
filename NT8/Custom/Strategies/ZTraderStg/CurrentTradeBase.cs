@@ -31,6 +31,19 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// All the parameters from the signal are held in TradeAction 
 	/// CurrentTrade->TradeAction->TradeSignal;
 	/// 
+	/// OrderMgmt: setup SL/PT, breakeven: when to setup?
+	/// decide new trade, new pos: exe event or pos event?
+	/// Signal triggerred order change? when to change the orders? OnBarUpdate
+	/// Event triggerred order change? when to change the orders? OnBarUpdate: breakeven, trailing stop,
+	/// Command triggerred order change? when to change the orders? OnBarUpdate
+	/// Priority of the three changes: command,signal,event
+	/// Command/rule/performance triggered change: change TradeSignal, fire the change the same bar; 
+	/// treat command as if a signal(how to define the signal with regular signal, add to the list, type of command signal);
+	/// Signal triggered change: signal changed, fire the change the same bar;
+	/// Event triggered change: change the signal first, fire the change on the event handler;
+	/// Sequence of the triggers: OnBarUpdate take the command, then the performace checking apply rule trigger changes,
+	/// the signal trigger and event trigger could come mixed, it has no preset order.
+	/// 
 	/// </summary>
 	public class CurrentTradeBase {
 		
@@ -38,18 +51,11 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			InstStrategy = instStg;
 			InitNewTrade();
 		}
-
-		#region Order Objects
-		private BracketOrderBase bracketOrder = new BracketOrderBase();
-		private TrailingSLOrderBase trailingSLOrder = new TrailingSLOrderBase();
-		public EntryExitOrderType exitOrderType = EntryExitOrderType.SimpleOCO;
-		
-		#endregion
-		
+	
 		#region Trade Mgmt variables
 		
-		public TradingDirection tradeDirection = TradingDirection.Both;
-		public TradingStyle tradeStyle = TradingStyle.TrendFollowing;
+		public TradingDirection TradeDirection = TradingDirection.Both;
+		public TradingStyle TradeStyle = TradingStyle.TrendFollowing;
 		
 		public int enCounterPBBars = 1;//Bar count of pullback for breakout entry setup
 		public bool enTrailing = true;//Trailing the entry price
@@ -104,9 +110,9 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public CalculationMode BECalculationMode = CalculationMode.Currency;//Breakeven CalMode
 		public CalculationMode TLSLCalculationMode = CalculationMode.Ticks;//Trailing SL CalMode
 		
-		public double dailyLossLmt = -200;//-300 the daily loss limit amount
-		public double profitFactor = 0.5;//PT/SL ratio
-		public int quantity = 1; //Quantity of the total contracts allowed to trade for the strategy
+		public double DailyLossLmt = -200;//-300 the daily loss limit amount
+		public double ProfitFactor = 0.5;//PT/SL ratio
+		public int MaxQuantity = 1; //Quantity of the total contracts allowed to trade for the strategy
 
 //		public double profitTargetPrice = 0;//Runtime var. For trailing PT using the price to set OCO order
 //		public double stopLossPrice = 0;//Runtime var; Using price to set OCO order, since Amt could be negative		
@@ -129,8 +135,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			PosUnrealizedPnL = 0;
 			
 			//TM variables
-			tradeDirection = InstStrategy.TM_TradingDirection;
-			tradeStyle = InstStrategy.TM_TradingStyle;
+			TradeDirection = InstStrategy.TM_TradingDirection;
+			TradeStyle = InstStrategy.TM_TradingStyle;
 			
 			enCounterPBBars = InstStrategy.TM_EnCounterPBBars;
 			enTrailing = InstStrategy.TM_EnTrailing;
@@ -170,23 +176,23 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			BECalculationMode = InstStrategy.MM_BECalculationMode;
 			TLSLCalculationMode = InstStrategy.MM_TLSLCalculationMode;
 			
-			profitFactor = InstStrategy.MM_ProfitFactor;
-			dailyLossLmt = InstStrategy.MM_DailyLossLmt;
+			ProfitFactor = InstStrategy.MM_ProfitFactor;
+			DailyLossLmt = InstStrategy.MM_DailyLossLmt;
 			
-			quantity = InstStrategy.DefaultQuantity;
+			MaxQuantity = InstStrategy.DefaultQuantity;
 		}
 		
 		//unused, newEntryTrade=newTrade, replaced by InitNewTrade
 		public void InitNewEntryTrade() {
 			//InitParams();
 			//CurrentTradeType = TradeType.Entry;
-			exitOrderType = EntryExitOrderType.SimpleOCO;
+			BracketOrder.ExitOrderType = EntryExitOrderType.SimpleOCO;
 		}
 
 		public void InitNewTLSL() {
 			//InitParams();
 			//CurrentTradeType = TradeType.Exit;
-			exitOrderType = EntryExitOrderType.TrailingStopLoss;
+			BracketOrder.ExitOrderType = EntryExitOrderType.TrailingStopLoss;
 			this.TradeAction.TrailingProfitTargetTics = 0;
 			switch(TLSLCalculationMode) {
 				case CalculationMode.Currency:
@@ -201,25 +207,48 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		#endregion
 		
 		#region Event Handler Methods
-		public void OnCurPositionUpdate(Cbi.Position position, double averagePrice, 
+		/// <summary>
+		/// New position created: setup SL/PT orders;
+		/// Old position closed: Start a new trade;
+		/// Position is being held: check performane to adjust SL/PT orders;
+		/// All flat: wait for Command/TradeSignal, or detect new position created;
+		/// 
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="averagePrice"></param>
+		/// <param name="quantity"></param>
+		/// <param name="marketPosition"></param>
+		public virtual void OnCurPositionUpdate(Cbi.Position position, double averagePrice, 
 			int quantity, Cbi.MarketPosition marketPosition)
 		{
-			InstStrategy.Print(InstStrategy.CurrentBar + ": OnCurPositionUpdate--");
 			try{
-				InstStrategy.Print(String.Format("{0}, AvgPrc: {1}, Quant={2}, MktPos={3}, marketPosition={4}, PnL={5}",
+				InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+					String.Format("{0}:OnCurPositionUpdate - AvgPrc: {1}, Quant={2}, MktPos={3}, marketPosition={4}, PnL={5}",
 						InstStrategy.CurrentBar, PosAvgPrice, PosQuantity, MktPosition, marketPosition, PosUnrealizedPnL));
 				//Position pos = position.MemberwiseClone();
 				if (MktPosition == MarketPosition.Flat)
 				{
+					if(marketPosition == MarketPosition.Flat) {
+						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+						String.Format("{0}:NoChangeOnPosition, MktPos={1}, marketPosition={2}",
+							InstStrategy.CurrentBar, MktPosition, marketPosition));
+					} else { //New position created, setup SL/PT
+						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+						String.Format("{0}:NewOnPosition, MktPos={1}, marketPosition={2}",
+							InstStrategy.CurrentBar, MktPosition, marketPosition));
+					}
 					//TradeAction.TrailingProfitTargetTics = InstStrategy.GetTicksByCurrency(TradeAction.profitTargetAmt);
 					//trailingSLTic = GetTicksByCurrency(CurrentTrade.stopLossAmt);
 				}
 				else if (marketPosition == MarketPosition.Flat) { //Positions were closed, trade is done, init a new trade;
-					InstStrategy.Print("InitNewTrade called");
+					InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(), "InitNewTrade called");
 					InitNewTrade();
 				}
-				else
+				else //Position is held, change SL/PT by rule/performance, scale in/out occured;
 				{
+					InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+						String.Format("{0}:Position is Held, MktPos={1}, marketPosition={2}, PosQuant={3}, Quant={4}", 
+						InstStrategy.CurrentBar, MktPosition, marketPosition, PosQuantity, quantity));
 					InstStrategy.CalProfitTargetAmt(PosAvgPrice, InstStrategy.MM_ProfitFactor);
 					InstStrategy.CalExitOcoPrice(PosAvgPrice, InstStrategy.MM_ProfitFactor);
 					InstStrategy.SetSimpleExitOCO(TradeAction.EntrySignal.SignalName);
@@ -234,6 +263,43 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			PosQuantity = quantity;
 			MktPosition = marketPosition;
 			PosUnrealizedPnL = position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, InstStrategy.Close[0]);
+		}
+
+		public virtual void OnCurExecutionUpdate(Execution execution, string executionId,
+			double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
+		{
+			InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(), 
+				InstStrategy.CurrentBar + ":OnCurExecutionUpdate"
+			+ ";marketPosition=" + marketPosition
+			+ ";quantity=" + quantity
+			+ ";price=" + price);
+			try {
+			} catch(Exception ex) {
+				InstStrategy.Print("Exception=" + ex.StackTrace);
+			}
+		}
+		
+		public virtual void OnCurOrderUpdate(Cbi.Order order, double limitPrice, double stopPrice, 
+			int quantity, int filled, double averageFillPrice, 
+			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
+		{
+			InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+				String.Format("{0}:OnCurOrderUpdate, limitPrice={1}, stopPrice={2}, quantity={3},\t\n filled={4}, averageFillPrice={5}, orderState={6}",
+				InstStrategy.CurrentBar, limitPrice, stopPrice, quantity, filled, averageFillPrice, orderState));
+			try {
+//			    if (order.Name == "myEntryOrder" && orderState != OrderState.Filled)
+//			      entryOrder = order;
+
+			 
+//			    if (entryOrder != null && entryOrder == order)
+//			    {
+//			        Print(order.ToString());
+//			        if (order.OrderState == OrderState.Filled)
+//			              entryOrder = null;
+//			    }
+			} catch(Exception ex) {
+				InstStrategy.Print("Exception=" + ex.StackTrace);
+			}
 		}
 		#endregion
 		
@@ -290,12 +356,12 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			set { bracketOrder = value; }
 		}
 
-		[Browsable(false), XmlIgnore]
-		public TrailingSLOrderBase TrailingSLOrder
-		{
-			get { return trailingSLOrder; }
-			set { trailingSLOrder = value; }
-		}
+//		[Browsable(false), XmlIgnore]
+//		public TrailingSLOrderBase TrailingSLOrder
+//		{
+//			get { return trailingSLOrder; }
+//			set { trailingSLOrder = value; }
+//		}
 		
 		[DefaultValueAttribute(MarketPosition.Flat)]
 		[Browsable(false), XmlIgnore]
@@ -329,10 +395,16 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		[Browsable(false), XmlIgnore]
 		public GStrategyBase InstStrategy
 		{ 
-			get;set;
+			get; set;
 		}
 		
 		//private GStrategyBase InstStrategy = null;
+		
+		
+		//Order Objects
+		private BracketOrderBase bracketOrder = new BracketOrderBase();
+		//private TrailingSLOrderBase trailingSLOrder = new TrailingSLOrderBase();
+//		public EntryExitOrderType BracketOrder.ExitOrderType = EntryExitOrderType.SimpleOCO;
 		
 		#endregion
 	}

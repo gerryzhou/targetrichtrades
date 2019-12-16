@@ -52,7 +52,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public string SignalName
 		{
 			get{
-				return TradeSignalType.ToString() +"-"
+				return SignalType.ToString() +"-"
 					+ Action.ToString() + "-"
 					+ Order_Type.ToString();
 			}
@@ -64,7 +64,17 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		/// </summary>		
  		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		[DefaultValueAttribute(TradeSignalType.Entry)]
-		public TradeSignalType TradeSignalType
+		public TradeSignalType SignalType
+		{
+			get; set;
+		}
+		
+		/// <summary>
+		/// The source of the signal: indicator, command, event
+		/// </summary>		
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		[DefaultValueAttribute(TradeSignalSource.Indicator)]
+		public TradeSignalSource SignalSource
 		{
 			get; set;
 		}

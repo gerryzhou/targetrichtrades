@@ -22,10 +22,15 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	public class BracketOrderBase : Order
 	{
 		private BracketOrderSubType bracketOrderSubType = BracketOrderSubType.UnKnown;
+		
 		private Order entryOrder;
-		private OCOBase ocoOrder = new OCOBase();
 		public OrderType EnOrderType = OrderType.Limit;
 		public CalculationMode EnCalculationMode = CalculationMode.Price;
+		
+		private EntryExitOrderType exitOrderType = EntryExitOrderType.SimpleOCO;
+		private OCOBase ocoOrder = new OCOBase();
+		
+		private TrailingSLOrderBase trailingSLOrder = new TrailingSLOrderBase();
 		
 		public bool enTrailing = true; //use trailing entry: counter pullback bars or simple enOffsetPnts
 		public bool ptTrailing = true; //use trailing profit target every bar
@@ -42,14 +47,28 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public Order EntryOrder
 		{
 			get { return entryOrder; }
-			set { entryOrder= value; }
+			set { entryOrder = value; }
 		}
 		
 		[Browsable(false), XmlIgnore]
 		public OCOBase OCOOrder
 		{
 			get { return ocoOrder;	}
-			set { ocoOrder= value; }
+			set { ocoOrder = value; }
+		}
+
+		[Browsable(false), XmlIgnore]
+		public TrailingSLOrderBase TrailingSLOrder
+		{
+			get { return trailingSLOrder; }
+			set { trailingSLOrder = value; }
+		}
+		
+		[Browsable(false), XmlIgnore]
+		public EntryExitOrderType ExitOrderType
+		{
+			get { return exitOrderType;	}
+			set { exitOrderType = value; }
 		}
 		#endregion
 	}

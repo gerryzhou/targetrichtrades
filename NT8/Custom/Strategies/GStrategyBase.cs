@@ -51,7 +51,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
-				indicatorProxy = GIndicatorProxy(this);//1, Account.Name);
+				IndicatorProxy = GIndicatorProxy(this);//1, Account.Name);
 				CurrentTrade = new CurrentTradeBase(this);
 				
 //				CurrentTrade.InstStrategy = ;
@@ -61,9 +61,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//Account.Flatten(new List<Instrument>{Instrument});				
 			}
 			else if (State == State.Terminated) {
-				if(indicatorProxy != null) {
-					indicatorProxy.Log2Disk = true;
-					indicatorProxy.PrintLog(true, true, CurrentBar + ":" + this.Name + " terminated!");
+				if(IndicatorProxy != null) {
+					IndicatorProxy.Log2Disk = true;
+					IndicatorProxy.PrintLog(true, true, CurrentBar + ":" + this.Name + " terminated!");
 				}
 			}
 		}
@@ -113,7 +113,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public void SetPrintOut(int i) {
-			PrintOut = indicatorProxy.PrintOut + i;
+			PrintOut = IndicatorProxy.PrintOut + i;
 		}
 		#endregion
 		

@@ -62,6 +62,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return null;
 		}
 		
+		public virtual void TakeTradeAction() {
+			CurrentTrade.TradeAction = GetTradeAction(CurrentBar);
+			switch(CurrentTrade.TradeAction.TradeActionType) {
+				case TradeActionType.EntrySimple:
+				case TradeActionType.Bracket:
+					PutEntryTrade();
+					break;
+				case TradeActionType.ExitOCO:
+					PutExitTrade();
+					break;
+				case TradeActionType.ExitSimple:
+					PutLiquidateTrade();
+					break;
+			}
+		}		
 		#endregion
 		
 		#region Manage TradeActions

@@ -88,10 +88,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (State == State.DataLoaded)
 			{
 				Print(this.Name + " set DataLoaded called....");				
-				AddChartIndicator(indicatorProxy);
+				AddChartIndicator(IndicatorProxy);
 				SetPrintOut(1);
-				indicatorProxy.LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
-				indicatorProxy.AddPriceActionTypeAllowed(PriceActionType.DnWide);
+				IndicatorProxy.LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
+				IndicatorProxy.AddPriceActionTypeAllowed(PriceActionType.DnWide);
 				
 				giSMI = GISMI(EMAPeriod1, EMAPeriod2, Range, SMITMAPeriod, SMICrossLevel);//(3, 5, 5, 8);
 				awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
@@ -119,11 +119,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			try {
 			base.OnBarUpdate();
-			indicatorProxy.TraceMessage(this.Name, PrintOut);
-			Print(String.Format("{0}: Stg={1}, GSZTraer={2}", CurrentBar, CurrentTrade.InstStrategy, indicatorProxy.GSZTrader));
+			IndicatorProxy.TraceMessage(this.Name, PrintOut);
+			Print(String.Format("{0}: Stg={1}, GSZTraer={2}", CurrentBar, CurrentTrade.InstStrategy, IndicatorProxy.GSZTrader));
 			} catch (Exception ex) {
-				indicatorProxy.Log2Disk = true;
-				indicatorProxy.PrintLog(true, true, "Exception: " + ex.StackTrace);
+				IndicatorProxy.Log2Disk = true;
+				IndicatorProxy.PrintLog(true, true, "Exception: " + ex.StackTrace);
 			}
 		}
 		#endregion
@@ -154,7 +154,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Unused
 		//public override bool CheckTradeSignals() {
 		public bool CheckTradeSignals1() {
-			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			IndicatorProxy.TraceMessage(this.Name, PrintOut);
 			List<TradeSignal> sigList = new List<TradeSignal>();
 			TradeSignal trdSignal = new TradeSignal();
 			Direction dir = giKAMA.GetDirection();// new Direction();
@@ -185,7 +185,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Direction dir = GetDirection(giPbSAR);
 			TradeSignal enSig = new TradeSignal();			
 			enSig.BarNo = CurrentBar;
-			enSig.TradeSignalType = TradeSignalType.Entry;
+			enSig.SignalType = TradeSignalType.Entry;
 			enSig.OrderCalculationMode = CalculationMode.Price;
 			enSig.Quantity = 1;
 			
@@ -202,7 +202,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Direction dir = GetDirection(giPbSAR);
 			TradeSignal slSig = new TradeSignal();
 			slSig.BarNo = CurrentBar;
-			slSig.TradeSignalType = TradeSignalType.StopLoss;
+			slSig.SignalType = TradeSignalType.StopLoss;
 			slSig.Order_Type = OrderType.Market;
 			if(dir.TrendDir==TrendDirection.Up) {
 				slSig.Action = OrderAction.Sell;
@@ -220,7 +220,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Direction dir = GetDirection(giPbSAR);
 			TradeSignal slSig = new TradeSignal();
 			slSig.BarNo = CurrentBar;
-			slSig.TradeSignalType = TradeSignalType.ProfitTarget;
+			slSig.SignalType = TradeSignalType.ProfitTarget;
 			slSig.Order_Type = OrderType.Limit;
 			if(dir.TrendDir==TrendDirection.Up) {
 				slSig.Action = OrderAction.Sell;
@@ -240,8 +240,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			if (giParabSAR.IsSpvAllowed4PAT(curBarPriceAction.paType) && barsSinceLastCross < barsAgoMaxPbSAREn) 
 //				return true;
 //			else return false;
-			PriceAction pa = indicatorProxy.GetPriceAction(Time[0]);
-			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":"
+			PriceAction pa = IndicatorProxy.GetPriceAction(Time[0]);
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":"
 				+ ";ToShortDateString=" + Time[0].ToString()
 				+ ";paType=" + pa.paType.ToString()
 				+ ";maxDownTicks=" + pa.maxDownTicks
@@ -276,19 +276,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public override bool CheckNewEntryTrade() {
-			indicatorProxy.PrintLog(true, IsLiveTrading(), "====CheckNewEntryTrade()===" + this.Name);
-			indicatorProxy.TraceMessage(this.Name, PrintOut);
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), "====CheckNewEntryTrade()===" + this.Name);
+			IndicatorProxy.TraceMessage(this.Name, PrintOut);
 			CurrentTrade.InitNewEntryTrade();
 			SetTradeAction();
 //			if(GetTradeSignal(CurrentBar) != null) {
 //				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
 //				{
-//					indicatorProxy.TraceMessage(this.Name, PrintOut);
+//					IndicatorProxy.TraceMessage(this.Name, PrintOut);
 //					CurrentTrade.tradeDirection = TradingDirection.Down;
 //				}
 //				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
 //				{
-//					indicatorProxy.TraceMessage(this.Name, PrintOut);
+//					IndicatorProxy.TraceMessage(this.Name, PrintOut);
 //					CurrentTrade.tradeDirection = TradingDirection.Up;
 //				}
 				

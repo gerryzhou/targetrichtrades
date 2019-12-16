@@ -64,8 +64,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public bool IsTradingTime(int session_start) {
 			//Bars.Session.GetNextBeginEnd(DateTime time, out DateTime sessionBegin, out DateTime sessionEnd)
-			int time_start = indicatorProxy.GetTimeByHM(TG_TradeStartH, TG_TradeStartM);
-			int time_end = indicatorProxy.GetTimeByHM(TG_TradeEndH, TG_TradeEndM);
+			int time_start = IndicatorProxy.GetTimeByHM(TG_TradeStartH, TG_TradeStartM);
+			int time_end = IndicatorProxy.GetTimeByHM(TG_TradeEndH, TG_TradeEndM);
 			int time_now = ToTime(Time[0]);
 			bool isTime= false;
 			if(time_start >= session_start) {
@@ -85,9 +85,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="timeM">time min</param>
 		/// <returns></returns>
 		public bool IsLiquidateTime(int timeH, int timeM) {
-			int time_now = indicatorProxy.GetTimeByHM(Time[0].Hour, Time[0].Minute);
-			int time_lastBar = indicatorProxy.GetTimeByHM(Time[1].Hour, Time[1].Minute);
-			int time_liq = indicatorProxy.GetTimeByHM(timeH, timeM);
+			int time_now = IndicatorProxy.GetTimeByHM(Time[0].Hour, Time[0].Minute);
+			int time_lastBar = IndicatorProxy.GetTimeByHM(Time[1].Hour, Time[1].Minute);
+			int time_liq = IndicatorProxy.GetTimeByHM(timeH, timeM);
 			bool isTime= false;
 			
 			if(time_now == time_liq || (time_liq > time_lastBar && time_liq <= time_now)) {
@@ -133,7 +133,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bse = BarsSinceEntryExecution();
 			double timeSinceEn = -1;
 			if(bse > 0) {
-				timeSinceEn = indicatorProxy.GetMinutesDiff(Time[0], Time[bse]);
+				timeSinceEn = IndicatorProxy.GetMinutesDiff(Time[0], Time[bse]);
 			}
 			return timeSinceEn;
 		}

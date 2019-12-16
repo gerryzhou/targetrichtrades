@@ -60,7 +60,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			switch(tdSigType) {
 				case TradeSignalType.Entry:
 					return CheckNewEntrySignals();
-				case TradeSignalType.Exit: 
+				case TradeSignalType.Liquidate: 
 					return CheckExitSignals();
 				case TradeSignalType.ProfitTarget:
 					return CheckProfitTargetSignals();
@@ -108,12 +108,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool CheckTradeSignals() {
-			if(HasPosition() != 0 && CheckIndicatorSignals(TradeSignalType.Exit)) {
+			if(HasPosition() != 0 && CheckIndicatorSignals(TradeSignalType.Liquidate)) {
 				return SetExitTradeAction();
 			}
 			else if(NewOrderAllowed() && CheckIndicatorSignals(TradeSignalType.Entry))
 			{
-				indicatorProxy.TraceMessage(this.Name, PrintOut);
+				IndicatorProxy.TraceMessage(this.Name, PrintOut);
 				return SetNewEntryTradeAction();
 			}
 

@@ -52,7 +52,9 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	public enum TradeActionType {Bracket, EntrySimple, EntryOCO, EntryTrailing, 
 		ExitSimple, ExitOCO, ExitTrailingSL, ExitTrailingPT, UnKnown};
 	
-	public enum TradeSignalType {Entry, Exit, ScaleIn, ScaleOut, StopLoss, TrailingStopLoss, ProfitTarget};
+	public enum TradeSignalType {Entry, Liquidate, ScaleIn, ScaleOut, StopLoss, TrailingStopLoss, ProfitTarget};
+	
+	public enum TradeSignalSource {Indicator, Event, Command};
 	
 	public enum OrderSignalName {EntryLongLmt, EntryShortLmt, EntryLongMkt, EntryShortMkt, EntryLongStopMkt, EntryShortStopMkt, 
 		ExitLong, ExitShort, ProfitTarget, StopLoss, TrailStop, ExitOnSessionClose, UnKnown};

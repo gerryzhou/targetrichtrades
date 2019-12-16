@@ -44,6 +44,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			new CmdObject();
 		}
 		
+		/// <summary>
+		/// Command could be liquidate, stop trading, cancel orders, etc.
+		/// Also it can be the change of parameters for current strategy;
+		/// It can inject the market context into the strategy; 
+		/// </summary>
+		/// <returns></returns>
 		public virtual CmdObject CheckCmd() {
 			return cmdObj;
 		}

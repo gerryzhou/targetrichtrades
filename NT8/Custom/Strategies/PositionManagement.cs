@@ -32,7 +32,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	{
 		#region Utils Functions
 		public int HasPosition() {
-			indicatorProxy.TraceMessage(this.Name, 0);
+			IndicatorProxy.TraceMessage(this.Name, 0);
 			int pos = 0;
 			if(IsLiveTrading()) {
 				//if(PositionAccount != null)
@@ -77,11 +77,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnPositionUpdate(Cbi.Position position, double averagePrice, 
 			int quantity, Cbi.MarketPosition marketPosition)
 		{
-			indicatorProxy.Log2Disk = true;
+			IndicatorProxy.Log2Disk = true;
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			
-			indicatorProxy.PrintLog(true, IsLiveTrading(), 
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				CurrentBar + ":OnPositionUpdate"
 				+ ";BarsSinceExit, BarsSinceEntry="
 				+ bsx + "," + bse
@@ -97,7 +97,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			CurrentTrade.OnCurPositionUpdate(position, averagePrice, quantity, marketPosition);
 			if(CurrentTrade.MktPosition != null && CurrentTrade.PosAvgPrice != null
 				&& CurrentTrade.PosQuantity != null && CurrentTrade.PosUnrealizedPnL != null)
-			indicatorProxy.PrintLog(true, IsLiveTrading(),			
+			IndicatorProxy.PrintLog(true, IsLiveTrading(),			
 			String.Format("{0}, AvgPrc: {1}, Quant={2}, MktPos={3}, PnL={4}",
 					CurrentBar, CurrentTrade.PosAvgPrice, CurrentTrade.PosQuantity, CurrentTrade.MktPosition, CurrentTrade.PosUnrealizedPnL));
 		}

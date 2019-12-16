@@ -41,7 +41,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region Variables
 		private List<Indicator> listIndicator = new List<Indicator>();
 			
-		protected GIndicatorProxy indicatorProxy;		
+		//protected GIndicatorProxy indicatorProxy;		
         // User defined variables (add any user defined variables below)
         //private int startH = 9; // Default setting for StartH
        // private int startM = 5; // Default setting for StartM
@@ -132,7 +132,13 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             get;set;// { return Values[1]; }
         }
-	
+		
+        [Browsable(false), XmlIgnore()]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+		public GIndicatorProxy IndicatorProxy
+        {
+            get;set;
+        }
+		
 //		[NinjaScriptProperty]
 //		[XmlIgnore]
 //		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName="Parameters")]
