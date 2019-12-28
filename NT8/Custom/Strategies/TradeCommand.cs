@@ -28,29 +28,21 @@ using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	public class CmdObject {
-		private Strategy instStrategy = null;
-
-		public Strategy GetStrategy() {
-			return this.instStrategy;
-		}
-	}
-	
 	public partial class GStrategyBase : Strategy
 	{
-		protected CmdObject cmdObj = null;
+		protected CmdBase cmdObj = new CmdBase();
 
 		public virtual void InitTradeCmd() {
-			new CmdObject();
 		}
 		
 		/// <summary>
 		/// Command could be liquidate, stop trading, cancel orders, etc.
 		/// Also it can be the change of parameters for current strategy;
-		/// It can inject the market context into the strategy; 
+		/// It can inject the market context into the strategy;
+		/// It can trigger a tradeSignal which has highest priority;
 		/// </summary>
 		/// <returns></returns>
-		public virtual CmdObject CheckCmd() {
+		public virtual CmdBase CheckCmd() {
 			return cmdObj;
 		}
 		

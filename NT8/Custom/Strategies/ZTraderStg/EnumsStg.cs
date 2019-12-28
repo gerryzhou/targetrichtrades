@@ -34,6 +34,14 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// -3=Cancel Orders(no entry/exit, cancel all orders)
 	public enum AlgoModeType {Trading=1, Liquidate=0, SemiAlgo=2, ExitOnly=-1, StopTrading=-2, CancelOrders=-3};
 	//public enum SessionBreak {AfternoonClose, EveningOpen, MorningOpen, NextDay};
+	
+	/// <summary>
+	/// 1=ChangeAlgoType;
+	/// 2=ChangeParams, change the trading parameters;
+	/// 3=InjectContext, provide the current market context;
+	/// </summary>
+	public enum CommandType {ChangeAlgoType=1, ChangeParams=2, InjectContext=3};
+	
 	public enum TradingDirection {Up=1, Down=-1, Both=0};
 	
 	public enum TradingStyle {TrendFollowing=1, CounterTrend=-1, Ranging=0};
@@ -54,7 +62,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	
 	public enum TradeSignalType {Entry, Liquidate, ScaleIn, ScaleOut, StopLoss, TrailingStopLoss, ProfitTarget};
 	
-	public enum TradeSignalSource {Indicator, Event, Command};
+	public enum TradeSignalSource {Indicator, Event, Command, PerformRule};
 	
 	public enum OrderSignalName {EntryLongLmt, EntryShortLmt, EntryLongMkt, EntryShortMkt, EntryLongStopMkt, EntryShortStopMkt, 
 		ExitLong, ExitShort, ProfitTarget, StopLoss, TrailStop, ExitOnSessionClose, UnKnown};

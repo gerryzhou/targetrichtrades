@@ -31,12 +31,15 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// All the parameters from the signal are held in TradeAction 
 	/// CurrentTrade->TradeAction->TradeSignal;
 	/// 
-	/// OrderMgmt: setup SL/PT, breakeven: when to setup?
+	/// OrderMgmt: setup SL/PT, breakeven: when to setup? Triggerred by PerformRule;
 	/// decide new trade, new pos: exe event or pos event?
 	/// Signal triggerred order change? when to change the orders? OnBarUpdate
 	/// Event triggerred order change? when to change the orders? OnBarUpdate: breakeven, trailing stop,
 	/// Command triggerred order change? when to change the orders? OnBarUpdate
-	/// Priority of the three changes: command,signal,event
+	/// PerformRule triggerred order change? when to change the orders? OnBarUpdate, the last trigger; 
+	/// Priority of the three changes: command (change algo mode, change params, injectContext),
+	/// signal/event(exclusive, event trigger new order allowed, init SL/PT; signal trigger entry/exit),
+	/// performRule (trigger money mgmt rules, change SL/PT, break-even, trailing stop; trigger trailing entry, exit by price change)
 	/// Command/rule/performance triggered change: change TradeSignal, fire the change the same bar; 
 	/// treat command as if a signal(how to define the signal with regular signal, add to the list, type of command signal);
 	/// Signal triggered change: signal changed, fire the change the same bar;

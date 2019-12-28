@@ -52,7 +52,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public string SignalName
 		{
 			get{
-				return SignalType.ToString() +"-"
+				return SignalType.ToString() + "-"
+					+ SignalSource.ToString() + "-"
 					+ Action.ToString() + "-"
 					+ Order_Type.ToString();
 			}

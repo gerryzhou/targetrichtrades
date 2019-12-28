@@ -43,12 +43,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region Variables
 
 		/// <summary>
-		/// Hold the trade signal from the underlining strategy
+		/// Hold the command/rule/performacne signals from the underlining strategy
 		/// The key=BarNo that holds the signal set
 		/// value=the set of signals
 		/// </summary>
-//		private SortedDictionary<int, TradeSignal> tradeSignals = 
-//			new SortedDictionary<int, TradeSignal>();
+		private SortedDictionary<int, List<TradeSignal>> commandSignals = 
+			new SortedDictionary<int, List<TradeSignal>>();
+
+		/// <summary>
+		/// Hold the event signals from the underlining strategy
+		/// The key=BarNo that holds the signal set
+		/// value=the set of signals
+		/// </summary>
+		private SortedDictionary<int, List<TradeSignal>> eventSignals = 
+			new SortedDictionary<int, List<TradeSignal>>();
+
 		#endregion
 		
 		#region Methods
@@ -134,6 +143,286 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#endregion
 
+		#region Command/Event signals function
+		public void AddTradeSignals(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, List<TradeSignal> signals) {
+			listSignals.Add(barNo, signals);
+		}
+		
+		/// <summary>
+		/// Add the signal to the list of the bar with barNo
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal"></param>
+		public void AddTradeSignal(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, TradeSignal signal) {
+			List<TradeSignal> list_signal;
+			if(!listSignals.TryGetValue(barNo, out list_signal)) {
+				list_signal = new List<TradeSignal>();
+			}
+			list_signal.Add(signal);
+			listSignals[barNo] = list_signal;
+		}
+		
+		public void AddTradeSignal(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, TradeSignalType tdSigType,
+			TradeSignalSource tdSigSrc, OrderAction ordAct, OrderType ordType) {
+			TradeSignal isig = new TradeSignal();
+			isig.BarNo = barNo;
+			isig.SignalType = tdSigType;
+			isig.SignalSource = tdSigSrc;
+			isig.Action = ordAct;
+			isig.Order_Type = ordType;
+			AddTradeSignal(barNo, listSignals, isig);
+		}
+
+		public void RemoveTradeSignal(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, string signame) { //SignalActionType saType, SupportResistanceRange<double> snr
+			List<TradeSignal> list_signal;
+			if(listSignals.TryGetValue(barNo, out list_signal)) {
+				foreach(TradeSignal s in list_signal) {
+					if(signame.Equals(s.SignalName)) {
+						Print(CurrentBar + ": Removed--" + s.BarNo + "," + s.SignalName);
+						list_signal.Remove(s);
+						break;
+					}
+				}
+			}		
+
+			listSignals[barNo] = list_signal;
+		}
+			
+		public int GetLastTradeSignalBarNo(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals) {
+			int k = -1;
+			foreach(int kk in listSignals.Keys.Reverse()) {
+				if(kk < barNo) {
+					k = kk;
+					break;
+				}
+			}
+			return k;
+		}
+		
+		/// <summary>
+		/// Get the signal list for the bar 
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <returns></returns>
+		public List<TradeSignal> GetTradeSignals(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals) {
+			List<TradeSignal> list_signal;
+			if(!listSignals.TryGetValue(barNo, out list_signal))
+				return null;
+			else
+				return list_signal;
+		}
+
+		/// <summary>
+		/// Get the last signal list before the barNo
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <returns></returns>
+		public List<TradeSignal> GetLastTradeSignals(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals) {
+			return GetTradeSignals(GetLastTradeSignalBarNo(barNo, listSignals), listSignals);
+		}
+		
+		/// <summary>
+		/// Get the signal from bar with barNo and the signal_name
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal_name"></param>
+		/// <returns></returns>
+		public TradeSignal GetTradeSignalByName(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, string signal_name) {
+			List<TradeSignal> list_signal = GetTradeSignals(barNo, listSignals);
+			if(list_signal != null) {
+				foreach(TradeSignal sig in list_signal) {
+					if(signal_name.Equals(sig.SignalName))
+						return sig;
+				}
+			}
+			
+			return null;			
+		}
+
+		/// <summary>
+		/// Get the last signal before barNo by signal_name
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal_name"></param>
+		/// <returns></returns>
+		public TradeSignal GetLastTradeSignalByName(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, string signal_name) {
+			int k = barNo;
+			foreach(int kk in listSignals.Keys.Reverse()) {
+				if(kk < k) {
+					TradeSignal sig = GetTradeSignalByName(k, listSignals, signal_name);
+					if(sig != null) return sig;
+					k = kk;
+				}
+			}
+			return null;			
+		}
+		
+		/// <summary>
+		/// Get the signal list for the bar by signal type
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal_type"></param>
+		/// <returns></returns>
+		public List<TradeSignal> GetTradeSignalByType(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, TradeSignalType signal_type) {
+			List<TradeSignal> list_signal = GetTradeSignals(barNo, listSignals);
+			if(list_signal != null) {				
+				List<TradeSignal> list_sigByType = new List<TradeSignal>();
+				foreach(TradeSignal sig in list_signal) {
+					if(signal_type == sig.SignalType)
+						list_sigByType.Add(sig);
+				}
+				if(list_sigByType.Count > 0)
+					return list_sigByType;
+			}
+			
+			return null;
+		}		
+
+		/// <summary>
+		/// Get last signal list before barNo by signal type
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal_type"></param>
+		/// <returns></returns>
+		public List<TradeSignal> GetLastTradeSignalByType(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, TradeSignalType signal_type) {
+			int k = barNo;
+			foreach(int kk in listSignals.Keys.Reverse()) {
+				if(kk < k) {
+					List<TradeSignal> sigs = GetTradeSignalByType(k, listSignals, signal_type);
+					if(sigs != null) return sigs;
+					k = kk;
+				}
+			}
+			return null;		
+		}
+		
+		/// <summary>
+		/// Get the signal list for the bar by signal source
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal_type"></param>
+		/// <returns></returns>
+		public List<TradeSignal> GetTradeSignalBySource(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, TradeSignalSource signal_src) {
+			List<TradeSignal> list_signal = GetTradeSignals(barNo, listSignals);
+			if(list_signal != null) {
+				List<TradeSignal> list_sigByType = new List<TradeSignal>();
+				foreach(TradeSignal sig in list_signal) {
+					if(signal_src == sig.SignalSource)
+						list_sigByType.Add(sig);
+				}
+				if(list_sigByType.Count > 0)
+					return list_sigByType;
+			}
+			
+			return null;
+		}		
+
+		/// <summary>
+		/// Get last signal list before barNo by signal source
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signal_type"></param>
+		/// <returns></returns>
+		public List<TradeSignal> GetLastTradeSignalBySource(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, TradeSignalSource signal_src) {
+			int k = barNo;
+			foreach(int kk in listSignals.Keys.Reverse()) {
+				if(kk < k) {
+					List<TradeSignal> sigs = GetTradeSignalBySource(k, listSignals, signal_src);
+					if(sigs != null) return sigs;
+					k = kk;
+				}
+			}
+			return null;		
+		}
+		
+		/// <summary>
+		/// Get the signal from bar with barNo and the OrderActionType
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signalActionType"></param>
+		/// <returns></returns>
+		public TradeSignal GetTradeSignalByActionType(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, OrderAction ord_actiontype) {
+			List<TradeSignal> list_signal = GetTradeSignals(barNo, listSignals);
+			if(list_signal != null) {
+				foreach(TradeSignal sig in list_signal) {
+					if(sig.Action != null && 
+						ord_actiontype.Equals(sig.Action))
+						return sig;
+				}
+			}
+			
+			return null;			
+		}
+
+		/// <summary>
+		/// Get the last signal before barNo by OrderActionType
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signalActionType"></param>
+		/// <returns></returns>
+		public TradeSignal GetLastTradeSignalByActionType(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, OrderAction ord_actiontype) {
+			int k = barNo;
+			foreach(int kk in listSignals.Keys.Reverse()) {				
+				if(kk < k) {
+					Print(CurrentBar + ": kk,k=" + kk + "," + k);
+					TradeSignal sig = GetTradeSignalByActionType(k, listSignals, ord_actiontype);
+					if(sig != null) return sig;
+					k = kk;
+				}
+			}
+			return null;			
+		}
+		
+		/// <summary>
+		/// Get the signal from bar with barNo and the OrderType
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signalActionType"></param>
+		/// <returns></returns>
+		public TradeSignal GetTradeSignalByOrderType(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, OrderType ord_type) {
+			List<TradeSignal> list_signal = GetTradeSignals(barNo, listSignals);
+			if(list_signal != null) {
+				foreach(TradeSignal sig in list_signal) {
+					if(sig.Order_Type != null && 
+						ord_type.Equals(sig.Order_Type))
+						return sig;
+				}
+			}
+			
+			return null;			
+		}
+
+		/// <summary>
+		/// Get the last signal before barNo by OrderType
+		/// </summary>
+		/// <param name="barNo"></param>
+		/// <param name="signalActionType"></param>
+		/// <returns></returns>
+		public TradeSignal GetLastTradeSignalByOrderType(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, OrderType ord_type) {
+			int k = barNo;
+			foreach(int kk in listSignals.Keys.Reverse()) {				
+				if(kk < k) {
+					Print(CurrentBar + ": kk,k=" + kk + "," + k);
+					TradeSignal sig = GetTradeSignalByOrderType(k, listSignals, ord_type);
+					if(sig != null) return sig;
+					k = kk;
+				}
+			}
+			return null;			
+		}
+		
+		public void PrintTradeSignal(SortedDictionary<int, List<TradeSignal>> listSignals) {
+			foreach(KeyValuePair<int, List<TradeSignal>> sig in listSignals) {
+				List<TradeSignal> list_signal = sig.Value;
+				int key = sig.Key;
+				if(list_signal != null) {
+					foreach(TradeSignal s in list_signal) {
+						Print(key + ":" + s.BarNo + "," + s.SignalName);
+					}
+				}
+			}
+		}
+		#endregion
         #region Properties
 
         #endregion		
