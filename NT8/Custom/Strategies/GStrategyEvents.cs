@@ -54,7 +54,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.Update();
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);
 			CheckCmd(); //Command trigger
-			CheckPerformance(); //Performance trigger
+			CheckPerformance(); //Performance/Rule trigger
 			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
 			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);			

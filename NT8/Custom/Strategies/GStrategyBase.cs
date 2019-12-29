@@ -37,7 +37,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if (State == State.SetDefaults)
 			{
-				Print(this.Name + "set defaults called....");
+				string ud_dir = NinjaTrader.Core.Globals.UserDataDir;
+				Print(this.Name + "set defaults called...." + ud_dir);
 				SetInitParams();
 //				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.TriangleRight, "CustomPlot1");
 //				AddLine(Brushes.Orange, 1, "CustomLine1");

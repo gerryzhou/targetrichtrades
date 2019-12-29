@@ -46,6 +46,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return cmdObj;
 		}
 		
+		/// <summary>
+		/// Replaced by PutTrade function;
+		/// </summary>
 		public virtual void ExecuteCommand() {
 			switch(AlgoMode) {
 				case AlgoModeType.Liquidate: // 0=liquidate; 
