@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -48,8 +48,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
-			double inputPeriod	= Input[Math.Min(CurrentBar, Period)];
-			Value[0]			= ((Input[0] - inputPeriod) / inputPeriod) * 100;
+			double inputPeriod = Input[Math.Min(CurrentBar, Period)];
+			
+			if (inputPeriod <= 0)
+				return;
+			
+			Value[0] = ((Input[0] - inputPeriod) / inputPeriod) * 100;
 		}
 
 		#region Properties

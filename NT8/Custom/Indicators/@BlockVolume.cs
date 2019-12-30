@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -52,16 +52,16 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		private void CalculateBlockVolume(bool forceCurrentBar)
 		{
-			if ((Instrument.MasterInstrument.InstrumentType == Cbi.InstrumentType.CryptoCurrency ? Core.Globals.ToCryptocurrencyVolume((long)Volume[0]) : Volume[0]) >= BlockSize)
+			bool inTransition 	= State == State.Realtime && BarsArray[1].Count - 1 - CurrentBars[1] > 1;
+			int whatBar 		= State == State.Historical || inTransition || Calculate != Calculate.OnBarClose || forceCurrentBar ? CurrentBars[1] : Math.Min(CurrentBars[1] + 1, BarsArray[1].Count - 1);
+			
+			if ((Instrument.MasterInstrument.InstrumentType == Cbi.InstrumentType.CryptoCurrency ? Core.Globals.ToCryptocurrencyVolume((long)BarsArray[1].GetVolume(whatBar)) : BarsArray[1].GetVolume(whatBar)) >= BlockSize)
 			{
-				bool inTransition = State == State.Realtime && BarsArray[1].Count - 1 - CurrentBars[1] > 1;
-				
 				if (!inTransition && hasCarriedOverTransitionTick && !forceCurrentBar && Calculate == Calculate.OnBarClose)
 					CalculateBlockVolume(true);
 				
-				int whatBar 					= State == State.Historical || inTransition || Calculate != Calculate.OnBarClose || forceCurrentBar ? CurrentBars[1] : Math.Min(CurrentBars[1] + 1, BarsArray[1].Count - 1);
 				hasCarriedOverTransitionTick 	= inTransition;
-				blockValue 						+= CountType == CountType.Volume ? (Instrument.MasterInstrument.InstrumentType == Cbi.InstrumentType.CryptoCurrency ? Core.Globals.ToCryptocurrencyVolume((long)Volumes[1].GetValueAt(whatBar)) : Volumes[1].GetValueAt(whatBar)) : 1;
+				blockValue 						+= CountType == CountType.Volume ? (Instrument.MasterInstrument.InstrumentType == Cbi.InstrumentType.CryptoCurrency ? Core.Globals.ToCryptocurrencyVolume((long)BarsArray[1].GetVolume(whatBar)) : BarsArray[1].GetVolume(whatBar)) : 1;
 			}
 		}
 		

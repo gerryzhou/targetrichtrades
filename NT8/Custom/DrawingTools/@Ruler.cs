@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
 using NinjaTrader.Cbi;
+using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.Data;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Chart;
@@ -25,7 +26,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Ruler IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class Ruler : DrawingTool
 	{
 		private const int 						cursorSensitivity 			= 15;
@@ -35,8 +35,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		private SharpDX.DirectWrite.TextFormat	textFormat;
 		private SharpDX.DirectWrite.TextLayout	textLayout;
 		private Brush							textBrush;
-		private DeviceBrush						textDeviceBrush				= new DeviceBrush();
-		private DeviceBrush						textBackgroundDeviceBrush	= new DeviceBrush();
+		private	readonly DeviceBrush			textDeviceBrush				= new DeviceBrush();
+		private	readonly DeviceBrush			textBackgroundDeviceBrush	= new DeviceBrush();
 		private string							yValueString;
 		private string 							timeText;
 		private ValueUnit						yValueDisplayUnit			= ValueUnit.Price;
@@ -125,6 +125,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 					Vector	endToTextVector		= txtAnchorPoint - endAnchorPoint;
 
 					//Text Outline Box Path as well
+					UpdateTextLayout(chartControl, ChartPanel, chartScale);
 					Point bottomLeft			= new Point(txtAnchorPoint.X - textLayout.MaxWidth - textMargin, txtAnchorPoint.Y);
 					Point topLeft				= new Point(bottomLeft.X, txtAnchorPoint.Y - textLayout.MaxHeight - 2 * textMargin);
 					Point topRight				= new Point(txtAnchorPoint.X, txtAnchorPoint.Y - textLayout.MaxHeight - 2 * textMargin);
@@ -145,7 +146,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			}
 		}
 
-		public override sealed Point[] GetSelectionPoints(ChartControl chartControl, ChartScale chartScale)
+		public sealed override Point[] GetSelectionPoints(ChartControl chartControl, ChartScale chartScale)
 		{
 			ChartPanel	chartPanel	= chartControl.ChartPanels[chartScale.PanelIndex];
 			Point		startPoint	= StartAnchor.GetPoint(chartControl, chartPanel, chartScale);
@@ -157,6 +158,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			return new[] { startPoint, textPoint, endPoint };
 		}
 		
+		public override object Icon { get { return Icons.DrawRuler; } }
+
 		public override bool IsVisibleOnChart(ChartControl chartControl, ChartScale chartScale, DateTime firstTimeOnChart, DateTime lastTimeOnChart)
 		{
 			if (DrawingState == DrawingState.Building)
@@ -314,7 +317,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			Point lineEndPoint					= EndAnchor.GetPoint(chartControl, panel, chartScale);
 		
 			// align to full pixel to avoid unneeded aliasing
-			double strokePixAdjust				= LineColor.Width % 2 == 0 ? 0.5d : 0d;
+			double strokePixAdjust				= (LineColor.Width % 2).ApproxCompare(0) == 0 ? 0.5d : 0d;
 			Vector strokePixAdjustVec			= new Vector(strokePixAdjust, strokePixAdjust);
 
 			SharpDX.Vector2 endVec				= (lineEndPoint + strokePixAdjustVec).ToVector2();
@@ -332,8 +335,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 				Brush borderBrush						= Application.Current.FindResource("BorderThinBrush") as Brush;
 				object thicknessResource				= Application.Current.FindResource("BorderThinThickness");
 				double thickness						= thicknessResource as double? ?? 1;
-				Stroke textBorderStroke					= new Stroke(borderBrush ?? LineColor.Brush, DashStyleHelper.Solid, Convert.ToSingle(thickness));
-				textBorderStroke.RenderTarget			= RenderTarget;
+				Stroke textBorderStroke					= new Stroke(borderBrush ?? LineColor.Brush, DashStyleHelper.Solid,Convert.ToSingle(thickness)) { RenderTarget = RenderTarget };
 
 				Point			textEndPoint			= TextAnchor.GetPoint(chartControl, panel, chartScale);
 				SharpDX.Vector2 textEndVec				= (textEndPoint + strokePixAdjustVec).ToVector2();
@@ -399,18 +401,17 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			{
 				case ValueUnit.Price	: yValueString = chartBars.Bars.Instrument.MasterInstrument.FormatPrice(yDiffPrice); break;
 				case ValueUnit.Currency	: 
-					if (AttachedTo.Instrument.MasterInstrument.InstrumentType == InstrumentType.Forex)
-						yValueString = Core.Globals.FormatCurrency((int)Math.Abs(yDiffTicks) * Account.All[0].ForexLotSize * (AttachedTo.Instrument.MasterInstrument.TickSize * AttachedTo.Instrument.MasterInstrument.PointValue));
-					else
-						yValueString = Core.Globals.FormatCurrency((int)Math.Abs(yDiffTicks) * (AttachedTo.Instrument.MasterInstrument.TickSize * AttachedTo.Instrument.MasterInstrument.PointValue)); 
-						break;
+					yValueString = AttachedTo.Instrument.MasterInstrument.InstrumentType == InstrumentType.Forex
+						? Core.Globals.FormatCurrency((int)Math.Abs(yDiffTicks) * Account.All[0].ForexLotSize * (AttachedTo.Instrument.MasterInstrument.TickSize * AttachedTo.Instrument.MasterInstrument.PointValue))
+						: Core.Globals.FormatCurrency((int)Math.Abs(yDiffTicks) * (AttachedTo.Instrument.MasterInstrument.TickSize * AttachedTo.Instrument.MasterInstrument.PointValue)); 
+					break;
 				case ValueUnit.Percent	: yValueString = (yDiffPrice / AttachedTo.Instrument.MasterInstrument.RoundToTickSize(StartAnchor.Price)).ToString("P", Core.Globals.GeneralOptions.CurrentCulture); break;
 				case ValueUnit.Ticks	: yValueString = yDiffTicks.ToString("F0"); break;
 				case ValueUnit.Pips		:
 					// show tenth pips (if available)
 					double pips = Math.Abs(yDiffTicks/10);
 					char decimalChar = Char.Parse(Core.Globals.GeneralOptions.CurrentCulture.NumberFormat.NumberDecimalSeparator);
-					yValueString = Int32.Parse(pips.ToString("F1").Split(new Char[]{ decimalChar })[1]) > 0 ? pips.ToString("F1").Replace(decimalChar, '\'') : pips.ToString("F0");
+					yValueString = Int32.Parse(pips.ToString("F1").Split(decimalChar)[1]) > 0 ? pips.ToString("F1").Replace(decimalChar, '\'') : pips.ToString("F0");
 					break;
 			}
 		
@@ -432,13 +433,13 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 											timeDiff.Subtract(new TimeSpan(timeDiff.Days, 0, 0, 0)).Duration().ToString()) : timeDiff.Duration().ToString();
 			}
 
-            Point startPoint = StartAnchor.GetPoint(chartControl, chartPanel, chartScale);
-            Point endPoint = EndAnchor.GetPoint(chartControl, chartPanel, chartScale);
-            int startIdx = chartBars.GetBarIdxByX(chartControl, (int)startPoint.X);
-            int endIdx = chartBars.GetBarIdxByX(chartControl, (int)endPoint.X);
-            int numBars = endIdx - startIdx;
+			Point startPoint = StartAnchor.GetPoint(chartControl, chartPanel, chartScale);
+			Point endPoint = EndAnchor.GetPoint(chartControl, chartPanel, chartScale);
+			int startIdx = chartBars.GetBarIdxByX(chartControl, (int)startPoint.X);
+			int endIdx = chartBars.GetBarIdxByX(chartControl, (int)endPoint.X);
+			int numBars = endIdx - startIdx;
 
-            SimpleFont wpfFont			= chartControl.Properties.LabelFont ?? new SimpleFont();
+			SimpleFont wpfFont			= chartControl.Properties.LabelFont ?? new SimpleFont();
 			textFormat					= wpfFont.ToDirectWriteTextFormat();
 			textFormat.TextAlignment	= SharpDX.DirectWrite.TextAlignment.Leading;
 			textFormat.WordWrapping		= SharpDX.DirectWrite.WordWrapping.NoWrap;
@@ -469,7 +470,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 				throw new ArgumentException("bad start/end date/time");
 
 			if (string.IsNullOrWhiteSpace(tag))
-				throw new ArgumentException("tag cant be null or empty", "tag");
+				throw new ArgumentException(@"tag cant be null or empty", "tag");
 
 			if (isGlobal && tag[0] != GlobalDrawingToolManager.GlobalDrawingToolTagPrefix)
 				tag = GlobalDrawingToolManager.GlobalDrawingToolTagPrefix + tag;
@@ -498,10 +499,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="textBarsAgo">The number of bars ago (x value) of the 3rd anchor point</param>
 		/// <param name="textY">The y value of the 3rd anchor point</param>
 		/// <returns></returns>
@@ -517,9 +518,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="startTime">The starting time where the draw object will be drawn.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="textTime">The time of the 3rd anchor point</param>
 		/// <param name="textY">The y value of the 3rd anchor point</param>
 		/// <returns></returns>
@@ -534,10 +535,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="textBarsAgo">The number of bars ago (x value) of the 3rd anchor point</param>
 		/// <param name="textY">The y value of the 3rd anchor point</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
@@ -555,9 +556,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="startTime">The starting time where the draw object will be drawn.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="textTime">The time of the 3rd anchor point</param>
 		/// <param name="textY">The y value of the 3rd anchor point</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>

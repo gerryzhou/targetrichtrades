@@ -12,8 +12,11 @@ using System.Windows.Media;
 using System.Xml.Serialization;
 using System.Reflection;
 using System.IO;
+using System.Web.Script.Serialization;
+
 using log4net;
 using log4net.Config;
+
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Chart;
@@ -61,6 +64,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 			}
 			else if (State == State.Configure)
 			{
+				GetConfigItem("", "");
 				string config_file = GZLogger.GetConfigFilePath(GetConfigFileDir());
 				Print(this.Name + ":GetConfigFilePath=" + config_file);
 				XmlConfigurator.Configure(new FileInfo(@config_file));////"C:\\www\\log\\log4net.config"));
@@ -89,6 +93,10 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		}
 		
 		public string GetConfigFileDir() {
+			string ud_dir = NinjaTrader.Core.Globals.UserDataDir
+				+ "bin" + Path.DirectorySeparatorChar
+				+ "Custom" + Path.DirectorySeparatorChar;
+			Print(this.Name + ":NinjaTrader.Core.Globals.UserDataDir=" + NinjaTrader.Core.Globals.UserDataDir);
 			string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 			Print(this.Name + ":Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)=" + currentDirectory);
 			string appPath = System.AppDomain.CurrentDomain.BaseDirectory;
@@ -97,8 +105,24 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 			Print(this.Name + ":System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)=" + entryPath);
 			string curPath = System.Environment.CurrentDirectory;
 			Print(this.Name + ":System.Environment.CurrentDirectory=" + curPath);
-			return Directory.GetParent(currentDirectory).FullName;
-		}		
+			return ud_dir; //Directory.GetParent(currentDirectory).FullName;
+		}
+		
+		public string GetConfigItem(string config_file, string item_name) {
+			string json_path = GetConfigFileDir() + "ztrader.json";
+			string json = System.IO.File.ReadAllText(json_path);
+            //DataContractJsonSerializer ser = new DataContractJsonSerializer();
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            Dictionary<string, object> dic = serializer.Deserialize<Dictionary<string, object>>(json);
+            //var jsonObject = JsonValue.Parse(json);
+			foreach(KeyValuePair<string, object> ele1 in dic) 
+          { 
+              Print(string.Format("JSON={0} and {1}", ele1.Key, ele1.Value));
+          }
+			
+            string item = null;
+			return item;
+		}
 
 		#region Properties
 		[NinjaScriptProperty]

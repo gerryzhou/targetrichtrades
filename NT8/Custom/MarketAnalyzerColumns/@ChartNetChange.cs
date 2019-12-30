@@ -8,6 +8,8 @@ using System.Windows.Media;
 using System.Xml.Serialization;
 using NinjaTrader.Gui;
 
+using NinjaTrader.Core.FloatingPoint;
+
 namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	[TypeConverter("NinjaTrader.NinjaScript.MarketAnalyzerColumns.ChartNetChangeConverter")]
@@ -46,14 +48,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 				BarsPeriod				= new Data.BarsPeriod { BarsPeriodType = Data.BarsPeriodType.Minute, Value = 1 };
 				DaysBack				= 0;
 				RangeType				= Cbi.RangeType.Days;
-				To						= Core.Globals.Now.Date;
+				To						= Now.Date;
 
 				if (Instrument != null)
 				{
 					TradingHoursInstance	= Instrument.MasterInstrument.TradingHours;
 					sessionIterator			= new Data.SessionIterator(TradingHoursInstance);
 
-					if (sessionIterator.IsInSession(Core.Globals.Now, false, true))
+					if (sessionIterator.IsInSession(Now, false, true))
 					{
 						tradingDayBegin	= sessionIterator.GetTradingDayBeginLocal(sessionIterator.ActualTradingDayExchange);
 						tradingDayEnd	= sessionIterator.ActualTradingDayEndLocal;
@@ -89,6 +91,11 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 			}
 		}
 
+		private DateTime Now
+		{
+			get { return Cbi.Connection.PlaybackConnection != null ? Cbi.Connection.PlaybackConnection.Now : Core.Globals.Now; }
+		}
+
 		protected override void OnMarketData(Data.MarketDataEventArgs marketDataUpdate)
 		{
 			if (marketDataUpdate.IsReset)
@@ -105,7 +112,7 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 
 		public override void OnRender(DrawingContext dc, System.Windows.Size renderSize)
 		{
-			DateTime now = Core.Globals.Now;
+			DateTime now = Now;
 			if (now > nextTradingDayBegin)
 			{
 				tradingDayBegin			= sessionIterator.GetTradingDayBeginLocal(sessionIterator.ActualTradingDayExchange);
@@ -139,6 +146,7 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 			List<LineSegment>		lineSegmentsUp		= new List<LineSegment>();
 			int						margin				= 1;
 			double					maxCloseOnX			= double.MinValue;
+			double					minCloseOnX			= double.MinValue;
 			double					maxPrice			= double.MinValue;
 			int						maxX				= -1;
 			double					minPrice			= double.MaxValue;
@@ -173,10 +181,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 					if (time > tradingDayEnd)
 						break;
 
-					double		close	= BarsArray[0].GetClose(idx);
-					int			x		= margin + Convert.ToInt32(netWidth * time.Subtract(tradingDayBegin).TotalSeconds / Math.Max(1, tradingDayEnd.Subtract(tradingDayBegin).TotalSeconds));
-					maxCloseOnX			= x == prevX ? Math.Max(close, maxCloseOnX) : close;
-					int			y		= margin + Convert.ToInt32(((maxPrice - maxCloseOnX) / Math.Max(BarsArray[0].Instrument.MasterInstrument.TickSize, maxPrice - minPrice)) * (netHeight - margin));
+					double		close		= BarsArray[0].GetClose(idx);
+					int			x			= margin + Convert.ToInt32(netWidth * time.Subtract(tradingDayBegin).TotalSeconds / Math.Max(1, tradingDayEnd.Subtract(tradingDayBegin).TotalSeconds));
+					maxCloseOnX				= x == prevX ? Math.Max(close, maxCloseOnX) : close;
+					minCloseOnX				= x == prevX ? Math.Min(close, minCloseOnX) : close;
+					double		closeOnX	= minCloseOnX.ApproxCompare(minPrice) == 0		? minCloseOnX 
+												: maxCloseOnX.ApproxCompare(maxPrice) == 0	? maxCloseOnX 
+												: close.ApproxCompare(previousClose) > 0	? maxCloseOnX : minCloseOnX;
+					int			y			= margin + Convert.ToInt32(((maxPrice - closeOnX) / Math.Max(BarsArray[0].Instrument.MasterInstrument.TickSize, maxPrice - minPrice)) * (netHeight - margin));
 
 					if (idx == firstIdx)
 					{

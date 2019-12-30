@@ -38,13 +38,18 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 				DaysBack				= Span == ChartSpan.Week ? 7 : Span == ChartSpan.Month ? 30 : Span == ChartSpan.Year ? 365 : 1;
 				RangeType				= Cbi.RangeType.Days;
 				TradingHoursInstance	= Data.TradingHours.All.FirstOrDefault(s => s.Name == Data.TradingHours.SystemDefault);
-				To						= Core.Globals.Now.Date;
+				To						= Now.Date;
 			}
 		}
 
 		public override string Format(double value)
 		{
 			return (value == double.MinValue || Instrument == null ? string.Empty : Instrument.MasterInstrument.FormatPrice(value));
+		}
+
+		private DateTime Now
+		{
+			get { return Cbi.Connection.PlaybackConnection != null ? Cbi.Connection.PlaybackConnection.Now : Core.Globals.Now; }
 		}
 
 		protected override void OnMarketData(Data.MarketDataEventArgs marketDataUpdate)
@@ -60,17 +65,17 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 			DateTime minTime;
 			switch (Span)
 			{
-				case ChartSpan.Min1:	minTime = Core.Globals.Now.AddMinutes(-1);		break;
-				case ChartSpan.Min5:	minTime = Core.Globals.Now.AddMinutes(-5);		break;
-				case ChartSpan.Min15:	minTime = Core.Globals.Now.AddMinutes(-15);		break;
-				case ChartSpan.Min30:	minTime = Core.Globals.Now.AddMinutes(-30);		break;
-				case ChartSpan.Min60:	minTime = Core.Globals.Now.AddMinutes(-60);		break;
-				case ChartSpan.Min240:	minTime = Core.Globals.Now.AddMinutes(-240);	break;
-				case ChartSpan.Week:	minTime = Core.Globals.Now.AddDays(-7);			break;
-				case ChartSpan.Month:	minTime = Core.Globals.Now.Date.AddMonths(-1);	break;
-				case ChartSpan.Year:	minTime = Core.Globals.Now.Date.AddYears(-1);	break;
+				case ChartSpan.Min1:	minTime = Now.AddMinutes(-1);		break;
+				case ChartSpan.Min5:	minTime = Now.AddMinutes(-5);		break;
+				case ChartSpan.Min15:	minTime = Now.AddMinutes(-15);		break;
+				case ChartSpan.Min30:	minTime = Now.AddMinutes(-30);		break;
+				case ChartSpan.Min60:	minTime = Now.AddMinutes(-60);		break;
+				case ChartSpan.Min240:	minTime = Now.AddMinutes(-240);	break;
+				case ChartSpan.Week:	minTime = Now.AddDays(-7);			break;
+				case ChartSpan.Month:	minTime = Now.Date.AddMonths(-1);	break;
+				case ChartSpan.Year:	minTime = Now.Date.AddYears(-1);	break;
 				default:
-				case ChartSpan.Day:		minTime = Core.Globals.Now.AddDays(-1);			break;
+				case ChartSpan.Day:		minTime = Now.AddDays(-1);			break;
 			}
 
 			if (fillBrush == null)
@@ -83,7 +88,7 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 			int						margin			= 1;
 			double					maxCloseOnX		= double.MinValue;
 			double					maxPrice		= double.MinValue;
-			DateTime				maxTime			= Core.Globals.Now;
+			DateTime				maxTime			= Now;
 			int						maxX			= -1;
 			double					minPrice		= double.MaxValue;
 			int						minX			= margin;

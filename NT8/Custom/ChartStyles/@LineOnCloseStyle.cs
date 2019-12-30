@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -24,14 +24,7 @@ namespace NinjaTrader.NinjaScript.ChartStyles
 
 		public override object Icon
 		{
-			get
-			{
-				if (icon == null)
-				{
-					icon = NinjaTrader.Gui.Tools.Icons.ChartLineOnClose;
-				}
-				return icon;
-			}
+			get { return icon ?? (icon = Gui.Tools.Icons.ChartLineOnClose); }
 		}
 
 		public override void OnRender(ChartControl chartControl, ChartScale chartScale, ChartBars chartBars)

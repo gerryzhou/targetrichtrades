@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -28,8 +28,8 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public class UnrealizedProfitLoss : MarketAnalyzerColumn
 	{
-		private				Currency				accountDenomination		= Currency.UsDollar;
-		private	Cbi.Position	position;		// holds the position for the actual instrument
+		private	Currency		accountDenomination		= Currency.UsDollar;
+		private	Cbi.Position	position;				// holds the position for the actual instrument
 
 		protected override void OnStateChange()
 		{
@@ -77,8 +77,8 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 		{
 			if (positionUpdate.Position.Account.Name == AccountName && positionUpdate.Position.Instrument == Instrument)
 			{
-				position = (positionUpdate.Operation == Cbi.Operation.Remove ? null : positionUpdate.Position);
-				CurrentValue = (position == null ? 0 : position.GetUnrealizedProfitLoss(Cbi.PerformanceUnit.Currency));
+				position 			= (positionUpdate.Operation == Cbi.Operation.Remove ? null : positionUpdate.Position);
+				CurrentValue 		= (position == null ? 0 : position.GetUnrealizedProfitLoss(Cbi.PerformanceUnit.Currency));
 				accountDenomination = positionUpdate.Position.Account.Denomination;
 			}
 		}

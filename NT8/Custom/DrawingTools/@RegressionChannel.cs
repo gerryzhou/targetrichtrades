@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -59,7 +59,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Regression Channel IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	[TypeConverter("NinjaTrader.NinjaScript.DrawingTools.RegressionChannelTypeConverter")]
 	public class RegressionChannel : DrawingTool
 	{
@@ -86,6 +85,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 
 		[Display(Order = 2)]
 		public ChartAnchor EndAnchor	{ get; set; }
+
+		public override object Icon { get { return Gui.Tools.Icons.DrawRegressionChannel; } }
 
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NinjaScriptDrawingToolRegressionChannelLowerChannel", GroupName = "NinjaScriptLines", Order = 3)]
 		public Stroke LowerChannelStroke { get; set; }
@@ -118,26 +119,26 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 
 		public double[] CalculateRegressionPriceValues(Bars baseBars, int startIndex, int endIndex)
 		{
-            double middleStartPrice, middleEndPrice, upperStartPrice, upperEndPrice, lowerStartPrice, lowerEndPrice = 0;
+			double middleStartPrice, middleEndPrice, upperStartPrice, upperEndPrice, lowerStartPrice, lowerEndPrice = 0;
 
-            if (startIndex == endIndex)
-            {
-                middleStartPrice = GetBarPrice(baseBars, endIndex);
-                middleEndPrice = GetBarPrice(baseBars, endIndex);
-                upperStartPrice = GetBarPrice(baseBars, endIndex);
-                upperEndPrice = GetBarPrice(baseBars, endIndex);
-                lowerStartPrice = GetBarPrice(baseBars, endIndex);
-                lowerEndPrice = GetBarPrice(baseBars, endIndex);
+			if (startIndex == endIndex)
+			{
+				middleStartPrice = GetBarPrice(baseBars, endIndex);
+				middleEndPrice = GetBarPrice(baseBars, endIndex);
+				upperStartPrice = GetBarPrice(baseBars, endIndex);
+				upperEndPrice = GetBarPrice(baseBars, endIndex);
+				lowerStartPrice = GetBarPrice(baseBars, endIndex);
+				lowerEndPrice = GetBarPrice(baseBars, endIndex);
 
-                return new double[] {
-                upperStartPrice,
-                upperEndPrice,
-                middleStartPrice,
-                middleEndPrice,
-                lowerStartPrice,
-                lowerEndPrice
-            };
-            }
+				return new double[] {
+				upperStartPrice,
+				upperEndPrice,
+				middleStartPrice,
+				middleEndPrice,
+				lowerStartPrice,
+				lowerEndPrice
+			};
+			}
 
 			// ignore actual positions and just count bars
 			int beginIndex		=			 (startIndex < endIndex) ? startIndex : endIndex;
@@ -270,7 +271,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 				}
 			}
 
-            return new double[] {
+			return new double[] {
 				upperStartPrice,
 				upperEndPrice,
 				middleStartPrice,
@@ -291,11 +292,11 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 
 			Bars baseBars = GetAttachedToChartBars().Bars;
 
-            // note: dont use anchor slotIndex directly, it can be irrelevant on time based charts (or not yet set on EQ charts)
-            int startIndex			= baseBars.GetBar(StartAnchor.Time);
+			// note: dont use anchor slotIndex directly, it can be irrelevant on time based charts (or not yet set on EQ charts)
+			int startIndex			= baseBars.GetBar(StartAnchor.Time);
 			int endIndex			= baseBars.GetBar(EndAnchor.Time);
 
-            double[] regressionPrices = CalculateRegressionPriceValues(baseBars, startIndex, endIndex);
+			double[] regressionPrices = CalculateRegressionPriceValues(baseBars, startIndex, endIndex);
 
 			return new []
 			{
@@ -484,8 +485,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		public override bool IsVisibleOnChart(ChartControl chartControl, ChartScale chartScale, DateTime firstTimeOnChart, DateTime lastTimeOnChart)
 		{
 			Point[] regressionPoints = CreateRegressionPoints(chartControl, chartScale);
-            if (regressionPoints == null)
-                return false;
+			if (regressionPoints == null)
+				return false;
 
 			Point		startPoint	= regressionPoints[2];
 			Point		endPoint	= regressionPoints[3];
@@ -515,13 +516,13 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			return false;
 		}
 
-        public override void OnBarsChanged()
-        {
-			if(cControl != null && cScale != null)
+		public override void OnBarsChanged()
+		{
+			if (cControl != null && cScale != null)
 				SetAnchorsToRegression(cControl, cScale);
-        }
+		}
 
-        public override void OnCalculateMinMax()
+		public override void OnCalculateMinMax()
 		{
 			MinValue = double.MaxValue;
 			MaxValue = double.MinValue;
@@ -544,12 +545,12 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 						dataPoint.CopyDataValues(EndAnchor);
 						StartAnchor.IsEditing = false;
 					}
-                    else if (EndAnchor.IsEditing)
-                    {
-                        EndAnchor.IsEditing = false;
-                    }
+					else if (EndAnchor.IsEditing)
+					{
+						EndAnchor.IsEditing = false;
+					}
 
-                    if (!StartAnchor.IsEditing && !EndAnchor.IsEditing)
+					if (!StartAnchor.IsEditing && !EndAnchor.IsEditing)
 					{
 						DrawingState = DrawingState.Normal;
 						IsSelected = false;
@@ -576,23 +577,23 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 
 		public override void OnMouseMove(ChartControl chartControl, ChartPanel chartPanel, ChartScale chartScale, ChartAnchor dataPoint)
 		{
-            if (IsLocked && DrawingState != DrawingState.Building)
+			if (IsLocked && DrawingState != DrawingState.Building)
 				return;
 
 			Bars		baseBars	= GetAttachedToChartBars().Bars;
 
 			DateTime	barMinTime	= baseBars.GetTime(0);
-            DateTime barMaxTime = DateTime.MinValue;
-            if (baseBars.BarsPeriod.BarsPeriodType == BarsPeriodType.Day
-                || baseBars.BarsPeriod.BarsPeriodType == BarsPeriodType.Week
-                || baseBars.BarsPeriod.BarsPeriodType == BarsPeriodType.Month
-                || baseBars.BarsPeriod.BarsPeriodType == BarsPeriodType.Year)
-                barMaxTime = baseBars.GetSessionEndTime(baseBars.Count - 1);
-            else
-                barMaxTime = baseBars.GetTime(baseBars.Count - 1);
+			DateTime barMaxTime = DateTime.MinValue;
+			if (baseBars.BarsPeriod.BarsPeriodType == BarsPeriodType.Day
+				|| baseBars.BarsPeriod.BarsPeriodType == BarsPeriodType.Week
+				|| baseBars.BarsPeriod.BarsPeriodType == BarsPeriodType.Month
+				|| baseBars.BarsPeriod.BarsPeriodType == BarsPeriodType.Year)
+				barMaxTime = baseBars.GetSessionEndTime(baseBars.Count - 1);
+			else
+				barMaxTime = baseBars.GetTime(baseBars.Count - 1);
 
-            // use local variables for start and end anchor with the start anchor representing the lowest X value
-            ChartAnchor startAnchor = (StartAnchor.Time < EndAnchor.Time) ? StartAnchor : EndAnchor;
+			// use local variables for start and end anchor with the start anchor representing the lowest X value
+			ChartAnchor startAnchor = (StartAnchor.Time < EndAnchor.Time) ? StartAnchor : EndAnchor;
 			ChartAnchor endAnchor	= (StartAnchor.Time < EndAnchor.Time) ? EndAnchor : StartAnchor;
 			DateTime desiredAnchorTime = dataPoint.Time;//chartControl.GetTimeByX((int) point.X);
 
@@ -653,17 +654,17 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			editingAnchor = null;
 		}
 
-        private ChartControl cControl;
-        private ChartScale cScale;
-        public override void OnRender(ChartControl chartControl, ChartScale chartScale)
+		private ChartControl cControl;
+		private ChartScale cScale;
+		public override void OnRender(ChartControl chartControl, ChartScale chartScale)
 		{
-            // save chartControl and chartScale for use in OnBarsChanged
-            cControl = chartControl;
-            cScale = chartScale;
-            // get a list of new y positions for each line in the channel
-            Point[] regressionPoints = CreateRegressionPoints(chartControl, chartScale);
-            if (regressionPoints == null)
-                return;
+			// save chartControl and chartScale for use in OnBarsChanged
+			cControl = chartControl;
+			cScale = chartScale;
+			// get a list of new y positions for each line in the channel
+			Point[] regressionPoints = CreateRegressionPoints(chartControl, chartScale);
+			if (regressionPoints == null)
+				return;
 
 			RegressionStroke.RenderTarget	= RenderTarget;
 			UpperChannelStroke.RenderTarget	= RenderTarget;
@@ -740,7 +741,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			ChartPanel chartPanel		= chartControl.ChartPanels[chartScale.PanelIndex];
 			Point[] regressionPoints	= CreateRegressionPoints(chartControl, chartScale);
 
-            StartAnchor.UpdateYFromDevicePoint(regressionPoints[2], chartScale);
+			StartAnchor.UpdateYFromDevicePoint(regressionPoints[2], chartScale);
 			EndAnchor.UpdateYFromDevicePoint(regressionPoints[3], chartScale);
 		}
 	}
@@ -823,8 +824,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// </summary>
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
 		/// <param name="brush">The brush used to color draw object</param>
 		/// <returns></returns>
 		public static RegressionChannel RegressionChannel(NinjaScriptBase owner, string tag, int startBarsAgo, int endBarsAgo, Brush brush)
@@ -854,8 +855,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
 		/// <param name="upperBrush">The brush for the upper line</param>
 		/// <param name="upperDashStyle">The DashStyle for the upper line</param>
 		/// <param name="upperWidth">Width of the upper line.</param>
@@ -916,8 +917,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// </summary>
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
 		/// <param name="templateName">The name of the drawing tool template the object will use to determine various visual properties</param>
 		/// <returns></returns>

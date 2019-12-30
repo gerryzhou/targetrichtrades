@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -160,7 +160,7 @@ namespace NinjaTrader.NinjaScript.ChartStyles
 							point1.X = x;																
 							point1.Y = chartScale.GetYByValue(transitionPoint);							
 							TransformBrush(overriddenBrush ?? Stroke.BrushDX, new RectangleF(point0.X, point0.Y - Stroke.Width, barWidth, Stroke.Width));
-							RenderTarget.DrawLine(point0, point1, Stroke.BrushDX, Stroke.Width, Stroke.StrokeStyle);				
+							RenderTarget.DrawLine(point0, point1, overriddenBrush ?? Stroke.BrushDX, Stroke.Width, Stroke.StrokeStyle);			
 							point0.X = x;																
 							point0.Y = chartScale.GetYByValue(transitionPoint);							
 							point1.X = x;																

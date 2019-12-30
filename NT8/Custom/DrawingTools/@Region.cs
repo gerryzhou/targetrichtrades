@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -22,7 +22,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Region IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class Region : DrawingTool
 	{
 		private int									areaOpacity;
@@ -45,7 +44,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		
 		[Browsable(false)]
 		public int Displacement { get; set; }
-		
+
 		[XmlIgnore]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NinjaScriptDrawingToolShapesAreaBrush", GroupName = "NinjaScriptGeneral", Order = 4)]
 		public Brush AreaBrush
@@ -163,7 +162,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			{
 				startBarIdx 	= StartAnchor.DrawnOnBar - StartAnchor.BarsAgo;
 				endBarIdx 		= EndAnchor.DrawnOnBar - EndAnchor.BarsAgo;
-				
+
 				if (startBarIdx == endBarIdx)
 				{
 					startBarIdx 	= chartBars.GetBarIdxByTime(chartControl, StartAnchor.Time);
@@ -325,7 +324,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 				
 				tmpBrush = IsInHitTest ? chartControl.SelectionBrush : OutlineStroke == null ? null : OutlineStroke.BrushDX;
 				if (tmpBrush!= null)
-					RenderTarget.DrawGeometry(polyGeo, OutlineStroke.BrushDX, OutlineStroke.Width);
+					RenderTarget.DrawGeometry(polyGeo, tmpBrush, OutlineStroke.Width);
 
 				polyGeo.Dispose();
 			}	
@@ -375,8 +374,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// </summary>
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
 		/// <param name="series">Any Series double type object such as an indicator, Close, High, Low etc.. The value of the object will represent a y value</param>
 		/// <param name="price">Any double value</param>
 		/// <param name="areaBrush">The brush used to color the fill region area of the draw object</param>
@@ -395,8 +394,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// </summary>
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
 		/// <param name="series1">Any Series double type object such as an indicator, Close, High, Low etc.. The value of the object will represent a y value.</param>
 		/// <param name="series2">Any Series double type object such as an indicator, Close, High, Low etc.. The value of the object will represent a y value.</param>
 		/// <param name="outlineBrush">The brush used to color the region outline of draw object</param>

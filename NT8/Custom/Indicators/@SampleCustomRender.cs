@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -65,7 +65,7 @@ public class SampleCustomRender : Indicator
 			}
 			else if (State == State.Historical)
 			{
-				ZOrder = -1; // default here is go below the bars and called in State.Historical
+				SetZOrder(-1); // default here is go below the bars and called in State.Historical
 			}
 		}
 

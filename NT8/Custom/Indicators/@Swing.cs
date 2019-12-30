@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -86,9 +86,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
-			double high0		= !(Input is PriceSeries) ? Input[0] : High[0];
-			double low0			= !(Input is PriceSeries) ? Input[0] : Low[0];
-			double close0		= !(Input is PriceSeries) ? Input[0] : Close[0];
+			double high0	= !(Input is PriceSeries || Input is Bars) ? Input[0] : High[0];
+			double low0		= !(Input is PriceSeries || Input is Bars) ? Input[0] : Low[0];
+			double close0	= !(Input is PriceSeries || Input is Bars) ? Input[0] : Close[0];
 
 			if (BarsArray[0].BarsType.IsRemoveLastBarSupported && CurrentBar < saveCurrentBar)
 			{
@@ -103,8 +103,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				lastLowCache.Clear();
 				for (int barsBack = Math.Min(CurrentBar, constant) - 1; barsBack >= 0; barsBack--)
 				{
-					lastHighCache.Add(!(Input is PriceSeries) ? Input[barsBack] : High[barsBack]);
-					lastLowCache.Add(!(Input is PriceSeries) ? Input[barsBack] : Low[barsBack]);
+					lastHighCache.Add(!(Input is PriceSeries || Input is Bars) ? Input[barsBack] : High[barsBack]);
+					lastLowCache.Add(!(Input is PriceSeries || Input is Bars) ? Input[barsBack] : Low[barsBack]);
 				}
 				saveCurrentBar = CurrentBar;
 				return;

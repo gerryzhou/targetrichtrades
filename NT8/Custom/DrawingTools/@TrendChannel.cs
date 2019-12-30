@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -22,7 +22,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Trend Channel IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class TrendChannel : PriceLevelContainer
 	{
 		private				int									areaOpacity;
@@ -38,6 +37,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		private				SharpDX.Vector2[]					fillRightFig;
 		private				bool								isReadyForMovingSecondLeg;
 		private				bool								updateEndAnc;
+
+		public override object Icon { get { return Gui.Tools.Icons.DrawTrendChannel; } }
 
 		[XmlIgnore]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NinjaScriptDrawingToolShapesAreaBrush", GroupName = "NinjaScriptGeneral", Order = 1)]

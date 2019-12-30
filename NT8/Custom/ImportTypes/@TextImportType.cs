@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -27,6 +27,7 @@ namespace NinjaTrader.NinjaScript.ImportTypes
 		private				bool			firstLine				= true;
 		private				bool			hasBidAsk;
 		private				bool			hasSubSecond;
+		private 			bool 			isCryptoCurrency;
 		private				StreamReader	reader;
 		private				Regex			regex;
 		private				string			separator				= string.Empty;
@@ -246,11 +247,11 @@ namespace NinjaTrader.NinjaScript.ImportTypes
 						Bid = Ask = double.MinValue;
 
 					if (BarsPeriodType != BarsPeriodType.Tick)
-						Volume = Convert.ToInt64(matches[5].Value.Trim(quotes).Trim(), cultureInfo);
+						Volume = isCryptoCurrency ? Core.Globals.FromCryptocurrencyVolume(Convert.ToDouble(matches[5].Value.Trim(quotes).Trim(), cultureInfo)) : Convert.ToInt64(matches[5].Value.Trim(quotes).Trim(), cultureInfo);
 					else if (BarsPeriodType == BarsPeriodType.Tick && !hasBidAsk)
-						Volume = Convert.ToInt64(matches[2].Value.Trim(quotes).Trim(), cultureInfo);
+						Volume = isCryptoCurrency ? Core.Globals.FromCryptocurrencyVolume(Convert.ToDouble(matches[2].Value.Trim(quotes).Trim(), cultureInfo)) : Convert.ToInt64(matches[2].Value.Trim(quotes).Trim(), cultureInfo);
 					else // PeriodType == Data.PeriodType.Tick && hasBidAsk
-						Volume = Convert.ToInt64(matches[4].Value.Trim(quotes).Trim(), cultureInfo);
+						Volume = isCryptoCurrency ? Core.Globals.FromCryptocurrencyVolume(Convert.ToDouble(matches[4].Value.Trim(quotes).Trim(), cultureInfo)) : Convert.ToInt64(matches[4].Value.Trim(quotes).Trim(), cultureInfo);
 
 					HasValidDataPoint = true;
 					return;
@@ -272,19 +273,21 @@ namespace NinjaTrader.NinjaScript.ImportTypes
 			if (FileNames == null)
 				return;
 
-			while (Instrument == null && currentInstrumentIdx + 1< FileNames.Length)
+			while (Instrument == null && currentInstrumentIdx + 1 < FileNames.Length)
 			{
 				FileInfo fileInfo		= new FileInfo(FileNames[++currentInstrumentIdx]);
-				string instrumentName	= fileInfo.Name.Replace(".Ask.", ".").Replace(".Bid.", ".").Replace(".Last.", ".");
-				Instrument				= Cbi.Instrument.GetInstrumentFuzzy(fileInfo.Extension.Length == 4 && instrumentName.Length > fileInfo.Extension.Length
-												? instrumentName.Substring(0, instrumentName.Length - fileInfo.Extension.Length).ToUpperInvariant() 
-												: instrumentName.ToUpperInvariant());
+				string instrumentName	= fileInfo.Name.ToLowerInvariant().Replace(".ask.", ".").Replace(".bid.", ".").Replace(".last.", ".");
+				Instrument				= Cbi.Instrument.GetInstrument(fileInfo.Extension.Length == 4 && instrumentName.Length > fileInfo.Extension.Length
+												? instrumentName.Substring(0, instrumentName.Length - fileInfo.Extension.Length).ToUpperInvariant()
+												: instrumentName.ToUpperInvariant(), true);
 
 				if (Instrument == null)
 				{
 					Cbi.Log.Process(typeof (Custom.Resource), "ImportTypeNinjaTraderInstrumentNotSupported", new object[] {FileNames[currentInstrumentIdx]}, Cbi.LogLevel.Error, Cbi.LogCategories.Default);
 					continue;
 				}
+
+				isCryptoCurrency 		= Instrument.MasterInstrument.InstrumentType == Cbi.InstrumentType.CryptoCurrency;
 
 				try
 				{
@@ -331,7 +334,7 @@ namespace NinjaTrader.NinjaScript.ImportTypes
 						return;
 					}
 
-					if (dialog.FileNames == null || dialog.FileNames.Length <= 0) 
+					if (dialog.FileNames.Length <= 0) 
 					{
 						SetState(State.Terminated);
 						return;

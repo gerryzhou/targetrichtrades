@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -21,7 +21,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an object that exposes information regarding an Andrews Pitchfork IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class AndrewsPitchfork : PriceLevelContainer
 	{
 		[TypeConverter("NinjaTrader.Custom.ResourceEnumConverter")]
@@ -54,6 +53,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 
 		[Display(ResourceType=typeof(Custom.Resource), Name="NinjaScriptDrawingToolFibonacciTimeExtensionsShowText", GroupName="NinjaScriptGeneral")]
 		public bool IsTextDisplayed			{ get; set; }
+
+		public override object Icon { get { return Gui.Tools.Icons.DrawAndrewsPitchfork; } }
 
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NinjaScriptDrawingToolPriceLevelsOpacity", GroupName = "NinjaScriptGeneral")]
 		public int PriceLevelOpacity		{ get; set; }
@@ -295,9 +296,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			{
 				double levelPrice	= (startPrice + ((priceLevel.Value / 100) * totalPriceRange));
 				float pixelY		= chartScale.GetYByValue(levelPrice);
-				float pixelX		= anchorExtensionPoint.X > anchorEndPoint.X ? 
-					(float)(anchorExtensionPoint.X - (Math.Abs((anchorEndPoint.X - anchorExtensionPoint.X) * (priceLevel.Value / 100)))) :
-					(float)(anchorExtensionPoint.X + ((anchorEndPoint.X - anchorExtensionPoint.X) * (priceLevel.Value / 100)));
+				float pixelX		= anchorExtensionPoint.X > anchorEndPoint.X ?
+					priceLevel.Value >= 0 ? (float)(anchorExtensionPoint.X - (Math.Abs((anchorEndPoint.X - anchorExtensionPoint.X) * (priceLevel.Value / 100)))) : (float)(anchorExtensionPoint.X + ((anchorEndPoint.X - anchorExtensionPoint.X) * (priceLevel.Value / 100))):
+					priceLevel.Value >= 0 ? (float)(anchorExtensionPoint.X + ((anchorEndPoint.X - anchorExtensionPoint.X) * (priceLevel.Value / 100))) : (float)(anchorExtensionPoint.X - (Math.Abs((anchorEndPoint.X - anchorExtensionPoint.X) * (priceLevel.Value / 100))));
 
 				Point startPoint	= new Point(pixelX, pixelY);
 				Point endPoint		= new Point(startPoint.X + (midPointExtension.X - anchorStartPoint.X), startPoint.Y + (midPointExtension.Y - anchorStartPoint.Y));
@@ -625,11 +626,11 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="anchor1BarsAgo">The number of bars ago (x value) of the 1st anchor point</param>
-		/// <param name="anchor1Y">The y value of the 1st anchor point</param>
-		/// <param name="anchor2BarsAgo">The number of bars ago (x value) of the 2nd anchor point</param>
-		/// <param name="anchor2Y">The y value of the 2nd anchor point</param>
-		/// <param name="anchor3BarsAgo">The number of bars ago (x value) of the 3rd anchor point</param>
-		/// <param name="anchor3Y">The y value of the 3rd anchor point</param>
+		/// <param name="anchor1Y">The y value coordinate of the first anchor point</param>
+		/// <param name="anchor2BarsAgo">The number of bars ago (x axis coordinate) to draw the second anchor point</param>
+		/// <param name="anchor2Y">The y value coordinate of the second anchor point</param>
+		/// <param name="anchor3BarsAgo">The number of bars ago (x axis coordinate) to draw the third anchor point</param>
+		/// <param name="anchor3Y">The y value coordinate of the third anchor point</param>
 		/// <param name="brush">The brush used to color draw object</param>
 		/// <param name="dashStyle">The dash style used for the lines of the object.</param>
 		/// <param name="width">The width of the draw object</param>
@@ -652,12 +653,12 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="anchor1Time">The time of the 1st anchor point</param>
-		/// <param name="anchor1Y">The y value of the 1st anchor point</param>
-		/// <param name="anchor2Time">The time of the 2nd anchor point</param>
-		/// <param name="anchor2Y">The y value of the 2nd anchor point</param>
-		/// <param name="anchor3Time">The time of the 3rd anchor point</param>
-		/// <param name="anchor3Y">The y value of the 3rd anchor point</param>
+		/// <param name="anchor1Time">The time at which to draw the first anchor point</param>
+		/// <param name="anchor1Y">The y value coordinate of the first anchor point</param>
+		/// <param name="anchor2Time">The time at which to draw the second anchor point</param>
+		/// <param name="anchor2Y">The y value coordinate of the second anchor point</param>
+		/// <param name="anchor3Time">The time at which to draw the third anchor point</param>
+		/// <param name="anchor3Y">The y value coordinate of the third anchor point</param>
 		/// <param name="brush">The brush used to color draw object</param>
 		/// <param name="dashStyle">The dash style used for the lines of the object</param>
 		/// <param name="width">The width of the draw object</param>
@@ -681,11 +682,11 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="anchor1BarsAgo">The number of bars ago (x value) of the 1st anchor point</param>
-		/// <param name="anchor1Y">The y value of the 1st anchor point</param>
-		/// <param name="anchor2BarsAgo">The number of bars ago (x value) of the 2nd anchor point</param>
-		/// <param name="anchor2Y">The y value of the 2nd anchor point</param>
-		/// <param name="anchor3BarsAgo">The number of bars ago (x value) of the 3rd anchor point</param>
-		/// <param name="anchor3Y">The y value of the 3rd anchor point</param>
+		/// <param name="anchor1Y">The y value coordinate of the first anchor point</param>
+		/// <param name="anchor2BarsAgo">The number of bars ago (x axis coordinate) to draw the second anchor point</param>
+		/// <param name="anchor2Y">The y value coordinate of the second anchor point</param>
+		/// <param name="anchor3BarsAgo">The number of bars ago (x axis coordinate) to draw the third anchor point</param>
+		/// <param name="anchor3Y">The y value coordinate of the third anchor point</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
 		/// <param name="templateName">The name of the drawing tool template the object will use to determine various visual properties</param>
 		/// <returns></returns>
@@ -704,15 +705,15 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <summary>
 		/// Draws an Andrew's Pitchfork.
 		/// </summary>
-		/// <param name="owner">The owner.</param>
-		/// <param name="tag">The tag.</param>
-		/// <param name="isAutoScale">if set to <c>true</c> [is automatic scale].</param>
-		/// <param name="anchor1Time">The time of the 1st anchor point</param>
-		/// <param name="anchor1Y">The y value of the 1st anchor point</param>
-		/// <param name="anchor2Time">The time of the 2nd anchor point</param>
-		/// <param name="anchor2Y">The y value of the 2nd anchor point</param>
-		/// <param name="anchor3Time">The time of the 3rd anchor point</param>
-		/// <param name="anchor3Y">The y value of the 3rd anchor point</param>
+		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
+		/// <param name="tag">A user defined unique id used to reference the draw object</param>
+		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
+		/// <param name="anchor1Time">The time at which to draw the first anchor point</param>
+		/// <param name="anchor1Y">The y value coordinate of the first anchor point</param>
+		/// <param name="anchor2Time">The time at which to draw the second anchor point</param>
+		/// <param name="anchor2Y">The y value coordinate of the second anchor point</param>
+		/// <param name="anchor3Time">The time at which to draw the third anchor point</param>
+		/// <param name="anchor3Y">The y value coordinate of the third anchor point</param>
 		/// <param name="isGlobal">if set to <c>true</c> [is global].</param>
 		/// <param name="templateName">Name of the template.</param>
 		/// <returns></returns>

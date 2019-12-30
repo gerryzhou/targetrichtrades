@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -23,7 +23,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Text IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class Text : DrawingTool
 	{
 		private		Brush							areaBrush;
@@ -41,6 +40,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		private		string							text;
 		private		Popup							popup;
 		
+		public override object Icon { get { return Gui.Tools.Icons.DrawText; } }
+
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NinjaScriptDrawingToolTextAlignment", GroupName = "NinjaScriptGeneral", Order = 7)]
 		public TextAlignment Alignment
 		{
@@ -183,10 +184,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 
 			Rect				outLineRect		= GetCurrentRect(layoutRect, outlinePadding); // this will add padding to layoutRect for us
 			SharpDX.RectangleF	outlineRectDx	= new SharpDX.RectangleF((float)outLineRect.X, (float)outLineRect.Y, (float)outLineRect.Width, (float)outLineRect.Height);
-
-			textBrushDevice	.RenderTarget	= RenderTarget;
-			areaBrushDevice	.RenderTarget	= RenderTarget;
-			OutlineStroke	.RenderTarget	= RenderTarget;
+			Stroke				outlineStroke	= OutlineStroke;
+			textBrushDevice	.RenderTarget		= RenderTarget;
+			areaBrushDevice	.RenderTarget		= RenderTarget;
+			outlineStroke	.RenderTarget		= RenderTarget;
 
 			SharpDX.Direct2D1.Brush tmpBrush;
 			if (AreaBrush != null)
@@ -207,11 +208,11 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			else 
 				areaBrushDevice.RenderTarget = null;
 
-			if (OutlineStroke.StrokeStyle != null && (OutlineStroke.Brush != null || !OutlineStroke.Brush.IsTransparent()))
+			if (outlineStroke.StrokeStyle != null && (outlineStroke.Brush != null || !outlineStroke.Brush.IsTransparent()))
 			{
-				tmpBrush = IsInHitTest ? chartControl.SelectionBrush : OutlineStroke.BrushDX;
+				tmpBrush = IsInHitTest ? chartControl.SelectionBrush : outlineStroke.BrushDX;
 				if (tmpBrush != null)
-					RenderTarget.DrawRectangle(outlineRectDx, tmpBrush, OutlineStroke.Width, OutlineStroke.StrokeStyle);
+					RenderTarget.DrawRectangle(outlineRectDx, tmpBrush, outlineStroke.Width, outlineStroke.StrokeStyle);
 			}
 			
 			textBrushDevice.RenderTarget = RenderTarget;
@@ -520,7 +521,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Text Fixed IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class TextFixed : Text
 	{
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NinjaScriptDrawingToolTextFixedTextPosition", GroupName = "NinjaScriptGeneral")]
@@ -533,9 +533,11 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			MaxValue = double.MinValue;
 		}
 		
-		private int PaddingMultiplier(ChartControl chartControl, ChartPanel panel)
+		private int PaddingMultiplier(ChartControl chartControl, ChartPanel panel, bool top)
 		{
-			return chartControl.ChartPanels.IndexOf(panel) == chartControl.ChartPanels.Count - 1 ? 2 : 1;
+			return !top
+				? chartControl.ChartPanels.IndexOf(panel) == chartControl.ChartPanels.Count - 1 ? 2 : 1
+				: chartControl.ChartPanels.IndexOf(panel) == 0 && chartControl.IsScrollArrowVisible ? 4 : 1;
 		}
 
 		protected override Point GetTextDrawingPosition(ChartControl chartControl, ChartPanel chartPanel, ChartScale chartScale)
@@ -559,7 +561,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			{
 				case TextPosition.BottomLeft:
 					x = chartPanel.X + padding;
-					y = chartPanel.Y + chartPanel.H - textHeight - padding * PaddingMultiplier(chartControl, chartPanel); // make enough room for copyright
+					y = chartPanel.Y + chartPanel.H - textHeight - padding * PaddingMultiplier(chartControl, chartPanel, false); // make enough room for copyright
 					break;
 				case TextPosition.BottomRight:
 					x = chartPanel.X + chartPanel.W - padding - textWidth;
@@ -575,7 +577,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 					break;
 				case TextPosition.TopRight:
 					x = chartPanel.X + chartPanel.W - padding - textWidth;
-					y = chartPanel.Y + (int)(padding * (chartControl.IsScrollArrowVisible ? 4 : 1)); // make enough room for arrow indicator
+					y = chartPanel.Y + (int)(padding * PaddingMultiplier(chartControl, chartPanel, true)); // make enough room for arrow indicator
 					break;
 			}
 			// store actual layout rect we ended up with (need it for mouse points etc)
@@ -605,6 +607,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 				ZOrderType				= DrawingToolZOrder.AlwaysDrawnLast;
 				// don't let user try to select fixed text
 				IgnoresUserInput		= true;
+				DisplayOnChartsMenus	= false;
 			}
 		}
 	}

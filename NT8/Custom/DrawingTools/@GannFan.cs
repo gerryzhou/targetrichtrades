@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -26,7 +26,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Gann Fan IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class GannFan : GannAngleContainer
 	{
 		[TypeConverter("NinjaTrader.Custom.ResourceEnumConverter")]
@@ -42,6 +41,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NinjaScriptDrawingToolGannFanFanDirection", GroupName = "NinjaScriptGeneral", Order = 3)]
 		public GannFanDirection	FanDirection { get; set; }
+
+		public override object Icon { get { return Icons.DrawGanFan; } }
 
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NinjaScriptDrawingToolGannFanDisplayText", GroupName = "NinjaScriptGeneral", Order = 2)]
 		public bool IsTextDisplayed { get; set; }
@@ -74,18 +75,18 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		public Point CalculateExtendedDataPoint(ChartPanel panel, ChartScale scale, int startX, double startPrice, Vector slope)
 		{
 			// find direction of slope
-			bool	right	= slope.X > 0;
-			bool	up		= slope.Y > 0;
-			int		xLength = right ? panel.W - startX : panel.X + startX;
-			double	priceSize = Math.Abs(xLength / slope.X) * slope.Y;
-			double	endY = startPrice + priceSize;
-			double	maxY = up ? panel.MaxValue : panel.MinValue;
+			bool	right		= slope.X > 0;
+			bool	up			= slope.Y > 0;
+			int		xLength 	= right ? panel.W - startX : panel.X + startX;
+			double	priceSize 	= Math.Abs(xLength / slope.X) * slope.Y;
+			double	endY 		= startPrice + priceSize;
+			double	maxY 		= up ? panel.MaxValue : panel.MinValue;
 			// check if Y endpoint is outside top or bottom of panel
 			if (up ? endY > maxY : maxY > endY)
 			{
-				double yLength = Math.Abs(maxY - startPrice);
-				double xSize = Math.Abs(yLength / slope.Y) * slope.X;
-				double endX = startX + xSize;
+				double yLength 	= Math.Abs(maxY - startPrice);
+				double xSize 	= Math.Abs(yLength / slope.Y) * slope.X;
+				double endX 	= startX + xSize;
 				return new Point(endX, scale.GetYByValue(maxY));
 			}
 			else
@@ -179,7 +180,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 
 		public override Point[] GetSelectionPoints(ChartControl chartControl, ChartScale chartScale)
 		{
-			ChartPanel	chartPanel = chartControl.ChartPanels[chartScale.PanelIndex];
+			ChartPanel	chartPanel 	= chartControl.ChartPanels[chartScale.PanelIndex];
 			Point		anchorPoint = Anchor.GetPoint(chartControl, chartPanel, chartScale);
 			return new[] { anchorPoint };
 		}
@@ -636,7 +637,19 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			{
 				try
 				{
+					// Clone from the new assembly here to prevent losing existing GannAngles on compile
 					object newInstance = oldGannAngle.AssemblyClone(Core.Globals.AssemblyRegistry.GetType(typeof(GannAngle).FullName));
+					
+					if (newInstance == null)
+						continue;
+					
+					newInstGannAngles.Add(newInstance);
+				}
+				catch (ArgumentException)
+				{
+					// In compiled assembly case, Add call will fail for different assemblies so do normal clone instead
+					object newInstance = oldGannAngle.Clone();
+					
 					if (newInstance == null)
 						continue;
 					
@@ -648,9 +661,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 						strokeProvider.Stroke = new Stroke();
 						oldStroke.CopyTo(strokeProvider.Stroke);
 					}
+					
 					newInstGannAngles.Add(newInstance);
 				}
-				catch (Exception e){ NinjaTrader.Code.Output.Process(e.ToString(), PrintTo.OutputTab1); }
+				catch { }
 			}
 		}
 

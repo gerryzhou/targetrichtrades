@@ -129,6 +129,12 @@
   <data name="ADLAD" xml:space="preserve">
     <value>AD</value>
   </data>
+  <data name="AlertOnBreak" xml:space="preserve">
+    <value>Alerta de pausa</value>
+  </data>
+  <data name="AlertOnBreakSound" xml:space="preserve">
+    <value>Alerta sobre o som de pausa</value>
+  </data>
   <data name="AndrewsPitchforkCalculationMethod_ModifiedSchiff" xml:space="preserve">
     <value>Schiff modificado</value>
   </data>
@@ -137,6 +143,12 @@
   </data>
   <data name="AndrewsPitchforkCalculationMethod_StandardPitchfork" xml:space="preserve">
     <value>Padrão</value>
+  </data>
+  <data name="AskLineLength" xml:space="preserve">
+    <value>Pergunte o comprimento da linha (% do gráfico)</value>
+  </data>
+  <data name="AskLineStroke" xml:space="preserve">
+    <value>Pergunte a linha</value>
   </data>
   <data name="BandPct" xml:space="preserve">
     <value>Por cento de banda</value>
@@ -150,11 +162,14 @@
   <data name="BarSpacing" xml:space="preserve">
     <value>Barra de espaçamento</value>
   </data>
+  <data name="BarsPeriodType" xml:space="preserve">
+    <value>Tipo de período de barras</value>
+  </data>
   <data name="BarsPeriodTypeNameDay" xml:space="preserve">
     <value>Dia</value>
   </data>
   <data name="BarsPeriodTypeNameHeikenAshi" xml:space="preserve">
-    <value>HEIKEN-Ashi</value>
+    <value>Heiken Ashi</value>
   </data>
   <data name="BarsPeriodTypeNameKagi" xml:space="preserve">
     <value>Adquirir</value>
@@ -192,6 +207,9 @@
   <data name="BarsPeriodTypeNameYear" xml:space="preserve">
     <value>Ano</value>
   </data>
+  <data name="BarsPeriodValue" xml:space="preserve">
+    <value>Período valor bares</value>
+  </data>
   <data name="BarTimerDisconnectedError" xml:space="preserve">
     <value>Temporizador de barra desativado já que você está desconectado do seu provedor de dados atualmente</value>
   </data>
@@ -210,6 +228,18 @@
   <data name="BarUp" xml:space="preserve">
     <value>Barra de cima</value>
   </data>
+  <data name="BasePeriod" xml:space="preserve">
+    <value>Período-base</value>
+  </data>
+  <data name="BidLineLength" xml:space="preserve">
+    <value>Comprimento da linha de oferta (% do gráfico)</value>
+  </data>
+  <data name="BidLineStroke" xml:space="preserve">
+    <value>Linha de oferta</value>
+  </data>
+  <data name="BlockTradeSize" xml:space="preserve">
+    <value>Tamanho do bloco de comércio</value>
+  </data>
   <data name="BollingerLowerBand" xml:space="preserve">
     <value>Banda inferior</value>
   </data>
@@ -220,10 +250,10 @@
     <value>Banda superior</value>
   </data>
   <data name="BuySellPressureBuyPressure" xml:space="preserve">
-    <value>Comprar pressão</value>
+    <value>Compra pressão</value>
   </data>
   <data name="BuySellPressureSellPressure" xml:space="preserve">
-    <value>Vender a pressão</value>
+    <value>Venda a pressão</value>
   </data>
   <data name="BuySellVolumeBuys" xml:space="preserve">
     <value>Compra</value>
@@ -245,6 +275,36 @@
   </data>
   <data name="CCILevelMinus2" xml:space="preserve">
     <value>Nível-2</value>
+  </data>
+  <data name="ChartSpan_Day" xml:space="preserve">
+    <value>1 Dia</value>
+  </data>
+  <data name="ChartSpan_Min1" xml:space="preserve">
+    <value>1 min</value>
+  </data>
+  <data name="ChartSpan_Min15" xml:space="preserve">
+    <value>15 min</value>
+  </data>
+  <data name="ChartSpan_Min240" xml:space="preserve">
+    <value>240 min</value>
+  </data>
+  <data name="ChartSpan_Min30" xml:space="preserve">
+    <value>30 min</value>
+  </data>
+  <data name="ChartSpan_Min5" xml:space="preserve">
+    <value>5 min</value>
+  </data>
+  <data name="ChartSpan_Min60" xml:space="preserve">
+    <value>60 min</value>
+  </data>
+  <data name="ChartSpan_Month" xml:space="preserve">
+    <value>1 Mês</value>
+  </data>
+  <data name="ChartSpan_Week" xml:space="preserve">
+    <value>1 Semana</value>
+  </data>
+  <data name="ChartSpan_Year" xml:space="preserve">
+    <value>1 Ano</value>
   </data>
   <data name="ConstantLines1" xml:space="preserve">
     <value>Linha 1</value>
@@ -280,10 +340,10 @@
     <value>Abe Corrente</value>
   </data>
   <data name="CustomWindowAddOnBuyMarket" xml:space="preserve">
-    <value>Comprar mercado</value>
+    <value>Compra mercado</value>
   </data>
   <data name="CustomWindowAddOnSellMarket" xml:space="preserve">
-    <value>Vender mercado</value>
+    <value>Venda mercado</value>
   </data>
   <data name="CustomWindowSampleDescription" xml:space="preserve">
     <value>Descrição de janela personalizada</value>
@@ -360,6 +420,12 @@
   <data name="DownBarColor" xml:space="preserve">
     <value>cor da barra inferior</value>
   </data>
+  <data name="DrawingToolIndicatorDescription" xml:space="preserve">
+    <value>O indicador da ferramenta de desenho azulejo adiciona a capacidade de ter um azulejo flutuante no gráfico que pode ser personalizado para acessar rapidamente as ferramentas de desenho mais usadas.</value>
+  </data>
+  <data name="DrawingToolIndicatorName" xml:space="preserve">
+    <value>Telha de ferramenta de desenho</value>
+  </data>
   <data name="DrawLines" xml:space="preserve">
     <value>Desenhar linhas</value>
   </data>
@@ -386,6 +452,9 @@
   </data>
   <data name="FastLimit" xml:space="preserve">
     <value>Limite rápido</value>
+  </data>
+  <data name="FastPeriod" xml:space="preserve">
+    <value>Período de rápida</value>
   </data>
   <data name="FibonacciTextAlignment_ExtremeLeft" xml:space="preserve">
     <value>Extrema-esquerda</value>
@@ -424,13 +493,16 @@
     <value>Em baixo à direita</value>
   </data>
   <data name="GannFanDirection_UpLeft" xml:space="preserve">
-    <value>Acima à esquerda</value>
+    <value>Para a esquerda</value>
   </data>
   <data name="GannFanDirection_UpRight" xml:space="preserve">
-    <value>Acima à direita</value>
+    <value>Direita para cima</value>
   </data>
   <data name="GuiAuthorize" xml:space="preserve">
     <value>Autorizar</value>
+  </data>
+  <data name="GuiChartStyleDojiBrush" xml:space="preserve">
+    <value>Cor para barras doji</value>
   </data>
   <data name="HigherHigh" xml:space="preserve">
     <value>Maior alta</value>
@@ -498,6 +570,12 @@
   <data name="ImportTypeNinjaTraderUnexpectedFieldNumber" xml:space="preserve">
     <value>{0}: número inesperado de campos na linha '{1}', deve ser 3, 5 ou 6</value>
   </data>
+  <data name="ImportTypeTickData" xml:space="preserve">
+    <value>Tick Data, LLC</value>
+  </data>
+  <data name="IncrementalPeriod" xml:space="preserve">
+    <value>Período incremental</value>
+  </data>
   <data name="Intermediate" xml:space="preserve">
     <value>Intermediário</value>
   </data>
@@ -509,6 +587,12 @@
   </data>
   <data name="KeyReversalPlot0" xml:space="preserve">
     <value>Planejamento 0</value>
+  </data>
+  <data name="LastLineLength" xml:space="preserve">
+    <value>Comprimento da última linha (% do gráfico)</value>
+  </data>
+  <data name="LastLineStroke" xml:space="preserve">
+    <value>Última linha</value>
   </data>
   <data name="Length" xml:space="preserve">
     <value>Comprimento</value>
@@ -549,6 +633,9 @@
   <data name="MailServicePort" xml:space="preserve">
     <value>Conexão - Porta</value>
   </data>
+  <data name="MailServiceSenderDisplayName" xml:space="preserve">
+    <value>Do nome</value>
+  </data>
   <data name="MailServiceServer" xml:space="preserve">
     <value>Conexão - servidor</value>
   </data>
@@ -576,8 +663,53 @@
   <data name="MAType" xml:space="preserve">
     <value>Movendo o tipo médio</value>
   </data>
+  <data name="MovingAverage" xml:space="preserve">
+    <value>Média móvel</value>
+  </data>
+  <data name="MovingAverageRibbonPlot1" xml:space="preserve">
+    <value>Média móvel 1</value>
+  </data>
+  <data name="MovingAverageRibbonPlot2" xml:space="preserve">
+    <value>Média móvel 2</value>
+  </data>
+  <data name="MovingAverageRibbonPlot3" xml:space="preserve">
+    <value>Média móvel 3</value>
+  </data>
+  <data name="MovingAverageRibbonPlot4" xml:space="preserve">
+    <value>Média móvel 4</value>
+  </data>
+  <data name="MovingAverageRibbonPlot5" xml:space="preserve">
+    <value>Média móvel 5</value>
+  </data>
+  <data name="MovingAverageRibbonPlot6" xml:space="preserve">
+    <value>Média móvel 6</value>
+  </data>
+  <data name="MovingAverageRibbonPlot7" xml:space="preserve">
+    <value>Média móvel 7</value>
+  </data>
+  <data name="MovingAverageRibbonPlot8" xml:space="preserve">
+    <value>Média móvel 8</value>
+  </data>
   <data name="NBarsDownTrigger" xml:space="preserve">
     <value>Trigger</value>
+  </data>
+  <data name="NegativeColor" xml:space="preserve">
+    <value>Cor negativa</value>
+  </data>
+  <data name="NetChangePosition_BottomLeft" xml:space="preserve">
+    <value>Inferior esquerdo</value>
+  </data>
+  <data name="NetChangePosition_BottomRight" xml:space="preserve">
+    <value>Inferior direito</value>
+  </data>
+  <data name="NetChangePosition_TopLeft" xml:space="preserve">
+    <value>Superior esquerdo</value>
+  </data>
+  <data name="NetChangePosition_TopRight" xml:space="preserve">
+    <value>Superior direito</value>
+  </data>
+  <data name="NinjaScriptBackground" xml:space="preserve">
+    <value>Fundo</value>
   </data>
   <data name="NinjaScriptBarsTypeDay" xml:space="preserve">
     <value>Dia</value>
@@ -633,6 +765,9 @@
   <data name="NinjaScriptBarsTypeWeek" xml:space="preserve">
     <value>Sem</value>
   </data>
+  <data name="NinjaScriptBorder" xml:space="preserve">
+    <value>Fronteira</value>
+  </data>
   <data name="NinjaScriptChartStyleBarWidth" xml:space="preserve">
     <value>Largura de barra</value>
   </data>
@@ -658,13 +793,19 @@
     <value>Contorno do corpo de vela</value>
   </data>
   <data name="NinjaScriptChartStyleCandlestick" xml:space="preserve">
-    <value>Castiçal</value>
+    <value>Candlestick</value>
+  </data>
+  <data name="NinjaScriptChartStyleCandlestickHollow" xml:space="preserve">
+    <value>Candlestick vazio</value>
   </data>
   <data name="NinjaScriptChartStyleCandleUpBarsColor" xml:space="preserve">
     <value>Cor para barras superiores</value>
   </data>
   <data name="NinjaScriptChartStyleCandleWick" xml:space="preserve">
     <value>Pavio de vela</value>
+  </data>
+  <data name="NinjaScriptChartStyleEquivolume" xml:space="preserve">
+    <value>Equivolume</value>
   </data>
   <data name="NinjaScriptChartStyleHeikenAshi" xml:space="preserve">
     <value>Heiken Ashi</value>
@@ -751,7 +892,7 @@
     <value>Texto</value>
   </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchfork" xml:space="preserve">
-    <value>Andrews Pitchfork</value>
+    <value>Forquilha Andrews</value>
   </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchforkCalculationMethod" xml:space="preserve">
     <value>Método de cálculo</value>
@@ -837,6 +978,24 @@
   <data name="NinjaScriptDrawingToolLine" xml:space="preserve">
     <value>Linha</value>
   </data>
+  <data name="NinjaScriptDrawingToolPath" xml:space="preserve">
+    <value>Caminho</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathBegin" xml:space="preserve">
+    <value>Caminho começar</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathEnd" xml:space="preserve">
+    <value>Fim do caminho</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathSegment" xml:space="preserve">
+    <value>Segmento de</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathShowCount" xml:space="preserve">
+    <value>Mostrar contagem</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPolygon" xml:space="preserve">
+    <value>Polígono</value>
+  </data>
   <data name="NinjaScriptDrawingToolPriceLevelsOpacity" xml:space="preserve">
     <value>Preço níveis de opacidade (%)</value>
   </data>
@@ -865,13 +1024,13 @@
     <value>Faixa de intervalo: {0} {1}</value>
   </data>
   <data name="NinjaScriptDrawingToolRegionHiglightX" xml:space="preserve">
-    <value>Destaque região X</value>
+    <value>Destaque da região x</value>
   </data>
   <data name="NinjaScriptDrawingToolRegionHiglightY" xml:space="preserve">
-    <value>Destaque da região Y</value>
+    <value>Destaque da região y</value>
   </data>
   <data name="NinjaScriptDrawingToolRegressionChannel" xml:space="preserve">
-    <value>Canal de regressão</value>
+    <value>Canal de Regressão</value>
   </data>
   <data name="NinjaScriptDrawingToolRegressionChannelLowerChannel" xml:space="preserve">
     <value>Canal inferior</value>
@@ -940,7 +1099,7 @@
     <value>Proporção</value>
   </data>
   <data name="NinjaScriptDrawingToolRuler" xml:space="preserve">
-    <value>Ruler</value>
+    <value>Regra</value>
   </data>
   <data name="NinjaScriptDrawingToolRulerDaysFormat" xml:space="preserve">
     <value>{0} dias</value>
@@ -956,6 +1115,9 @@
   </data>
   <data name="NinjaScriptDrawingToolRulerYValueText" xml:space="preserve">
     <value>Valor de Y:</value>
+  </data>
+  <data name="NinjaScriptDrawingTools" xml:space="preserve">
+    <value>Ferramentas de desenho</value>
   </data>
   <data name="NinjaScriptDrawingToolsChartArrowDownMarkerName" xml:space="preserve">
     <value>Seta para baixo</value>
@@ -1030,7 +1192,7 @@
     <value>Cor - fonte</value>
   </data>
   <data name="NinjaScriptDrawingToolTextFixed" xml:space="preserve">
-    <value>Texto fixado</value>
+    <value>Texto fixo</value>
   </data>
   <data name="NinjaScriptDrawingToolTextFixedTextPosition" xml:space="preserve">
     <value>Posição do texto</value>
@@ -1043,6 +1205,9 @@
   </data>
   <data name="NinjaScriptDrawingToolTextOutlineVisible" xml:space="preserve">
     <value>Contorno - habilitado</value>
+  </data>
+  <data name="NinjaScriptDrawingToolTimeCycles" xml:space="preserve">
+    <value>Ciclos de tempo</value>
   </data>
   <data name="NinjaScriptDrawingToolTrendChannel" xml:space="preserve">
     <value>Canal de tendência</value>
@@ -1113,11 +1278,17 @@
   <data name="NinjaScriptGeneticOptimizerStabilitySizePercent" xml:space="preserve">
     <value>Tamanho de estabilidade (%)</value>
   </data>
+  <data name="NinjaScriptGeneticOptimizerThresholdGenerations" xml:space="preserve">
+    <value>Gerações limiares</value>
+  </data>
   <data name="NinjaScriptIndicator" xml:space="preserve">
     <value>Indicador</value>
   </data>
   <data name="NinjaScriptIndicatorAvg" xml:space="preserve">
-    <value>AVG</value>
+    <value>Avg</value>
+  </data>
+  <data name="NinjaScriptIndicatorCount" xml:space="preserve">
+    <value>Count</value>
   </data>
   <data name="NinjaScriptIndicatorDefault" xml:space="preserve">
     <value>Padrão</value>
@@ -1146,6 +1317,9 @@
   <data name="NinjaScriptIndicatorDescriptionBarTimer" xml:space="preserve">
     <value>Exibe o restante tempo da barra de tempo com base</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionBlockVolume" xml:space="preserve">
+    <value>O volume de blocos detecta os blocos de negócios e mostra quantos ocorreram por barra. Isso pode ser exibido como negociações ou como volume. Os dados históricos do tick são necessários para traçar o histórico.</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionBollinger" xml:space="preserve">
     <value>Bandas de Bollinger são plotadas em níveis de desvio padrão acima e abaixo de uma média móvel. Desde que o desvio padrão é uma medida da volatilidade, as bandas são auto-ajustáveis: alargamento durante os mercados voláteis e contratantes durante os períodos mais calmos.</value>
   </data>
@@ -1153,10 +1327,13 @@
     <value>O equilíbrio de poder indicador mede a força dos touros vs ursos avaliando a capacidade de cada um para empurrar o preço para um nível extremo.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionBuySellPressure" xml:space="preserve">
-    <value>Indica o atual comprando ou vendendo a pressão como um perecentage. Este é um indicador de escala por carrapato. Se 'Calcular' é definido como ' na barra perto ', os valores do indicador será sempre 100.</value>
+    <value>Indica o atual comprando ou vendendo a pressão como um perecentage. Este é um indicador de escala por tick. Se 'Calcular' é definido como ' na barra perto ', os valores do indicador será sempre 100.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionBuySellVolume" xml:space="preserve">
     <value>Plota um histograma dividindo o volume entre comércios em ask ou superior e comércios em oferta e inferior.  Só funciona em dados históricos, se usando a escala Replay</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionCamarillaPivots" xml:space="preserve">
+    <value>Pivôs da Camarilla são uma análise de preço também que gera níveis de suporte e resistência potenciais multiplicando o intervalo prévio em seguida, adicionando ou subtraindo-lo do fim.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionCandlestickPattern" xml:space="preserve">
     <value>Detecta padrões de velas comuns e marca os mesmos no gráfico</value>
@@ -1173,11 +1350,17 @@
   <data name="NinjaScriptIndicatorDescriptionChaikinVolatility" xml:space="preserve">
     <value>Compara a diferença entre uma gama de instrumentos atuais e históricos usando médias móveis exponenciais.</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionChoppinessIndex" xml:space="preserve">
+    <value>O índice de Choppiness é projetado para determinar se o mercado está agitado (negociando lateralmente) ou não instável (negociação dentro de uma tendência em qualquer direção)</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionCMO" xml:space="preserve">
     <value>O CMO difere de outros osciladores de impulso como índice de força relativa (RSI) e estocástica. Ele usa ambos acima e abaixo dados dias no numerador do cálculo para medir diretamente o impulso. Principalmente utilizado para procurar por condições extremas de sobrecompra e sobrevenda, CMO também pode ser usado para procurar por tendências.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionConstantLines" xml:space="preserve">
     <value>Desenha Linhas com valores definidos pelo usuário.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionCorrelation" xml:space="preserve">
+    <value>O indicador de correlação irá representar a correlação da série de dados com um instrumento desejado. Valores próximos de 1 indicam movimento na mesma direção. Valores próximos de -1 indicam movimento em direções opostas. Valores próximos de 0 indicam ausência de correlação.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionCurrentDayOHL" xml:space="preserve">
     <value>Plota os valores abertos, máximas e mínimas da sessão começando no dia atual.</value>
@@ -1186,7 +1369,10 @@
     <value>As caixas Darvas foram tiradas das páginas do livro de Nicolas Darvas, como eu fiz $2.000.000 no mercado acionário. As caixas são usadas para normalizar uma tendência. Um sinal de 'comprar' iria ser indicado quando o preço das ações ultrapassa o topo da caixa. Um sinal de 'vender' iria ser indicado quando o preço das ações cai abaixo da parte inferior da caixa.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionDEMA" xml:space="preserve">
-    <value>Média móvel exponencial dupla</value>
+    <value>A Média móvel exponencial dupla (DEMA) é uma combinação de uma média móvel exponencial única e uma média móvel exponencial dupla.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionDisparityIndex" xml:space="preserve">
+    <value>O índice de disparidade mede a diferença entre o preço e uma média móvel exponencial. Um valor maior poderia sugerir o ímpeto altista, enquanto um valor menor que zero poderia sugerir a dinâmica de baixa.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionDM" xml:space="preserve">
     <value>Movimento direcional (DM). Este é o mesmo indicador como o ADX, com a adição dos dois indicadores de movimento direcional + DI e -DI. + DI e -DI medem impulso ascendente e descendente. Um sinal da compra é gerado quando + DI -DI de cruza para o lado positivo. Um sinal de venda é gerado quando cruza -DI + DI para o lado negativo.</value>
@@ -1201,13 +1387,16 @@
     <value>Donchian Channel. O indicador de canal Donchian foi criado por Richard Donchian. Ele usa o mais alto e o baixo mais baixo de um período de tempo para plotar o canal.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionDoubleStochastics" xml:space="preserve">
-    <value>Dupla estocástica</value>
+    <value>Double Stochastics é uma variação do indicador Stochastics desenvolvido por William Blau.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionEaseOfMovement" xml:space="preserve">
     <value>O indicador da facilidade de movimento (EMV) enfatiza os dias em que o estoque é mover-se facilmente e minimiza os dias em que o estoque está encontrando dificuldades para mover. Um sinal da compra é gerado quando o EMV cruza acima de zero, um sinal de venda quando se cruza abaixo de zero. Quando o EMV paira em torno de zero, então existem movimentos de preço pequeno e/ou alto volume, ou seja, o preço não está se movendo facilmente.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionEMA" xml:space="preserve">
     <value>O Exponential Moving Average é um indicador que mostra o valor médio de um preço de segurança em um período de tempo. Quando calculando o EMA aplica mais peso aos preços recentes do que SMA.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionFibonacciPivots" xml:space="preserve">
+    <value>Pivôs de Fibonacci são uma análise de preço também que gera apoio potencial e níveis de resistência, multiplicando-se o prévio alcance contra valores de Fibonacci em seguida, adicionando ou subtraindo a média do prior, alto, baixo e fechem.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionFisherTransform" xml:space="preserve">
     <value>Transformar o Fisher tem pontos de viragem nítidos e distintos que ocorrem em tempo hábil. Os balanços de pico resultante são usados para identificar reversões de preço.</value>
@@ -1234,10 +1423,10 @@
     <value>O Linear Regression é um indicador que 'prevê' o valor de um preço.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionLinRegIntercept" xml:space="preserve">
-    <value>Interceptação de regressão linear</value>
+    <value>A Intercepção de regressão linear fornece o valor de intercepção da linha de tendência de regressão linear.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionLinRegSlope" xml:space="preserve">
-    <value>Regressão linear-Slope</value>
+    <value>A inclinação de regressão linear fornece o valor da inclinação da linha de tendência de regressão linear.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionMACD" xml:space="preserve">
     <value>O MACD (movimentação convergência/divergência média) é uma tendência seguindo indicador de momentum que mostra a relação entre duas médias móveis de preços.</value>
@@ -1251,6 +1440,9 @@
   <data name="NinjaScriptIndicatorDescriptionMAX" xml:space="preserve">
     <value>O máximo mostra o máximo de barras de n últimas.</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionMcClellanOscillator" xml:space="preserve">
+    <value>McClellan Oscillator é a diferença entre duas médias móveis exponenciais da NYSE avanço declínio propagação. Este indicador exigem ADV e DECL indexam dados.</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionMFI" xml:space="preserve">
     <value>O MFI (índice de fluxo de dinheiro) é um indicador de impulso que mede a força do dinheiro fluindo dentro e fora de uma segurança.</value>
   </data>
@@ -1260,11 +1452,20 @@
   <data name="NinjaScriptIndicatorDescriptionMomentum" xml:space="preserve">
     <value>O indicador Momentum mede a quantidade que o preço de um título mudou ao longo de um período de tempo determinado.</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionMoneyFlowOscillator" xml:space="preserve">
+    <value>O oscilador de fluxo de dinheiro mede a quantidade de volume de fluxo de dinheiro durante um determinado período. Um movimento em território positivo indica pressão de compra, enquanto um movimento em território negativo indica pressão de venda.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionMovingAverageRibbon" xml:space="preserve">
+    <value>A faixa média em movimento é uma série de incrementar a médias móveis.</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionNBarsDown" xml:space="preserve">
     <value>Este indicador retorna 1 quando temos n de barras consecutivas para baixo, caso contrário retorna 0. Uma barra para baixo é definida como um bar onde o fechamento é abaixo a céu aberto e os bares fazem com que uma alta inferior e um limite inferior baixa. Você pode ajustar os requisitos específicos com as opções de indicador.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionNBarsUp" xml:space="preserve">
     <value>Este indicador retorna 1 quando temos n de barras consecutivas acima, caso contrário retorna 0. Uma barra de cima é definida como um bar onde o fechamento está acima a céu aberto e os bares fazem com que uma maior alta e uma baixa maior. Você pode ajustar os requisitos específicos com as opções de indicador.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionNetChangeDisplay" xml:space="preserve">
+    <value>Exibe a variação líquida no gráfico.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionOBV" xml:space="preserve">
     <value>OBV (em Volume de equilíbrio) é um totalizador de volume. Mostra-se o volume está fluindo dentro ou fora de uma segurança. Quando a segurança fecha mais alto que o anterior perto, todo o volume do dia é considerado volume up. Quando fecha o fecha de segurança mais baixo do que o anterior, todo o volume do dia é considerado de baixo volume.</value>
@@ -1276,10 +1477,13 @@
     <value>O PFE (Polarized Fractal eficiência) é um indicador que usa a geometria fractal para determinar quanto à eficácia, o preço está se movendo.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionPivots" xml:space="preserve">
-    <value>Pontos de pivô</value>
+    <value>O indicador Pivots (pontos de pivô) traça as médias de Alto, Baixo e Encerramento de uma sessão ou grupo de sessões anteriores. Isso é baseado nos dados históricos fornecidos pelo seu provedor de alimentação de dados de mercado.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionPPO" xml:space="preserve">
     <value>PPO (oscilador de preço de porcentagem) é baseado em duas médias móveis, expressadas em percentagem. A PPO é encontrada subtraindo o MA mais de MA o mais curto e então dividindo a diferença pela MA mais.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionPriceLine" xml:space="preserve">
+    <value>Exibe perguntar, oferta, e/ou últimas linhas no gráfico.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionPriceOscillator" xml:space="preserve">
     <value>O indicador de preço oscilador mostra a variação entre duas médias móveis, pelo preço de uma segurança.</value>
@@ -1287,14 +1491,20 @@
   <data name="NinjaScriptIndicatorDescriptionPriorDayOHLC" xml:space="preserve">
     <value>Plota os valores abertos, altos, baixos e estreita da sessão começando no dia anterior.</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionPsychologicalLine" xml:space="preserve">
+    <value>A linha psicológica é a relação entre o número de barras de aumento sobre o número especificado de bares.</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionRange" xml:space="preserve">
     <value>Calcula o intervalo de um bar.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionRangeCounter" xml:space="preserve">
-    <value>Exibe a contagem de escala de uma barra"</value>
+    <value>Exibe a contagem de intervalo de uma barra.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionRegressionChannel" xml:space="preserve">
     <value>Regressão linear é usada para calcular que um melhor ajuste de linha para os dados de preço. Além disso, uma banda superior e inferior é adicionada por calcular o desvio padrão de preços da linha de regressão.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionRelativeVigorIndex" xml:space="preserve">
+    <value>O índice de Vigor relativo mede a força de uma tendência, comparando a um preço de fechamento de instrumentos para sua faixa de preço. É baseado no fato de que os preços tendem a fechar-se mais alto que eles abram em tendências e mais perto inferiores abrem em downtrends.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionRIND" xml:space="preserve">
     <value>CASCA (indicador de intervalo) compara o intervalo intradiário (alto - baixo) para o dia inter (perto - anterior) intervalo. Quando o intervalo intradiário é maior do que o intervalo inter dia, o indicador da faixa será um valor elevado. Isto sinaliza um fim à tendência atual. Quando o indicador de escala está em um nível baixo, uma nova tendência está prestes a começar.</value>
@@ -1306,7 +1516,7 @@
     <value>O IFR (índice de força relativa) é um oscilador de seguimento de preço que varia entre 0 e 100.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionRSquared" xml:space="preserve">
-    <value>Indicador de R-quadrado</value>
+    <value>O indicador R-Squared calcula o quão bem o preço se aproxima de uma linha de regressão linear. O indicador obtém seu nome do cálculo, que é o quadrado do coeficiente de correlação (referido na matemática pela letra grega rho, ou r). O intervalo do R-Squared é de zero a um.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionRSS" xml:space="preserve">
     <value>Força relativa de espalhar do spread entre duas médias móveis. TASC, outubro de 2006, p. 16.</value>
@@ -1342,16 +1552,19 @@
     <value>O indicador de Swing plota linhas que representa o balanço alto e pontos baixos.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionT3" xml:space="preserve">
-    <value>T3 Média móvel</value>
+    <value>O T3 é um tipo de média móvel, ou função de regularização. Baseia-se na DEMA. O T3 toma o cálculo DEMA e adiciona um fator vfactor que está entre zero e 1. A função resultante chama-se GD, ou DEMA generalizada. Um GD com fator 1 é o mesmo que o DEMA. Um GD com um fator vfactor de zero é o mesmo que uma média móvel exponencial. O T3 normalmente usa um fator vfactor de 0,7.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionTEMA" xml:space="preserve">
-    <value>Média móvel exponencial tripla</value>
+    <value>O TEMA é um indicador de regularização. Foi desenhado por Patrick Mulloy e está descrito no seu artigo na edição de Janeiro de 1994 da revista Technical Analysis of Stocks and Commodities.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionTickCounter" xml:space="preserve">
     <value>Exibe assinale a contagem de um bar</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionTMA" xml:space="preserve">
     <value>A TMA (Triangular média móvel) é uma média ponderada móvel. Em comparação com o WMA que coloca mais peso na barra de preço mais recente, o TMA coloca mais peso sobre os dados no meio do período especificado.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionTrendLines" xml:space="preserve">
+    <value>Quando um balanço alto é seguido por um balanço alto baixo, uma linha de tendência alta é automaticamente plotada. Quando uma oscilação baixa é seguida por uma oscilação baixa mais alta, uma linha de tendência baixa é automaticamente plotada.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionTRIX" xml:space="preserve">
     <value>O TRIX (triplo exponencial média) exibe a porcentagem de taxa de mudança (ROC) de um triplo EMA. Trix oscila acima e abaixo o valor zero. O indicador se aplica suavização triplo na tentativa de eliminar os movimentos de preço insignificante dentro da tendência que você está tentando isolar.</value>
@@ -1389,6 +1602,9 @@
   <data name="NinjaScriptIndicatorDescriptionVolumeZones" xml:space="preserve">
     <value>Zonas de volume Plota um histograma horizontal que se sobrepõe uma tabela de preços. As barras do histograma estendem-se da esquerda para a direita, começando no lado esquerdo do gráfico. O comprimento de cada barra é determinado pelo total cumulativo de todas as barras de volume para os períodos durante os quais o preço caiu dentro da escala vertical da barra de histograma.</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionVortex" xml:space="preserve">
+    <value>O indicador do Vortex é um oscilador usado para identificar tendências. Um sinal bullish aciona quando a linha de VIPlus cruza acima da linha de VIMinus. Um sinal em baixa aciona quando a linha de VIMinus cruza acima da linha VIPlus.</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionVROC" xml:space="preserve">
     <value>O VROC (Volume taxa de mudança) mostra-se ou não uma tendência do volume é desenvolver em qualquer uma acima ou para baixo a direção. Ele é semelhante ao indicador de ROC, mas é aplicado ao volume em vez disso.</value>
   </data>
@@ -1410,14 +1626,23 @@
   <data name="NinjaScriptIndicatorDiff" xml:space="preserve">
     <value>Diff</value>
   </data>
+  <data name="NinjaScriptIndicatorDisparityLine" xml:space="preserve">
+    <value>Disparity line</value>
+  </data>
   <data name="NinjaScriptIndicatorDown" xml:space="preserve">
-    <value>Para baixo</value>
+    <value>Down</value>
   </data>
   <data name="NinjaScriptIndicatorLower" xml:space="preserve">
-    <value>Baixa</value>
+    <value>Lower</value>
+  </data>
+  <data name="NinjaScriptIndicatorMcClellanOscillatorLine" xml:space="preserve">
+    <value>McClellan Oscillator line</value>
   </data>
   <data name="NinjaScriptIndicatorMiddle" xml:space="preserve">
-    <value>Meio</value>
+    <value>Middle</value>
+  </data>
+  <data name="NinjaScriptIndicatorMoneyFlowLine" xml:space="preserve">
+    <value>Money flow line</value>
   </data>
   <data name="NinjaScriptIndicatorNameADL" xml:space="preserve">
     <value>ADL</value>
@@ -1435,13 +1660,16 @@
     <value>Aroon</value>
   </data>
   <data name="NinjaScriptIndicatorNameAroonOscillator" xml:space="preserve">
-    <value>Aroon oscilador</value>
+    <value>Aroon oscillator</value>
   </data>
   <data name="NinjaScriptIndicatorNameATR" xml:space="preserve">
     <value>ATR</value>
   </data>
   <data name="NinjaScriptIndicatorNameBarTimer" xml:space="preserve">
-    <value>Temporizador de bar</value>
+    <value>Bar timer</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameBlockVolume" xml:space="preserve">
+    <value>Block volume</value>
   </data>
   <data name="NinjaScriptIndicatorNameBollinger" xml:space="preserve">
     <value>Bollinger</value>
@@ -1450,40 +1678,52 @@
     <value>BOP</value>
   </data>
   <data name="NinjaScriptIndicatorNameBuySellPressure" xml:space="preserve">
-    <value>Comprar vender pressão</value>
+    <value>Buy sell pressure</value>
   </data>
   <data name="NinjaScriptIndicatorNameBuySellVolume" xml:space="preserve">
-    <value>Comprar volume de venda</value>
+    <value>Buy sell volume</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCamarillaPivots" xml:space="preserve">
+    <value>Camarilla pivots</value>
   </data>
   <data name="NinjaScriptIndicatorNameCandlestickPattern" xml:space="preserve">
-    <value>Candlestick padrões</value>
+    <value>Candlestick pattern</value>
   </data>
   <data name="NinjaScriptIndicatorNameCCI" xml:space="preserve">
     <value>CCI</value>
   </data>
   <data name="NinjaScriptIndicatorNameChaikinMoneyFlow" xml:space="preserve">
-    <value>Fluxo de dinheiro Chaikin</value>
+    <value>Chaikin money flow</value>
   </data>
   <data name="NinjaScriptIndicatorNameChaikinOscillator" xml:space="preserve">
-    <value>Chaikin oscilador</value>
+    <value>Chaikin oscillator</value>
   </data>
   <data name="NinjaScriptIndicatorNameChaikinVolatility" xml:space="preserve">
-    <value>Volatilidade de Chaikin</value>
+    <value>Chaikin volatility</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameChoppinessIndex" xml:space="preserve">
+    <value>Choppiness index</value>
   </data>
   <data name="NinjaScriptIndicatorNameCMO" xml:space="preserve">
     <value>CMO</value>
   </data>
   <data name="NinjaScriptIndicatorNameConstantLines" xml:space="preserve">
-    <value>Linhas constantes</value>
+    <value>Constant lines</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCorrelation" xml:space="preserve">
+    <value>Correlation</value>
   </data>
   <data name="NinjaScriptIndicatorNameCurrentDayOHL" xml:space="preserve">
-    <value>OHL do dia</value>
+    <value>Current day OHL</value>
   </data>
   <data name="NinjaScriptIndicatorNameDarvas" xml:space="preserve">
     <value>Darvas</value>
   </data>
   <data name="NinjaScriptIndicatorNameDEMA" xml:space="preserve">
     <value>DEMA</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameDisparityIndex" xml:space="preserve">
+    <value>Disparity index</value>
   </data>
   <data name="NinjaScriptIndicatorNameDM" xml:space="preserve">
     <value>DM</value>
@@ -1492,22 +1732,25 @@
     <value>DMI</value>
   </data>
   <data name="NinjaScriptIndicatorNameDMIndex" xml:space="preserve">
-    <value>Índice de DM</value>
+    <value>DM index</value>
   </data>
   <data name="NinjaScriptIndicatorNameDonchianChannel" xml:space="preserve">
-    <value>Canais Donchian</value>
+    <value>Donchian channel</value>
   </data>
   <data name="NinjaScriptIndicatorNameDoubleStochastics" xml:space="preserve">
-    <value>Dupla estocástica</value>
+    <value>Double stochastics</value>
   </data>
   <data name="NinjaScriptIndicatorNameEaseOfMovement" xml:space="preserve">
-    <value>Facilidade de movimento</value>
+    <value>Ease of movement</value>
   </data>
   <data name="NinjaScriptIndicatorNameEMA" xml:space="preserve">
     <value>EMA</value>
   </data>
+  <data name="NinjaScriptIndicatorNameFibonacciPivots" xml:space="preserve">
+    <value>Fibonacci pivots</value>
+  </data>
   <data name="NinjaScriptIndicatorNameFisherTransform" xml:space="preserve">
-    <value>Transformação de Fisher</value>
+    <value>Fisher transform</value>
   </data>
   <data name="NinjaScriptIndicatorNameFOSC" xml:space="preserve">
     <value>FOSC</value>
@@ -1522,97 +1765,118 @@
     <value>Keltner channel</value>
   </data>
   <data name="NinjaScriptIndicatorNameKeyReversalDown" xml:space="preserve">
-    <value>Chave reversão para baixo</value>
+    <value>Key reversal down</value>
   </data>
   <data name="NinjaScriptIndicatorNameKeyReversalUp" xml:space="preserve">
-    <value>Chave reversão acima</value>
+    <value>Key reversal up</value>
   </data>
   <data name="NinjaScriptIndicatorNameLinReg" xml:space="preserve">
     <value>Lin reg.</value>
   </data>
   <data name="NinjaScriptIndicatorNameLinRegIntercept" xml:space="preserve">
-    <value>Interceptação de reg. de Lin</value>
+    <value>Lin. reg. intercept</value>
   </data>
   <data name="NinjaScriptIndicatorNameLinRegSlope" xml:space="preserve">
-    <value>Inclinação de reg. de Lin</value>
+    <value>Lin. reg. slope</value>
   </data>
   <data name="NinjaScriptIndicatorNameMACD" xml:space="preserve">
     <value>MACD</value>
   </data>
   <data name="NinjaScriptIndicatorNameMAEnvelopes" xml:space="preserve">
-    <value>Envelopes de MA</value>
+    <value>MA envelopes</value>
   </data>
   <data name="NinjaScriptIndicatorNameMAMA" xml:space="preserve">
-    <value>MAMÃE</value>
+    <value>MAMA</value>
   </data>
   <data name="NinjaScriptIndicatorNameMAX" xml:space="preserve">
     <value>MAX</value>
   </data>
+  <data name="NinjaScriptIndicatorNameMcClellanOscillator" xml:space="preserve">
+    <value>McClellan oscillator</value>
+  </data>
   <data name="NinjaScriptIndicatorNameMFI" xml:space="preserve">
-    <value>IFM</value>
+    <value>MFI</value>
   </data>
   <data name="NinjaScriptIndicatorNameMIN" xml:space="preserve">
     <value>MIN</value>
   </data>
   <data name="NinjaScriptIndicatorNameMomentum" xml:space="preserve">
-    <value>Dinâmica</value>
+    <value>Momentum</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameMoneyFlowOscillator" xml:space="preserve">
+    <value>Money flow oscillator</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameMovingAverageRibbon" xml:space="preserve">
+    <value>Moving average ribbon</value>
   </data>
   <data name="NinjaScriptIndicatorNameNBarsDown" xml:space="preserve">
-    <value>Barras de N para baixo</value>
+    <value>N bars down</value>
   </data>
   <data name="NinjaScriptIndicatorNameNBarsUp" xml:space="preserve">
-    <value>Barras de N acima</value>
+    <value>N bars up</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameNetChangeDisplay" xml:space="preserve">
+    <value>Net change display</value>
   </data>
   <data name="NinjaScriptIndicatorNameOBV" xml:space="preserve">
     <value>OBV</value>
   </data>
   <data name="NinjaScriptIndicatorNameParabolicSAR" xml:space="preserve">
-    <value>Parabólico SAR</value>
+    <value>Parabolic SAR</value>
   </data>
   <data name="NinjaScriptIndicatorNamePFE" xml:space="preserve">
     <value>PFE</value>
   </data>
   <data name="NinjaScriptIndicatorNamePivots" xml:space="preserve">
-    <value>Pivôs</value>
+    <value>Pivots</value>
   </data>
   <data name="NinjaScriptIndicatorNamePPO" xml:space="preserve">
     <value>PPO</value>
   </data>
+  <data name="NinjaScriptIndicatorNamePriceLine" xml:space="preserve">
+    <value>Price line</value>
+  </data>
   <data name="NinjaScriptIndicatorNamePriceOscillator" xml:space="preserve">
-    <value>Oscilador de preço</value>
+    <value>Price oscillator</value>
   </data>
   <data name="NinjaScriptIndicatorNamePriorDayOHLC" xml:space="preserve">
-    <value>Dia anterior OHLC</value>
+    <value>Prior day OHLC</value>
+  </data>
+  <data name="NinjaScriptIndicatorNamePsychologicalLine" xml:space="preserve">
+    <value>Psychological line</value>
   </data>
   <data name="NinjaScriptIndicatorNameRange" xml:space="preserve">
-    <value>Alcance</value>
+    <value>Range</value>
   </data>
   <data name="NinjaScriptIndicatorNameRangeCounter" xml:space="preserve">
-    <value>Contador gama</value>
+    <value>Range counter</value>
   </data>
   <data name="NinjaScriptIndicatorNameRegressionChannel" xml:space="preserve">
-    <value>Canal de regressão</value>
+    <value>Regression channel</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameRelativeVigorIndex" xml:space="preserve">
+    <value>Relative vigor index</value>
   </data>
   <data name="NinjaScriptIndicatorNameRIND" xml:space="preserve">
-    <value>CASCA</value>
+    <value>RIND</value>
   </data>
   <data name="NinjaScriptIndicatorNameROC" xml:space="preserve">
     <value>ROC</value>
   </data>
   <data name="NinjaScriptIndicatorNameRSI" xml:space="preserve">
-    <value>NOS.</value>
+    <value>RSI</value>
   </data>
   <data name="NinjaScriptIndicatorNameRSquared" xml:space="preserve">
-    <value>R ao quadrado</value>
+    <value>R squared</value>
   </data>
   <data name="NinjaScriptIndicatorNameRSS" xml:space="preserve">
     <value>RSS</value>
   </data>
   <data name="NinjaScriptIndicatorNameRVI" xml:space="preserve">
-    <value>UV.</value>
+    <value>RVI</value>
   </data>
   <data name="NinjaScriptIndicatorNameSampleCustomRender" xml:space="preserve">
-    <value>Processar de amostra personalizada</value>
+    <value>Sample custom render</value>
   </data>
   <data name="NinjaScriptIndicatorNameSMA" xml:space="preserve">
     <value>SMA</value>
@@ -1621,13 +1885,13 @@
     <value>STD dev.</value>
   </data>
   <data name="NinjaScriptIndicatorNameStdError" xml:space="preserve">
-    <value>Erro padrão</value>
+    <value>Std. error</value>
   </data>
   <data name="NinjaScriptIndicatorNameStochastics" xml:space="preserve">
-    <value>Estocástica</value>
+    <value>Stochastics</value>
   </data>
   <data name="NinjaScriptIndicatorNameStochasticsFast" xml:space="preserve">
-    <value>Estocástico rápido</value>
+    <value>Stochastics fast</value>
   </data>
   <data name="NinjaScriptIndicatorNameStochRSI" xml:space="preserve">
     <value>Stoch RSI</value>
@@ -1636,19 +1900,22 @@
     <value>SUM</value>
   </data>
   <data name="NinjaScriptIndicatorNameSwing" xml:space="preserve">
-    <value>Balanço</value>
+    <value>Swing</value>
   </data>
   <data name="NinjaScriptIndicatorNameT3" xml:space="preserve">
     <value>T3</value>
   </data>
   <data name="NinjaScriptIndicatorNameTEMA" xml:space="preserve">
-    <value>ASSUNTO</value>
+    <value>TEMA</value>
   </data>
   <data name="NinjaScriptIndicatorNameTickCounter" xml:space="preserve">
-    <value>Contador de carrapato</value>
+    <value>Tick counter</value>
   </data>
   <data name="NinjaScriptIndicatorNameTMA" xml:space="preserve">
     <value>TMA</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameTrendLines" xml:space="preserve">
+    <value>Trend lines</value>
   </data>
   <data name="NinjaScriptIndicatorNameTRIX" xml:space="preserve">
     <value>TRIX</value>
@@ -1657,34 +1924,37 @@
     <value>TSF</value>
   </data>
   <data name="NinjaScriptIndicatorNameTSI" xml:space="preserve">
-    <value>ETI</value>
+    <value>TSI</value>
   </data>
   <data name="NinjaScriptIndicatorNameUltimateOscillator" xml:space="preserve">
-    <value>Finais do oscilador</value>
+    <value>Ultimate oscillator</value>
   </data>
   <data name="NinjaScriptIndicatorNameVMA" xml:space="preserve">
     <value>VMA</value>
   </data>
   <data name="NinjaScriptIndicatorNameVOL" xml:space="preserve">
-    <value>VOL.</value>
+    <value>VOL</value>
   </data>
   <data name="NinjaScriptIndicatorNameVOLMA" xml:space="preserve">
     <value>VOLMA</value>
   </data>
   <data name="NinjaScriptIndicatorNameVolumeCounter" xml:space="preserve">
-    <value>Contador de volume</value>
+    <value>Volume counter</value>
   </data>
   <data name="NinjaScriptIndicatorNameVolumeOscillator" xml:space="preserve">
-    <value>Oscilador de volume</value>
+    <value>Volume oscillator</value>
   </data>
   <data name="NinjaScriptIndicatorNameVolumeProfile" xml:space="preserve">
-    <value>Perfil de volume</value>
+    <value>Volume profile</value>
   </data>
   <data name="NinjaScriptIndicatorNameVolumesZones" xml:space="preserve">
-    <value>Zonas de volume</value>
+    <value>Volume zones</value>
   </data>
   <data name="NinjaScriptIndicatorNameVolumeUpDown" xml:space="preserve">
-    <value>Volume de cima para baixo</value>
+    <value>Volume up down</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameVortex" xml:space="preserve">
+    <value>Vortex</value>
   </data>
   <data name="NinjaScriptIndicatorNameVROC" xml:space="preserve">
     <value>VROC</value>
@@ -1693,40 +1963,61 @@
     <value>VWMA</value>
   </data>
   <data name="NinjaScriptIndicatorNameWilliamsR" xml:space="preserve">
-    <value>Williams, R</value>
+    <value>Williams R</value>
   </data>
   <data name="NinjaScriptIndicatorNameWMA" xml:space="preserve">
     <value>WMA</value>
   </data>
   <data name="NinjaScriptIndicatorNameZigZag" xml:space="preserve">
-    <value>Ziguezague</value>
+    <value>Zig zag</value>
   </data>
   <data name="NinjaScriptIndicatorNameZLEMA" xml:space="preserve">
     <value>ZLEMA</value>
   </data>
   <data name="NinjaScriptIndicatorNeutral" xml:space="preserve">
-    <value>Neutro</value>
+    <value>Neutral</value>
   </data>
   <data name="NinjaScriptIndicatorOverbought" xml:space="preserve">
-    <value>Sobrecomprado</value>
+    <value>Overbought</value>
+  </data>
+  <data name="NinjaScriptIndicatorOverBoughtLine" xml:space="preserve">
+    <value>Over bought line</value>
   </data>
   <data name="NinjaScriptIndicatorOversold" xml:space="preserve">
-    <value>Sobrevendido</value>
+    <value>Oversold</value>
+  </data>
+  <data name="NinjaScriptIndicatorOverSoldLine" xml:space="preserve">
+    <value>Over sold line</value>
+  </data>
+  <data name="NinjaScriptIndicatorRelativeVigorIndex" xml:space="preserve">
+    <value>Relative Vigor Index</value>
   </data>
   <data name="NinjaScriptIndicatorSignal" xml:space="preserve">
-    <value>Sinal</value>
+    <value>Signal</value>
   </data>
   <data name="NinjaScriptIndicatorUp" xml:space="preserve">
-    <value>Acima</value>
+    <value>Up</value>
   </data>
   <data name="NinjaScriptIndicatorUpper" xml:space="preserve">
-    <value>Superior</value>
+    <value>Upper</value>
+  </data>
+  <data name="NinjaScriptIndicatorVIMinus" xml:space="preserve">
+    <value>VIMinus</value>
+  </data>
+  <data name="NinjaScriptIndicatorVIPlus" xml:space="preserve">
+    <value>VIPlus</value>
   </data>
   <data name="NinjaScriptIndicatorVisualGroup" xml:space="preserve">
-    <value>visual</value>
+    <value>Visual</value>
   </data>
   <data name="NinjaScriptIndicatorZeroLine" xml:space="preserve">
-    <value>Linha zero</value>
+    <value>Zero line</value>
+  </data>
+  <data name="NinjaScriptIsVisibleOnlyFocused" xml:space="preserve">
+    <value>Visível apenas quando em foco</value>
+  </data>
+  <data name="NinjaScriptLine" xml:space="preserve">
+    <value>Linha</value>
   </data>
   <data name="NinjaScriptLines" xml:space="preserve">
     <value>Linhas</value>
@@ -1767,6 +2058,12 @@
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionCalendarYearLowDate" xml:space="preserve">
     <value>Data o baixo preço para o ano civil em curso ocorreu</value>
   </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionChartMini" xml:space="preserve">
+    <value>Esta coluna mercado Analyzer Plota um gráfico mini pelas propriedades de entrada.</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionChartNetChange" xml:space="preserve">
+    <value>Esta coluna mercado Analyzer Plota um gráfico mini pelas propriedades de entrada.</value>
+  </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionCurrentRatio" xml:space="preserve">
     <value>Ativo circulante dividido pelo passivo circulante</value>
   </data>
@@ -1778,6 +2075,9 @@
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionDailyVolume" xml:space="preserve">
     <value>Volume de hoje</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionDaysUntilRollover" xml:space="preserve">
+    <value>Exibe quantos dias de distância da prorrogação para o próximo contrato</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionDescription" xml:space="preserve">
     <value>Descrição do instrumento</value>
@@ -1828,10 +2128,16 @@
     <value>Capitalização de mercado. O valor total das ações emitidas.</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionMarketPrice" xml:space="preserve">
-    <value>Preço atual e mudança de resultado líquido</value>
+    <value>Preço atual e modificação líquida</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionNetChange" xml:space="preserve">
     <value>Preço atual em relação ao último preço de fechamento</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionNetChangeMaxDown" xml:space="preserve">
+    <value>Corrente baixa em relação ao último preço de fechamento</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionNetChangeMaxUp" xml:space="preserve">
+    <value>Corrente alta em relação ao último preço de fechamento</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionNextYearsEarningsPerShare" xml:space="preserve">
     <value>Ganhos projetados por ação</value>
@@ -1884,6 +2190,9 @@
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionTradedContracts" xml:space="preserve">
     <value>Hoje está cheia de contratos</value>
   </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionTSTrend" xml:space="preserve">
+    <value>Esta coluna exibe uma barra colorida que representa os ticks de entrada com as mesmas cores que a janela T &amp; S usa</value>
+  </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionUnrealizedProfitLoss" xml:space="preserve">
     <value>Lucro ou prejuízo para a posição atual </value>
   </data>
@@ -1903,7 +2212,7 @@
     <value>Beta</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameBidAskSpread" xml:space="preserve">
-    <value>Lance de perguntar a propagação</value>
+    <value>Spread C/V</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameBidPrice" xml:space="preserve">
     <value>Preço OFC</value>
@@ -1923,6 +2232,12 @@
   <data name="NinjaScriptMarketAnalyzerColumnNameCalendarYearLowDate" xml:space="preserve">
     <value>Ano civil data de baixa</value>
   </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameChartMini" xml:space="preserve">
+    <value>Gráfico - Mini</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameChartNetChange" xml:space="preserve">
+    <value>Gráfico - Variação líquida</value>
+  </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameCurrentRatio" xml:space="preserve">
     <value>Liquidez corrente</value>
   </data>
@@ -1934,6 +2249,9 @@
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameDailyVolume" xml:space="preserve">
     <value>Volume do dia</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameDaysUntilRollover" xml:space="preserve">
+    <value>Dias até a prorrogação</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameDescription" xml:space="preserve">
     <value>Descrição</value>
@@ -1963,7 +2281,7 @@
     <value>Volatilidade histórica</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameInstrument" xml:space="preserve">
-    <value>Símbolo</value>
+    <value>Ativo</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameLastClose" xml:space="preserve">
     <value>Último fechamento</value>
@@ -1989,6 +2307,12 @@
   <data name="NinjaScriptMarketAnalyzerColumnNameNetChange" xml:space="preserve">
     <value>Variação líquida</value>
   </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameNetChangeMaxDown" xml:space="preserve">
+    <value>Variação líquida máxima para baixo</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameNetChangeMaxUp" xml:space="preserve">
+    <value>Variação líquida máxima acima</value>
+  </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameNextYearsEarningsPerShare" xml:space="preserve">
     <value>Resultados no próximo ano por acção</value>
   </data>
@@ -1999,7 +2323,7 @@
     <value>Abertura</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameOpenInterest" xml:space="preserve">
-    <value>Open interest</value>
+    <value>Em aberto</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNamePercentHeldByInstitutions" xml:space="preserve">
     <value>Por cento detidos por instituições</value>
@@ -2040,11 +2364,17 @@
   <data name="NinjaScriptMarketAnalyzerColumnNameTradedContracts" xml:space="preserve">
     <value>Contratos negociados</value>
   </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameTSTrend" xml:space="preserve">
+    <value>Tendência T &amp; S</value>
+  </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameUnrealizedProfitLoss" xml:space="preserve">
     <value>Perda de lucro não realizado</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameVwap" xml:space="preserve">
     <value>VWAP</value>
+  </data>
+  <data name="NinjaScriptNumberOfRows" xml:space="preserve">
+    <value>Linhas</value>
   </data>
   <data name="NinjaScriptOnBarCloseError" xml:space="preserve">
     <value>{0} baseia-se em atualizações de carrapato de compra/venda esperando Calculate 'em cada tick'</value>
@@ -2133,6 +2463,15 @@
   <data name="NinjaScriptOptimizationFitnessNameMaxSortinoRatioShort" xml:space="preserve">
     <value>Max. Rácio Sortino (curto)</value>
   </data>
+  <data name="NinjaScriptOptimizationFitnessNameMaxStrength" xml:space="preserve">
+    <value>Max. força</value>
+  </data>
+  <data name="NinjaScriptOptimizationFitnessNameMaxStrengthLong" xml:space="preserve">
+    <value>Max. força (longo)</value>
+  </data>
+  <data name="NinjaScriptOptimizationFitnessNameMaxStrengthShort" xml:space="preserve">
+    <value>Max. força (curta)</value>
+  </data>
   <data name="NinjaScriptOptimizationFitnessNameMaxUlcerRatio" xml:space="preserve">
     <value>Max. Relação de úlcera</value>
   </data>
@@ -2196,6 +2535,39 @@
   <data name="NinjaScriptStrategyDescriptionSampleMultiTimeFrame" xml:space="preserve">
     <value>Estratégia de amostra multi tempo quadro.</value>
   </data>
+  <data name="NinjaScriptStrategyGenerator" xml:space="preserve">
+    <value>Gerador de estratégia</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorCandleStickPatternPrompt" xml:space="preserve">
+    <value>1 padrão de candle stick|{0} padrões de candle stick|Adicionar padrão de candle stick...|Configurar padrão de candle stick...|Configurar padrões de candle stick...</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorEntries" xml:space="preserve">
+    <value>Condições de entrada</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorEntriesOrExits" xml:space="preserve">
+    <value>O que precisava para a condição de saída de ordem de pelo menos uma entrada.</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorIndicatorException" xml:space="preserve">
+    <value>Excepção à expressão:{0}{1}}</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorIndicatorsPrompt" xml:space="preserve">
+    <value>1 indicador|{0} indicadores|Adicionar indicador...|Configurar indicador...|Configurar indicadores...</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorPeformance" xml:space="preserve">
+    <value>Desempenho para {0} = {1}</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorProperties" xml:space="preserve">
+    <value>AI Gerar Propriedades</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorTerminated" xml:space="preserve">
+    <value>Gerador de estratégia terminado após {0} gerações, uma vez que não houve melhoria de desempenho por {1} gerações</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorUseCandleStickPattern" xml:space="preserve">
+    <value>Padrão Candle stick</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorUseIndicators" xml:space="preserve">
+    <value>Indicadores</value>
+  </data>
   <data name="NinjaScriptStrategyNameSampleATMStrategy" xml:space="preserve">
     <value>Estratégia de ATM de amostra</value>
   </data>
@@ -2244,14 +2616,38 @@
   <data name="NinjaScriptSuperDomColumnVolume" xml:space="preserve">
     <value>Volume</value>
   </data>
+  <data name="NinjaScriptTileError" xml:space="preserve">
+    <value>Erro ao carregar a ferramenta de desenho {0} : {1}</value>
+  </data>
+  <data name="NinjaScriptYOffset" xml:space="preserve">
+    <value>Deslocamento do pixel Y</value>
+  </data>
+  <data name="NumberOfTrendLines" xml:space="preserve">
+    <value>Número de linhas de tendência</value>
+  </data>
   <data name="NumStdDev" xml:space="preserve">
     <value>Número de desvios padrão</value>
   </data>
   <data name="OffsetMultiplier" xml:space="preserve">
     <value>Multiplicador de deslocamento</value>
   </data>
+  <data name="OldTrendsOpacity" xml:space="preserve">
+    <value>Tendências antigas opacidade</value>
+  </data>
   <data name="Opacity" xml:space="preserve">
     <value>Opacidade</value>
+  </data>
+  <data name="PathCapMode_Arrow" xml:space="preserve">
+    <value>Seta</value>
+  </data>
+  <data name="PathCapMode_Line" xml:space="preserve">
+    <value>Linha</value>
+  </data>
+  <data name="PathToolCapMode_Arrow" xml:space="preserve">
+    <value>Seta</value>
+  </data>
+  <data name="PathToolCapMode_Line" xml:space="preserve">
+    <value>Linha</value>
   </data>
   <data name="PerformanceMetricSampleCumProfit" xml:space="preserve">
     <value>Métrica de desempenho de lucro de cum de amostra</value>
@@ -2310,6 +2706,9 @@
   <data name="PivotsR3" xml:space="preserve">
     <value>R3</value>
   </data>
+  <data name="PivotsR4" xml:space="preserve">
+    <value>R4</value>
+  </data>
   <data name="PivotsS1" xml:space="preserve">
     <value>S1</value>
   </data>
@@ -2319,14 +2718,29 @@
   <data name="PivotsS3" xml:space="preserve">
     <value>S3</value>
   </data>
+  <data name="PivotsS4" xml:space="preserve">
+    <value>S4</value>
+  </data>
   <data name="PlotCurrentValue" xml:space="preserve">
     <value>Desenha apenas o valor corrente</value>
+  </data>
+  <data name="PositiveColor" xml:space="preserve">
+    <value>Cor positiva</value>
   </data>
   <data name="PPOSmoothed" xml:space="preserve">
     <value>Suavizado</value>
   </data>
+  <data name="PriceLinePlotAsk" xml:space="preserve">
+    <value>Pergunte a linha</value>
+  </data>
+  <data name="PriceLinePlotBid" xml:space="preserve">
+    <value>Linha de oferta</value>
+  </data>
+  <data name="PriceLinePlotLast" xml:space="preserve">
+    <value>Última linha</value>
+  </data>
   <data name="PriorDayOHLCClose" xml:space="preserve">
-    <value>Fechamento anterior</value>
+    <value>Fechamento Anterior</value>
   </data>
   <data name="PriorDayOHLCHigh" xml:space="preserve">
     <value>Máxima anterior</value>
@@ -2448,6 +2862,27 @@
   <data name="ShareMailException" xml:space="preserve">
     <value>Houve um erro ao enviar uma mensagem de email: {0}</value>
   </data>
+  <data name="ShareMailPreconfiguredAol" xml:space="preserve">
+    <value>AOL</value>
+  </data>
+  <data name="ShareMailPreconfiguredComcast" xml:space="preserve">
+    <value>Comcast</value>
+  </data>
+  <data name="ShareMailPreconfiguredGmail" xml:space="preserve">
+    <value>Gmail</value>
+  </data>
+  <data name="ShareMailPreconfiguredICloud" xml:space="preserve">
+    <value>iCloud</value>
+  </data>
+  <data name="ShareMailPreconfiguredManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="ShareMailPreconfiguredOutlook" xml:space="preserve">
+    <value>Outlook</value>
+  </data>
+  <data name="ShareMailPreconfiguredYahoo" xml:space="preserve">
+    <value>Yahoo</value>
+  </data>
   <data name="ShareMailSendError" xml:space="preserve">
     <value>Houve um erro ao enviar sua mensagem: {0}</value>
   </data>
@@ -2478,17 +2913,65 @@
   <data name="ShareStockTwitsSentSuccessfully" xml:space="preserve">
     <value>{0} - mensagem enviada com sucesso</value>
   </data>
+  <data name="ShareTextMessageEmail" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="ShareTextMessageEmailRequired" xml:space="preserve">
+    <value>Para configurar a mensagem de texto através do Serviço de partilha de e-mail, deve primeiro configurar um Serviço de partilha de e-mail.</value>
+  </data>
+  <data name="ShareTextMessageErrorOnShare" xml:space="preserve">
+    <value>Houve um erro ao enviar mensagem através do serviço de e-mail {0}: '{1}'</value>
+  </data>
+  <data name="ShareTextMessageMmsAddress" xml:space="preserve">
+    <value>Endereço MMS</value>
+  </data>
+  <data name="ShareTextMessageName" xml:space="preserve">
+    <value>Mensagem de texto via e-mail</value>
+  </data>
+  <data name="ShareTextMessagePhoneNumber" xml:space="preserve">
+    <value>Número de telefone</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredAtt" xml:space="preserve">
+    <value>AT&amp;T</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredSprint" xml:space="preserve">
+    <value>Sprint</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredTMobile" xml:space="preserve">
+    <value>T-Mobile</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredVerizon" xml:space="preserve">
+    <value>Verizon</value>
+  </data>
+  <data name="ShareTextMessageSentSuccessfully" xml:space="preserve">
+    <value>{0} - mensagem de texto enviada</value>
+  </data>
+  <data name="ShareTextMessageSmsAddress" xml:space="preserve">
+    <value>Endereço SMS</value>
+  </data>
   <data name="ShareTooManyRequests" xml:space="preserve">
     <value>O provedor de compartilhamento retornou uma mensagem de TooManyRequests: '{0}'</value>
   </data>
   <data name="ShareTwitterSentSuccessfully" xml:space="preserve">
     <value>{0} - tweet enviado com sucesso</value>
   </data>
+  <data name="ShowAskLine" xml:space="preserve">
+    <value>Mostrar pedir linha</value>
+  </data>
+  <data name="ShowBidLine" xml:space="preserve">
+    <value>Mostrar a linha de lance</value>
+  </data>
   <data name="ShowClose" xml:space="preserve">
     <value>Mostrar fechamento</value>
   </data>
   <data name="ShowHigh" xml:space="preserve">
     <value>Mostrar máxima</value>
+  </data>
+  <data name="ShowLastLine" xml:space="preserve">
+    <value>Mostrar a última linha</value>
   </data>
   <data name="ShowLow" xml:space="preserve">
     <value>Mostrar mínima</value>
@@ -2513,6 +2996,9 @@
   </data>
   <data name="SlowLimit" xml:space="preserve">
     <value>Limite de lento</value>
+  </data>
+  <data name="SlowPeriod" xml:space="preserve">
+    <value>Período lento</value>
   </data>
   <data name="SmallAreaColor" xml:space="preserve">
     <value>Cor de pequena área</value>
@@ -2543,6 +3029,9 @@
   </data>
   <data name="Strength" xml:space="preserve">
     <value>Força</value>
+  </data>
+  <data name="SuperDomColumnException" xml:space="preserve">
+    <value>Coluna SuperDOM '{0}': Erro ao chamar o método '{1}': {2}</value>
   </data>
   <data name="SwingHigh" xml:space="preserve">
     <value>Balanço de alto</value>
@@ -2593,13 +3082,25 @@
     <value>Superior direito</value>
   </data>
   <data name="TickCounterBarError" xml:space="preserve">
-    <value>Contador de carrapato só funciona em bares construídos com um número definido de carrapatos</value>
+    <value>Contador de tick só funciona em bares construídos com um número definido de ticks</value>
   </data>
   <data name="TickCounterTickCount" xml:space="preserve">
     <value>Contagem em escala = </value>
   </data>
   <data name="TickCounterTicksRemaining" xml:space="preserve">
-    <value>Carrapatos restantes = </value>
+    <value>Ticks restantes = </value>
+  </data>
+  <data name="TrendLinesCurrentTrendLine" xml:space="preserve">
+    <value>Linha de tendência atual</value>
+  </data>
+  <data name="TrendLinesTrendLineBroken" xml:space="preserve">
+    <value>{0} quebrado</value>
+  </data>
+  <data name="TrendLinesTrendLineHigh" xml:space="preserve">
+    <value>Linha de tendência alta</value>
+  </data>
+  <data name="TrendLinesTrendLineLow" xml:space="preserve">
+    <value>Linha de tendência baixa</value>
   </data>
   <data name="TrendStrength" xml:space="preserve">
     <value>Força de tendência</value>
@@ -2615,6 +3116,9 @@
   </data>
   <data name="TwitterSignature" xml:space="preserve">
     <value> #NinjaTrader</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+    <value>Unidade</value>
   </data>
   <data name="UpBarColor" xml:space="preserve">
     <value>cor da barra de subida</value>

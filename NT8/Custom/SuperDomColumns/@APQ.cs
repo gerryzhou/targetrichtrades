@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -496,22 +496,30 @@ namespace NinjaTrader.NinjaScript.SuperDomColumns
 
 		private void RemoveOrder(Cbi.Order order, double excludePrice = double.MinValue)
 		{
-			// Remove order from any other prices it might reside in
-			foreach (KeyValuePair<double, ConcurrentDictionary<Cbi.Order, long>> kvp in priceToOrderApqMap)
+			try
 			{
-				if (excludePrice != double.MinValue)
+				// Remove order from any other prices it might reside in
+				KeyValuePair<double, ConcurrentDictionary<Cbi.Order, long>>[] kvps = priceToOrderApqMap.ToArray();
+				foreach (KeyValuePair<double, ConcurrentDictionary<Cbi.Order, long>> kvp in kvps)
 				{
-					if (kvp.Key != excludePrice)
+					if (excludePrice != double.MinValue)
+					{
+						if (kvp.Key != excludePrice)
+						{
+							long oldApq;
+							kvp.Value.TryRemove(order, out oldApq);
+						}
+					}
+					else
 					{
 						long oldApq;
 						kvp.Value.TryRemove(order, out oldApq);
 					}
 				}
-				else
-				{
-					long oldApq;
-					kvp.Value.TryRemove(order, out oldApq);
-				}
+			}
+			catch (Exception ex)
+			{
+				LogAndPrint(typeof(NinjaTrader.Custom.Resource), "SuperDomColumnException", new[] { Name, "RemoveOrder", ex.Message }, Cbi.LogLevel.Error);
 			}
 		}
 
@@ -523,35 +531,43 @@ namespace NinjaTrader.NinjaScript.SuperDomColumns
 
 		private void UpdateApqValuesForScreen()
 		{
-			// Get all the orders for the given price
-			// Sort them by time
-			// APQ = the apq value for the oldest order in the dictionary
-			foreach (KeyValuePair<double, ConcurrentDictionary<Cbi.Order, long>> kvp in priceToOrderApqMap)
+			try
 			{
-				ConcurrentDictionary<Cbi.Order, long>	ordersThisPrice;
-				double									price				= kvp.Key;
-				if (priceToOrderApqMap.TryGetValue(price, out ordersThisPrice))
+				// Get all the orders for the given price
+				// Sort them by time
+				// APQ = the apq value for the oldest order in the dictionary
+				KeyValuePair<double, ConcurrentDictionary<Cbi.Order, long>>[] kvps = priceToOrderApqMap.ToArray();
+				foreach (KeyValuePair<double, ConcurrentDictionary<Cbi.Order, long>> kvp in kvps)
 				{
-					List<Cbi.Order> orders = ordersThisPrice.Keys.ToList();
-					if (orders.Count > 0)
+					ConcurrentDictionary<Cbi.Order, long>	ordersThisPrice;
+					double									price				= kvp.Key;
+					if (priceToOrderApqMap.TryGetValue(price, out ordersThisPrice))
 					{
-						orders.Sort((a, b) => b.Time.CompareTo(a.Time));
-						Cbi.Order oldest = orders[orders.Count - 1];
+						List<Cbi.Order> orders = ordersThisPrice.Select(o => o.Key).ToList();
+						if (orders.Count > 0)
+						{
+							orders.Sort((a, b) => b.Time.CompareTo(a.Time));
+							Cbi.Order oldest = orders[orders.Count - 1];
 						
-						priceApqValues.AddOrUpdate(price, ordersThisPrice[oldest], (key, oldValue) => ordersThisPrice[oldest]);
+							priceApqValues.AddOrUpdate(price, ordersThisPrice[oldest], (key, oldValue) => ordersThisPrice[oldest]);
+						}
+						else
+						{
+							long oldValue;
+							priceApqValues.TryRemove(price, out oldValue);
+							priceToOrderApqMap.TryRemove(price, out ordersThisPrice);
+						}
 					}
 					else
 					{
 						long oldValue;
 						priceApqValues.TryRemove(price, out oldValue);
-						priceToOrderApqMap.TryRemove(price, out ordersThisPrice);
 					}
 				}
-				else
-				{
-					long oldValue;
-					priceApqValues.TryRemove(price, out oldValue);
-				}
+			}
+			catch (Exception ex)
+			{
+				LogAndPrint(typeof(NinjaTrader.Custom.Resource), "SuperDomColumnException", new[] { Name, "UpdateApqValuesForScreen", ex.Message }, Cbi.LogLevel.Error);
 			}
 		}
 

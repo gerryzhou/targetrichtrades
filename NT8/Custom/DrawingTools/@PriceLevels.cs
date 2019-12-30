@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -211,7 +211,19 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			{
 				try
 				{
+					// Clone from the new assembly here to prevent losing existing PriceLevels on compile
 					object newInstance = oldPriceLevel.AssemblyClone(Core.Globals.AssemblyRegistry.GetType(typeof(PriceLevel).FullName));
+					
+					if (newInstance == null)
+						continue;
+					
+					newInstPriceLevels.Add(newInstance);
+				}
+				catch (ArgumentException)
+				{
+					// In compiled assembly case, Add call will fail for different assemblies so do normal clone instead
+					object newInstance = oldPriceLevel.Clone();
+					
 					if (newInstance == null)
 						continue;
 					
@@ -223,6 +235,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 						strokeProvider.Stroke = new Stroke();
 						oldStroke.CopyTo(strokeProvider.Stroke);
 					}
+					
 					newInstPriceLevels.Add(newInstance);
 				}
 				catch { }

@@ -61,9 +61,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 	    }
 		
 		public static string GetConfigFilePath(string config_dir) {
-			return config_dir + Path.DirectorySeparatorChar 
-				+ "bin" + Path.DirectorySeparatorChar
-				+ "Custom" + Path.DirectorySeparatorChar
+			return config_dir
 				+ "log4net.config";
 		}
 	}

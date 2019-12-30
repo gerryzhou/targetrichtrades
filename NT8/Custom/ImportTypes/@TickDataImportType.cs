@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -25,6 +25,7 @@ namespace NinjaTrader.NinjaScript.ImportTypes
 		private				CultureInfo		cultureInfo;
 		private				int				currentInstrumentIdx	= -1;
 		private				bool			firstLine				= true;
+		private 			bool 			isCryptoCurrency;
 		private				StreamReader	reader;
 		private				Regex			regex;
 		private				string			separator				= string.Empty;
@@ -178,7 +179,7 @@ namespace NinjaTrader.NinjaScript.ImportTypes
 				{
 					Open	= High = Low = Close = Convert.ToDouble(matches[2].Value.Trim(quotes).Trim(), cultureInfo);
 					Bid		= Ask = double.MinValue;
-					Volume	= Convert.ToInt64(matches[3].Value.Trim(quotes).Trim(), cultureInfo);
+					Volume 	= isCryptoCurrency ? NinjaTrader.Core.Globals.FromCryptocurrencyVolume(Convert.ToDouble(matches[3].Value.Trim(quotes).Trim(), cultureInfo)) : Convert.ToInt64(matches[3].Value.Trim(quotes).Trim(), cultureInfo);
 
 					HasValidDataPoint = true;
 					return;
@@ -204,15 +205,17 @@ namespace NinjaTrader.NinjaScript.ImportTypes
 			{
 				FileInfo fileInfo		= new FileInfo(FileNames[++currentInstrumentIdx]);
 				string instrumentName	= fileInfo.Name.Replace(".Ask.", ".").Replace(".Bid.", ".").Replace(".Last.", ".");
-				Instrument				= Cbi.Instrument.GetInstrumentFuzzy(fileInfo.Extension.Length == 4 && instrumentName.Length > fileInfo.Extension.Length
+				Instrument				= Cbi.Instrument.GetInstrument(fileInfo.Extension.Length == 4 && instrumentName.Length > fileInfo.Extension.Length
 												? instrumentName.Substring(0, instrumentName.Length - fileInfo.Extension.Length).ToUpperInvariant() 
-												: instrumentName.ToUpperInvariant());
+												: instrumentName.ToUpperInvariant(), true);
 
 				if (Instrument == null)
 				{
 					Cbi.Log.Process(typeof (Custom.Resource), "ImportTypeNinjaTraderInstrumentNotSupported", new object[] {FileNames[currentInstrumentIdx]}, Cbi.LogLevel.Error, Cbi.LogCategories.Default);
 					continue;
 				}
+
+				isCryptoCurrency 		= Instrument.MasterInstrument.InstrumentType == NinjaTrader.Cbi.InstrumentType.CryptoCurrency;
 
 				try
 				{

@@ -80,6 +80,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		
+		public string GetCmdFilePath() {
+			string path = IndicatorProxy.GetConfigFileDir()
+				+ "ztrader.config";
+			return path;
+		}
+		
 		public FileInfo[] GetCmdFile(string srcDir) {
 			Print("GetCmdFile src: " + srcDir);
 		    DirectoryInfo DirInfo = new DirectoryInfo(srcDir);

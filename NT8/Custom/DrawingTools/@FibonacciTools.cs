@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -67,10 +67,11 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Fibonacci Circle IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	[TypeConverter("NinjaTrader.NinjaScript.DrawingTools.FibonacciCircleTimeTypeConverter")]
 	public class FibonacciCircle : FibonacciRetracements
 	{
+		public override object Icon { get { return Icons.DrawFbCircle; } }
+
 		[Display(ResourceType=typeof(Custom.Resource), Name = "NinjaScriptDrawingToolFibonacciTimeExtensionsShowText", GroupName = "NinjaScriptGeneral")]
 		public bool IsTextDisplayed { get; set; }
 		
@@ -323,9 +324,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Fibonacci Retracements IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class FibonacciRetracements : FibonacciLevels
 	{
+		public override object Icon { get { return Icons.DrawFbRetracement; } }
+
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NinjaScriptDrawingToolFibonacciRetracementsExtendLinesRight", GroupName = "NinjaScriptLines")]
 		public bool 					IsExtendedLinesRight 	{ get; set; }
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NinjaScriptDrawingToolFibonacciRetracementsExtendLinesLeft", GroupName = "NinjaScriptLines")]
@@ -726,7 +728,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Fibonacci Extensions IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class FibonacciExtensions : FibonacciRetracements 
 	{
 		Point anchorExtensionPoint;
@@ -874,6 +875,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 				return new Tuple<Point, Point>(new Point(extPoint.X, extPoint.Y), new Point(extPoint.X, extPoint.Y));
 			return new Tuple<Point, Point>(new Point(extPoint.X, minLevelY), new Point(extPoint.X, anchorExtensionPoint.Y));
 		}
+
+		public override object Icon { get { return Icons.DrawFbExtensions; } }
 
 		public override bool IsAlertConditionTrue(AlertConditionItem conditionItem, Condition condition, ChartAlertValue[] values, ChartControl chartControl, ChartScale chartScale)
 		{
@@ -1108,10 +1111,11 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Fibonacci Time Extensions IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	[TypeConverter("NinjaTrader.NinjaScript.DrawingTools.FibonacciCircleTimeTypeConverter")]
 	public class FibonacciTimeExtensions : FibonacciRetracements
 	{
+		public override object Icon { get { return Icons.DrawFbFbTimeExtensions; } }
+
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NinjaScriptDrawingToolFibonacciTimeExtensionsShowText", GroupName = "NinjaScriptGeneral")]
 		public bool IsTextDisplayed { get; set; }
 
@@ -1402,9 +1406,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="startTime">The starting time where the draw object will be drawn.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <returns></returns>
 		public static FibonacciCircle FibonacciCircle(NinjaScriptBase owner, string tag, bool isAutoScale, 
 			DateTime startTime, double startY, DateTime endTime, double endY)
@@ -1418,10 +1422,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <returns></returns>
 		public static FibonacciCircle FibonacciCircle(NinjaScriptBase owner, string tag, bool isAutoScale, 
 			int startBarsAgo, double startY, int endBarsAgo, double endY)
@@ -1436,9 +1440,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="startTime">The starting time where the draw object will be drawn.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
 		/// <param name="templateName">The name of the drawing tool template the object will use to determine various visual properties</param>
 		/// <returns></returns>
@@ -1454,10 +1458,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
 		/// <param name="templateName">The name of the drawing tool template the object will use to determine various visual properties</param>
 		/// <returns></returns>
@@ -1474,10 +1478,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="extensionBarsAgo">The extension bars ago.</param>
 		/// <param name="extensionY">The y value of the 3rd anchor point</param>
 		/// <returns></returns>
@@ -1495,9 +1499,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="startTime">The starting time where the draw object will be drawn.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="extensionTime">The time of the 3rd anchor point</param>
 		/// <param name="extensionY">The y value of the 3rd anchor point</param>
 		/// <returns></returns>
@@ -1515,9 +1519,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="startTime">The starting time where the draw object will be drawn.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="extensionTime">The time of the 3rd anchor point</param>
 		/// <param name="extensionY">The y value of the 3rd anchor point</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
@@ -1536,10 +1540,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="extensionBarsAgo">The extension bars ago.</param>
 		/// <param name="extensionY">The y value of the 3rd anchor point</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
@@ -1559,9 +1563,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="startTime">The starting time where the draw object will be drawn.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <returns></returns>
 		public static FibonacciRetracements FibonacciRetracements(NinjaScriptBase owner, string tag, bool isAutoScale, 
 			DateTime startTime, double startY, DateTime endTime, double endY)
@@ -1576,10 +1580,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <returns></returns>
 		public static FibonacciRetracements FibonacciRetracements(NinjaScriptBase owner, string tag, bool isAutoScale, 
 			int startBarsAgo, double startY, int endBarsAgo, double endY)
@@ -1595,9 +1599,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="startTime">The starting time where the draw object will be drawn.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
 		/// <param name="templateName">The name of the drawing tool template the object will use to determine various visual properties</param>
 		/// <returns></returns>
@@ -1614,10 +1618,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
 		/// <param name="templateName">The name of the drawing tool template the object will use to determine various visual properties</param>
 		/// <returns></returns>
@@ -1635,9 +1639,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="startTime">The starting time where the draw object will be drawn.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <returns></returns>
 		public static FibonacciTimeExtensions FibonacciTimeExtensions(NinjaScriptBase owner, string tag, bool isAutoScale, 
 			DateTime startTime, double startY, DateTime endTime, double endY)
@@ -1651,10 +1655,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <returns></returns>
 		public static FibonacciTimeExtensions FibonacciTimeExtensions(NinjaScriptBase owner, string tag, bool isAutoScale, 
 			int startBarsAgo, double startY, int endBarsAgo, double endY)
@@ -1669,9 +1673,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="startTime">The starting time where the draw object will be drawn.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
 		/// <param name="templateName">The name of the drawing tool template the object will use to determine various visual properties</param>
 		/// <returns></returns>
@@ -1687,10 +1691,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
 		/// <param name="templateName">The name of the drawing tool template the object will use to determine various visual properties</param>
 		/// <returns></returns>

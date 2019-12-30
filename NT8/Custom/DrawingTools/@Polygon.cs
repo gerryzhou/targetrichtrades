@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -22,7 +22,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Polygon IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class Polygon : DrawingTool
 	{
 		#region Variables
@@ -72,6 +71,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 				areaBrushDevice.Brush	= null;
 			}
 		}
+
+		public override object Icon { get { return Gui.Tools.Icons.DrawPolygon; } }
 
 		[Browsable(false)]
 		[SkipOnCopyTo(true), ExcludeFromTemplate]
@@ -440,14 +441,15 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 
 		public override void OnRender(ChartControl chartControl, ChartScale chartScale)
 		{
-            if (firstTime && DrawingState == DrawingState.Normal)
-            {
-                firstTime = false;
-                Cbi.License.Log("Polygon");
-            }
+			if (firstTime && DrawingState == DrawingState.Normal)
+			{
+				firstTime = false;
+				Cbi.License.Log("Polygon");
+			}
 
 			RenderTarget.AntialiasMode	= SharpDX.Direct2D1.AntialiasMode.PerPrimitive;
-			OutlineStroke.RenderTarget	= RenderTarget;
+			Stroke outlineStroke		= OutlineStroke;
+			outlineStroke.RenderTarget	= RenderTarget;
 			ChartPanel chartPanel		= chartControl.ChartPanels[PanelIndex];
 
 			// dont bother with an area brush if we're doing a hit test (software) render pass. we do not render area then.
@@ -470,7 +472,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			}
 
 			// align to full pixel to avoid unneeded aliasing
-			double strokePixAdjust = OutlineStroke.Width % 2 == 0 ? 0.5d : 0d;
+			double strokePixAdjust = outlineStroke.Width % 2 == 0 ? 0.5d : 0d;
 
 			// always re-create polygon geometry here
 			SharpDX.Direct2D1.PathGeometry polyGeo = CreatePolygonGeometry(chartControl, chartPanel, chartScale, strokePixAdjust);
@@ -489,8 +491,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 				}
 			}
 
-			SharpDX.Direct2D1.Brush tmpBrush = IsInHitTest ? chartControl.SelectionBrush : OutlineStroke.BrushDX;
-			RenderTarget.DrawGeometry(polyGeo, tmpBrush, OutlineStroke.Width, OutlineStroke.StrokeStyle);
+			SharpDX.Direct2D1.Brush tmpBrush = IsInHitTest ? chartControl.SelectionBrush : outlineStroke.BrushDX;
+			RenderTarget.DrawGeometry(polyGeo, tmpBrush, outlineStroke.Width, outlineStroke.StrokeStyle);
 			polyGeo.Dispose();
 		}
 
@@ -570,17 +572,17 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <summary>
 		/// Draws a Polygon.
 		/// </summary>
-		/// <param name="owner">The owner.</param>
-		/// <param name="tag">The tag.</param>
-		/// <param name="isAutoScale">if set to <c>true</c> [is automatic scale].</param>
+		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
+		/// <param name="tag">A user defined unique id used to reference the draw object</param>
+		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="anchor1BarsAgo">The number of bars ago (x value) of the 1st anchor point</param>
-		/// <param name="anchor1Y">The y value of the 1st anchor point</param>
-		/// <param name="anchor2BarsAgo">The number of bars ago (x value) of the 2nd anchor point</param>
-		/// <param name="anchor2Y">The y value of the 2nd anchor point</param>
-		/// <param name="anchor3BarsAgo">The number of bars ago (x value) of the 3rd anchor point</param>
-		/// <param name="anchor3Y">The y value of the 3rd anchor point</param>
-		/// <param name="anchor4BarsAgo">The number of bars ago (x value) of the 4th anchor point</param>
-		/// <param name="anchor4Y">The y value of the 4th anchor point</param>
+		/// <param name="anchor1Y">The y value coordinate of the first anchor point</param>
+		/// <param name="anchor2BarsAgo">The number of bars ago (x axis coordinate) to draw the second anchor point</param>
+		/// <param name="anchor2Y">The y value coordinate of the second anchor point</param>
+		/// <param name="anchor3BarsAgo">The number of bars ago (x axis coordinate) to draw the third anchor point</param>
+		/// <param name="anchor3Y">The y value coordinate of the third anchor point</param>
+		/// <param name="anchor4BarsAgo">The number of bars ago (x axis coordinate) to draw the fourth anchor point</param>
+		/// <param name="anchor4Y">The y value coordinate of the fourth anchor point</param>
 		/// <returns></returns>
 		public static Polygon Polygon(NinjaScriptBase owner, string tag, bool isAutoScale, int anchor1BarsAgo, double anchor1Y, int anchor2BarsAgo, double anchor2Y, int anchor3BarsAgo, double anchor3Y, int anchor4BarsAgo, double anchor4Y)
 		{
@@ -590,17 +592,17 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <summary>
 		/// Draws a Polygon.
 		/// </summary>
-		/// <param name="owner">The owner.</param>
-		/// <param name="tag">The tag.</param>
-		/// <param name="isAutoScale">if set to <c>true</c> [is automatic scale].</param>
-		/// <param name="anchor1Time">The time of the 1st anchor point</param>
-		/// <param name="anchor1Y">The y value of the 1st anchor point</param>
-		/// <param name="anchor2Time">The time of the 2nd anchor point</param>
-		/// <param name="anchor2Y">The y value of the 2nd anchor point</param>
-		/// <param name="anchor3Time">The time of the 3rd anchor point</param>
-		/// <param name="anchor3Y">The y value of the 3rd anchor point</param>
-		/// <param name="anchor4Time">The time of the 4th anchor point</param>
-		/// <param name="anchor4Y">The y value of the 4th anchor point</param>
+		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
+		/// <param name="tag">A user defined unique id used to reference the draw object</param>
+		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
+		/// <param name="anchor1Time">The time at which to draw the first anchor point</param>
+		/// <param name="anchor1Y">The y value coordinate of the first anchor point</param>
+		/// <param name="anchor2Time">The time at which to draw the second anchor point</param>
+		/// <param name="anchor2Y">The y value coordinate of the second anchor point</param>
+		/// <param name="anchor3Time">The time at which to draw the third anchor point</param>
+		/// <param name="anchor3Y">The y value coordinate of the third anchor point</param>
+		/// <param name="anchor4Time">The time at which to draw the fourth anchor point</param>
+		/// <param name="anchor4Y">The y value coordinate of the fourth anchor point</param>
 		/// <returns></returns>
 		public static Polygon Polygon(NinjaScriptBase owner, string tag, bool isAutoScale, DateTime anchor1Time, double anchor1Y, DateTime anchor2Time, double anchor2Y, DateTime anchor3Time, double anchor3Y, DateTime anchor4Time, double anchor4Y)
 		{
@@ -610,19 +612,19 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <summary>
 		/// Draws a Polygon.
 		/// </summary>
-		/// <param name="owner">The owner.</param>
-		/// <param name="tag">The tag.</param>
-		/// <param name="isAutoScale">if set to <c>true</c> [is automatic scale].</param>
+		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
+		/// <param name="tag">A user defined unique id used to reference the draw object</param>
+		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="anchor1BarsAgo">The number of bars ago (x value) of the 1st anchor point</param>
-		/// <param name="anchor1Y">The y value of the 1st anchor point</param>
-		/// <param name="anchor2BarsAgo">The number of bars ago (x value) of the 2nd anchor point</param>
-		/// <param name="anchor2Y">The y value of the 2nd anchor point</param>
-		/// <param name="anchor3BarsAgo">The number of bars ago (x value) of the 3rd anchor point</param>
-		/// <param name="anchor3Y">The y value of the 3rd anchor point</param>
-		/// <param name="anchor4BarsAgo">The number of bars ago (x value) of the 4th anchor point</param>
-		/// <param name="anchor4Y">The y value of the 4th anchor point</param>
-		/// <param name="anchor5BarsAgo">The number of bars ago (x value) of the 5th anchor point</param>
-		/// <param name="anchor5Y">The y value of the 5th anchor point</param>
+		/// <param name="anchor1Y">The y value coordinate of the first anchor point</param>
+		/// <param name="anchor2BarsAgo">The number of bars ago (x axis coordinate) to draw the second anchor point</param>
+		/// <param name="anchor2Y">The y value coordinate of the second anchor point</param>
+		/// <param name="anchor3BarsAgo">The number of bars ago (x axis coordinate) to draw the third anchor point</param>
+		/// <param name="anchor3Y">The y value coordinate of the third anchor point</param>
+		/// <param name="anchor4BarsAgo">The number of bars ago (x axis coordinate) to draw the fourth anchor point</param>
+		/// <param name="anchor4Y">The y value coordinate of the fourth anchor point</param>
+		/// <param name="anchor5BarsAgo">The number of bars ago (x axis coordinate) to draw the fifth anchor point</param>
+		/// <param name="anchor5Y">The y value coordinate of the fifth anchor point</param>
 		/// <returns></returns>
 		public static Polygon Polygon(NinjaScriptBase owner, string tag, bool isAutoScale, int anchor1BarsAgo, double anchor1Y, int anchor2BarsAgo, double anchor2Y, int anchor3BarsAgo, double anchor3Y, int anchor4BarsAgo, double anchor4Y, int anchor5BarsAgo, double anchor5Y)
 		{
@@ -632,19 +634,19 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <summary>
 		/// Draws a Polygon.
 		/// </summary>
-		/// <param name="owner">The owner.</param>
-		/// <param name="tag">The tag.</param>
-		/// <param name="isAutoScale">if set to <c>true</c> [is automatic scale].</param>
-		/// <param name="anchor1Time">The time of the 1st anchor point</param>
-		/// <param name="anchor1Y">The y value of the 1st anchor point</param>
-		/// <param name="anchor2Time">The time of the 2nd anchor point</param>
-		/// <param name="anchor2Y">The y value of the 2nd anchor point</param>
-		/// <param name="anchor3Time">The time of the 3rd anchor point</param>
-		/// <param name="anchor3Y">The y value of the 3rd anchor point</param>
-		/// <param name="anchor4Time">The time of the 4th anchor point</param>
-		/// <param name="anchor4Y">The y value of the 4th anchor point</param>
-		/// <param name="anchor5Time">The time of the 5th anchor point</param>
-		/// <param name="anchor5Y">The y value of the 5th anchor point</param>
+		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
+		/// <param name="tag">A user defined unique id used to reference the draw object</param>
+		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
+		/// <param name="anchor1Time">The time at which to draw the first anchor point</param>
+		/// <param name="anchor1Y">The y value coordinate of the first anchor point</param>
+		/// <param name="anchor2Time">The time at which to draw the second anchor point</param>
+		/// <param name="anchor2Y">The y value coordinate of the second anchor point</param>
+		/// <param name="anchor3Time">The time at which to draw the third anchor point</param>
+		/// <param name="anchor3Y">The y value coordinate of the third anchor point</param>
+		/// <param name="anchor4Time">The time at which to draw the fourth anchor point</param>
+		/// <param name="anchor4Y">The y value coordinate of the fourth anchor point</param>
+		/// <param name="anchor5Time">The time at which to draw the fifth anchor point</param>
+		/// <param name="anchor5Y">The y value coordinate of the fifth anchor point</param>
 		/// <returns></returns>
 		public static Polygon Polygon(NinjaScriptBase owner, string tag, bool isAutoScale, DateTime anchor1Time, double anchor1Y, DateTime anchor2Time, double anchor2Y, DateTime anchor3Time, double anchor3Y, DateTime anchor4Time, double anchor4Y, DateTime anchor5Time, double anchor5Y)
 		{
@@ -654,21 +656,21 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <summary>
 		/// Draws a Polygon.
 		/// </summary>
-		/// <param name="owner">The owner.</param>
-		/// <param name="tag">The tag.</param>
-		/// <param name="isAutoScale">if set to <c>true</c> [is automatic scale].</param>
+		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
+		/// <param name="tag">A user defined unique id used to reference the draw object</param>
+		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="anchor1BarsAgo">The number of bars ago (x value) of the 1st anchor point</param>
-		/// <param name="anchor1Y">The y value of the 1st anchor point</param>
-		/// <param name="anchor2BarsAgo">The number of bars ago (x value) of the 2nd anchor point</param>
-		/// <param name="anchor2Y">The y value of the 2nd anchor point</param>
-		/// <param name="anchor3BarsAgo">The number of bars ago (x value) of the 3rd anchor point</param>
-		/// <param name="anchor3Y">The y value of the 3rd anchor point</param>
-		/// <param name="anchor4BarsAgo">The number of bars ago (x value) of the 4th anchor point</param>
-		/// <param name="anchor4Y">The y value of the 4th anchor point</param>
-		/// <param name="anchor5BarsAgo">The number of bars ago (x value) of the 5th anchor point</param>
-		/// <param name="anchor5Y">The y value of the 5th anchor point</param>
-		/// <param name="anchor6BarsAgo">The number of bars ago (x value) of the 6th anchor point</param>
-		/// <param name="anchor6Y">The y value of the 6th anchor point</param>
+		/// <param name="anchor1Y">The y value coordinate of the first anchor point</param>
+		/// <param name="anchor2BarsAgo">The number of bars ago (x axis coordinate) to draw the second anchor point</param>
+		/// <param name="anchor2Y">The y value coordinate of the second anchor point</param>
+		/// <param name="anchor3BarsAgo">The number of bars ago (x axis coordinate) to draw the third anchor point</param>
+		/// <param name="anchor3Y">The y value coordinate of the third anchor point</param>
+		/// <param name="anchor4BarsAgo">The number of bars ago (x axis coordinate) to draw the fourth anchor point</param>
+		/// <param name="anchor4Y">The y value coordinate of the fourth anchor point</param>
+		/// <param name="anchor5BarsAgo">The number of bars ago (x axis coordinate) to draw the fifth anchor point</param>
+		/// <param name="anchor5Y">The y value coordinate of the fifth anchor point</param>
+		/// <param name="anchor6BarsAgo">The number of bars ago (x axis coordinate) to draw the sixth anchor point</param>
+		/// <param name="anchor6Y">The y value coordinate of the sixth anchor point</param>
 		/// <returns></returns>
 		public static Polygon Polygon(NinjaScriptBase owner, string tag, bool isAutoScale, int anchor1BarsAgo, double anchor1Y, int anchor2BarsAgo, double anchor2Y, int anchor3BarsAgo, double anchor3Y, int anchor4BarsAgo, double anchor4Y, int anchor5BarsAgo, double anchor5Y, int anchor6BarsAgo, double anchor6Y)
 		{
@@ -678,21 +680,21 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <summary>
 		/// Draws a Polygon.
 		/// </summary>
-		/// <param name="owner">The owner.</param>
-		/// <param name="tag">The tag.</param>
-		/// <param name="isAutoScale">if set to <c>true</c> [is automatic scale].</param>
-		/// <param name="anchor1Time">The time of the 1st anchor point</param>
-		/// <param name="anchor1Y">The y value of the 1st anchor point</param>
-		/// <param name="anchor2Time">The time of the 2nd anchor point</param>
-		/// <param name="anchor2Y">The y value of the 2nd anchor point</param>
-		/// <param name="anchor3Time">The time of the 3rd anchor point</param>
-		/// <param name="anchor3Y">The y value of the 3rd anchor point</param>
-		/// <param name="anchor4Time">The time of the 4th anchor point</param>
-		/// <param name="anchor4Y">The y value of the 4th anchor point</param>
-		/// <param name="anchor5Time">The time of the 5th anchor point</param>
-		/// <param name="anchor5Y">The y value of the 5th anchor point</param>
-		/// <param name="anchor6Time">The time of the 6th anchor point</param>
-		/// <param name="anchor6Y">The y value of the 6th anchor point</param>
+		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
+		/// <param name="tag">A user defined unique id used to reference the draw object</param>
+		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
+		/// <param name="anchor1Time">The time at which to draw the first anchor point</param>
+		/// <param name="anchor1Y">The y value coordinate of the first anchor point</param>
+		/// <param name="anchor2Time">The time at which to draw the second anchor point</param>
+		/// <param name="anchor2Y">The y value coordinate of the second anchor point</param>
+		/// <param name="anchor3Time">The time at which to draw the third anchor point</param>
+		/// <param name="anchor3Y">The y value coordinate of the third anchor point</param>
+		/// <param name="anchor4Time">The time at which to draw the fourth anchor point</param>
+		/// <param name="anchor4Y">The y value coordinate of the fourth anchor point</param>
+		/// <param name="anchor5Time">The time at which to draw the fifth anchor point</param>
+		/// <param name="anchor5Y">The y value coordinate of the fifth anchor point</param>
+		/// <param name="anchor6Time">The time at which to draw the sixth anchor point</param>
+		/// <param name="anchor6Y">The y value coordinate of the sixth anchor point</param>
 		/// <returns></returns>
 		public static Polygon Polygon(NinjaScriptBase owner, string tag, bool isAutoScale, DateTime anchor1Time, double anchor1Y, DateTime anchor2Time, double anchor2Y, DateTime anchor3Time, double anchor3Y, DateTime anchor4Time, double anchor4Y, DateTime anchor5Time, double anchor5Y, DateTime anchor6Time, double anchor6Y)
 		{

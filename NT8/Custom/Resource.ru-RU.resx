@@ -129,8 +129,14 @@
   <data name="ADLAD" xml:space="preserve">
     <value>AD</value>
   </data>
+  <data name="AlertOnBreak" xml:space="preserve">
+    <value>Оповещение о перерыве</value>
+  </data>
+  <data name="AlertOnBreakSound" xml:space="preserve">
+    <value>Оповещение по звуку перерыва</value>
+  </data>
   <data name="AndrewsPitchforkCalculationMethod_ModifiedSchiff" xml:space="preserve">
-    <value>Измененый Schiff</value>
+    <value>Modified Schiff</value>
   </data>
   <data name="AndrewsPitchforkCalculationMethod_Schiff" xml:space="preserve">
     <value>Schiff</value>
@@ -220,7 +226,7 @@
     <value>Перед запуском Бар таймер ожидает данные в реальном времени</value>
   </data>
   <data name="BarUp" xml:space="preserve">
-    <value>График вверх</value>
+    <value>Бар вверх</value>
   </data>
   <data name="BasePeriod" xml:space="preserve">
     <value>Базовый периода</value>
@@ -230,6 +236,9 @@
   </data>
   <data name="BidLineStroke" xml:space="preserve">
     <value>Линия Bid</value>
+  </data>
+  <data name="BlockTradeSize" xml:space="preserve">
+    <value>Размер блочной сделки</value>
   </data>
   <data name="BollingerLowerBand" xml:space="preserve">
     <value>Нижняя полоса</value>
@@ -411,6 +420,12 @@
   <data name="DownBarColor" xml:space="preserve">
     <value>Цвет графика вниз</value>
   </data>
+  <data name="DrawingToolIndicatorDescription" xml:space="preserve">
+    <value>Индикатор Drawing tool tile добавляет возможность иметь плавающую плитку на графике, которую можно настроить для быстрого доступа к наиболее часто используемым инструментам рисования.</value>
+  </data>
+  <data name="DrawingToolIndicatorName" xml:space="preserve">
+    <value>Drawing tool tile</value>
+  </data>
   <data name="DrawLines" xml:space="preserve">
     <value>Рисовать линии</value>
   </data>
@@ -485,6 +500,9 @@
   </data>
   <data name="GuiAuthorize" xml:space="preserve">
     <value>Авторизовать</value>
+  </data>
+  <data name="GuiChartStyleDojiBrush" xml:space="preserve">
+    <value>Color for doji bars</value>
   </data>
   <data name="HigherHigh" xml:space="preserve">
     <value>Более высокий high</value>
@@ -687,6 +705,9 @@
   <data name="NetChangePosition_TopRight" xml:space="preserve">
     <value>Вверху Справа</value>
   </data>
+  <data name="NinjaScriptBackground" xml:space="preserve">
+    <value>Справочная информация</value>
+  </data>
   <data name="NinjaScriptBarsTypeDay" xml:space="preserve">
     <value>День</value>
   </data>
@@ -741,6 +762,9 @@
   <data name="NinjaScriptBarsTypeWeek" xml:space="preserve">
     <value>Неделя</value>
   </data>
+  <data name="NinjaScriptBorder" xml:space="preserve">
+    <value>Граница</value>
+  </data>
   <data name="NinjaScriptChartStyleBarWidth" xml:space="preserve">
     <value>Ширина бара</value>
   </data>
@@ -768,11 +792,17 @@
   <data name="NinjaScriptChartStyleCandlestick" xml:space="preserve">
     <value>Свечи</value>
   </data>
+  <data name="NinjaScriptChartStyleCandlestickHollow" xml:space="preserve">
+    <value>Hollow candlestick</value>
+  </data>
   <data name="NinjaScriptChartStyleCandleUpBarsColor" xml:space="preserve">
     <value>Цвет для баров вверх</value>
   </data>
   <data name="NinjaScriptChartStyleCandleWick" xml:space="preserve">
     <value>"Хвост" свечи</value>
+  </data>
+  <data name="NinjaScriptChartStyleEquivolume" xml:space="preserve">
+    <value>Equivolume</value>
   </data>
   <data name="NinjaScriptChartStyleHeikenAshi" xml:space="preserve">
     <value>Heiken Ashi</value>
@@ -817,7 +847,7 @@
     <value>Цвет для баров вверх</value>
   </data>
   <data name="NinjaScriptChartStyleOpenClose" xml:space="preserve">
-    <value>Открыто/Закрыто</value>
+    <value>Open/Close</value>
   </data>
   <data name="NinjaScriptChartStyleOpenCloseDownBarsColor" xml:space="preserve">
     <value>Цвет для баров вниз</value>
@@ -945,6 +975,21 @@
   <data name="NinjaScriptDrawingToolLine" xml:space="preserve">
     <value>Линия</value>
   </data>
+  <data name="NinjaScriptDrawingToolPath" xml:space="preserve">
+    <value>Путь</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathBegin" xml:space="preserve">
+    <value>Начало пути</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathEnd" xml:space="preserve">
+    <value>Конец пути</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathSegment" xml:space="preserve">
+    <value>Сегмент</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathShowCount" xml:space="preserve">
+    <value>Show count</value>
+  </data>
   <data name="NinjaScriptDrawingToolPolygon" xml:space="preserve">
     <value>Многоугольник</value>
   </data>
@@ -1067,6 +1112,9 @@
   </data>
   <data name="NinjaScriptDrawingToolRulerYValueText" xml:space="preserve">
     <value>Значение Y:</value>
+  </data>
+  <data name="NinjaScriptDrawingTools" xml:space="preserve">
+    <value>Инструменты для рисования</value>
   </data>
   <data name="NinjaScriptDrawingToolsChartArrowDownMarkerName" xml:space="preserve">
     <value>Стрелка вниз</value>
@@ -1227,11 +1275,17 @@
   <data name="NinjaScriptGeneticOptimizerStabilitySizePercent" xml:space="preserve">
     <value>Стабильный размер (%)</value>
   </data>
+  <data name="NinjaScriptGeneticOptimizerThresholdGenerations" xml:space="preserve">
+    <value>Threshold generations</value>
+  </data>
   <data name="NinjaScriptIndicator" xml:space="preserve">
     <value>Индикатор</value>
   </data>
   <data name="NinjaScriptIndicatorAvg" xml:space="preserve">
     <value>Avg</value>
+  </data>
+  <data name="NinjaScriptIndicatorCount" xml:space="preserve">
+    <value>Count</value>
   </data>
   <data name="NinjaScriptIndicatorDefault" xml:space="preserve">
     <value>По умолчанию</value>
@@ -1260,6 +1314,9 @@
   <data name="NinjaScriptIndicatorDescriptionBarTimer" xml:space="preserve">
     <value>Отображает оставшееся время на основе времени бар</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionBlockVolume" xml:space="preserve">
+    <value>Block volume обнаруживает блочные сделки и отображает, сколько проишло за бар. Это может быть отображено в виде сделок или объема. Иторические тиковые данные необходимы для построения графика.</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionBollinger" xml:space="preserve">
     <value>Bollinger Bands строятся на стандартном отклонении уровней выше и ниже скользящей средней. Поскольку стандарт отклонения это измерение волатильности, полосы сами регулируются: расширяются когда рыноки волатильны, и сжимаются когда спокойные периоды.</value>
   </data>
@@ -1271,6 +1328,9 @@
   </data>
   <data name="NinjaScriptIndicatorDescriptionBuySellVolume" xml:space="preserve">
     <value>Построители гистограм разделяют значение между торговлей на ask или выше и торговлей на bid и ниже. Работает только на данных с историей если используется Тик Проиграть.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionCamarillaPivots" xml:space="preserve">
+    <value>Camarilla pivots являются ценовым анализом, который генерирует потенциальные уровни поддержки и сопротивления, умножая предыдущий диапазон, затем добавляя или вычитая его из закрытия.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionCandlestickPattern" xml:space="preserve">
     <value>Обнаруживает общие закономерности подсвечника и отмечает их на графике</value>
@@ -1286,6 +1346,9 @@
   </data>
   <data name="NinjaScriptIndicatorDescriptionChaikinVolatility" xml:space="preserve">
     <value>Сравнивает разницу между текущими инструментами и диапазоном истории используя экспоненциальные скользящие среднии.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionChoppinessIndex" xml:space="preserve">
+    <value>Индекс Choppiness предназначен для определения, является ли рынок изменчивым (торгуется в боковом направлении) или не изменчивым (торгуется в тренде в любом направлении)</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionCMO" xml:space="preserve">
     <value>CMO отличается от других осцилляторов моментума, таких как Relative Strength Index, (RSI) и Stochastics. Он использует дневные данные Вверх и Вниз, в числителе расчета для измерения моментума напрямую. В первую очередь используется для поиска экстремальных состояний перекупок и перепродаж, CMO может также быть использован для поиска трендов.</value>
@@ -1325,6 +1388,9 @@
   </data>
   <data name="NinjaScriptIndicatorDescriptionEMA" xml:space="preserve">
     <value>Exponential Moving Average (EMA) индикатор, который показывает среднее значение цены ценной бумаги за период времени. Когда вычисляется скользящяя средняя. EMA делает более весомыми последние цены чем SMA.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionFibonacciPivots" xml:space="preserve">
+    <value>Fibonacci pivots представляют собой анализ цен, который генерирует потенциальные уровни поддержки и сопротивления, умножая предыдущий диапазон на значения Фибоначчи, затем прибавляя или вычитая его из среднего значения предыдущего high, low и закрытия.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionFisherTransform" xml:space="preserve">
     <value>Fisher Transform имеет острые и различные точки поворота, которые происходят своевременно. Полученные пик колебания, используются для определения ценовых разворотов.</value>
@@ -1419,6 +1485,9 @@
   <data name="NinjaScriptIndicatorDescriptionPriorDayOHLC" xml:space="preserve">
     <value>Наносит значения сессии начиная от предыдущего дня: открытие, high, low, закрытие</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionPsychologicalLine" xml:space="preserve">
+    <value>Psychological Line - это отношение числа восходящих баров к указанному количеству баров.</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionRange" xml:space="preserve">
     <value>Вычисление диапазона бара.</value>
   </data>
@@ -1488,6 +1557,9 @@
   <data name="NinjaScriptIndicatorDescriptionTMA" xml:space="preserve">
     <value>ТМА (Triangular Moving Average) это взвешенная скользящая средняя. По сравнению с WMA, которая делает более весомым последний бар цены, ТМА делает более весомыми данные в середине указанного периода.</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionTrendLines" xml:space="preserve">
+    <value>Когда за высоким swing следует более низкий, автоматически строится линия максимума. Когда за низким swing следует более высокий, автоматически строится линия минимума тренда.</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionTRIX" xml:space="preserve">
     <value>TRIX (Triple Exponential Average) отображает процент Rate of Change (ROC) из тройного EMA. TRIX колеблется выше и ниже нулевой величины. Индикатор применяет трехкратное сглаживание в попытке устранить незначительные ценовые движения в пределах тренда, который пытаетесь изолировать.</value>
   </data>
@@ -1523,6 +1595,9 @@
   </data>
   <data name="NinjaScriptIndicatorDescriptionVolumeZones" xml:space="preserve">
     <value>Volume zones строят горизонтальную гистограмму которая перекрывает ценовой график. Бары гистограмм растянуты слева направо, начиная с левой стороны графика. Длина каждого бара определяется нарастающим итогом объема всех баров за периоды в течение которого цена упала в вертикальном диапазоне бара гистограммы.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionVortex" xml:space="preserve">
+    <value>Индикатор Vortex - это осциллятор, используемый для определения трендов. Бычий сигнал срабатывает, когда линия VIPlus пересекает линию VIMinus. Медвежий сигнал срабатывает, когда линия VIMinus пересекает линию VIPlus</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionVROC" xml:space="preserve">
     <value>VROC (Volume Rate-of-Change) показывает развивается ли тренд объема в большую или меньшую сторону. Это похоже на индикатор ROC, но применяется к объему.</value>
@@ -1587,6 +1662,9 @@
   <data name="NinjaScriptIndicatorNameBarTimer" xml:space="preserve">
     <value>Bar timer</value>
   </data>
+  <data name="NinjaScriptIndicatorNameBlockVolume" xml:space="preserve">
+    <value>Block volume</value>
+  </data>
   <data name="NinjaScriptIndicatorNameBollinger" xml:space="preserve">
     <value>Bollinger</value>
   </data>
@@ -1598,6 +1676,9 @@
   </data>
   <data name="NinjaScriptIndicatorNameBuySellVolume" xml:space="preserve">
     <value>Buy sell volume</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCamarillaPivots" xml:space="preserve">
+    <value>Camarilla pivots</value>
   </data>
   <data name="NinjaScriptIndicatorNameCandlestickPattern" xml:space="preserve">
     <value>Candlestick pattern</value>
@@ -1613,6 +1694,9 @@
   </data>
   <data name="NinjaScriptIndicatorNameChaikinVolatility" xml:space="preserve">
     <value>Chaikin volatility</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameChoppinessIndex" xml:space="preserve">
+    <value>Choppiness index</value>
   </data>
   <data name="NinjaScriptIndicatorNameCMO" xml:space="preserve">
     <value>CMO</value>
@@ -1652,6 +1736,9 @@
   </data>
   <data name="NinjaScriptIndicatorNameEMA" xml:space="preserve">
     <value>EMA</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameFibonacciPivots" xml:space="preserve">
+    <value>Fibonacci pivots</value>
   </data>
   <data name="NinjaScriptIndicatorNameFisherTransform" xml:space="preserve">
     <value>Fisher transform</value>
@@ -1720,7 +1807,7 @@
     <value>N bars up</value>
   </data>
   <data name="NinjaScriptIndicatorNameNetChangeDisplay" xml:space="preserve">
-    <value>Отображение изменений</value>
+    <value>Net change display</value>
   </data>
   <data name="NinjaScriptIndicatorNameOBV" xml:space="preserve">
     <value>OBV</value>
@@ -1745,6 +1832,9 @@
   </data>
   <data name="NinjaScriptIndicatorNamePriorDayOHLC" xml:space="preserve">
     <value>Prior day OHLC</value>
+  </data>
+  <data name="NinjaScriptIndicatorNamePsychologicalLine" xml:space="preserve">
+    <value>Psychological line</value>
   </data>
   <data name="NinjaScriptIndicatorNameRange" xml:space="preserve">
     <value>Range</value>
@@ -1815,6 +1905,9 @@
   <data name="NinjaScriptIndicatorNameTMA" xml:space="preserve">
     <value>TMA</value>
   </data>
+  <data name="NinjaScriptIndicatorNameTrendLines" xml:space="preserve">
+    <value>Trend lines</value>
+  </data>
   <data name="NinjaScriptIndicatorNameTRIX" xml:space="preserve">
     <value>TRIX</value>
   </data>
@@ -1850,6 +1943,9 @@
   </data>
   <data name="NinjaScriptIndicatorNameVolumeUpDown" xml:space="preserve">
     <value>Volume up down</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameVortex" xml:space="preserve">
+    <value>Vortex</value>
   </data>
   <data name="NinjaScriptIndicatorNameVROC" xml:space="preserve">
     <value>VROC</value>
@@ -1896,11 +1992,23 @@
   <data name="NinjaScriptIndicatorUpper" xml:space="preserve">
     <value>Верхний</value>
   </data>
+  <data name="NinjaScriptIndicatorVIMinus" xml:space="preserve">
+    <value>VIMinus</value>
+  </data>
+  <data name="NinjaScriptIndicatorVIPlus" xml:space="preserve">
+    <value>VIPlus</value>
+  </data>
   <data name="NinjaScriptIndicatorVisualGroup" xml:space="preserve">
     <value>Визуальный</value>
   </data>
   <data name="NinjaScriptIndicatorZeroLine" xml:space="preserve">
     <value>Нулевая линия</value>
+  </data>
+  <data name="NinjaScriptIsVisibleOnlyFocused" xml:space="preserve">
+    <value>Видимо только в фокусе</value>
+  </data>
+  <data name="NinjaScriptLine" xml:space="preserve">
+    <value>Линия</value>
   </data>
   <data name="NinjaScriptLines" xml:space="preserve">
     <value>Линии</value>
@@ -1959,6 +2067,9 @@
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionDailyVolume" xml:space="preserve">
     <value>Сегодняшний объем</value>
   </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionDaysUntilRollover" xml:space="preserve">
+    <value>Показывает, сколько дней от ролловер на следующий контракта.</value>
+  </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionDescription" xml:space="preserve">
     <value>Описание инструмента</value>
   </data>
@@ -1993,10 +2104,10 @@
     <value>Закрытие последней торговой сессии</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionLastPrice" xml:space="preserve">
-    <value>Последняя торговая цена</value>
+    <value>Цена последней сделки</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionLastSize" xml:space="preserve">
-    <value>Последний торговый размер</value>
+    <value>Размер последней сделки</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionLow52Weeks" xml:space="preserve">
     <value>Самое низкое значение за последние 52 недели</value>
@@ -2012,6 +2123,12 @@
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionNetChange" xml:space="preserve">
     <value>Текущая цена в сравнении с последней ценой закрытия </value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionNetChangeMaxDown" xml:space="preserve">
+    <value>Текущий low по сравнению с последней ценой закрытия</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionNetChangeMaxUp" xml:space="preserve">
+    <value>Текущий high по сравнению с последней ценой закрытия</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionNextYearsEarningsPerShare" xml:space="preserve">
     <value>Проект дохода на каждую акцию</value>
@@ -2047,7 +2164,7 @@
     <value>Соотношение дохода к цене акции</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionSettlement" xml:space="preserve">
-    <value>Сегодняшняя расчетная цена</value>
+    <value>Сегодняшняя цена Settlement</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionSharesOutstanding" xml:space="preserve">
     <value>Число выделенных акций</value>
@@ -2063,6 +2180,9 @@
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionTradedContracts" xml:space="preserve">
     <value>Сегодняшние заполненные контракты</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionTSTrend" xml:space="preserve">
+    <value>This columndisplays a colored bar that represents the incoming ticks with the same colors that the T &amp; S window uses</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnDescriptionUnrealizedProfitLoss" xml:space="preserve">
     <value>Прибыль/убыток для текущей позиции</value>
@@ -2103,6 +2223,12 @@
   <data name="NinjaScriptMarketAnalyzerColumnNameCalendarYearLowDate" xml:space="preserve">
     <value>День low за календарный год</value>
   </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameChartMini" xml:space="preserve">
+    <value>Chart - Mini</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameChartNetChange" xml:space="preserve">
+    <value>Chart - Net change</value>
+  </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameCurrentRatio" xml:space="preserve">
     <value>Текущее соотношение</value>
   </data>
@@ -2114,6 +2240,9 @@
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameDailyVolume" xml:space="preserve">
     <value>Дневной объем</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameDaysUntilRollover" xml:space="preserve">
+    <value>Дней до ролловера</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameDescription" xml:space="preserve">
     <value>Описание</value>
@@ -2146,13 +2275,13 @@
     <value>Инструмент</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameLastClose" xml:space="preserve">
-    <value>Посленее закрытие</value>
+    <value>Последнее закрытие</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameLastPrice" xml:space="preserve">
-    <value>Последняя цена</value>
+    <value>Цена последней сделки</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameLastSize" xml:space="preserve">
-    <value>Последний размер</value>
+    <value>Размер последней сделки</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameLow52Weeks" xml:space="preserve">
     <value>Самое низкое значение за 52 недели</value>
@@ -2168,6 +2297,12 @@
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameNetChange" xml:space="preserve">
     <value>Изменение net</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameNetChangeMaxDown" xml:space="preserve">
+    <value>Изменение net макс вниз</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameNetChangeMaxUp" xml:space="preserve">
+    <value>Изменение net макс вверх</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameNextYearsEarningsPerShare" xml:space="preserve">
     <value>Доход следующего года каждой акции</value>
@@ -2191,7 +2326,7 @@
     <value>Размер позиции</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNamePriceEarningsRatio" xml:space="preserve">
-    <value>Цена доходной ставки</value>
+    <value>Сотношение цены к доходу</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameProfitLoss" xml:space="preserve">
     <value>Прибыль/убыток</value>
@@ -2203,7 +2338,7 @@
     <value>Выручка за акцию</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameSettlement" xml:space="preserve">
-    <value>Расчетная цена</value>
+    <value>Цена Settlement</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameSharesOutstanding" xml:space="preserve">
     <value>Акции выделенные</value>
@@ -2220,11 +2355,17 @@
   <data name="NinjaScriptMarketAnalyzerColumnNameTradedContracts" xml:space="preserve">
     <value>Проторговано контрактов</value>
   </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameTSTrend" xml:space="preserve">
+    <value>T &amp; S тренд</value>
+  </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameUnrealizedProfitLoss" xml:space="preserve">
     <value>Нереализованная прибыль/убыток</value>
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameVwap" xml:space="preserve">
     <value>VWAP</value>
+  </data>
+  <data name="NinjaScriptNumberOfRows" xml:space="preserve">
+    <value>Строк</value>
   </data>
   <data name="NinjaScriptOnBarCloseError" xml:space="preserve">
     <value>{0} зависит от обновлений тика bid/ask, ожидает Пересчет 'На каждый тик'</value>
@@ -2364,9 +2505,6 @@
   <data name="NinjaScriptOptimizerGenetic" xml:space="preserve">
     <value>Генетический</value>
   </data>
-  <data name="NinjaScriptOptimizerUniversal" xml:space="preserve">
-    <value>Универсальный</value>
-  </data>
   <data name="NinjaScriptParameters" xml:space="preserve">
     <value>Параметры</value>
   </data>
@@ -2387,6 +2525,39 @@
   </data>
   <data name="NinjaScriptStrategyDescriptionSampleMultiTimeFrame" xml:space="preserve">
     <value>Много-временной пакет пример стратегии.</value>
+  </data>
+  <data name="NinjaScriptStrategyGenerator" xml:space="preserve">
+    <value>Генератор стратегий</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorCandleStickPatternPrompt" xml:space="preserve">
+    <value>1 candle stick pattern|{0} candle stick patterns|Add candle stick pattern...|Configure candle stick pattern...|Configure candle stick patterns...</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorEntries" xml:space="preserve">
+    <value>Условия входа</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorEntriesOrExits" xml:space="preserve">
+    <value>Вам нужен хотя бы один ордер на вход чтобы установить условия для выхода.</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorIndicatorException" xml:space="preserve">
+    <value>Исключение в выражении: {0} {1}</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorIndicatorsPrompt" xml:space="preserve">
+    <value>1 индикатор | {0} индикаторов | Добавить индикатор ... | Настроить индикатор ... | Настроить индикатор ...</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorPeformance" xml:space="preserve">
+    <value>Анализ торговли для {0} = {1}</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorProperties" xml:space="preserve">
+    <value>AI Generate Properties</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorTerminated" xml:space="preserve">
+    <value>Генератор стратегий прервался после {0} генерорований, так как не было улучшения производительности для {1} генерирования</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorUseCandleStickPattern" xml:space="preserve">
+    <value>Candle stick pattern</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorUseIndicators" xml:space="preserve">
+    <value>Индикаторы</value>
   </data>
   <data name="NinjaScriptStrategyNameSampleATMStrategy" xml:space="preserve">
     <value>Образец АТМ стратегии</value>
@@ -2436,8 +2607,14 @@
   <data name="NinjaScriptSuperDomColumnVolume" xml:space="preserve">
     <value>Объем</value>
   </data>
-  <data name="NinjaScriptUniversalOptimizerEntriesOrExits" xml:space="preserve">
-    <value>Вам нужен хотя бы один ордер на вход чтобы установить условия для выхода.</value>
+  <data name="NinjaScriptTileError" xml:space="preserve">
+    <value>Ошибка при загрузке инструмента рисования {0}: {1}</value>
+  </data>
+  <data name="NinjaScriptYOffset" xml:space="preserve">
+    <value>Y pixel offset</value>
+  </data>
+  <data name="NumberOfTrendLines" xml:space="preserve">
+    <value>Количество линий тренда</value>
   </data>
   <data name="NumStdDev" xml:space="preserve">
     <value>Число стандартых отклонений</value>
@@ -2445,8 +2622,23 @@
   <data name="OffsetMultiplier" xml:space="preserve">
     <value>Множитель отступа</value>
   </data>
+  <data name="OldTrendsOpacity" xml:space="preserve">
+    <value>Old trends opacity</value>
+  </data>
   <data name="Opacity" xml:space="preserve">
     <value>Непрозрачность</value>
+  </data>
+  <data name="PathCapMode_Arrow" xml:space="preserve">
+    <value>Стрелка</value>
+  </data>
+  <data name="PathCapMode_Line" xml:space="preserve">
+    <value>Линия</value>
+  </data>
+  <data name="PathToolCapMode_Arrow" xml:space="preserve">
+    <value>Стрелка</value>
+  </data>
+  <data name="PathToolCapMode_Line" xml:space="preserve">
+    <value>Линия</value>
   </data>
   <data name="PerformanceMetricSampleCumProfit" xml:space="preserve">
     <value>Пример показателя анализа совокупной прибыли</value>
@@ -2488,7 +2680,7 @@
     <value>Дневной</value>
   </data>
   <data name="PivotRange_Monthly" xml:space="preserve">
-    <value>Недельный</value>
+    <value>Месячный</value>
   </data>
   <data name="PivotRange_Weekly" xml:space="preserve">
     <value>Месячный</value>
@@ -2505,6 +2697,9 @@
   <data name="PivotsR3" xml:space="preserve">
     <value>R3</value>
   </data>
+  <data name="PivotsR4" xml:space="preserve">
+    <value>R4</value>
+  </data>
   <data name="PivotsS1" xml:space="preserve">
     <value>S1</value>
   </data>
@@ -2513,6 +2708,9 @@
   </data>
   <data name="PivotsS3" xml:space="preserve">
     <value>S3</value>
+  </data>
+  <data name="PivotsS4" xml:space="preserve">
+    <value>S4</value>
   </data>
   <data name="PlotCurrentValue" xml:space="preserve">
     <value>Нанести текущее значение только</value>
@@ -2655,6 +2853,27 @@
   <data name="ShareMailException" xml:space="preserve">
     <value>Обнаружена ошибка при отправке сообщения: {0}</value>
   </data>
+  <data name="ShareMailPreconfiguredAol" xml:space="preserve">
+    <value>AOL</value>
+  </data>
+  <data name="ShareMailPreconfiguredComcast" xml:space="preserve">
+    <value>Comcast</value>
+  </data>
+  <data name="ShareMailPreconfiguredGmail" xml:space="preserve">
+    <value>Gmail</value>
+  </data>
+  <data name="ShareMailPreconfiguredICloud" xml:space="preserve">
+    <value>iCloud</value>
+  </data>
+  <data name="ShareMailPreconfiguredManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="ShareMailPreconfiguredOutlook" xml:space="preserve">
+    <value>Outlook</value>
+  </data>
+  <data name="ShareMailPreconfiguredYahoo" xml:space="preserve">
+    <value>Yahoo</value>
+  </data>
   <data name="ShareMailSendError" xml:space="preserve">
     <value>Обнаружена ошибка при отправке сообщения: {0}</value>
   </data>
@@ -2684,6 +2903,45 @@
   </data>
   <data name="ShareStockTwitsSentSuccessfully" xml:space="preserve">
     <value>{0} - Сообщение успешно отправлено</value>
+  </data>
+  <data name="ShareTextMessageEmail" xml:space="preserve">
+    <value>Электронная почта</value>
+  </data>
+  <data name="ShareTextMessageEmailRequired" xml:space="preserve">
+    <value>Чтобы настроить текстовое сообщение по электронной почте 'Поделиться в соц сетях' , вы должны сначала настроить электронную почту 'Поделиться в соц сетях'.</value>
+  </data>
+  <data name="ShareTextMessageErrorOnShare" xml:space="preserve">
+    <value>Произошла ошибка при отправке сообщения через службу электронной почты {0}: '{1}'</value>
+  </data>
+  <data name="ShareTextMessageMmsAddress" xml:space="preserve">
+    <value>MMS address</value>
+  </data>
+  <data name="ShareTextMessageName" xml:space="preserve">
+    <value>Текстовое сообщение по электронной почте</value>
+  </data>
+  <data name="ShareTextMessagePhoneNumber" xml:space="preserve">
+    <value>Телефонный номер</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredAtt" xml:space="preserve">
+    <value>AT&amp;T</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredSprint" xml:space="preserve">
+    <value>Sprint</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredTMobile" xml:space="preserve">
+    <value>T-Mobile</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredVerizon" xml:space="preserve">
+    <value>Verizon</value>
+  </data>
+  <data name="ShareTextMessageSentSuccessfully" xml:space="preserve">
+    <value>{0} - текстовое сообщение отправлено</value>
+  </data>
+  <data name="ShareTextMessageSmsAddress" xml:space="preserve">
+    <value>SMS адрес</value>
   </data>
   <data name="ShareTooManyRequests" xml:space="preserve">
     <value>Провайдер возвратил сообщение слишком много запросов: '{0}'</value>
@@ -2763,6 +3021,9 @@
   <data name="Strength" xml:space="preserve">
     <value>Сила</value>
   </data>
+  <data name="SuperDomColumnException" xml:space="preserve">
+    <value>SuperDOM столбец '{0}': ошибка метода '{1}': {2}</value>
+  </data>
   <data name="SwingHigh" xml:space="preserve">
     <value>Свинг high</value>
   </data>
@@ -2819,6 +3080,18 @@
   </data>
   <data name="TickCounterTicksRemaining" xml:space="preserve">
     <value>Ticks Remaining = </value>
+  </data>
+  <data name="TrendLinesCurrentTrendLine" xml:space="preserve">
+    <value>Линия текущего тренда</value>
+  </data>
+  <data name="TrendLinesTrendLineBroken" xml:space="preserve">
+    <value>{0} сломан</value>
+  </data>
+  <data name="TrendLinesTrendLineHigh" xml:space="preserve">
+    <value>Линия тренда high</value>
+  </data>
+  <data name="TrendLinesTrendLineLow" xml:space="preserve">
+    <value>Линия тренда low</value>
   </data>
   <data name="TrendStrength" xml:space="preserve">
     <value>Сила тренда</value>

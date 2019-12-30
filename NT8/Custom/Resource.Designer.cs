@@ -97,6 +97,24 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Alert on break.
+        /// </summary>
+        public static string AlertOnBreak {
+            get {
+                return ResourceManager.GetString("AlertOnBreak", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alert on break sound.
+        /// </summary>
+        public static string AlertOnBreakSound {
+            get {
+                return ResourceManager.GetString("AlertOnBreakSound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Modified Schiff.
         /// </summary>
         public static string AndrewsPitchforkCalculationMethod_ModifiedSchiff {
@@ -952,6 +970,24 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Drawing tool tile indicator adds the ability to have a floating tile in the chart that can be customized to quickly access the most commonly used drawing tools..
+        /// </summary>
+        public static string DrawingToolIndicatorDescription {
+            get {
+                return ResourceManager.GetString("DrawingToolIndicatorDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drawing tool tile.
+        /// </summary>
+        public static string DrawingToolIndicatorName {
+            get {
+                return ResourceManager.GetString("DrawingToolIndicatorName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Draw lines.
         /// </summary>
         public static string DrawLines {
@@ -1173,6 +1209,15 @@ namespace NinjaTrader.Custom {
         public static string GuiAuthorize {
             get {
                 return ResourceManager.GetString("GuiAuthorize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color for doji bars.
+        /// </summary>
+        public static string GuiChartStyleDojiBrush {
+            get {
+                return ResourceManager.GetString("GuiChartStyleDojiBrush", resourceCulture);
             }
         }
         
@@ -1564,6 +1609,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to From name.
+        /// </summary>
+        public static string MailServiceSenderDisplayName {
+            get {
+                return ResourceManager.GetString("MailServiceSenderDisplayName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connection - Server.
         /// </summary>
         public static string MailServiceServer {
@@ -1780,6 +1834,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Background.
+        /// </summary>
+        public static string NinjaScriptBackground {
+            get {
+                return ResourceManager.GetString("NinjaScriptBackground", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Day.
         /// </summary>
         public static string NinjaScriptBarsTypeDay {
@@ -1942,6 +2005,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Border.
+        /// </summary>
+        public static string NinjaScriptBorder {
+            get {
+                return ResourceManager.GetString("NinjaScriptBorder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bar width.
         /// </summary>
         public static string NinjaScriptChartStyleBarWidth {
@@ -2023,6 +2095,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hollow candlestick.
+        /// </summary>
+        public static string NinjaScriptChartStyleCandlestickHollow {
+            get {
+                return ResourceManager.GetString("NinjaScriptChartStyleCandlestickHollow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Color for up bars.
         /// </summary>
         public static string NinjaScriptChartStyleCandleUpBarsColor {
@@ -2037,6 +2118,15 @@ namespace NinjaTrader.Custom {
         public static string NinjaScriptChartStyleCandleWick {
             get {
                 return ResourceManager.GetString("NinjaScriptChartStyleCandleWick", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Equivolume.
+        /// </summary>
+        public static string NinjaScriptChartStyleEquivolume {
+            get {
+                return ResourceManager.GetString("NinjaScriptChartStyleEquivolume", resourceCulture);
             }
         }
         
@@ -2554,6 +2644,51 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Path.
+        /// </summary>
+        public static string NinjaScriptDrawingToolPath {
+            get {
+                return ResourceManager.GetString("NinjaScriptDrawingToolPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path begin.
+        /// </summary>
+        public static string NinjaScriptDrawingToolPathBegin {
+            get {
+                return ResourceManager.GetString("NinjaScriptDrawingToolPathBegin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path end.
+        /// </summary>
+        public static string NinjaScriptDrawingToolPathEnd {
+            get {
+                return ResourceManager.GetString("NinjaScriptDrawingToolPathEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Segment.
+        /// </summary>
+        public static string NinjaScriptDrawingToolPathSegment {
+            get {
+                return ResourceManager.GetString("NinjaScriptDrawingToolPathSegment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show count.
+        /// </summary>
+        public static string NinjaScriptDrawingToolPathShowCount {
+            get {
+                return ResourceManager.GetString("NinjaScriptDrawingToolPathShowCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Polygon.
         /// </summary>
         public static string NinjaScriptDrawingToolPolygon {
@@ -2919,6 +3054,15 @@ namespace NinjaTrader.Custom {
         public static string NinjaScriptDrawingToolRulerYValueText {
             get {
                 return ResourceManager.GetString("NinjaScriptDrawingToolRulerYValueText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drawing tools.
+        /// </summary>
+        public static string NinjaScriptDrawingTools {
+            get {
+                return ResourceManager.GetString("NinjaScriptDrawingTools", resourceCulture);
             }
         }
         
@@ -3400,6 +3544,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Threshold generations.
+        /// </summary>
+        public static string NinjaScriptGeneticOptimizerThresholdGenerations {
+            get {
+                return ResourceManager.GetString("NinjaScriptGeneticOptimizerThresholdGenerations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Indicator.
         /// </summary>
         public static string NinjaScriptIndicator {
@@ -3630,6 +3783,15 @@ namespace NinjaTrader.Custom {
         public static string NinjaScriptIndicatorDescriptionConstantLines {
             get {
                 return ResourceManager.GetString("NinjaScriptIndicatorDescriptionConstantLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The correlation indicator will plot the correlation of the data series to a desired instrument. Values close to 1 indicate movement in the same direction. Values close to -1 indicate movement in opposite directions. Values near 0 indicate no correlation..
+        /// </summary>
+        public static string NinjaScriptIndicatorDescriptionCorrelation {
+            get {
+                return ResourceManager.GetString("NinjaScriptIndicatorDescriptionCorrelation", resourceCulture);
             }
         }
         
@@ -4237,6 +4399,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to When a high swing is followed by a lower high swing, a trend line high is automatically plotted. When a low swing is followed by a higher low swing, a trend line low is automatically plotted..
+        /// </summary>
+        public static string NinjaScriptIndicatorDescriptionTrendLines {
+            get {
+                return ResourceManager.GetString("NinjaScriptIndicatorDescriptionTrendLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The TRIX (Triple Exponential Average) displays the percentage Rate of Change (ROC) of a triple EMA. Trix oscillates above and below the zero value. The indicator applies triple smoothing in an attempt to eliminate insignificant price movements within the trend that you&apos;re trying to isolate..
         /// </summary>
         public static string NinjaScriptIndicatorDescriptionTRIX {
@@ -4665,6 +4836,15 @@ namespace NinjaTrader.Custom {
         public static string NinjaScriptIndicatorNameConstantLines {
             get {
                 return ResourceManager.GetString("NinjaScriptIndicatorNameConstantLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Correlation.
+        /// </summary>
+        public static string NinjaScriptIndicatorNameCorrelation {
+            get {
+                return ResourceManager.GetString("NinjaScriptIndicatorNameCorrelation", resourceCulture);
             }
         }
         
@@ -5272,6 +5452,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Trend lines.
+        /// </summary>
+        public static string NinjaScriptIndicatorNameTrendLines {
+            get {
+                return ResourceManager.GetString("NinjaScriptIndicatorNameTrendLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to TRIX.
         /// </summary>
         public static string NinjaScriptIndicatorNameTRIX {
@@ -5560,6 +5749,24 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Visible only when in focus.
+        /// </summary>
+        public static string NinjaScriptIsVisibleOnlyFocused {
+            get {
+                return ResourceManager.GetString("NinjaScriptIsVisibleOnlyFocused", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line.
+        /// </summary>
+        public static string NinjaScriptLine {
+            get {
+                return ResourceManager.GetString("NinjaScriptLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Lines.
         /// </summary>
         public static string NinjaScriptLines {
@@ -5731,6 +5938,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Displays how many days away from rollover to next contract.
+        /// </summary>
+        public static string NinjaScriptMarketAnalyzerColumnDescriptionDaysUntilRollover {
+            get {
+                return ResourceManager.GetString("NinjaScriptMarketAnalyzerColumnDescriptionDaysUntilRollover", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Instrument description.
         /// </summary>
         public static string NinjaScriptMarketAnalyzerColumnDescriptionDescription {
@@ -5893,6 +6109,24 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Current low compared to last close price.
+        /// </summary>
+        public static string NinjaScriptMarketAnalyzerColumnDescriptionNetChangeMaxDown {
+            get {
+                return ResourceManager.GetString("NinjaScriptMarketAnalyzerColumnDescriptionNetChangeMaxDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current high compared to last close price.
+        /// </summary>
+        public static string NinjaScriptMarketAnalyzerColumnDescriptionNetChangeMaxUp {
+            get {
+                return ResourceManager.GetString("NinjaScriptMarketAnalyzerColumnDescriptionNetChangeMaxUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Projected earnings per share.
         /// </summary>
         public static string NinjaScriptMarketAnalyzerColumnDescriptionNextYearsEarningsPerShare {
@@ -6042,6 +6276,15 @@ namespace NinjaTrader.Custom {
         public static string NinjaScriptMarketAnalyzerColumnDescriptionTradedContracts {
             get {
                 return ResourceManager.GetString("NinjaScriptMarketAnalyzerColumnDescriptionTradedContracts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This columndisplays a colored bar that represents the incoming ticks with the same colors that the T &amp; S window uses.
+        /// </summary>
+        public static string NinjaScriptMarketAnalyzerColumnDescriptionTSTrend {
+            get {
+                return ResourceManager.GetString("NinjaScriptMarketAnalyzerColumnDescriptionTSTrend", resourceCulture);
             }
         }
         
@@ -6217,6 +6460,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Days until rollover.
+        /// </summary>
+        public static string NinjaScriptMarketAnalyzerColumnNameDaysUntilRollover {
+            get {
+                return ResourceManager.GetString("NinjaScriptMarketAnalyzerColumnNameDaysUntilRollover", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Description.
         /// </summary>
         public static string NinjaScriptMarketAnalyzerColumnNameDescription {
@@ -6379,6 +6631,24 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Net change max down.
+        /// </summary>
+        public static string NinjaScriptMarketAnalyzerColumnNameNetChangeMaxDown {
+            get {
+                return ResourceManager.GetString("NinjaScriptMarketAnalyzerColumnNameNetChangeMaxDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Net change max up.
+        /// </summary>
+        public static string NinjaScriptMarketAnalyzerColumnNameNetChangeMaxUp {
+            get {
+                return ResourceManager.GetString("NinjaScriptMarketAnalyzerColumnNameNetChangeMaxUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Next year earnings per share.
         /// </summary>
         public static string NinjaScriptMarketAnalyzerColumnNameNextYearsEarningsPerShare {
@@ -6532,6 +6802,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to T &amp; S trend.
+        /// </summary>
+        public static string NinjaScriptMarketAnalyzerColumnNameTSTrend {
+            get {
+                return ResourceManager.GetString("NinjaScriptMarketAnalyzerColumnNameTSTrend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unrealized profit loss.
         /// </summary>
         public static string NinjaScriptMarketAnalyzerColumnNameUnrealizedProfitLoss {
@@ -6546,6 +6825,15 @@ namespace NinjaTrader.Custom {
         public static string NinjaScriptMarketAnalyzerColumnNameVwap {
             get {
                 return ResourceManager.GetString("NinjaScriptMarketAnalyzerColumnNameVwap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rows.
+        /// </summary>
+        public static string NinjaScriptNumberOfRows {
+            get {
+                return ResourceManager.GetString("NinjaScriptNumberOfRows", resourceCulture);
             }
         }
         
@@ -6964,15 +7252,6 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Universal.
-        /// </summary>
-        public static string NinjaScriptOptimizerUniversal {
-            get {
-                return ResourceManager.GetString("NinjaScriptOptimizerUniversal", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Parameters.
         /// </summary>
         public static string NinjaScriptParameters {
@@ -7032,6 +7311,105 @@ namespace NinjaTrader.Custom {
         public static string NinjaScriptStrategyDescriptionSampleMultiTimeFrame {
             get {
                 return ResourceManager.GetString("NinjaScriptStrategyDescriptionSampleMultiTimeFrame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy generator.
+        /// </summary>
+        public static string NinjaScriptStrategyGenerator {
+            get {
+                return ResourceManager.GetString("NinjaScriptStrategyGenerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1 candle stick pattern|{0} candle stick patterns|Add candle stick pattern...|Configure candle stick pattern...|Configure candle stick patterns....
+        /// </summary>
+        public static string NinjaScriptStrategyGeneratorCandleStickPatternPrompt {
+            get {
+                return ResourceManager.GetString("NinjaScriptStrategyGeneratorCandleStickPatternPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entry conditions.
+        /// </summary>
+        public static string NinjaScriptStrategyGeneratorEntries {
+            get {
+                return ResourceManager.GetString("NinjaScriptStrategyGeneratorEntries", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You needed to at least one entry order exit condition..
+        /// </summary>
+        public static string NinjaScriptStrategyGeneratorEntriesOrExits {
+            get {
+                return ResourceManager.GetString("NinjaScriptStrategyGeneratorEntriesOrExits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exception on expression:{0}{1}.
+        /// </summary>
+        public static string NinjaScriptStrategyGeneratorIndicatorException {
+            get {
+                return ResourceManager.GetString("NinjaScriptStrategyGeneratorIndicatorException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1 indicator|{0} indicators|Add indicator...|Configure indicator...|Configure indicators....
+        /// </summary>
+        public static string NinjaScriptStrategyGeneratorIndicatorsPrompt {
+            get {
+                return ResourceManager.GetString("NinjaScriptStrategyGeneratorIndicatorsPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Performance for {0} = {1}.
+        /// </summary>
+        public static string NinjaScriptStrategyGeneratorPeformance {
+            get {
+                return ResourceManager.GetString("NinjaScriptStrategyGeneratorPeformance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AI Generate Properties.
+        /// </summary>
+        public static string NinjaScriptStrategyGeneratorProperties {
+            get {
+                return ResourceManager.GetString("NinjaScriptStrategyGeneratorProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy generator terminated after {0} generations, since there was no performance improvement for {1} generations.
+        /// </summary>
+        public static string NinjaScriptStrategyGeneratorTerminated {
+            get {
+                return ResourceManager.GetString("NinjaScriptStrategyGeneratorTerminated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Candle stick pattern.
+        /// </summary>
+        public static string NinjaScriptStrategyGeneratorUseCandleStickPattern {
+            get {
+                return ResourceManager.GetString("NinjaScriptStrategyGeneratorUseCandleStickPattern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indicators.
+        /// </summary>
+        public static string NinjaScriptStrategyGeneratorUseIndicators {
+            get {
+                return ResourceManager.GetString("NinjaScriptStrategyGeneratorUseIndicators", resourceCulture);
             }
         }
         
@@ -7180,11 +7558,29 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You needed to at least one entry order exit condition..
+        ///   Looks up a localized string similar to Error while loading Drawing tool {0} : {1}.
         /// </summary>
-        public static string NinjaScriptUniversalOptimizerEntriesOrExits {
+        public static string NinjaScriptTileError {
             get {
-                return ResourceManager.GetString("NinjaScriptUniversalOptimizerEntriesOrExits", resourceCulture);
+                return ResourceManager.GetString("NinjaScriptTileError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Y pixel offset.
+        /// </summary>
+        public static string NinjaScriptYOffset {
+            get {
+                return ResourceManager.GetString("NinjaScriptYOffset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number of trend lines.
+        /// </summary>
+        public static string NumberOfTrendLines {
+            get {
+                return ResourceManager.GetString("NumberOfTrendLines", resourceCulture);
             }
         }
         
@@ -7207,11 +7603,56 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Old trends opacity.
+        /// </summary>
+        public static string OldTrendsOpacity {
+            get {
+                return ResourceManager.GetString("OldTrendsOpacity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Opacity.
         /// </summary>
         public static string Opacity {
             get {
                 return ResourceManager.GetString("Opacity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Arrow.
+        /// </summary>
+        public static string PathCapMode_Arrow {
+            get {
+                return ResourceManager.GetString("PathCapMode_Arrow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line.
+        /// </summary>
+        public static string PathCapMode_Line {
+            get {
+                return ResourceManager.GetString("PathCapMode_Line", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Arrow.
+        /// </summary>
+        public static string PathToolCapMode_Arrow {
+            get {
+                return ResourceManager.GetString("PathToolCapMode_Arrow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line.
+        /// </summary>
+        public static string PathToolCapMode_Line {
+            get {
+                return ResourceManager.GetString("PathToolCapMode_Line", resourceCulture);
             }
         }
         
@@ -7855,6 +8296,69 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AOL.
+        /// </summary>
+        public static string ShareMailPreconfiguredAol {
+            get {
+                return ResourceManager.GetString("ShareMailPreconfiguredAol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Comcast.
+        /// </summary>
+        public static string ShareMailPreconfiguredComcast {
+            get {
+                return ResourceManager.GetString("ShareMailPreconfiguredComcast", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gmail.
+        /// </summary>
+        public static string ShareMailPreconfiguredGmail {
+            get {
+                return ResourceManager.GetString("ShareMailPreconfiguredGmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to iCloud.
+        /// </summary>
+        public static string ShareMailPreconfiguredICloud {
+            get {
+                return ResourceManager.GetString("ShareMailPreconfiguredICloud", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manual.
+        /// </summary>
+        public static string ShareMailPreconfiguredManual {
+            get {
+                return ResourceManager.GetString("ShareMailPreconfiguredManual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outlook.
+        /// </summary>
+        public static string ShareMailPreconfiguredOutlook {
+            get {
+                return ResourceManager.GetString("ShareMailPreconfiguredOutlook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yahoo.
+        /// </summary>
+        public static string ShareMailPreconfiguredYahoo {
+            get {
+                return ResourceManager.GetString("ShareMailPreconfiguredYahoo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There was an error sending your message: {0}.
         /// </summary>
         public static string ShareMailSendError {
@@ -7941,6 +8445,123 @@ namespace NinjaTrader.Custom {
         public static string ShareStockTwitsSentSuccessfully {
             get {
                 return ResourceManager.GetString("ShareStockTwitsSentSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Email.
+        /// </summary>
+        public static string ShareTextMessageEmail {
+            get {
+                return ResourceManager.GetString("ShareTextMessageEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To configure the Text message via email Share Service you must first set up an Email Share Service..
+        /// </summary>
+        public static string ShareTextMessageEmailRequired {
+            get {
+                return ResourceManager.GetString("ShareTextMessageEmailRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There was an error sending message via {0} email service: &apos;{1}&apos;.
+        /// </summary>
+        public static string ShareTextMessageErrorOnShare {
+            get {
+                return ResourceManager.GetString("ShareTextMessageErrorOnShare", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MMS address.
+        /// </summary>
+        public static string ShareTextMessageMmsAddress {
+            get {
+                return ResourceManager.GetString("ShareTextMessageMmsAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text message via email.
+        /// </summary>
+        public static string ShareTextMessageName {
+            get {
+                return ResourceManager.GetString("ShareTextMessageName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phone number.
+        /// </summary>
+        public static string ShareTextMessagePhoneNumber {
+            get {
+                return ResourceManager.GetString("ShareTextMessagePhoneNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AT&amp;T.
+        /// </summary>
+        public static string ShareTextMessagePreconfiguredAtt {
+            get {
+                return ResourceManager.GetString("ShareTextMessagePreconfiguredAtt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manual.
+        /// </summary>
+        public static string ShareTextMessagePreconfiguredManual {
+            get {
+                return ResourceManager.GetString("ShareTextMessagePreconfiguredManual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sprint.
+        /// </summary>
+        public static string ShareTextMessagePreconfiguredSprint {
+            get {
+                return ResourceManager.GetString("ShareTextMessagePreconfiguredSprint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to T-Mobile.
+        /// </summary>
+        public static string ShareTextMessagePreconfiguredTMobile {
+            get {
+                return ResourceManager.GetString("ShareTextMessagePreconfiguredTMobile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Verizon.
+        /// </summary>
+        public static string ShareTextMessagePreconfiguredVerizon {
+            get {
+                return ResourceManager.GetString("ShareTextMessagePreconfiguredVerizon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} - Text message sent.
+        /// </summary>
+        public static string ShareTextMessageSentSuccessfully {
+            get {
+                return ResourceManager.GetString("ShareTextMessageSentSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SMS address.
+        /// </summary>
+        public static string ShareTextMessageSmsAddress {
+            get {
+                return ResourceManager.GetString("ShareTextMessageSmsAddress", resourceCulture);
             }
         }
         
@@ -8179,6 +8800,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SuperDOM column &apos;{0}&apos;: Error on calling &apos;{1}&apos; method: {2}.
+        /// </summary>
+        public static string SuperDomColumnException {
+            get {
+                return ResourceManager.GetString("SuperDomColumnException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Swing high.
         /// </summary>
         public static string SwingHigh {
@@ -8346,6 +8976,42 @@ namespace NinjaTrader.Custom {
         public static string TickCounterTicksRemaining {
             get {
                 return ResourceManager.GetString("TickCounterTicksRemaining", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current trend line.
+        /// </summary>
+        public static string TrendLinesCurrentTrendLine {
+            get {
+                return ResourceManager.GetString("TrendLinesCurrentTrendLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} broken.
+        /// </summary>
+        public static string TrendLinesTrendLineBroken {
+            get {
+                return ResourceManager.GetString("TrendLinesTrendLineBroken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trend line high.
+        /// </summary>
+        public static string TrendLinesTrendLineHigh {
+            get {
+                return ResourceManager.GetString("TrendLinesTrendLineHigh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trend line low.
+        /// </summary>
+        public static string TrendLinesTrendLineLow {
+            get {
+                return ResourceManager.GetString("TrendLinesTrendLineLow", resourceCulture);
             }
         }
         

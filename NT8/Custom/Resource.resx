@@ -2853,8 +2853,8 @@
   <data name="ImportTypeTickData" xml:space="preserve">
     <value>Tick Data, LLC</value>
   </data>
-  <data name="NinjaScriptOptimizerUniversal" xml:space="preserve">
-    <value>Universal</value>
+  <data name="NinjaScriptStrategyGenerator" xml:space="preserve">
+    <value>Strategy generator</value>
   </data>
   <data name="NinjaScriptOptimizationFitnessNameMaxStrength" xml:space="preserve">
     <value>Max. strength</value>
@@ -2868,7 +2868,7 @@
   <data name="NinjaScriptGeneticOptimizerCrossoverRatePercent" xml:space="preserve">
     <value>Crossover rate (%)</value>
   </data>
-  <data name="NinjaScriptUniversalOptimizerEntriesOrExits" xml:space="preserve">
+  <data name="NinjaScriptStrategyGeneratorEntriesOrExits" xml:space="preserve">
     <value>You needed to at least one entry order exit condition.</value>
   </data>
   <data name="ChartSpan_Day" xml:space="preserve">
@@ -2975,5 +2975,227 @@
   </data>
   <data name="NinjaScriptMarketAnalyzerColumnNameChartNetChange" xml:space="preserve">
     <value>Chart - Net change</value>
+  </data>
+  <data name="ShareMailPreconfiguredAol" xml:space="preserve">
+    <value>AOL</value>
+  </data>
+  <data name="ShareMailPreconfiguredComcast" xml:space="preserve">
+    <value>Comcast</value>
+  </data>
+  <data name="ShareMailPreconfiguredGmail" xml:space="preserve">
+    <value>Gmail</value>
+  </data>
+  <data name="ShareMailPreconfiguredICloud" xml:space="preserve">
+    <value>iCloud</value>
+  </data>
+  <data name="ShareMailPreconfiguredManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="ShareMailPreconfiguredOutlook" xml:space="preserve">
+    <value>Outlook</value>
+  </data>
+  <data name="ShareMailPreconfiguredYahoo" xml:space="preserve">
+    <value>Yahoo</value>
+  </data>
+  <data name="ShareTextMessageEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="ShareTextMessageMmsAddress" xml:space="preserve">
+    <value>MMS address</value>
+  </data>
+  <data name="ShareTextMessageName" xml:space="preserve">
+    <value>Text message via email</value>
+  </data>
+  <data name="ShareTextMessagePhoneNumber" xml:space="preserve">
+    <value>Phone number</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredAtt" xml:space="preserve">
+    <value>AT&amp;T</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredSprint" xml:space="preserve">
+    <value>Sprint</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredTMobile" xml:space="preserve">
+    <value>T-Mobile</value>
+  </data>
+  <data name="ShareTextMessagePreconfiguredVerizon" xml:space="preserve">
+    <value>Verizon</value>
+  </data>
+  <data name="ShareTextMessageSmsAddress" xml:space="preserve">
+    <value>SMS address</value>
+  </data>
+  <data name="ShareTextMessageErrorOnShare" xml:space="preserve">
+    <value>There was an error sending message via {0} email service: '{1}'</value>
+  </data>
+  <data name="ShareTextMessageSentSuccessfully" xml:space="preserve">
+    <value>{0} - Text message sent</value>
+  </data>
+  <data name="ShareTextMessageEmailRequired" xml:space="preserve">
+    <value>To configure the Text message via email Share Service you must first set up an Email Share Service.</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPath" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathBegin" xml:space="preserve">
+    <value>Path begin</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathEnd" xml:space="preserve">
+    <value>Path end</value>
+  </data>
+  <data name="PathToolCapMode_Arrow" xml:space="preserve">
+    <value>Arrow</value>
+  </data>
+  <data name="PathToolCapMode_Line" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathSegment" xml:space="preserve">
+    <value>Segment</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionNetChangeMaxDown" xml:space="preserve">
+    <value>Current low compared to last close price</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionNetChangeMaxUp" xml:space="preserve">
+    <value>Current high compared to last close price</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameNetChangeMaxDown" xml:space="preserve">
+    <value>Net change max down</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameNetChangeMaxUp" xml:space="preserve">
+    <value>Net change max up</value>
+  </data>
+  <data name="NinjaScriptDrawingToolPathShowCount" xml:space="preserve">
+    <value>Show count</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionDaysUntilRollover" xml:space="preserve">
+    <value>Displays how many days away from rollover to next contract</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameDaysUntilRollover" xml:space="preserve">
+    <value>Days until rollover</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnDescriptionTSTrend" xml:space="preserve">
+    <value>This columndisplays a colored bar that represents the incoming ticks with the same colors that the T &amp; S window uses</value>
+  </data>
+  <data name="NinjaScriptMarketAnalyzerColumnNameTSTrend" xml:space="preserve">
+    <value>T &amp; S trend</value>
+  </data>
+  <data name="DrawingToolIndicatorDescription" xml:space="preserve">
+    <value>The Drawing tool tile indicator adds the ability to have a floating tile in the chart that can be customized to quickly access the most commonly used drawing tools.</value>
+  </data>
+  <data name="DrawingToolIndicatorName" xml:space="preserve">
+    <value>Drawing tool tile</value>
+  </data>
+  <data name="NinjaScriptDrawingTools" xml:space="preserve">
+    <value>Drawing tools</value>
+  </data>
+  <data name="NinjaScriptIsVisibleOnlyFocused" xml:space="preserve">
+    <value>Visible only when in focus</value>
+  </data>
+  <data name="NinjaScriptNumberOfRows" xml:space="preserve">
+    <value>Rows</value>
+  </data>
+  <data name="NinjaScriptTileError" xml:space="preserve">
+    <value>Error while loading Drawing tool {0} : {1}</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorPeformance" xml:space="preserve">
+    <value>Performance for {0} = {1}</value>
+  </data>
+  <data name="NinjaScriptChartStyleCandlestickHollow" xml:space="preserve">
+    <value>Hollow candlestick</value>
+  </data>
+  <data name="GuiChartStyleDojiBrush" xml:space="preserve">
+    <value>Color for doji bars</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorTerminated" xml:space="preserve">
+    <value>Strategy generator terminated after {0} generations, since there was no performance improvement for {1} generations</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorIndicatorException" xml:space="preserve">
+    <value>Exception on expression:{0}{1}</value>
+  </data>
+  <data name="NinjaScriptGeneticOptimizerThresholdGenerations" xml:space="preserve">
+    <value>Threshold generations</value>
+  </data>
+  <data name="SuperDomColumnException" xml:space="preserve">
+    <value>SuperDOM column '{0}': Error on calling '{1}' method: {2}</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorProperties" xml:space="preserve">
+    <value>AI Generate Properties</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorUseIndicators" xml:space="preserve">
+    <value>Indicators</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorIndicatorsPrompt" xml:space="preserve">
+    <value>1 indicator|{0} indicators|Add indicator...|Configure indicator...|Configure indicators...</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorUseCandleStickPattern" xml:space="preserve">
+    <value>Candle stick pattern</value>
+  </data>
+  <data name="NinjaScriptChartStyleEquivolume" xml:space="preserve">
+    <value>Equivolume</value>
+  </data>
+  <data name="PathCapMode_Arrow" xml:space="preserve">
+    <value>Arrow</value>
+  </data>
+  <data name="PathCapMode_Line" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorCandleStickPatternPrompt" xml:space="preserve">
+    <value>1 candle stick pattern|{0} candle stick patterns|Add candle stick pattern...|Configure candle stick pattern...|Configure candle stick patterns...</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionTrendLines" xml:space="preserve">
+    <value>When a high swing is followed by a lower high swing, a trend line high is automatically plotted. When a low swing is followed by a higher low swing, a trend line low is automatically plotted.</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameTrendLines" xml:space="preserve">
+    <value>Trend lines</value>
+  </data>
+  <data name="NumberOfTrendLines" xml:space="preserve">
+    <value>Number of trend lines</value>
+  </data>
+  <data name="TrendLinesTrendLineHigh" xml:space="preserve">
+    <value>Trend line high</value>
+  </data>
+  <data name="TrendLinesTrendLineLow" xml:space="preserve">
+    <value>Trend line low</value>
+  </data>
+  <data name="NinjaScriptStrategyGeneratorEntries" xml:space="preserve">
+    <value>Entry conditions</value>
+  </data>
+  <data name="OldTrendsOpacity" xml:space="preserve">
+    <value>Old trends opacity</value>
+  </data>
+  <data name="TrendLinesCurrentTrendLine" xml:space="preserve">
+    <value>Current trend line</value>
+  </data>
+  <data name="AlertOnBreak" xml:space="preserve">
+    <value>Alert on break</value>
+  </data>
+  <data name="AlertOnBreakSound" xml:space="preserve">
+    <value>Alert on break sound</value>
+  </data>
+  <data name="TrendLinesTrendLineBroken" xml:space="preserve">
+    <value>{0} broken</value>
+  </data>
+  <data name="NinjaScriptLine" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="NinjaScriptBackground" xml:space="preserve">
+    <value>Background</value>
+  </data>
+  <data name="NinjaScriptBorder" xml:space="preserve">
+    <value>Border</value>
+  </data>
+  <data name="NinjaScriptYOffset" xml:space="preserve">
+    <value>Y pixel offset</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionCorrelation" xml:space="preserve">
+    <value>The correlation indicator will plot the correlation of the data series to a desired instrument. Values close to 1 indicate movement in the same direction. Values close to -1 indicate movement in opposite directions. Values near 0 indicate no correlation.</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCorrelation" xml:space="preserve">
+    <value>Correlation</value>
+  </data>
+  <data name="MailServiceSenderDisplayName" xml:space="preserve">
+    <value>From name</value>
   </data>
 </root>

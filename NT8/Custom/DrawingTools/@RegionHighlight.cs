@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -300,7 +300,7 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 				//Point buildAdjusted = Mode == RegionHighlightMode.Time ? new Point(point.X, startAnchorPoint.Y) : new Point(startAnchorPoint.X, point.Y);
 				//EndAnchor.UpdateFromPoint(buildAdjusted, chartControl, chartScale);
 			}
-			else if (DrawingState == DrawingState.Editing)
+			else if (DrawingState == DrawingState.Editing && editingAnchor != null)
 				dataPoint.CopyDataValues(editingAnchor);
 			else if (DrawingState == DrawingState.Moving)
 				foreach (ChartAnchor anchor in Anchors)
@@ -343,7 +343,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 				hasSetZOrder = true;
 			}
 			RenderTarget.AntialiasMode	= SharpDX.Direct2D1.AntialiasMode.PerPrimitive;
-			OutlineStroke.RenderTarget	= RenderTarget;
+			Stroke outlineStroke		= OutlineStroke;
+			outlineStroke.RenderTarget	= RenderTarget;
 			ChartPanel	chartPanel		= chartControl.ChartPanels[PanelIndex];
 
 			// recenter region anchors to always be onscreen/centered
@@ -366,7 +367,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			double		width		= endPoint.X - startPoint.X;
 		
 			AnchorLineStroke.RenderTarget	= RenderTarget;
-			OutlineStroke.RenderTarget		= RenderTarget;
 
 			if (!IsInHitTest && AreaBrush != null)
 			{
@@ -385,19 +385,19 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			}
 
 			// align to full pixel to avoid unneeded aliasing
-			float strokePixAdjust = Math.Abs(OutlineStroke.Width % 2d).ApproxCompare(0) == 0 ? 0.5f : 0f;
+			float strokePixAdjust = Math.Abs(outlineStroke.Width % 2d).ApproxCompare(0) == 0 ? 0.5f : 0f;
 
 			SharpDX.RectangleF rect = Mode == RegionHighlightMode.Time ? 
-				new SharpDX.RectangleF((float) startPoint.X + strokePixAdjust, ChartPanel.Y - OutlineStroke.Width + strokePixAdjust, 
-										(float) width, chartPanel.Y + chartPanel.H + OutlineStroke.Width * 2) : 
-				new SharpDX.RectangleF(chartPanel.X - OutlineStroke.Width + strokePixAdjust, (float)startPoint.Y + strokePixAdjust, 
-										chartPanel.X + chartPanel.W + OutlineStroke.Width * 2, (float)(endPoint.Y - startPoint.Y));
+				new SharpDX.RectangleF((float) startPoint.X + strokePixAdjust, ChartPanel.Y - outlineStroke.Width + strokePixAdjust, 
+										(float) width, chartPanel.Y + chartPanel.H + outlineStroke.Width * 2) : 
+				new SharpDX.RectangleF(chartPanel.X - outlineStroke.Width + strokePixAdjust, (float)startPoint.Y + strokePixAdjust, 
+										chartPanel.X + chartPanel.W + outlineStroke.Width * 2, (float)(endPoint.Y - startPoint.Y));
 
 			if (!IsInHitTest && areaBrushDevice.BrushDX != null)
 				RenderTarget.FillRectangle(rect, areaBrushDevice.BrushDX);
 
-			SharpDX.Direct2D1.Brush tmpBrush = IsInHitTest ? chartControl.SelectionBrush : OutlineStroke.BrushDX;
-			RenderTarget.DrawRectangle(rect, tmpBrush, OutlineStroke.Width, OutlineStroke.StrokeStyle);
+			SharpDX.Direct2D1.Brush tmpBrush = IsInHitTest ? chartControl.SelectionBrush : outlineStroke.BrushDX;
+			RenderTarget.DrawRectangle(rect, tmpBrush, outlineStroke.Width, outlineStroke.StrokeStyle);
 
 			if (IsSelected)
 			{
@@ -411,9 +411,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// Represents an interface that exposes information regarding a Region Highlight X IDrawingTool.
 	/// </summary>
 	[CLSCompliant(false)]
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class RegionHighlightX : RegionHighlightBase
 	{
+		public override object Icon { get { return Gui.Tools.Icons.DrawRegionHighlightX; } }
+
 		protected override void OnStateChange()
 		{
 			base.OnStateChange();
@@ -431,9 +432,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// Represents an interface that exposes information regarding a Region Highlight Y IDrawingTool.
 	/// </summary>
 	[CLSCompliant(false)]
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class RegionHighlightY : RegionHighlightBase
 	{
+		public override object Icon { get { return Gui.Tools.Icons.DrawRegionHighlightY; } }
+
 		protected override void OnStateChange()
 		{
 			base.OnStateChange();
@@ -526,8 +528,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// </summary>
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
 		/// <param name="brush">The brush used to color draw object</param>
 		/// <returns></returns>
 		[CLSCompliant(false)]
@@ -558,8 +560,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// </summary>
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
 		/// <param name="brush">The brush used to color draw object</param>
 		/// <param name="areaBrush">The brush used to color the fill region area of the draw object</param>
 		/// <param name="areaOpacity"> Sets the level of transparency for the fill color. Valid values between 0 - 100. (0 = completely transparent, 100 = no opacity)</param>
@@ -591,8 +593,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// </summary>
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
-		/// <param name="startBarsAgo">The starting bar (x axis co-ordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
+		/// <param name="startBarsAgo">The starting bar (x axis coordinate) where the draw object will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
 		/// <param name="templateName">The name of the drawing tool template the object will use to determine various visual properties</param>
 		/// <returns></returns>
@@ -607,8 +609,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// </summary>
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="brush">The brush used to color draw object</param>
 		/// <returns></returns>
 		[CLSCompliant(false)]
@@ -623,8 +625,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="brush">The brush used to color draw object</param>
 		/// <param name="areaBrush">The brush used to color the fill region area of the draw object</param>
 		/// <param name="areaOpacity"> Sets the level of transparency for the fill color. Valid values between 0 - 100. (0 = completely transparent, 100 = no opacity)</param>
@@ -640,8 +642,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// </summary>
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
-		/// <param name="startY">The starting y value co-ordinate where the draw object will be drawn</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="startY">The starting y value coordinate where the draw object will be drawn</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
 		/// <param name="templateName">The name of the drawing tool template the object will use to determine various visual properties</param>
 		/// <returns></returns>

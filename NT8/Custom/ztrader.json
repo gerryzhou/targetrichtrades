@@ -1,0 +1,14 @@
+{
+    "GIndicator": {
+        "TargetFolderLocations": {
+            "TestFolder1": "Some path",
+            "TestFolder2": "Another path"
+        }
+    },
+    "GStrategy": {
+        "TargetFolderLocations": {
+            "TestFolder1": "Some path",
+            "TestFolder2": "Another path"
+        }
+    }
+}

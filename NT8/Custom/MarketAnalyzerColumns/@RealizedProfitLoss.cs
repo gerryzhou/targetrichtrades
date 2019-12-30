@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -51,7 +51,8 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 			accountDenomination	= accountItemUpdate.Account.Denomination;
 			executions.Clear();
 			foreach (Cbi.Execution execution in accountItemUpdate.Account.Executions)
-				if (execution.Instrument == Instrument || (execution.Instrument.MasterInstrument.InstrumentType == InstrumentType.Stock && execution.Instrument.FullName == Instrument.FullName))
+				if (execution.Instrument == Instrument
+						|| (execution.Instrument.MasterInstrument.InstrumentType == InstrumentType.Stock && execution.Instrument.FullName == Instrument.FullName))
 					executions.Add(execution);
 			CurrentValue = Cbi.SystemPerformance.Calculate(executions).AllTrades.TradesPerformance.Currency.CumProfit;
 		}
@@ -69,7 +70,8 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 					accountDenomination	= account.Denomination;
 					executions.Clear();
 					foreach (Cbi.Execution execution in account.Executions)
-						if (execution.Instrument == Instrument || (execution.Instrument.MasterInstrument.InstrumentType == InstrumentType.Stock && execution.Instrument.FullName == Instrument.FullName))
+						if (execution.Instrument == Instrument
+								|| (execution.Instrument.MasterInstrument.InstrumentType == InstrumentType.Stock && execution.Instrument.FullName == Instrument.FullName))
 							executions.Add(execution);
 					CurrentValue = Cbi.SystemPerformance.Calculate(executions).AllTrades.TradesPerformance.Currency.CumProfit;
 				}
@@ -79,8 +81,8 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 		protected override void OnExecutionUpdate(Cbi.ExecutionEventArgs executionUpdate)
 		{
 			if (executionUpdate.Execution.Account.Name != AccountName 
-				|| (executionUpdate.Execution.Instrument.MasterInstrument.InstrumentType != InstrumentType.Stock && executionUpdate.Execution.Instrument != Instrument)
-				|| (executionUpdate.Execution.Instrument.MasterInstrument.InstrumentType == InstrumentType.Stock && executionUpdate.Execution.Instrument.FullName != Instrument.FullName))
+					|| (executionUpdate.Execution.Instrument.MasterInstrument.InstrumentType != InstrumentType.Stock && executionUpdate.Execution.Instrument != Instrument)
+					|| (executionUpdate.Execution.Instrument.MasterInstrument.InstrumentType == InstrumentType.Stock && executionUpdate.Execution.Instrument.FullName != Instrument.FullName))
 				return;
 
 			executions.Add(executionUpdate.Execution);

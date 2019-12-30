@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -194,9 +194,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Dot IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class Dot : ChartMarker
 	{
+		public override object Icon { get { return Gui.Tools.Icons.DrawDot; } }
+
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
@@ -240,7 +241,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Square IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class Square : ChartMarker
 	{
 		protected void DrawSquare(float width, ChartControl chartControl, ChartScale chartScale)
@@ -262,6 +262,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 			if (tmpBrush != null)
 				RenderTarget.DrawRectangle(new SharpDX.RectangleF(xCentered, yCentered, width, width), tmpBrush);
 		}
+
+		public override object Icon { get { return Gui.Tools.Icons.DrawSquare; } }
 
 		protected override void OnStateChange()
 		{
@@ -292,9 +294,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Diamond IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class Diamond : Square
 	{
+		public override object Icon { get { return Gui.Tools.Icons.DrawDiamond; } }
+
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
@@ -422,9 +425,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding an Arrow Down IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class ArrowDown : ArrowMarkerBase
 	{
+		public override object Icon { get { return Gui.Tools.Icons.DrawArrowDown; } }
+
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
@@ -447,9 +451,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding an Arrow Up IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class ArrowUp : ArrowMarkerBase
 	{
+		public override object Icon { get { return Gui.Tools.Icons.DrawArrowUp; } }
+
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
@@ -525,9 +530,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Triangle Down IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class TriangleDown : TriangleBase
 	{
+		public override object Icon { get { return Gui.Tools.Icons.DrawTriangleDown; } }
+
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
@@ -550,9 +556,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Triangle Up IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class TriangleUp : TriangleBase
 	{
+		public override object Icon { get { return Gui.Tools.Icons.DrawTriangleUp; } }
+
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)

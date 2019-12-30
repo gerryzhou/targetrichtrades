@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -38,24 +38,26 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 				DataType				= typeof(string);
 			}
 			else if (State == State.Configure)
-			{
-				CurrentText				= "";
-			}
+				CurrentText	= string.Empty;
 			else if (State == State.Realtime)
 			{
 				if (Instrument != null && Instrument.FundamentalData != null && Instrument.FundamentalData.High52WeeksDate != null)
 				{
-					CurrentValue = Instrument.FundamentalData.High52WeeksDate.Value.Subtract(Core.Globals.MinDate).TotalDays;
-					CurrentText = Format(CurrentValue);
+					CurrentValue	= Instrument.FundamentalData.High52WeeksDate.Value.Subtract(Core.Globals.MinDate).TotalDays;
+					CurrentText		= Format(CurrentValue);
 				}
 			}
 		}
 
 		protected override void OnFundamentalData(Data.FundamentalDataEventArgs fundamentalDataUpdate)
 		{
-			if (fundamentalDataUpdate.FundamentalDataType == Data.FundamentalDataType.High52WeeksDate)
-				CurrentValue = fundamentalDataUpdate.DateTimeValue.Subtract(Core.Globals.MinDate).TotalDays;
-			CurrentText = Format(CurrentValue);
+			if (fundamentalDataUpdate.IsReset)
+				CurrentValue = double.MinValue;
+			else if (fundamentalDataUpdate.FundamentalDataType == Data.FundamentalDataType.High52WeeksDate)
+			{
+				CurrentValue	= fundamentalDataUpdate.DateTimeValue.Subtract(Core.Globals.MinDate).TotalDays;
+				CurrentText		= Format(CurrentValue);
+			}
 		}
 
 		#region Miscellaneous

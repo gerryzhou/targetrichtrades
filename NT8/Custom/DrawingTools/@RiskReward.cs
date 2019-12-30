@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -26,7 +26,6 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 	/// <summary>
 	/// Represents an interface that exposes information regarding a Risk Reward IDrawingTool.
 	/// </summary>
-	[EditorBrowsable(EditorBrowsableState.Always)]
 	public class RiskReward : DrawingTool
 	{
 		private const int		cursorSensitivity		= 15;
@@ -50,6 +49,8 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		public ChartAnchor		RiskAnchor				{ get; set; }
 		[Browsable(false)]
 		public ChartAnchor		RewardAnchor			{ get; set; }
+
+		public override object Icon { get { return Icons.DrawRiskReward; } }
 
 		[Range(0, double.MaxValue)]
 		[NinjaScriptProperty]
@@ -668,9 +669,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="entryTime">The time where the draw object's entry will be drawn</param>
-		/// <param name="entryY">The y value co-ordinate where the draw object's entry price will be drawn</param>
+		/// <param name="entryY">The y value coordinate where the draw object's entry price will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="ratio">An int value determining the calculated ratio between the risk or reward based on the entry point</param>
 		/// <param name="isStop">A bool value, when true will use the endTime/endBarsAgo and endY to set the stop, and will automatically calculate the target based off the ratio value.</param>
 		/// <returns></returns>
@@ -687,10 +688,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="entryBarsAgo">The starting bar (x axis co-ordinate) where the draw object's entry will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="entryY">The y value co-ordinate where the draw object's entry price will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="entryBarsAgo">The starting bar (x axis coordinate) where the draw object's entry will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="entryY">The y value coordinate where the draw object's entry price will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="ratio">An int value determining the calculated ratio between the risk or reward based on the entry point</param>
 		/// <param name="isStop">A bool value, when true will use the endTime/endBarsAgo and endY to set the stop, and will automatically calculate the target based off the ratio value.</param>
 		/// <returns></returns>
@@ -708,9 +709,9 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
 		/// <param name="entryTime">The time where the draw object's entry will be drawn</param>
-		/// <param name="entryY">The y value co-ordinate where the draw object's entry price will be drawn</param>
+		/// <param name="entryY">The y value coordinate where the draw object's entry price will be drawn</param>
 		/// <param name="endTime">The end time where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="ratio">An int value determining the calculated ratio between the risk or reward based on the entry point</param>
 		/// <param name="isStop">A bool value, when true will use the endTime/endBarsAgo and endY to set the stop, and will automatically calculate the target based off the ratio value.</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>
@@ -729,10 +730,10 @@ namespace NinjaTrader.NinjaScript.DrawingTools
 		/// <param name="owner">The hosting NinjaScript object which is calling the draw method</param>
 		/// <param name="tag">A user defined unique id used to reference the draw object</param>
 		/// <param name="isAutoScale">Determines if the draw object will be included in the y-axis scale</param>
-		/// <param name="entryBarsAgo">The starting bar (x axis co-ordinate) where the draw object's entry will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
-		/// <param name="entryY">The y value co-ordinate where the draw object's entry price will be drawn</param>
-		/// <param name="endBarsAgo">The end bar (x axis co-ordinate) where the draw object will terminate</param>
-		/// <param name="endY">The end y value co-ordinate where the draw object will terminate</param>
+		/// <param name="entryBarsAgo">The starting bar (x axis coordinate) where the draw object's entry will be drawn. For example, a value of 10 would paint the draw object 10 bars back.</param>
+		/// <param name="entryY">The y value coordinate where the draw object's entry price will be drawn</param>
+		/// <param name="endBarsAgo">The end bar (x axis coordinate) where the draw object will terminate</param>
+		/// <param name="endY">The end y value coordinate where the draw object will terminate</param>
 		/// <param name="ratio">An int value determining the calculated ratio between the risk or reward based on the entry point</param>
 		/// <param name="isStop">A bool value, when true will use the endTime/endBarsAgo and endY to set the stop, and will automatically calculate the target based off the ratio value.</param>
 		/// <param name="isGlobal">Determines if the draw object will be global across all charts which match the instrument</param>

@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -66,8 +66,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
-			double input0	= Input[0];
-			Value[0] 		= 100 * ((input0 - tsf[0]) / input0);
+			if (Input[0] <= 0)
+				return;
+			
+			Value[0] = 100 * ((Input[0] - tsf[0]) / Input[0]);
 		}
 
 		#region Properties

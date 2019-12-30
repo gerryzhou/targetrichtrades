@@ -8,12 +8,17 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("NinjaTrader")]
 [assembly: AssemblyProduct("NinjaTrader")]
-[assembly: AssemblyCopyright("NinjaTrader© 2003-2018 NinjaTrader LLC")]
+[assembly: AssemblyCopyright("NinjaTrader© 2003-2019 NinjaTrader LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: CLSCompliant(true)]
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("8.0.16.3")]
+#if PRODUCTION
+[assembly: AssemblyVersion("8.0.20.1")]
+#else
+[assembly: AssemblyVersion("8.0.21.0")]
+#endif
+
 [assembly: NeutralResourcesLanguage("en", UltimateResourceFallbackLocation.MainAssembly)]

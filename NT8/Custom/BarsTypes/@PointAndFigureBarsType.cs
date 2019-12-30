@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -32,7 +32,6 @@ namespace NinjaTrader.NinjaScript.BarsTypes
 		private			long			tmpVolume;
 		private			Trend			trend					= Trend.Undetermined;
 		private			long			volumeCount;
-
 
 		public override void ApplyDefaultBasePeriodValue(BarsPeriod period)
 		{
@@ -273,6 +272,9 @@ namespace NinjaTrader.NinjaScript.BarsTypes
 		{
 			if (SessionIterator == null)
 				SessionIterator = new SessionIterator(bars);
+			bool isNewSession	= SessionIterator.IsNewSession(time, isBar);
+			if (isNewSession)
+				SessionIterator.GetNextSession(time, isBar);
 
 			#region Building Bars from Base Period
 
@@ -385,8 +387,10 @@ namespace NinjaTrader.NinjaScript.BarsTypes
 				case BarsPeriodType.Tick:
 					if (tmpTime == Core.Globals.MinDate || BarsPeriod.BaseBarsPeriodValue == 1)
 					{
-						prevTime		= tmpTime = time;
-						tmpTickCount	= BarsPeriod.BaseBarsPeriodValue == 1 ? 0 : 1;
+						prevTime		= tmpTime;
+						if (prevTime == Core.Globals.MinDate)
+							prevTime = time;
+						tmpTime			= time;
 						endOfBar		= BarsPeriod.BaseBarsPeriodValue == 1;
 						break;
 					}
@@ -437,9 +441,6 @@ namespace NinjaTrader.NinjaScript.BarsTypes
 			double tickSize		= bars.Instrument.MasterInstrument.TickSize;
 			boxSize				= Math.Floor(10000000.0 * BarsPeriod.Value * tickSize) / 10000000.0;
 			reversalSize		= BarsPeriod.Value2 * boxSize;
-			bool isNewSession	= SessionIterator.IsNewSession(time, isBar);
-			if (isNewSession)
-				SessionIterator.GetNextSession(time, isBar);
 
 			if (bars.Count == 0 || IsIntraday && bars.IsResetOnNewTradingDay && isNewSession)
 			{

@@ -1,5 +1,5 @@
 // 
-// Copyright (C) 2018, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -85,9 +85,9 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 				return;
 
 			executions.Add(executionUpdate.Execution);
-			realizedPL = Cbi.SystemPerformance.Calculate(executions).AllTrades.TradesPerformance.Currency.CumProfit;
-
-			CurrentValue = realizedPL + (position == null ? 0 : position.GetUnrealizedProfitLoss(Cbi.PerformanceUnit.Currency));
+			
+			realizedPL 		= Cbi.SystemPerformance.Calculate(executions).AllTrades.TradesPerformance.Currency.CumProfit;
+			CurrentValue 	= realizedPL + (position == null ? 0 : position.GetUnrealizedProfitLoss(Cbi.PerformanceUnit.Currency));
 		}
 
 		protected override void OnMarketData(Data.MarketDataEventArgs marketDataUpdate)
@@ -100,8 +100,8 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 			if (positionUpdate.Position.Account.Name != AccountName || positionUpdate.Position.Instrument != Instrument)
 				return;
 
-			position = (positionUpdate.Operation == Cbi.Operation.Remove ? null : positionUpdate.Position);
-			CurrentValue = realizedPL + (position == null ? 0 : position.GetUnrealizedProfitLoss(Cbi.PerformanceUnit.Currency));
+			position 		= (positionUpdate.Operation == Cbi.Operation.Remove ? null : positionUpdate.Position);
+			CurrentValue 	= realizedPL + (position == null ? 0 : position.GetUnrealizedProfitLoss(Cbi.PerformanceUnit.Currency));
 		}
 
 		#region Properties
@@ -118,7 +118,6 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 			if (CellConditions.Count == 0)
 				ForeColor = (value >= 0 ? Application.Current.TryFindResource("MAGridForeground") : 
 										Application.Current.TryFindResource("StrategyAnalyzerNegativeValueBrush")) as Brush;
-
 
 			Cbi.Currency formatCurrency = accountDenomination;
 			return Core.Globals.FormatCurrency(value, formatCurrency);
