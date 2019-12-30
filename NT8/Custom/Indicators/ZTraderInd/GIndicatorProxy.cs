@@ -64,9 +64,9 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 			}
 			else if (State == State.Configure)
 			{
-				GetConfigItem("", "");
-				string config_file = GZLogger.GetConfigFilePath(GetConfigFileDir());
-				Print(this.Name + ":GetConfigFilePath=" + config_file);
+				string cmdPathRoot = GUtils.GetConfigItem(GUtils.MainConfigFile, "CmdPathRoot");
+				string config_file = GLogger.GetConfigFilePath(GUtils.GetConfigFileDir());
+				Print(this.Name + ":GetConfigFilePath, CmdPathRoot=" + config_file + "," + cmdPathRoot);
 				XmlConfigurator.Configure(new FileInfo(@config_file));////"C:\\www\\log\\log4net.config"));
 				//GZLogger.ConfigureFileAppender( "C:\\www\\log\\log_test.txt" );
 			}
@@ -91,39 +91,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 			if(IsLastBarOnChart() > 0)
 				PrintLog(true, false, "dailyPattern=" + DailyPattern.Count);
 		}
-		
-		public string GetConfigFileDir() {
-			string ud_dir = NinjaTrader.Core.Globals.UserDataDir
-				+ "bin" + Path.DirectorySeparatorChar
-				+ "Custom" + Path.DirectorySeparatorChar;
-			Print(this.Name + ":NinjaTrader.Core.Globals.UserDataDir=" + NinjaTrader.Core.Globals.UserDataDir);
-			string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-			Print(this.Name + ":Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)=" + currentDirectory);
-			string appPath = System.AppDomain.CurrentDomain.BaseDirectory;
-			Print(this.Name + ":System.AppDomain.CurrentDomain.BaseDirectory=" + appPath);
-			string entryPath = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-			Print(this.Name + ":System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)=" + entryPath);
-			string curPath = System.Environment.CurrentDirectory;
-			Print(this.Name + ":System.Environment.CurrentDirectory=" + curPath);
-			return ud_dir; //Directory.GetParent(currentDirectory).FullName;
-		}
-		
-		public string GetConfigItem(string config_file, string item_name) {
-			string json_path = GetConfigFileDir() + "ztrader.json";
-			string json = System.IO.File.ReadAllText(json_path);
-            //DataContractJsonSerializer ser = new DataContractJsonSerializer();
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            Dictionary<string, object> dic = serializer.Deserialize<Dictionary<string, object>>(json);
-            //var jsonObject = JsonValue.Parse(json);
-			foreach(KeyValuePair<string, object> ele1 in dic) 
-          { 
-              Print(string.Format("JSON={0} and {1}", ele1.Key, ele1.Value));
-          }
 			
-            string item = null;
-			return item;
-		}
-
 		#region Properties
 		[NinjaScriptProperty]
 		[Display(Name="GSZTrader", Description="GSZTrader instance for indicator proxy")]
@@ -133,29 +101,18 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		//[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
 		//[Display(Name="CustInput", Description="CustInput for indicator proxy", Order=0, GroupName="Parameters")]
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public int CustInput
 		{ get; set; }
-
-		//[NinjaScriptProperty]
-		//[Range(1, int.MaxValue)]
-		//[Display(Name="AccName", Description="Account Name for strategy", Order=1, GroupName="Parameters")]
-//		[Browsable(false)]
-//		[XmlIgnore]
-//		public string AccName
-//		{ get; set; }
 		
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public Dictionary<string, List<MarketContext>> DailyPattern
 		{
 			get { return dailyPattern; }
 			set { dailyPattern = value;}
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public Series<double> CustPlot
 		{
 			get { return Values[0]; }

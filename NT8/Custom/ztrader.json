@@ -10,5 +10,7 @@
             "TestFolder1": "Some path",
             "TestFolder2": "Another path"
         }
-    }
+    },
+	"CmdPathRoot": "C:\\www\\cmd\\",
+	"CmdFileName": "ztrader_cmd.json"
 }

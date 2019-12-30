@@ -33,7 +33,7 @@ using NinjaTrader.Gui.Tools;
 //This namespace holds Add ons in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.AddOns
 {	
-	public class GZLogger
+	public class GLogger
 	{
 	    public static void ConfigureFileAppender( string logFile )
 	    {

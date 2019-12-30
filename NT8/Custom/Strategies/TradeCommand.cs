@@ -23,6 +23,7 @@ using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
+using NinjaTrader.NinjaScript.AddOns;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -81,8 +82,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public string GetCmdFilePath() {
-			string path = IndicatorProxy.GetConfigFileDir()
-				+ "ztrader.config";
+			List<string> names = new List<string>(){"CmdPathRoot","CmdFileName"};
+			Dictionary<string,object> dic =	GUtils.GetConfigItems(GUtils.MainConfigFile, names);
+			object dir = null, name = null;
+			dic.TryGetValue("CmdPathRoot", out dir);
+			dic.TryGetValue("CmdFileName", out name);
+			string path = dir.ToString() + name.ToString();
+			Print("GetCmdFilePath=" + path);
 			return path;
 		}
 		
@@ -152,8 +158,34 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return paraMap;
 		}
 		
+		public Dictionary<string,string> ReadCmdPara() {
+			Dictionary<string,string> paraMap = new Dictionary<string,string>();
+			
+			Dictionary<string,object> paraDic = GUtils.LoadJsonDictionary(GetCmdFilePath());
+	
+			int counter = 0;  
+			string line;
+			foreach(KeyValuePair<string, object> ele in paraDic) {
+				paraMap.Add(ele.Key, ele.Value.ToString());
+				Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", ele.Key, ele.Value.ToString()));
+			}
+			// Read the file and display it line by line.  
+//			while((line = file.ReadLine()) != null)  
+//			{
+//				string[] pa = line.Split(':');
+//				paraMap.Add(pa[0], pa[1]);
+//				Print(line);  
+//				counter++;
+//			}
+
+			Print("There were {0} lines." + counter);
+			// Suspend the screen.
+			//System.Console.ReadLine();
+			return paraMap;
+		}
+		
         #region Properties
 	
-        #endregion		
+        #endregion
 	}	
 }

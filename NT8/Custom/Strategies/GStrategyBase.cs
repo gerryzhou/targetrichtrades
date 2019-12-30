@@ -59,7 +59,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//tradeSignal = new TradeSignal();
 				CancelAccountOrders();
 				//Account.CancelAllOrders(Instrument);
-				//Account.Flatten(new List<Instrument>{Instrument});				
+				//Account.Flatten(new List<Instrument>{Instrument});
+				ReadCmdPara();
 			}
 			else if (State == State.Terminated) {
 				if(IndicatorProxy != null) {

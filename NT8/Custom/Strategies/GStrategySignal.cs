@@ -423,7 +423,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		#endregion
-        #region Properties
+        
+		#region Properties
 
         #endregion		
 	}
