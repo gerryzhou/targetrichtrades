@@ -188,13 +188,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
 //				{
 //					IndicatorProxy.TraceMessage(this.Name, prtLevel);
-//					CurrentTrade.TradeDirection = TradingDirection.Down;
+//					TM_TradingDirection = TradingDirection.Down;
 //				}
 //				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
 //				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
 //				{
 //					IndicatorProxy.TraceMessage(this.Name, prtLevel);
-//					CurrentTrade.TradeDirection = TradingDirection.Up;
+//					TM_TradingDirection = TradingDirection.Up;
 //				}
 				
 //				CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
@@ -211,8 +211,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public override void PutTrade() {
 			if(CurrentTrade.TradeAction.TradeActionType == TradeActionType.EntrySimple) {
-				IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade CurrentTrade.stopLossAmt=" + CurrentTrade.stopLossAmt + "," + MM_StopLossAmt);
-				if(CurrentTrade.TradeDirection == TradingDirection.Down) {
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade MM_StopLossAmt=" + MM_StopLossAmt + "," + MM_StopLossAmt);
+				if(TM_TradingDirection == TradingDirection.Down) {
 					//CurrentTrade.BracketOrder.EntryOrder = 
 					//EnterShort(OrderSignalName.EntryShort.ToString());
 					//EnterShortLimit(Close[0], OrderSignalName.EntryShort.ToString());
@@ -221,7 +221,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					CurrentTrade.TradeAction.EntryPrice = Close[0];
 					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
 				}
-				else if(CurrentTrade.TradeDirection == TradingDirection.Up) {
+				else if(TM_TradingDirection == TradingDirection.Up) {
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 					EnterLong(OrderSignalName.EntryLongMkt.ToString());
 					//EnterLongLimit(Low[0]-5, OrderSignalName.EntryLong.ToString());

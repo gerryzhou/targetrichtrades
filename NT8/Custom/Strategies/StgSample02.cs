@@ -118,12 +118,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
 //				{
 //					indicatorProxy.TraceMessage(this.Name, PrintOut);
-//					CurrentTrade.TradeDirection = TradingDirection.Down;
+//					TM_TradingDirection = TradingDirection.Down;
 //				}
 //				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
 //				{
 //					indicatorProxy.TraceMessage(this.Name, PrintOut);
-//					CurrentTrade.TradeDirection = TradingDirection.Up;
+//					TM_TradingDirection = TradingDirection.Up;
 //				}
 				
 //				CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
@@ -137,13 +137,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override void PutTrade(){
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);
 			if(CurrentTrade.TradeAction.TradeActionType == TradeActionType.EntrySimple) {
-				IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade CurrentTrade.stopLossAmt=" + CurrentTrade.stopLossAmt + "," + MM_StopLossAmt);
-				if(CurrentTrade.TradeDirection == TradingDirection.Down) {
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade MM_StopLossAmt=" + MM_StopLossAmt + "," + MM_StopLossAmt);
+				if(TM_TradingDirection == TradingDirection.Down) {
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Down OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 					CurrentTrade.TradeAction.EntryPrice = GetTypicalPrice(0);
 					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
 				}
-				else if(CurrentTrade.TradeDirection == TradingDirection.Up) {
+				else if(TM_TradingDirection == TradingDirection.Up) {
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 					CurrentTrade.TradeAction.EntryPrice = GetTypicalPrice(0);
 					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());

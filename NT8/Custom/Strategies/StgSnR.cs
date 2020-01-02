@@ -89,7 +89,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				AddDataSeries(Data.BarsPeriodType.Day, 1);
 				//IncludeCommission = true;
 				//CurrentTrade = new CurrentTrade(this);
-				CurrentTrade.barsSincePTSL = TM_BarsSincePTSL;
+				//CurrentTrade.barsSincePTSL = TM_BarsSincePTSL;
 			}			
 		}
 
@@ -167,7 +167,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //					&& GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down
 //					&& IndicatorProxy.GetResistance(GetTradeSignal(CurrentBar).SnR.Resistance) > High[0]) {
 //					IndicatorProxy.TraceMessage(this.Name, prtLevel);
-//					CurrentTrade.TradeDirection = TradingDirection.Down;
+//					TM_TradingDirection = TradingDirection.Down;
 //					CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
 //					CurrentTrade.stopLossPrice = IndicatorProxy.GetResistance(GetTradeSignal(CurrentBar).SnR.Resistance);
 //				}
@@ -175,7 +175,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //					&& GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up
 //					&& IndicatorProxy.GetSupport(GetTradeSignal(CurrentBar).SnR.Support) < Low[0]) {
 //					IndicatorProxy.TraceMessage(this.Name, prtLevel);
-//					CurrentTrade.TradeDirection = TradingDirection.Up;
+//					TM_TradingDirection = TradingDirection.Up;
 //					CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
 //					CurrentTrade.stopLossPrice = IndicatorProxy.GetSupport(GetTradeSignal(CurrentBar).SnR.Support);
 					//Print(CurrentBar + ": GetResistance=" + IndicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);
@@ -188,14 +188,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		public override void PutTrade() {
 			if(CurrentTrade.TradeAction.TradeActionType == TradeActionType.EntrySimple) {
-				IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade CurrentTrade.stopLossAmt=" + CurrentTrade.stopLossAmt + "," + MM_StopLossAmt);
-				if(CurrentTrade.TradeDirection == TradingDirection.Down) {
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade MM_StopLossAmt=" + MM_StopLossAmt + "," + MM_StopLossAmt);
+				if(TM_TradingDirection == TradingDirection.Down) {
 					//CurrentTrade.TradeAction.EntrySignal.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShort.ToString());
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Down OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 					CurrentTrade.TradeAction.EntryPrice = Close[0];
 					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
 				}
-				else if(CurrentTrade.TradeDirection == TradingDirection.Up) {
+				else if(TM_TradingDirection == TradingDirection.Up) {
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 					CurrentTrade.TradeAction.EntryPrice = Close[0];
 					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());
