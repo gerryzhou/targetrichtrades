@@ -14,17 +14,53 @@
 	{"TG_TradeStartH":["8", "Int32", "Bars count before inflection for entry"]},
 	{"TG_TradeStartM":["45", "Int32", "Bars count before inflection for entry"]},
 	{"TG_TradeEndH":["14", "Int32", "Bars count before inflection for entry"]},
-	{"TG_TradeEndM":["59", "Int32", "Bars count before inflection for entry"]}
+	{"TG_TradeEndM":["59", "Int32", "Bars count before inflection for entry"]},
+	{"TG_OpenStartH":["8", "Int32", "Bars count before inflection for entry"]},
+	{"TG_OpenStartM":["45", "Int32", "Bars count before inflection for entry"]},
+	{"TG_OpenEndH":["14", "Int32", "Bars count before inflection for entry"]},
+	{"TG_OpenEndM":["59", "Int32", "Bars count before inflection for entry"]},
+	{"TG_TradeLiqH":["15", "Int32", "Bars count before inflection for entry"]},
+	{"TG_TradeLiqM":["08", "Int32", "Bars count before inflection for entry"]},
+	{"TG_EnSwingMinPnts":["200", "Double", "Bars count before inflection for entry"]},
+	{"TG_EnSwingMaxPnts":["200", "Double", "Bars count before inflection for entry"]},
+	{"TG_EnPullbackMinPnts":["200", "Double", "Bars count before inflection for entry"]},
+	{"TG_EnPullbackMaxPnts":["200", "Double", "Bars count before inflection for entry"]}
 	],
 
 "MoneyManagement":[
+	{"MM_ProfitFactor":["200", "Double", "Bars count before inflection for entry"]},
+	{"MM_PTCalculationMode":["Currency", "CalculationMode", "Bars count before inflection for entry"]},
+	{"MM_PTTrailing":["False", "Boolean", "Bars count before inflection for entry"]},
 	{"MM_ProfitTargetAmt":["200", "Double", "Bars count before inflection for entry"]},
-	{"MM_StopLossAmt":["50", "Double", "Bars count before inflection for entry"]}
+	{"MM_ProfitTgtTic":["200", "Int32", "Bars count before inflection for entry"]},
+	{"MM_ProfitTgtIncTic":["200", "Int32", "Bars count before inflection for entry"]},
+	{"MM_ProfitLockMinTic":["200", "Int32", "Bars count before inflection for entry"]},
+	{"MM_ProfitLockMaxTic":["200", "Int32", "Bars count before inflection for entry"]},
+	{"MM_SLCalculationMode":["Currency", "CalculationMode", "Bars count before inflection for entry"]},
+	{"MM_StopLossAmt":["50", "Double", "Bars count before inflection for entry"]},
+	{"MM_StopLossTic":["200", "Int32", "Bars count before inflection for entry"]},
+	{"MM_StopLossIncTic":["200", "Int32", "Bars count before inflection for entry"]},
+	{"MM_SLTrailing":["False", "Boolean", "Bars count before inflection for entry"]},
+	{"MM_TLSLCalculationMode":["Ticks", "CalculationMode", "Bars count before inflection for entry"]},
+	{"MM_TrailingStopLossTic":["200", "Int32", "Bars count before inflection for entry"]},
+	{"MM_TrailingStopLossAmt":["200", "Double", "Bars count before inflection for entry"]},
+	{"MM_TrailingStopLossPercent":["200", "Double", "Bars count before inflection for entry"]},
+	{"MM_BECalculationMode":["Currency", "CalculationMode", "Bars count before inflection for entry"]},
+	{"MM_BreakEvenAmt":["200", "Double", "Bars count before inflection for entry"]},
+	{"MM_DailyLossLmt":["200", "Double", "Bars count before inflection for entry"]}
 	],
 
 "TradeManagement":[
 	{"TM_TradingDirection":["Up", "TradingDirection", "Bars count before inflection for entry"]},
-	{"TM_TradingStyle":["TrendFollowing", "TradingStyle", "Bars count before inflection for entry"]}
+	{"TM_TradingStyle":["TrendFollowing", "TradingStyle", "Bars count before inflection for entry"]},
+	{"TM_EnTrailing":["False", "Boolean", "Bars count before inflection for entry"]},
+	{"TM_EnOffsetPnts":["1.5", "Double", "Bars count before inflection for entry"]},
+	{"TM_MinutesChkEnOrder":["15", "Int32", "Bars count before inflection for entry"]},
+	{"TM_MinutesChkPnL":["15", "Int32", "Bars count before inflection for entry"]},
+	{"TM_BarsToCheckPnL":["15", "Int32", "Bars count before inflection for entry"]},
+	{"TM_BarsHoldEnOrd":["15", "Int32", "Bars count before inflection for entry"]},
+	{"TM_EnCounterPBBars":["15", "Int32", "Bars count before inflection for entry"]},
+	{"TM_BarsSincePTSL":["15", "Int32", "Bars count before inflection for entry"]}
 	]
 }
 
