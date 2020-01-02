@@ -22,6 +22,7 @@ using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
+using NinjaTrader.NinjaScript.AddOns;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -40,9 +41,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				string ud_dir = NinjaTrader.Core.Globals.UserDataDir;
 				Print(this.Name + "set defaults called, NinjaTrader.Core.Globals.UserDataDir=" + ud_dir);
 				SetInitParams();
-//				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.TriangleRight, "CustomPlot1");
-//				AddLine(Brushes.Orange, 1, "CustomLine1");
-//				AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.HLine, "CustomPlot2");
+				//	AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.TriangleRight, "CustomPlot1");
+				//	AddLine(Brushes.Orange, 1, "CustomLine1");
+				//	AddPlot(new Stroke(Brushes.Orange, 2), PlotStyle.HLine, "CustomPlot2");
 			}
 			else if (State == State.Configure)
 			{				
@@ -52,15 +53,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
-				IndicatorProxy = GIndicatorProxy(this);//1, Account.Name);
 				CurrentTrade = new CurrentTradeBase(this);
+				IndicatorProxy = GIndicatorProxy(this);//1, Account.Name);
+				GUtils.UpdateProperties(this, ReadCmdPara(), IndicatorProxy);
 				
-//				CurrentTrade.InstStrategy = ;
+				//	CurrentTrade.InstStrategy = ;
 				//tradeSignal = new TradeSignal();
 				CancelAccountOrders();
 				//Account.CancelAllOrders(Instrument);
 				//Account.Flatten(new List<Instrument>{Instrument});
-				ReadCmdPara();
 			}
 			else if (State == State.Terminated) {
 				if(IndicatorProxy != null) {

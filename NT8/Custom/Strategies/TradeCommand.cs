@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using System.Reflection;
 using System.IO;
 
 using NinjaTrader.Cbi;
@@ -158,32 +159,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return paraMap;
 		}
 		
-		public Dictionary<string,string> ReadCmdPara() {
-			Dictionary<string,string> paraMap = new Dictionary<string,string>();
-			
-			Dictionary<string,object> paraDic = GUtils.LoadJsonDictionary(GetCmdFilePath());
-	
-			int counter = 0;  
-			string line;
-			foreach(KeyValuePair<string, object> ele in paraDic) {
-				paraMap.Add(ele.Key, ele.Value.ToString());
+		/// <summary>
+		/// Read Cmd parameters from json cmd file;
+		/// Inidcator section set for Custom Strategy
+		/// MM, TM, TG sections set for general Strategy
+		/// Strategy embedded properties only set at State.SetDefaults from OnStateChange
+		/// CurrentTrade only retrieved values from the custom/general Strategies;
+		/// </summary>
+		/// <returns></returns>
+		public Dictionary<string,object> ReadCmdPara() {		
+			Dictionary<string,object> paraDict = GUtils.LoadJson2Dictionary(GetCmdFilePath());
+			foreach(KeyValuePair<string, object> ele in paraDict) {
+				//paraMap.Add(ele.Key, ele.Value.ToString());
 				Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", ele.Key, ele.Value.ToString()));
 			}
-			// Read the file and display it line by line.  
-//			while((line = file.ReadLine()) != null)  
-//			{
-//				string[] pa = line.Split(':');
-//				paraMap.Add(pa[0], pa[1]);
-//				Print(line);  
-//				counter++;
-//			}
-
-			Print("There were {0} lines." + counter);
-			// Suspend the screen.
-			//System.Console.ReadLine();
-			return paraMap;
+			
+			return paraDict;
 		}
-		
+				
         #region Properties
 	
         #endregion

@@ -1,0 +1,31 @@
+{
+"Indicator":[
+	{"EnBarsBeforeInflection":["2", "Int32", "Bars count before inflection for entry"]},
+	{"BarsLookback":["20", "Int32", "Bars count before inflection for entry"]}
+	],
+
+"Strategy":[
+	{"AlgoMode":["Trading", "AlgoModeType", "Bars count before inflection for entry"]},
+	{"PrintOut":["2", "Int32", "Bars count before inflection for entry"]},
+	{"BackTest":["False", "Boolean", "Bars count before inflection for entry"]}
+	],
+
+"Trigger":[
+	{"TG_TradeStartH":["8", "Int32", "Bars count before inflection for entry"]},
+	{"TG_TradeStartM":["45", "Int32", "Bars count before inflection for entry"]},
+	{"TG_TradeEndH":["14", "Int32", "Bars count before inflection for entry"]},
+	{"TG_TradeEndM":["59", "Int32", "Bars count before inflection for entry"]}
+	],
+
+"MoneyManagement":[
+	{"MM_ProfitTargetAmt":["200", "Double", "Bars count before inflection for entry"]},
+	{"MM_StopLossAmt":["50", "Double", "Bars count before inflection for entry"]}
+	],
+
+"TradeManagement":[
+	{"TM_TradingDirection":["Up", "TradingDirection", "Bars count before inflection for entry"]},
+	{"TM_TradingStyle":["TrendFollowing", "TradingStyle", "Bars count before inflection for entry"]}
+	]
+}
+
+

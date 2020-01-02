@@ -185,6 +185,10 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			MaxQuantity = InstStrategy.DefaultQuantity;
 		}
 		
+		public void InitParameters(Dictionary<string, object> dict) {
+			
+		}
+		
 		//unused, newEntryTrade=newTrade, replaced by InitNewTrade
 		public void InitNewEntryTrade() {
 			//InitParams();
