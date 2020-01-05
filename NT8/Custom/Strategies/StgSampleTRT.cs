@@ -118,9 +118,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnBarUpdate()
 		{
 			try {
-			base.OnBarUpdate();
-			IndicatorProxy.TraceMessage(this.Name, PrintOut);
-			Print(String.Format("{0}: Stg={1}, GSZTraer={2}", CurrentBar, CurrentTrade.InstStrategy, IndicatorProxy.GSZTrader));
+				base.OnBarUpdate();
+				IndicatorProxy.TraceMessage(this.Name, PrintOut);
+				Print(String.Format("{0}: Stg={1}, GSZTrader={2}", CurrentBar, CurrentTrade.InstStrategy, IndicatorProxy.GSZTrader));
 			} catch (Exception ex) {
 				IndicatorProxy.Log2Disk = true;
 				IndicatorProxy.PrintLog(true, true, "Exception: " + ex.StackTrace);
@@ -186,6 +186,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			TradeSignal enSig = new TradeSignal();			
 			enSig.BarNo = CurrentBar;
 			enSig.SignalType = TradeSignalType.Entry;
+			enSig.SignalSource = TradeSignalSource.Indicator;
 			enSig.OrderCalculationMode = CalculationMode.Price;
 			enSig.Quantity = 1;
 			

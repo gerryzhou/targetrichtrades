@@ -40,7 +40,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// 2=ChangeParams, change the trading parameters;
 	/// 3=InjectContext, provide the current market context;
 	/// </summary>
-	public enum CommandType {ChangeAlgoType=1, ChangeParams=2, InjectContext=3};
+	public enum CommandType {ChangeAlgoType=1, ChangeParams=2, InjectContext=3, None=4};
 	
 	public enum TradingDirection {Up=1, Down=-1, Both=0};
 	

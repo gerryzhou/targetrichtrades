@@ -54,7 +54,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.Update();
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);
 			CheckCmd(); //Command trigger
-			CheckPerformance(); //Performance/Rule trigger
+			
 			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
 			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);			
@@ -108,6 +108,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		#endregion
 		
+		#region OnData/AccountUpdate Functions
 		/// <summary>
 		/// Only updated on live/sim trading, not triggered at back-testing
 		/// </summary>
@@ -141,5 +142,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			
 		}
+		#endregion
 	}
 }

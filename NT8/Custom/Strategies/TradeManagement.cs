@@ -55,21 +55,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 					IndicatorProxy.TraceMessage(this.Name, PrintOut);
 					CloseAllPositions();
 					break;
-				case AlgoModeType.Trading: //trading
-					//SetTradeAction(); called from CheckExitTrade() or CheckNewEntryTrade();
-					//CheckIndicatorSignals(); called from SetTradeAction(); save trade signals into the trade action;
-					//PutTrade(); first GetTradeAction() and then put exit or entry trade;
-					IndicatorProxy.TraceMessage(this.Name, PrintOut);
-					if(CheckTradeSignals()) {
-						TakeTradeAction();//PutTrade();
-					}
-					break;
-				case AlgoModeType.SemiAlgo:	// 2=semi-algo(manual entry, algo exit);
-					ChangeSLPT();
-					break;
-				case AlgoModeType.ExitOnly: // -1=stop trading(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
-					CancelEntryOrders();
-					break;
 				case AlgoModeType.CancelOrders: //cancel order
 					IndicatorProxy.TraceMessage(this.Name, PrintOut);
 					CancelAllOrders();
@@ -79,6 +64,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 					CloseAllPositions();
 					IndicatorProxy.TraceMessage(this.Name, PrintOut);
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + "- Stop trading cmd:" + IndicatorProxy.Get24HDateTime(Time[0]));
+					break;
+				case AlgoModeType.ExitOnly: // -1=stop trading(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
+					CancelEntryOrders();
+					break;
+				case AlgoModeType.Trading: //trading
+					//SetTradeAction(); called from CheckExitTrade() or CheckNewEntryTrade();
+					//CheckIndicatorSignals(); called from SetTradeAction(); save trade signals into the trade action;
+					//PutTrade(); first GetTradeAction() and then put exit or entry trade;
+					IndicatorProxy.TraceMessage(this.Name, PrintOut);
+					CheckPerformance(); //Performance/Rule trigger
+					CheckTradeSignals();//Signal trigger
+					SetTradeAction();
+					TakeTradeAction();//PutTrade();
+					break;
+				case AlgoModeType.SemiAlgo:	// 2=semi-algo(manual entry, algo exit);
+					CheckPerformance(); //Performance/Rule trigger
+					SetTradeAction();
+					ChangeSLPT(); //re-implement to fit TradeAction process
 					break;
 			}
 			//TakeTradeAction();
@@ -169,7 +172,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 min_en = IndicatorProxy.GetMinutesDiff(CurrentTrade.BracketOrder.EntryOrder.Time, Time[0]);// DateTime.Now);
                 //if ( IsTwoBarReversal(cur_gap, TickSize, enCounterPBBars) || (barsHoldEnOrd > 0 && barsSinceEnOrd >= barsHoldEnOrd) || ( minutesChkEnOrder > 0 &&  min_en >= minutesChkEnOrder))
-				if ( (TM_BarsHoldEnOrd > 0 && CurrentTrade.barsSinceEnOrd >= TM_BarsHoldEnOrd) || ( TM_MinutesChkEnOrder > 0 &&  min_en >= TM_MinutesChkEnOrder))	
+				if ((TM_BarsHoldEnOrd > 0 && CurrentTrade.barsSinceEnOrd >= TM_BarsHoldEnOrd) || ( TM_MinutesChkEnOrder > 0 &&  min_en >= TM_MinutesChkEnOrder))	
                 {
                     CancelOrder(CurrentTrade.BracketOrder.EntryOrder);
                     //giParabSAR.PrintLog(true, !backTest, log_file, "Order cancelled for " + AccName + ":" + barsSinceEnOrd + "/" + min_en + " bars/mins elapsed--" + BracketOrder.EntryOrder.ToString());

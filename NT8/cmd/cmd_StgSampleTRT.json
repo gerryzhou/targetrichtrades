@@ -1,13 +1,14 @@
 {
-"Indicator":[
-	{"EnBarsBeforeInflection":["2", "Int32", "Bars count before inflection for entry"]},
-	{"BarsLookback":["20", "Int32", ""]}
-	],
-
 "Strategy":[
+	{"CommandType": ["None", "CommandType", "The type of command - ChangeAlgoType; ChangeParams; InjectContext; None;"]},
 	{"AlgoMode":["Trading", "AlgoModeType", ""]},
 	{"PrintOut":["2", "Int32", ""]},
 	{"BackTest":["False", "Boolean", ""]}
+	],
+	
+"Indicator":[
+	{"EnBarsBeforeInflection":["2", "Int32", "Bars count before inflection for entry"]},
+	{"BarsLookback":["20", "Int32", ""]}
 	],
 
 "Trigger":[
@@ -30,7 +31,7 @@
 "MoneyManagement":[
 	{"MM_ProfitFactor":["2.5", "Double", "PT/SL ratio"]},
 	{"MM_PTCalculationMode":["Currency", "CalculationMode", "Profit target CalMode"]},
-	{"MM_PTTrailing":["False", "Boolean", "Trailing profit target"]},
+	{"MM_PTTrailing":["False", "Boolean", "Trailing profit target or not"]},
 	{"MM_ProfitTargetAmt":["450", "Double", "Default(450-650 USD) setting for ProfitTarget $Amount"]},
 	{"MM_ProfitTgtTic":["40", "Int32", "Ticks of profit target"]},
 	{"MM_ProfitTgtIncTic":["16", "Int32", "Default tick Amt for increasing ProfitTarget with trailing PT order"]},
@@ -40,7 +41,7 @@
 	{"MM_StopLossAmt":["50", "Double", "Default $ amount setting for StopLoss"]},
 	{"MM_StopLossTic":["200", "Int32", "Default tick setting for StopLoss"]},
 	{"MM_StopLossIncTic":["200", "Int32", "Default tick Amt for increasing StopLoss"]},
-	{"MM_SLTrailing":["False", "Boolean", "Trailing stop loss"]},
+	{"MM_SLTrailing":["False", "Boolean", "Trailing stop loss or not"]},
 	{"MM_TLSLCalculationMode":["Ticks", "CalculationMode", "Trailing SL CalMode"]},
 	{"MM_TrailingStopLossTic":["200", "Int32", "Ticks for trailing stop loss order"]},
 	{"MM_TrailingStopLossAmt":["200", "Double", "Default setting for trailing Stop Loss Amt"]},
@@ -61,6 +62,17 @@
 	{"TM_BarsHoldEnOrd":["15", "Int32", "Bars count since en order was issued"]},
 	{"TM_EnCounterPBBars":["15", "Int32", ""]},
 	{"TM_BarsSincePTSL":["15", "Int32", ""]}
+	],
+
+"MarketContext":[
+	{
+		"CTX_Daily":
+			[
+				"20170606;8401401:UpWide#10-16-3-5",
+				"20170607;8401151:DnWide#10-16-3-5;11521459:UpTight#10-16-3-5",
+				"20170608;8401123:UpTight#10-16-3-5;11301459:DnTight#10-16-3-5"
+			]
+	}
 	]
 }
 

@@ -57,7 +57,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return maIns.RoundToTickSize(Position.AveragePrice);
 		}
 				
-		public MarketPosition GetMarketPosition() {			
+		public MarketPosition GetMarketPosition() {
 			if(IsLiveTrading())
 				return PositionAccount.MarketPosition;
 			else

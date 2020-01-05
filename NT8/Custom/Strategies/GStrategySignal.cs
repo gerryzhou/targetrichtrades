@@ -57,6 +57,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		private SortedDictionary<int, List<TradeSignal>> eventSignals = 
 			new SortedDictionary<int, List<TradeSignal>>();
+		
+		// Indicator Signals list is defined in individual indicators, 
+		// TradeSignal is produced from commandSignals, evertSignals and indicators,
+		// The TradeSignal is stored in TradeAction each bar;
 
 		#endregion
 		

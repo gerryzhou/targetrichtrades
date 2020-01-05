@@ -106,7 +106,8 @@ Notes for implementation:
 ** Trending indicator: PbSAR instead of KAMA;
 ** Range chart vs Time chart: range chart fits trend/wave, time chart fits range/volatility;
 ** Stop loss set as being beyond the entry bar instead of the diamond bar;
-** Still too much lagging for 8 ticks range chart;
+** Still too much lagging for 8 ticks range chart; 
+	ways to solve lagging: a) introduce new dimension like volume, timming, pattern, score
 ** SMITMA >= 40 for entry short, <= -40 for entry long; also needs upper bound: 80?
 ** Profit target using 2*StopLoss instead of diamond; 
 	Reason: this setup is based on momentum, it's good for scalping other than betting for swing (lower down the winning rate),
@@ -124,6 +125,9 @@ Notes for implementation:
 ** Win by Logic+Math, using contradiction+MoneyManagement to have a pair of hedged algos;
 	1) Hedge two instruments;
 	2) Game theory: increase size after a series of losses;
+	3) Evaluate the pressure, magnetism of S/R, 
+		and the extensions magnetism/pressure using backtesting for each instruments, 
+		to find out which combination defines a good S/R; Quantify the quality of S/R with a score/category
 
 
 

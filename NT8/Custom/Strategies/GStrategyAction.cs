@@ -48,7 +48,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 		
 		#region Set/Check TradeActions
-		public virtual void SetTradeAction() {}
+		/// <summary>
+		/// Take the triggers from command, perform/rule, and indicator signals
+		/// to generate tradeAction for current Bar or next Bar(most likely current Bar);
+		/// This function could be overridden by custom strategy to define
+		/// different logics/priorities to handle the triggers
+		/// </summary>
+		public virtual void SetTradeAction() {
+			//Read signals from command(cur bar), 
+			//perform/rule(next bar, because the trigger could fire before/after SetTradeAction was called),
+			//indicators(cur bar)
+		}
 		
 		public virtual bool SetNewEntryTradeAction() {
 			return false;

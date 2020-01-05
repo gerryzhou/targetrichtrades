@@ -96,12 +96,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			// See the Help Guide for additional information
 			IsInstantiatedOnEachOptimizationIteration	= true;
 			//QuantityType = QuantityType.DefaultQuantity;
-			SetOrderQuantity = SetOrderQuantity.DefaultQuantity;
-			DefaultQuantity = 1;
-			WaitForOcoClosingBracket = false;
+			SetOrderQuantity							= SetOrderQuantity.DefaultQuantity;
+			DefaultQuantity								= 1;
+			WaitForOcoClosingBracket					= false;
 			
 			//CustomColor1					= Brushes.Orange;
-			StartH						= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
+			StartH	= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
 			// Use Unmanaged order methods
         	IsUnmanaged = true;
 			AlgoMode = AlgoModeType.Trading;

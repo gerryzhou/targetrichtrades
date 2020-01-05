@@ -36,18 +36,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// to generate the signal or get the value of the functions 
 	/// </summary>
 	public partial class GStrategyBase : Strategy
-	{
-		
+	{		
 		#region Variables
-		private List<Indicator> listIndicator = new List<Indicator>();
-			
-		//protected GIndicatorProxy indicatorProxy;		
-        // User defined variables (add any user defined variables below)
-        //private int startH = 9; // Default setting for StartH
-       // private int startM = 5; // Default setting for StartM
-        //private int endH = 11; // Default setting for EndH
-       // private int endM = 5; // Default setting for EndM
-		//private string accName = ""; //account name from strategy, extracting simply string for print/log;
 
 		#endregion
 
@@ -111,13 +101,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool HasMarketContextChanged() {return false;}
-		
-//		public string GetAccName() {
-//			return accName;
-//		}		
-		public void AddIndicator(Indicator i) {
-			this.listIndicator.Add(i);
-		}
+
 		#endregion
 		
         #region Properties
@@ -138,19 +122,6 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             get;set;
         }
-		
-//		[NinjaScriptProperty]
-//		[XmlIgnore]
-//		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName="Parameters")]
-//		public Brush CustomColor1
-//		{ get; set; }
-
-//		[Browsable(false)]
-//		public string CustomColor1Serializable
-//		{
-//			get { return Serialize.BrushToString(CustomColor1); }
-//			set { CustomColor1 = Serialize.StringToBrush(value); }
-//		}			
 
 //		[NinjaScriptProperty]
 //		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]

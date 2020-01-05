@@ -52,32 +52,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Replaced by PutTrade function;
 		/// </summary>
 		public virtual void ExecuteCommand() {
-			switch(AlgoMode) {
-				case AlgoModeType.Liquidate: // 0=liquidate; 
-					CloseAllPositions();
-					break;
-				case AlgoModeType.Trading:	// 1=trading; 
-					//CheckPositions();
-					CheckTrigger();
-					ChangeSLPT();
-					CheckEnOrder(-1);
+			switch(Command_Type) {
+				case CommandType.ChangeAlgoType: //; 
 					
-					if(NewOrderAllowed() && PatternMatched())
-					{
-						//indicatorProxy.PrintLog(true, !backTest, "----------------PutTrade, isReversalBar=" + isReversalBar + ",giParabSAR.IsSpvAllowed4PAT(curBarPat)=" + giParabSAR.IsSpvAllowed4PAT(curBarPriceAction.paType));
-						//PutTrade(zz_gap, cur_gap, isReversalBar);
-					}
 					break;
-				case AlgoModeType.SemiAlgo:	// 2=semi-algo(manual entry, algo exit);
-					ChangeSLPT();
+				case CommandType.ChangeParams:	//; 
+					
 					break;
-				case AlgoModeType.ExitOnly: // -1=stop trading(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
-					CancelEntryOrders();
+				case CommandType.InjectContext:	//;
+					
 					break;
-				case AlgoModeType.StopTrading: // -2=stop trading(no entry/exit, liquidate positions and cancel all entry/exit orders);
-					CancelAllOrders();
-					break;
-				default:
+
+				case CommandType.None: //;
 					break;
 			}
 		}
@@ -178,7 +164,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 				
         #region Properties
-	
+		[Description("Command Type")]
+ 		[Browsable(false), XmlIgnore]
+        public CommandType Command_Type
+        {
+            get; set;
+        }	
         #endregion
 	}	
 }
