@@ -84,7 +84,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		
-		public override TradeSignal GetTradeSignal() {
+		// Replaced by CheckIndicatorSignals();		
+		public bool GetTradeSignal(TradeSignalType tsType) {
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);
 			TradeSignal trdSignal = new TradeSignal();
 			Direction dir = new Direction();
@@ -108,7 +109,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			hi3 = GetHighestPrice(BarsLookback);
 			lo3 = GetLowestPrice(BarsLookback);
 			
-			return trdSignal;
+			return false;
 		}
 		
 		public override bool CheckNewEntryTrade() {

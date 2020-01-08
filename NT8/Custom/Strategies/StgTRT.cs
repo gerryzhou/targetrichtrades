@@ -132,7 +132,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			return null;
 		}
 		
-		public override TradeSignal GetTradeSignal() {
+		// Replaced by CheckIndicatorSignals();
+		public bool GetTradeSignal(TradeSignalType tsType) {
 			giSMI.Update();
 			awOscillator.Update();
 			giSnR.Update();
@@ -171,7 +172,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				trdSignal.TrendDir = dir;
 			}
 			
-			return trdSignal;
+			return false;
 		}
 		#endregion
 		

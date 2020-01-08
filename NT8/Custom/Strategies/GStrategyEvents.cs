@@ -55,11 +55,53 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);
 			CheckCmd(); //Command trigger
 			
-			//double gap = GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).GetCurZZGap();
-			//bool isReversalBar = true;//CurrentBar>BarsRequired?false:GIParabolicSAR(0.002, 0.2, 0.002, AccName, Color.Cyan).IsReversalBar();
-			IndicatorProxy.TraceMessage(this.Name, PrintOut);			
+			switch(AlgoMode) {
+				case AlgoModeType.Liquidate: //liquidate
+					IndicatorProxy.TraceMessage(this.Name, PrintOut);
+					CloseAllPositions();
+					break;
+				case AlgoModeType.CancelOrders: //cancel order
+					IndicatorProxy.TraceMessage(this.Name, PrintOut);
+					CancelAllOrders();
+					break;
+				case AlgoModeType.StopTrading: // -2=stop trading(no entry/exit, liquidate positions and cancel all entry/exit orders);
+					CancelAllOrders();
+					CloseAllPositions();
+					IndicatorProxy.TraceMessage(this.Name, PrintOut);
+					IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + "- Stop trading cmd:" + IndicatorProxy.Get24HDateTime(Time[0]));
+					break;
+				case AlgoModeType.ExitOnly: // -1=stop trading(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
+					CancelEntryOrders();
+					break;
+				case AlgoModeType.Trading: //trading
+					//SetTradeAction(); called from CheckExitTrade() or CheckNewEntryTrade();
+					//CheckIndicatorSignals(); called from SetTradeAction(); save trade signals into the trade action;
+					//PutTrade(); first GetTradeAction() and then put exit or entry trade;
+					IndicatorProxy.TraceMessage(this.Name, PrintOut);
+					//CheckPerformance(); //Performance/Rule trigger					
+					//SetTradeAction();
+					if(HasPosition() != 0)
+						CheckPerformance();
+					//Produce trade signals from indicator indicator signals
+					CheckIndicatorSignals();
+					SetTradeAction();
+					//PutTrade();
+					TakeTradeAction();
+					break;
+				case AlgoModeType.SemiAlgo:	// 2=semi-algo(manual entry, algo exit);
+					if(HasPosition() != 0) {
+						CheckPerformance(); //Performance/Rule trigger
+						//ChangeSLPT(); //re-implement to fit TradeAction process
+						//Produce trade signals from indicator indicator signals
+						CheckIndicatorSignals();
+						SetTradeAction();
+						//PutTrade();
+						TakeTradeAction();
+					}
+					break;
+			}
 
-			PutTrade();
+			IndicatorProxy.TraceMessage(this.Name, PrintOut);
 		}		
 		#endregion
 		
@@ -79,7 +121,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			+ ";GetAvgPrice=" + GetAvgPrice()
 			+ ";price=" + price);
 			CurrentTrade.OnCurExecutionUpdate(execution, executionId, price, quantity, marketPosition, orderId, time);
-			
+			return;
 			if(IsUnmanaged)
 				OnExecutionUpdateUM(execution, executionId, price, quantity, marketPosition, orderId, time);
 			else
@@ -94,11 +136,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if(BarsInProgress !=0) return;
 			IndicatorProxy.Log2Disk = true;
-			
+
 			Print(CurrentBar + ":OnOrderUpdate IsUnmanaged=" + IsUnmanaged);
+			
+			//The logic is implemented in the method below
 			CurrentTrade.OnCurOrderUpdate(order, limitPrice, stopPrice, quantity, filled, averageFillPrice, 
 				orderState, time, error, comment);
+			//return;
 			
+			//The order execution is implemented in the method below
 			if(IsUnmanaged)
 				OnOrderUpdateUM(order, limitPrice, stopPrice, quantity, filled, 
 				averageFillPrice, orderState, time, error, comment);

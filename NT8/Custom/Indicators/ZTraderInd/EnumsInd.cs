@@ -33,25 +33,25 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
     public enum TrendDirection { Up = 1, Down = -1, Flat = 0, UnKnown = 9 };
     public enum BreakoutDirection { Up = 1, Down = -1, UnKnown = 0 };
     public enum ReversalDirection { Up = 1, Down = -1, UnKnown = 0 };
-	public enum SupportResistanceType {Support = 1, Resistance = -1, Unknown = 0};
-	public enum LineCrossType {Above, Below, Both}; //over/under or above/below
-	public enum DivergenceType {Divergent=-1, Convergent=1, UnKnown=0};
-	public enum SignalBarByType {ByTime=1, ByVolume=2, ByPrice=3, ByBarNo=4}; // Identify singal bar by time/vol/price/barNo
+	public enum SupportResistanceType { Support = 1, Resistance = -1, Unknown = 0 };
+	public enum LineCrossType { Above, Below, Both }; //over/under or above/below
+	public enum DivergenceType { Divergent=-1, Convergent=1, UnKnown=0 };
+	public enum SignalBarByType { ByTime=1, ByVolume=2, ByPrice=3, ByBarNo=4 }; // Identify singal bar by time/vol/price/barNo
 
-	public enum SignalType {Direction, Volatility, SnR,
-					SimplePriceAction, CombinedPriceAction, Unknown};
+	public enum SignalType { Direction, Volatility, SnR,
+					SimplePriceAction, CombinedPriceAction, Unknown };
 	
-	public enum SignalActionType {TrendUp, TrendDn, BreakoutUp, BreakoutDn, PullbackUp, PullbackDn, ReversalUp, ReversalDn,
+	public enum SignalActionType { TrendUp, TrendDn, BreakoutUp, BreakoutDn, PullbackUp, PullbackDn, ReversalUp, ReversalDn,
 					CrossOver, CrossUnder, Divergence, Convergence, InflectionUp, InflectionDn,
-					Flat, Unknown};
+					Flat, Unknown };
 	
 	//The size of High-Low of the bar
-	public enum BarRangeType {Doji, Small, Large, Huge};
+	public enum BarRangeType { Doji, Small, Large, Huge };
 	//The size of Close-Open of the bar
-	public enum BarBodyRangeType {Doji, Small, Large, Huge};
+	public enum BarBodyRangeType { Doji, Small, Large, Huge };
 
     public enum PriceActionType { UpTight=1, UpWide=2, DnTight=4, DnWide=8, RngTight=16, RngWide=32, UnKnown=64 };
-	public enum PriceSubtype {Close, Open, High, Low, Median, Typical};
+	public enum PriceSubtype { Close, Open, High, Low, Median, Typical };
 	
 	public enum MarketCycleType {
 		W1Early, W1Middle, W1End,
@@ -63,12 +63,13 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 		WBEarly, WBMiddle, WBEnd,
 		WCEarly, WCMiddle, WCEnd };
 	
-	public enum MovingAvgType {SMA, EMA, TMA, KAMA};
+	public enum MovingAvgType { SMA, EMA, TMA, KAMA };
 	
-	public enum FibRatioType { R1, R2, R3, R4, R5, E1, E2, E3, E4, E5, E6};
+	public enum FibRatioType { R1, R2, R3, R4, R5, E1, E2, E3, E4, E5, E6 };
 	
-	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4};
+	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4 };
 }
+
 
 
 

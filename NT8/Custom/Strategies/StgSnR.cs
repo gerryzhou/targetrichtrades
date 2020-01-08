@@ -114,12 +114,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return ind.GetDirection();
 		}
 		
-		public override TradeSignal GetTradeSignal() {
+		// Replaced by CheckIndicatorSignals();
+		public bool GetTradeSignal(TradeSignalType tsType) {
 			giSMI.Update();
 			giSnR.Update();
 			TradeSignal trdSignal = null; //= new IndicatorSignal();
 			
-			if(CurrentBar <= BarsRequiredToTrade) return trdSignal;
+			if(CurrentBar <= BarsRequiredToTrade) return false;//trdSignal;
 			
 			int infl = giSMI.GetInflection(giSMI.SMITMA);
 			
@@ -155,7 +156,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //					trdSignal.SnR = giSMI.GetSupportResistance(CurrentBar-1);
 				}//entry long by reversal
 			}
-			return trdSignal;
+			return false;
 		}
 		
 		public override bool CheckNewEntryTrade() {

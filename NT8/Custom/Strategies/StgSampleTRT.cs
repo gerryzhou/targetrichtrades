@@ -143,15 +143,74 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			if(indSigCrs != null && indSigCrs.SignalAction != null)
 				Print(CurrentBar + ":stg-Last " + giSMI.SignalName_LineCross + "=" + indSigCrs.BarNo + "," + indSigCrs.SignalAction.SignalActionType.ToString());
-
-			return PatternMatched();
+			
+			if(PatternMatched()) {
+				Direction dir = GetDirection(giPbSAR);
+				TradeSignal enSig = new TradeSignal();			
+				enSig.BarNo = CurrentBar;
+				enSig.SignalType = TradeSignalType.Entry;
+				enSig.SignalSource = TradeSignalSource.Indicator;
+				enSig.OrderCalculationMode = CalculationMode.Price;
+				enSig.Quantity = 1;
+				
+				if(dir.TrendDir==TrendDirection.Up) 
+					enSig.Action = OrderAction.Buy;
+				else if(dir.TrendDir==TrendDirection.Down) 
+					enSig.Action = OrderAction.Sell;
+				enSig.Order_Type = OrderType.Market;
+				AddTradeSignal(CurrentBar, IndicatorTradeSignals, enSig);
+				Print(CurrentBar + ":PatternMatched-- " + enSig.Action.ToString() + "," + enSig.SignalSource.ToString());
+				return true;
+			} else
+				return false;
 		}
 		
+		/// <summary>
+		/// Check the exit trade signal by indicator signal;
+		/// only check exit OCO signals
+		/// </summary>
+		/// <returns></returns>
 		public override bool CheckExitSignals(){
-			return false;
+			return CheckExitOCOSignals();
+		}
+	
+		public override bool CheckStopLossSignal() {
+			Direction dir = GetDirection(giPbSAR);			
+			TradeSignal slSig = new TradeSignal();
+			slSig.BarNo = CurrentBar;
+			slSig.SignalType = TradeSignalType.StopLoss;
+			slSig.Order_Type = OrderType.Market;
+			if(dir.TrendDir==TrendDirection.Up) {
+				slSig.Action = OrderAction.Sell;
+				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Support);
+			}
+			else if(dir.TrendDir==TrendDirection.Down) {
+				slSig.Action = OrderAction.Buy;
+				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Resistance);
+			}
+			AddTradeSignal(CurrentBar, IndicatorTradeSignals, slSig);
+			return true;
 		}
 		
-		/// Unused
+		public override bool CheckProfitTargetSignal() {			
+			Direction dir = GetDirection(giPbSAR);
+			TradeSignal ptSig = new TradeSignal();
+			ptSig.BarNo = CurrentBar;
+			ptSig.SignalType = TradeSignalType.ProfitTarget;
+			ptSig.Order_Type = OrderType.Limit;
+			if(dir.TrendDir==TrendDirection.Up) {
+				ptSig.Action = OrderAction.Sell;
+				ptSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Resistance);
+			}
+			else if(dir.TrendDir==TrendDirection.Down) {
+				ptSig.Action = OrderAction.Buy;
+				ptSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Support);
+			}
+			AddTradeSignal(CurrentBar, IndicatorTradeSignals, ptSig);
+			return true;
+		}
+		
+		/// ====Unused====
 		//public override bool CheckTradeSignals() {
 		public bool CheckTradeSignals1() {
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);
@@ -181,58 +240,62 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return false;
 		}
 		
-		public override TradeSignal SetEntrySignal() {
-			Direction dir = GetDirection(giPbSAR);
-			TradeSignal enSig = new TradeSignal();			
-			enSig.BarNo = CurrentBar;
-			enSig.SignalType = TradeSignalType.Entry;
-			enSig.SignalSource = TradeSignalSource.Indicator;
-			enSig.OrderCalculationMode = CalculationMode.Price;
-			enSig.Quantity = 1;
+		/// <summary>
+		/// Set the entry signal for TradeAction, 
+		/// with the combination of command, perform/rule, indicators signals;
+		/// </summary>
+		/// <param name="action"></param>
+		/// <returns></returns>
+		public override void SetEntrySignal(TradeAction action) {
+			List<TradeSignal> cmdSig = GetTradeSignalByType(CurrentBar, CommandSignals, TradeSignalType.Entry);
+			List<TradeSignal> evtSig = GetTradeSignalByType(CurrentBar, EventSignals, TradeSignalType.Entry);
+			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.Entry);
 			
-			if(dir.TrendDir==TrendDirection.Up) 
-				enSig.Action = OrderAction.Buy;
-			else if(dir.TrendDir==TrendDirection.Down) 
-				enSig.Action = OrderAction.Sell;
-			enSig.Order_Type = OrderType.Market;
-			
-			return enSig;
+			if(cmdSig != null && cmdSig.Count>0)
+				action.EntrySignal = cmdSig[0];
+			else if (evtSig != null && evtSig.Count>0)
+				action.EntrySignal = evtSig[0];
+			else if(indTdSig != null && indTdSig.Count>0)
+				action.EntrySignal = indTdSig[0];
+			//return enSig;
 		}
 		
-		public override TradeSignal SetStopLossSignal() {
-			Direction dir = GetDirection(giPbSAR);
-			TradeSignal slSig = new TradeSignal();
-			slSig.BarNo = CurrentBar;
-			slSig.SignalType = TradeSignalType.StopLoss;
-			slSig.Order_Type = OrderType.Market;
-			if(dir.TrendDir==TrendDirection.Up) {
-				slSig.Action = OrderAction.Sell;
-				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Support);
-			}
-			else if(dir.TrendDir==TrendDirection.Down) {
-				slSig.Action = OrderAction.Buy;
-				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Resistance);
-			}
-
-			return slSig;
+		/// <summary>
+		/// Set the stop loss signal for TradeAction, 
+		/// with the combination of command, perform/rule, indicators signals;
+		/// </summary>
+		/// <param name="action"></param>
+		/// <returns></returns>
+		public override void SetStopLossSignal(TradeAction action) {
+			List<TradeSignal> cmdSig = GetTradeSignalByType(CurrentBar, CommandSignals, TradeSignalType.StopLoss);
+			List<TradeSignal> evtSig = GetTradeSignalByType(CurrentBar, EventSignals, TradeSignalType.StopLoss);
+			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.StopLoss);
+			
+			if(cmdSig != null && cmdSig.Count>0)
+				action.StopLossSignal = cmdSig[0];
+			else if (evtSig != null && evtSig.Count>0)
+				action.StopLossSignal = evtSig[0];
+			else if(indTdSig != null && indTdSig.Count>0)
+				action.StopLossSignal = indTdSig[0];
 		}
 
-		public override TradeSignal SetProfitTargetSignal() {
-			Direction dir = GetDirection(giPbSAR);
-			TradeSignal slSig = new TradeSignal();
-			slSig.BarNo = CurrentBar;
-			slSig.SignalType = TradeSignalType.ProfitTarget;
-			slSig.Order_Type = OrderType.Limit;
-			if(dir.TrendDir==TrendDirection.Up) {
-				slSig.Action = OrderAction.Sell;
-				slSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Resistance);
-			}
-			else if(dir.TrendDir==TrendDirection.Down) {
-				slSig.Action = OrderAction.Buy;
-				slSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Support);
-			}
-
-			return slSig;
+		/// <summary>
+		/// Set the profit target signal for TradeAction, 
+		/// with the combination of command, perform/rule, indicators signals;
+		/// </summary>
+		/// <param name="action"></param>
+		/// <returns></returns>
+		public override void SetProfitTargetSignal(TradeAction action) {
+			List<TradeSignal> cmdSig = GetTradeSignalByType(CurrentBar, CommandSignals, TradeSignalType.ProfitTarget);
+			List<TradeSignal> evtSig = GetTradeSignalByType(CurrentBar, EventSignals, TradeSignalType.ProfitTarget);
+			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.ProfitTarget);
+			
+			if(cmdSig != null && cmdSig.Count>0)
+				action.ProfitTargetSignal = cmdSig[0];
+			else if (evtSig != null && evtSig.Count>0)
+				action.ProfitTargetSignal = evtSig[0];
+			else if(indTdSig != null && indTdSig.Count>0)
+				action.ProfitTargetSignal = indTdSig[0];
 		}
 		
 		protected override bool PatternMatched()
@@ -268,14 +331,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 			ta.BarNo = CurrentBar;
 			ta.ActionName = "SampleTRT-Entry";
 			ta.TradeActionType = TradeActionType.Bracket;
-			ta.EntrySignal = SetEntrySignal();
-			ta.StopLossSignal = SetStopLossSignal();
-			ta.ProfitTargetSignal = SetProfitTargetSignal();
+			//ta.EntrySignal = 
+			SetEntrySignal(ta);
+			//ta.StopLossSignal = 
+			SetStopLossSignal(ta);
+			//ta.ProfitTargetSignal = 
+			SetProfitTargetSignal(ta);
 			AddTradeAction(CurrentBar, ta);
-		
+			Print(string.Format("{0}: EnSig={1}, SLSig={2}, PTSig={3}", CurrentBar, ta.EntrySignal, ta.StopLossSignal, ta.ProfitTargetSignal));
 			return true;
 		}
 		
+		public override bool SetExitTradeAction() {
+			return false;
+		}
+		
+		// ====unused====
 		public override bool CheckNewEntryTrade() {
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), "====CheckNewEntryTrade()===" + this.Name);
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);

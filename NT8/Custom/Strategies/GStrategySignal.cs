@@ -39,7 +39,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// </summary>
 	public partial class GStrategyBase : Strategy
 	{		
-		
 		#region Variables
 
 		/// <summary>
@@ -57,81 +56,99 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		private SortedDictionary<int, List<TradeSignal>> eventSignals = 
 			new SortedDictionary<int, List<TradeSignal>>();
+
+		/// <summary>
+		/// Hold the trade signals produced by indicator signals,
+		/// The key=BarNo that holds the signal set
+		/// value=the set of signals
+		/// </summary>
+		private SortedDictionary<int, List<TradeSignal>> indTdSignals = 
+			new SortedDictionary<int, List<TradeSignal>>();
 		
 		// Indicator Signals list is defined in individual indicators, 
-		// TradeSignal is produced from commandSignals, evertSignals and indicators,
-		// The TradeSignal is stored in TradeAction each bar;
+		// TradeAction is produced from commandSignals, evertSignals and indicatorSignals(->TradeSignals),
+		// The TradeSignal eventually picked/produced is stored in TradeAction each bar;
 
 		#endregion
 		
 		#region Methods
 		/// <summary>
-		/// The indicator signal is to trigger trade actions
-		/// Set the indicator signals for each bar/indicator
+		/// The indicator signal is to produce trade signal
+		/// and then trigger trade actions with 
+		/// command/perform/rule trade signal, event trade signal
+		/// combined. It fills InidcatorTradeSignals
 		/// </summary>
-		public virtual bool CheckIndicatorSignals(TradeSignalType tdSigType){
-			switch(tdSigType) {
-				case TradeSignalType.Entry:
-					return CheckNewEntrySignals();
-				case TradeSignalType.Liquidate: 
-					return CheckExitSignals();
-				case TradeSignalType.ProfitTarget:
-					return CheckProfitTargetSignals();
-				case TradeSignalType.StopLoss:
-					return CheckStopLossSignals();
-				case TradeSignalType.TrailingStopLoss:
-					return CheckTrailingStopLossSignals();
-				case TradeSignalType.ScaleIn:
-					return CheckScaleInSignals();
-				case TradeSignalType.ScaleOut:
-					return CheckScaleOutSignals();
-				default:
-					return false;
+		public virtual bool CheckIndicatorSignals(){
+			if(HasPosition() == 0) {
+				return CheckNewEntrySignals();
+			} else {
+				return CheckExitSignals();
 			}
 		}
-
+		
+		/// <summary>
+		/// All of the below CheckXXXSignals functions
+		/// need to be overridden in custom strategy,
+		/// but only implement those will be called in the strategy
+		/// </summary>
+		/// <returns></returns>
 		public virtual bool CheckNewEntrySignals(){return false;}
+		// Check the signal that needs immediate exit
+		// without modifying SL/TP
 		public virtual bool CheckExitSignals(){return false;}
-		public virtual bool CheckExitOCOSignals(){return false;}
-		public virtual bool CheckStopLossSignals(){return false;}
-		public virtual bool CheckProfitTargetSignals(){return false;}
-		public virtual bool CheckTrailingStopLossSignals(){return false;}
-		public virtual bool CheckScaleInSignals(){return false;}
-		public virtual bool CheckScaleOutSignals(){return false;}
+		public virtual bool CheckExitOCOSignals(){
+			return CheckStopLossSignal() && CheckProfitTargetSignal();
+		}
+		public virtual bool CheckStopLossSignal(){return false;}
+		public virtual bool CheckProfitTargetSignal(){return false;}
+		public virtual bool CheckTrailingStopLossSignal(){return false;}
+		public virtual bool CheckScaleInSignal(){return false;}
+		public virtual bool CheckScaleOutSignal(){return false;}
+		
 		
 		/// <summary>
 		/// The trade signal is to trigger entry/exit, 
 		/// or modify existing orders for extry/exit;
 		/// The trade signals are generated from indicator signals
 		/// and stored in TradeActions so no need to save it again bar by bar;
+		/// This function is replaced by GetTradeSignalByXXX() 
+		/// or GetLastTradeSignalByXXX() below;
 		/// </summary>
 		/// <returns></returns>
-		public virtual TradeSignal GetTradeSignal() {return null;}
-		
-		public virtual void SetTradeSignal() {}
-		
-		public virtual TradeSignal SetEntrySignal() {return null;}
-		
-		public virtual TradeSignal SetStopLossSignal() {return null;}
-		
-		public virtual TradeSignal SetProfitTargetSignal() {return null;}
+//		public virtual bool CheckTradeSignals(TradeSignalType tdSigType) {
+//			switch(tdSigType) {
+//				case TradeSignalType.Entry:
+//					return CheckNewEntrySignals();
+//				case TradeSignalType.Liquidate: 
+//					return CheckExitSignals();
+//				case TradeSignalType.ProfitTarget:
+//					return CheckProfitTargetSignals();
+//				case TradeSignalType.StopLoss:
+//					return CheckStopLossSignals();
+//				case TradeSignalType.TrailingStopLoss:
+//					return CheckTrailingStopLossSignals();
+//				case TradeSignalType.ScaleIn:
+//					return CheckScaleInSignals();
+//				case TradeSignalType.ScaleOut:
+//					return CheckScaleOutSignals();
+//				default:
+//					return false;
+//			}
+//		}
 		
 		/// <summary>
-		/// Check trade signals from indicator signals
+		/// Combine the command/perform/rule, event and indicator 
+		/// trade signals to generate the trade signal for trade action
 		/// </summary>
-		/// <returns></returns>
-		public virtual bool CheckTradeSignals() {
-			if(HasPosition() != 0 && CheckIndicatorSignals(TradeSignalType.Liquidate)) {
-				return SetExitTradeAction();
-			}
-			else if(NewOrderAllowed() && CheckIndicatorSignals(TradeSignalType.Entry))
-			{
-				IndicatorProxy.TraceMessage(this.Name, PrintOut);
-				return SetNewEntryTradeAction();
-			}
-
-			return false;
+		public virtual void SetTradeSignal(TradeAction action) {			
 		}
+		
+		public virtual void SetEntrySignal(TradeAction action) {}
+		
+		public virtual void SetStopLossSignal(TradeAction action) {}
+		
+		public virtual void SetProfitTargetSignal(TradeAction action) {}
+		
 		
 		public virtual double GetEntryPrice(SupportResistanceType srt) {
 			return 0;
@@ -429,7 +446,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
         
 		#region Properties
-
+		public SortedDictionary<int, List<TradeSignal>> CommandSignals {
+			get{
+				return this.commandSignals;
+			}
+		}
+		
+		public SortedDictionary<int, List<TradeSignal>> EventSignals {
+			get{
+				return this.eventSignals;
+			}
+		}
+		
+		public SortedDictionary<int, List<TradeSignal>> IndicatorTradeSignals {
+			get{
+				return this.indTdSignals;
+			}
+		}
         #endregion		
 	}
 }

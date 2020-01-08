@@ -47,7 +47,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else {
 				//tradeSignal = GetTradeSignal();
 				if (GetMarketPosition() != MarketPosition.Flat) { //There are positions
-					CheckExitTrade();
+					//CheckExitTrade();
 				}
 				else { // no positions
 					CheckNewEntryTrade();

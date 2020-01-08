@@ -42,11 +42,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			new SortedDictionary<int, List<IndicatorSignal>>();
 		
 		#region Methods
-		
-		public virtual IndicatorSignal CheckIndicatorSignal() {
-			return null;
-		}
-		
+			
 		public void AddIndicatorSignals(int barNo, List<IndicatorSignal> signals) {
 			this.indicatorSignals.Add(barNo, signals);
 		}

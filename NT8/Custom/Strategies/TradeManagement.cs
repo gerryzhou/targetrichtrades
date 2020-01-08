@@ -49,42 +49,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public virtual void PutTrade() {
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + 
-				"::PutTrade()--" + this.ToString());
-			switch(AlgoMode) {
-				case AlgoModeType.Liquidate: //liquidate
-					IndicatorProxy.TraceMessage(this.Name, PrintOut);
-					CloseAllPositions();
-					break;
-				case AlgoModeType.CancelOrders: //cancel order
-					IndicatorProxy.TraceMessage(this.Name, PrintOut);
-					CancelAllOrders();
-					break;
-				case AlgoModeType.StopTrading: // -2=stop trading(no entry/exit, liquidate positions and cancel all entry/exit orders);
-					CancelAllOrders();
-					CloseAllPositions();
-					IndicatorProxy.TraceMessage(this.Name, PrintOut);
-					IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + "- Stop trading cmd:" + IndicatorProxy.Get24HDateTime(Time[0]));
-					break;
-				case AlgoModeType.ExitOnly: // -1=stop trading(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
-					CancelEntryOrders();
-					break;
-				case AlgoModeType.Trading: //trading
-					//SetTradeAction(); called from CheckExitTrade() or CheckNewEntryTrade();
-					//CheckIndicatorSignals(); called from SetTradeAction(); save trade signals into the trade action;
-					//PutTrade(); first GetTradeAction() and then put exit or entry trade;
-					IndicatorProxy.TraceMessage(this.Name, PrintOut);
-					CheckPerformance(); //Performance/Rule trigger
-					CheckTradeSignals();//Signal trigger
-					SetTradeAction();
-					TakeTradeAction();//PutTrade();
-					break;
-				case AlgoModeType.SemiAlgo:	// 2=semi-algo(manual entry, algo exit);
-					CheckPerformance(); //Performance/Rule trigger
-					SetTradeAction();
-					ChangeSLPT(); //re-implement to fit TradeAction process
-					break;
-			}
-			//TakeTradeAction();
+				"::PutTrade()--" + this.ToString());			
 		}
 		
 		public virtual void PutEntryTrade() {
@@ -115,45 +80,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public virtual void PutLiquidateTrade() {
 		}
-		
-		/// <summary>
-		/// Check performance first, 
-		/// then check signal to determine special exit: 
-		/// liquidate, reverse, or scale in/out;
-		/// </summary>
-		/// <returns></returns>
-		public virtual bool CheckExitTrade() {
-			int prtLevel = 1;
-			//CurrentTrade.SetTradeType(TradeType.Exit);
-			IndicatorProxy.TraceMessage(this.Name, prtLevel);
-			ChangeSLPT();
-			//if(Position.MarketPosition == MarketPosition.Flat) return null;
-			IndicatorProxy.TraceMessage(this.Name, prtLevel);
-			CheckExitTradeBySignal();
 			
-			return false;
-		}
-		
-		/// <summary>
-		/// Check exit trader from signal instead of by money management policy
-		/// </summary>
-		/// <returns></returns>
-		public virtual void CheckExitTradeBySignal() {
-//			if(GetTradeSignal(CurrentBar) == null) return;
-//			indicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":CheckExitTradeBySignal"
-//			+ ";indicatorSignal.ReversalDir=" + GetTradeSignal(CurrentBar).ReversalDir.ToString()
-//			+ ";Position.MarketPosition=" + GetMarketPosition()
-//			);
-//			if((GetTradeSignal(CurrentBar).ReversalDir == Reversal.Up && GetMarketPosition() == MarketPosition.Short) ||
-//				(GetTradeSignal(CurrentBar).ReversalDir == Reversal.Down && GetMarketPosition() == MarketPosition.Long)) {
-//				CurrentTrade.SetTradeType(TradeType.Liquidate);
-//				CloseAllPositions();
-//				CancelExitOrders();
-//			} else {
-
-//			}			
-		}
-		
 		/// <summary>
 		/// Check if new entry trade could be generated
 		/// </summary>
@@ -983,7 +910,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 					CurrentTrade.BracketOrder.TrailingSLOrder.EntryOrder = null;
 				}
 		    }
-			
+/*			
+			//Reset SL order
 			IndicatorProxy.TraceMessage(this.Name, prtLevel);
 		    if (CurrentTrade.BracketOrder.OCOOrder.StopLossOrder != null &&
 				CurrentTrade.BracketOrder.OCOOrder.StopLossOrder == order)
@@ -997,6 +925,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 		    }
 			
+			//Reset PT order
 			IndicatorProxy.TraceMessage(this.Name, prtLevel);
 		    if (CurrentTrade.BracketOrder.OCOOrder.ProfitTargetOrder != null &&
 				CurrentTrade.BracketOrder.OCOOrder.ProfitTargetOrder == order)
@@ -1010,6 +939,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 		    }
 
+			//Reset TLSL order
 			IndicatorProxy.TraceMessage(this.Name, prtLevel);
 		    if ( CurrentTrade.BracketOrder.TrailingSLOrder.TLSLOrder != null && CurrentTrade.BracketOrder.TrailingSLOrder.TLSLOrder == order)
 		    {				
@@ -1024,12 +954,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			IndicatorProxy.TraceMessage(this.Name, prtLevel);
 			if (orderState == OrderState.Working || orderState == OrderState.Accepted) {
+				//Set En order
 				if(oName.Equals(CurrentTrade.TradeAction.EntrySignal.SignalName)) {
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "Entry Order Name=" + oName);
 					CurrentTrade.BracketOrder.EntryOrder = order;
 					CurrentTrade.BracketOrder.TrailingSLOrder.EntryOrder = order;
 				}
 				
+				//Set SL, PT order
 				if(order.Oco != null && order.Oco.Equals(CurrentTrade.OcoID)){
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "Exit order.Name=" + oName);
 					if(oName.Equals(CurrentTrade.TradeAction.ProfitTargetSignal.SignalName)) {						
@@ -1040,11 +972,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 					}
 				}
 				
+				//Set SLPT order
 				if(oName.Equals(CurrentTrade.TradeAction.StopLossSignal.SignalName)) {
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "TLSL Order Name=" + oName);
 					CurrentTrade.BracketOrder.TrailingSLOrder.TLSLOrder = order;
 				}
 			}
+			*/
 		}
 		
 		#endregion

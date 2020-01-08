@@ -77,7 +77,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);
 		}
 		
-		public override TradeSignal GetTradeSignal() {
+		// Replaced by CheckIndicatorSignals();		
+		public bool GetTradeSignal(TradeSignalType tsType) {
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);
 			TradeSignal trdSignal = new TradeSignal();
 			Direction dir = new Direction();
@@ -90,7 +91,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			trdSignal.TrendDir = dir;
 			
 //			this.AddTradeSignal(CurrentBar, trdSignal);
-			return trdSignal;
+			return false;
 		}
 		
 		public override bool CheckNewEntryTrade() {

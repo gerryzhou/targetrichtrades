@@ -72,6 +72,15 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	public enum EntryExitOrderType {Limit, Market, TrailingEntry, SimpleOCO, BreakEven, LockMinProfit, TrailingStopLoss};
 	
 	public enum ExitBy {Signal, RRR, Time, BarCount, HoldWinner, TrailingStopLoss}; //RRR=Risk/Reward Ratio;
+	
+	/// <summary>
+	/// NewEstablished: old=0, new!=0;
+	/// Liquidate: old!=0, new=0;
+	/// Hold: old=new!=0;
+	/// ScaledIn: abs(old) < abs(new);
+	/// ScaledOut: abs(old) > abs(new); 
+	/// </summary>
+	public enum PositionStatus {NewEstablished, Liquidate, Hold, ScaledIn, ScaledOut};
 		
 	public enum MoneyMgmtPolicy {SimpleSLPT, TrailingSLPT, PositionScaleInOut};
 }

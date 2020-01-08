@@ -58,6 +58,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//Read signals from command(cur bar), 
 			//perform/rule(next bar, because the trigger could fire before/after SetTradeAction was called),
 			//indicators(cur bar)
+			if(HasPosition() == 0) {
+				SetNewEntryTradeAction();
+			} else {
+				SetExitTradeAction();
+			}
 		}
 		
 		public virtual bool SetNewEntryTradeAction() {
@@ -74,6 +79,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public virtual void TakeTradeAction() {
 			CurrentTrade.TradeAction = GetTradeAction(CurrentBar);
+			if(CurrentTrade.TradeAction == null) {
+				Print(String.Format("{0}:TakeTradeAction called, CurrentTrade.TradeAction=null", CurrentBar));
+				return;
+			} else {
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":TakeTradeAction"
+			+ ";entrySignalName="// + CurrentTrade.TradeAction.EntrySignal.SignalName
+			+ ";CurrentTrade.TDID=" //+ CurrentTrade.TradeID
+			+ ";OcoID=" //+ CurrentTrade.OcoID
+			+ ";HasPosition=" + HasPosition());
+			}
+				
 			switch(CurrentTrade.TradeAction.TradeActionType) {
 				case TradeActionType.EntrySimple:
 				case TradeActionType.Bracket:
