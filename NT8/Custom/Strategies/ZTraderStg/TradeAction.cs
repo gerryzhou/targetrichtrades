@@ -33,7 +33,9 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	public class TradeAction
 	{		
 		#region Methods
-		
+		public TradeAction() {
+			this.Executed = false;
+		}
 		#endregion
 		
 		#region Protperies
@@ -89,7 +91,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		/// </summary>
 		public double EntryPrice {
 			get{
-				if(OrderType.StopMarket.Equals(EntrySignal.Order_Type))
+				if(EntrySignal == null) return -1;
+				else if(OrderType.StopMarket.Equals(EntrySignal.Order_Type))
 					return EntrySignal.StopPrice;
 				else return EntrySignal.LimitPrice;
 			}
@@ -104,7 +107,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		/// StopLoss price, stop price only
 		/// </summary>
 		public double StopLossPrice {
-			get{ return StopLossSignal.StopPrice; }
+			get{ return StopLossSignal==null? -1 : StopLossSignal.StopPrice; }
 			set { StopLossSignal.StopPrice = value;	}
 		}
 		
@@ -112,7 +115,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		/// ProfitTarget price, limit price only
 		/// </summary>
 		public double ProfitTargetPrice {
-			get{ return ProfitTargetSignal.LimitPrice; }
+			get{ return ProfitTargetSignal==null? -1 : ProfitTargetSignal.LimitPrice; }
 			set { ProfitTargetSignal.LimitPrice = value; }
 		}
 		
@@ -123,6 +126,12 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			get{ return ProfitTargetSignal.PriceOffset; }
 			set { ProfitTargetSignal.PriceOffset = value; }
 		}
+		
+		/// <summary>
+		/// The action has been taken or not
+		/// </summary>
+		public bool Executed { get; set; }
+		
 		#endregion
 	}
 }

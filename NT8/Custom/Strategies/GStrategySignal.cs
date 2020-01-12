@@ -80,7 +80,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		public virtual bool CheckIndicatorSignals(){
 			if(HasPosition() == 0) {
-				return CheckNewEntrySignals();
+				return CheckNewEntrySignals() && CheckExitOCOSignals();
 			} else {
 				return CheckExitSignals();
 			}
@@ -93,12 +93,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool CheckNewEntrySignals(){return false;}
-		// Check the signal that needs immediate exit
-		// without modifying SL/TP
-		public virtual bool CheckExitSignals(){return false;}
-		public virtual bool CheckExitOCOSignals(){
-			return CheckStopLossSignal() && CheckProfitTargetSignal();
+
+		/// <summary>
+		/// Check the signal that needs immediate exit without modifying SL/TP
+		/// Check the exit trade signal by indicator signal;
+		/// only check exit OCO signals
+		/// </summary>
+		/// <returns></returns>
+		public virtual bool CheckExitSignals(){
+			return CheckExitOCOSignals();
 		}
+		
+		public virtual bool CheckExitOCOSignals(){
+			bool slCk = CheckStopLossSignal();
+			bool ptCk = CheckProfitTargetSignal();
+			return slCk && ptCk;
+		}
+		
 		public virtual bool CheckStopLossSignal(){return false;}
 		public virtual bool CheckProfitTargetSignal(){return false;}
 		public virtual bool CheckTrailingStopLossSignal(){return false;}
@@ -149,19 +160,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public virtual void SetProfitTargetSignal(TradeAction action) {}
 		
-		
-		public virtual double GetEntryPrice(SupportResistanceType srt) {
-			return 0;
-		}
-		
-		public virtual double GetStopLossPrice(SupportResistanceType srt) {
-			return 0;
-		}
-		
-		public virtual double GetProfitTargetPrice(SupportResistanceType srt) {
-			return 0;
-		}
-		
 		#endregion
 
 		#region Command/Event signals function
@@ -179,8 +177,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if(!listSignals.TryGetValue(barNo, out list_signal)) {
 				list_signal = new List<TradeSignal>();
 			}
+//			else
+//				listSignals.Remove(barNo);
+			
 			list_signal.Add(signal);
+			//listSignals.Add(barNo, list_signal);
 			listSignals[barNo] = list_signal;
+			Print(String.Format("{0}:AddTradeSignal list_signal.Count={1}, listSignals.Count={2}", CurrentBar, list_signal.Count, listSignals.Count));
+			if(listSignals.Count < 5)
+				foreach(KeyValuePair<int, List<TradeSignal>> m in listSignals) {
+					List<TradeSignal> mm = m.Value as List<TradeSignal>;
+					foreach(TradeSignal ts in mm) {
+						Print(String.Format("{0}:AddTradeSignal SortedDictionary key={1}, SignalType={2}", CurrentBar, m.Key, ts.SignalType.ToString()));
+					}
+				}
 		}
 		
 		public void AddTradeSignal(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, TradeSignalType tdSigType,
@@ -227,9 +237,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public List<TradeSignal> GetTradeSignals(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals) {
 			List<TradeSignal> list_signal;
-			if(!listSignals.TryGetValue(barNo, out list_signal))
-				return null;
-			else
+			listSignals.TryGetValue(barNo, out list_signal);
+			//	return null;
+			//else
+			Print(String.Format("{0}:GetTradeSignals list_signal.Count={1}, listSignals.Count={2}", CurrentBar, list_signal, listSignals.Count));
 				return list_signal;
 		}
 
@@ -286,14 +297,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public List<TradeSignal> GetTradeSignalByType(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, TradeSignalType signal_type) {
 			List<TradeSignal> list_signal = GetTradeSignals(barNo, listSignals);
+			Print(String.Format("{0}:GetTradeSignalByType signal_type={1}, list_signal={2}, listSignals.Count={3}",
+			CurrentBar, signal_type, list_signal, listSignals.Count));
 			if(list_signal != null) {				
 				List<TradeSignal> list_sigByType = new List<TradeSignal>();
 				foreach(TradeSignal sig in list_signal) {
-					if(signal_type == sig.SignalType)
+					//if(list_signal.Count >= 1)
+					if(signal_type == sig.SignalType) {
+						Print(String.Format("{0}:GetTradeSignalByType== signal_type={1}, sig.SignalType={2}, list_signal.Count={3}", 
+							CurrentBar, signal_type, sig.SignalType, list_signal.Count));
 						list_sigByType.Add(sig);
+					}
 				}
-				if(list_sigByType.Count > 0)
+				if(list_sigByType.Count > 0) {
 					return list_sigByType;
+				}
 			}
 			
 			return null;

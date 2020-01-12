@@ -27,6 +27,10 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		#region Properites
 		/// <summary>
 		/// The OCO id for bracket or OCO trade
+		/// Setup this field when SL and PT order
+		/// are submitted, linked and working properly;
+		/// otherwise, it means this order set 
+		/// is not verified yet;
 		/// </summary>		
 		[Browsable(false), XmlIgnore]
 		[DefaultValueAttribute(null)]

@@ -19,7 +19,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
-using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -70,6 +70,26 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else return
 				Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
 		}
+		
+		public PositionStatus GetPositionStatus(int prevPos) {
+			int curPos = HasPosition();
+			if(curPos == 0) {
+				if(prevPos != 0)
+					return PositionStatus.Liquidate;
+				else return PositionStatus.Flat;
+			} else {
+				if(prevPos == 0)
+					return PositionStatus.NewEstablished;
+				else if(prevPos == curPos)
+					return PositionStatus.Hold;
+				else if(Math.Abs(prevPos) < Math.Abs(curPos))
+					return PositionStatus.ScaledIn;
+				else if(Math.Abs(prevPos) > Math.Abs(curPos))
+					return PositionStatus.ScaledOut;
+			}
+			
+			return PositionStatus.UnKnown;
+		}
 		#endregion
 		
 		#region Event Handlers
@@ -98,7 +118,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if(CurrentTrade.MktPosition != null && CurrentTrade.PosAvgPrice != null
 				&& CurrentTrade.PosQuantity != null && CurrentTrade.PosUnrealizedPnL != null)
 			IndicatorProxy.PrintLog(true, IsLiveTrading(),			
-			String.Format("{0}, AvgPrc: {1}, Quant={2}, MktPos={3}, PnL={4}",
+			String.Format("OnPositionUpdate:{0}, CurrentTrade updated -- AvgPrc: {1}, Quant={2}, MktPos={3}, PnL={4}",
 					CurrentBar, CurrentTrade.PosAvgPrice, CurrentTrade.PosQuantity, CurrentTrade.MktPosition, CurrentTrade.PosUnrealizedPnL));
 		}
 		

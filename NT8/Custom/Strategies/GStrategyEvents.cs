@@ -105,31 +105,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}		
 		#endregion
 		
-		#region OnExecutionUpdate Function
-		protected override void OnExecutionUpdate(Execution execution, string executionId, double price, int quantity, MarketPosition marketPosition,
-			string orderId, DateTime time)
-		{
-			if(BarsInProgress !=0) return;
-			IndicatorProxy.Log2Disk = true;
-			Print(CurrentBar + ":OnExecutionUpdate"
-			+ ";IsUnmanaged=" + IsUnmanaged
-			+ ";IsLiveTrading=" + IsLiveTrading()
-			+ ";GetMarketPosition=" + GetMarketPosition()
-			+ ";marketPosition=" + marketPosition
-			+ ";quantity=" + quantity
-			+ ";HasPosition=" + HasPosition()
-			+ ";GetAvgPrice=" + GetAvgPrice()
-			+ ";price=" + price);
-			CurrentTrade.OnCurExecutionUpdate(execution, executionId, price, quantity, marketPosition, orderId, time);
-			return;
-			if(IsUnmanaged)
-				OnExecutionUpdateUM(execution, executionId, price, quantity, marketPosition, orderId, time);
-			else
-				OnExecutionUpdateMG(execution, executionId, price, quantity, marketPosition, orderId, time);
-		}
-		#endregion
-		
 		#region OnOrderUpdate Function
+		/// <summary>
+		/// OnOrderUpdate->OnExecutionUpdate->OnPositionUpdate
+		/// OnPositionUpdate: check new trade, change position for curTrade, no order update;
+		/// OnExecutionUpdate: check filled order, update the new entry order and liquidate order; 
+		/// OnOrderUpdate: deal with working order, rejected/cancelled orders;
+		/// </summary>
+		/// <param name="order"></param>
+		/// <param name="limitPrice"></param>
+		/// <param name="stopPrice"></param>
+		/// <param name="quantity"></param>
+		/// <param name="filled"></param>
+		/// <param name="averageFillPrice"></param>
+		/// <param name="orderState"></param>
+		/// <param name="time"></param>
+		/// <param name="error"></param>
+		/// <param name="comment"></param>
 		protected override void OnOrderUpdate(Cbi.Order order, double limitPrice, double stopPrice, 
 			int quantity, int filled, double averageFillPrice, 
 			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
@@ -137,12 +129,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if(BarsInProgress !=0) return;
 			IndicatorProxy.Log2Disk = true;
 
-			Print(CurrentBar + ":OnOrderUpdate IsUnmanaged=" + IsUnmanaged);
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+				CurrentBar + ":OnOrderUpdate IsUnmanaged=" + IsUnmanaged);
 			
 			//The logic is implemented in the method below
 			CurrentTrade.OnCurOrderUpdate(order, limitPrice, stopPrice, quantity, filled, averageFillPrice, 
 				orderState, time, error, comment);
-			//return;
+			return;
 			
 			//The order execution is implemented in the method below
 			if(IsUnmanaged)
@@ -151,6 +144,36 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else
 				OnOrderUpdateMG(order, limitPrice, stopPrice, quantity, filled, 
 				averageFillPrice, orderState, time, error, comment);
+		}
+		#endregion
+		
+		#region OnExecutionUpdate Function
+		protected override void OnExecutionUpdate(Execution execution, string executionId, double price, int quantity, MarketPosition marketPosition,
+			string orderId, DateTime time)
+		{
+			if(BarsInProgress !=0) return;
+			IndicatorProxy.Log2Disk = true;
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+			CurrentBar + ":OnExecutionUpdate"
+			+ ";IsUnmanaged=" + IsUnmanaged
+			+ ";IsLiveTrading=" + IsLiveTrading()
+			+ ";IsInitialEntry=" + execution.IsInitialEntry
+			+ ";IsEntry=" + execution.IsEntry
+			+ ";IsExit=" + execution.IsExit
+			+ ";IsLastExit=" + execution.IsLastExit
+			+ ";GetMarketPosition=" + GetMarketPosition()
+			+ ";marketPosition=" + marketPosition
+			+ ";quantity=" + quantity
+			+ ";HasPosition=" + HasPosition()
+			+ ";GetAvgPrice=" + GetAvgPrice()
+			+ ";price=" + price);
+			
+			CurrentTrade.OnCurExecutionUpdate(execution, executionId, price, quantity, marketPosition, orderId, time);
+			return;
+			if(IsUnmanaged)
+				OnExecutionUpdateUM(execution, executionId, price, quantity, marketPosition, orderId, time);
+			else
+				OnExecutionUpdateMG(execution, executionId, price, quantity, marketPosition, orderId, time);
 		}
 		#endregion
 		

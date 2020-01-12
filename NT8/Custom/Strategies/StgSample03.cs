@@ -121,8 +121,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			trdSignal.TrendDir = dir;
 			
 //			this.AddTradeSignal(CurrentBar, trdSignal);
-			hi3 = GetHighestPrice(BarsLookback);
-			lo3 = GetLowestPrice(BarsLookback);
+			hi3 = GetHighestPrice(BarsLookback, true);
+			lo3 = GetLowestPrice(BarsLookback, true);
 			
 			return false;
 		}

@@ -165,21 +165,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return false;
 		}
 		
-		/// <summary>
-		/// Check the exit trade signal by indicator signal;
-		/// only check exit OCO signals
-		/// </summary>
-		/// <returns></returns>
-		public override bool CheckExitSignals(){
-			return CheckExitOCOSignals();
-		}
-	
 		public override bool CheckStopLossSignal() {
+//			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.StopLoss);
+//			if(indTdSig != null && indTdSig.Count>0) return false;
+			Print(CurrentBar + ":CheckStopLossSignal called -----------");
+			if(CurrentTrade.TradeAction != null &&
+				CurrentTrade.TradeAction.StopLossSignal != null) return false;
+			giPbSAR.Update();
 			Direction dir = GetDirection(giPbSAR);			
 			TradeSignal slSig = new TradeSignal();
 			slSig.BarNo = CurrentBar;
 			slSig.SignalType = TradeSignalType.StopLoss;
 			slSig.Order_Type = OrderType.Market;
+			slSig.SignalSource = TradeSignalSource.Indicator;
+			slSig.OrderCalculationMode = CalculationMode.Price;
+			slSig.Quantity = 1;
 			if(dir.TrendDir==TrendDirection.Up) {
 				slSig.Action = OrderAction.Sell;
 				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Support);
@@ -193,11 +193,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public override bool CheckProfitTargetSignal() {			
+//			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.ProfitTarget);
+//			if(indTdSig != null && indTdSig.Count>0) return false;
+			Print(CurrentBar + ":CheckProfitTargetSignal called -----------");
+			if(CurrentTrade.TradeAction != null && 
+				CurrentTrade.TradeAction.ProfitTargetSignal != null) return false;
+			giPbSAR.Update();
 			Direction dir = GetDirection(giPbSAR);
 			TradeSignal ptSig = new TradeSignal();
 			ptSig.BarNo = CurrentBar;
 			ptSig.SignalType = TradeSignalType.ProfitTarget;
 			ptSig.Order_Type = OrderType.Limit;
+			ptSig.SignalSource = TradeSignalSource.Indicator;
+			ptSig.OrderCalculationMode = CalculationMode.Price;
+			ptSig.Quantity = 1;
 			if(dir.TrendDir==TrendDirection.Up) {
 				ptSig.Action = OrderAction.Sell;
 				ptSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Resistance);
@@ -234,8 +243,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			trdSignal.TrendDir = dir;
 			
 //			this.AddTradeSignal(CurrentBar, trdSignal);
-			hi3 = GetHighestPrice(BarsLookback);
-			lo3 = GetLowestPrice(BarsLookback);
+			hi3 = GetHighestPrice(BarsLookback, true);
+			lo3 = GetLowestPrice(BarsLookback, true);
 			
 			return false;
 		}
@@ -331,19 +340,37 @@ namespace NinjaTrader.NinjaScript.Strategies
 			ta.BarNo = CurrentBar;
 			ta.ActionName = "SampleTRT-Entry";
 			ta.TradeActionType = TradeActionType.Bracket;
-			//ta.EntrySignal = 
 			SetEntrySignal(ta);
-			//ta.StopLossSignal = 
-			SetStopLossSignal(ta);
-			//ta.ProfitTargetSignal = 
-			SetProfitTargetSignal(ta);
-			AddTradeAction(CurrentBar, ta);
-			Print(string.Format("{0}: EnSig={1}, SLSig={2}, PTSig={3}", CurrentBar, ta.EntrySignal, ta.StopLossSignal, ta.ProfitTargetSignal));
+			CurrentTrade.TradeAction = ta;
+			//AddTradeAction(CurrentBar, ta);
+			IndicatorProxy.PrintLog(true, IsLiveTrading(),
+				string.Format("{0}: SetNewEntryTradeAction EnSig={1}, SLSig={2}, PTSig={3}, StopLossPrice={4}, ProfitTargetPrice={5}",
+				CurrentBar, ta.EntrySignal, ta.StopLossSignal, ta.ProfitTargetSignal, ta.StopLossPrice, ta.ProfitTargetPrice));
 			return true;
 		}
 		
 		public override bool SetExitTradeAction() {
-			return false;
+			TradeAction ta = CurrentTrade.TradeAction;//GetTradeAction(CurrentBar);
+			if(ta == null || ta.Executed) {
+				ta = new TradeAction();
+				ta.BarNo = CurrentBar;
+				ta.ActionName = "SampleTRT-ExitOCO";
+				ta.TradeActionType = TradeActionType.ExitOCO;		
+				//AddTradeAction(CurrentBar, ta);
+				IndicatorProxy.PrintLog(true, IsLiveTrading(),
+					String.Format("{0}:SetExitTradeAction ta==null StopLossPrice={1}, ProfitTargetPrice={2}",
+					CurrentBar, CurrentTrade.TradeAction.StopLossPrice, CurrentTrade.TradeAction.ProfitTargetPrice));
+			} else { //check if the SL/PT needs to be changed or not
+				//ta.TradeActionType = TradeActionType.ExitOCO;
+				IndicatorProxy.PrintLog(true, IsLiveTrading(),
+					String.Format("{0}:SetExitTradeAction ta!=null StopLossPrice={1}, ProfitTargetPrice={2}",
+					CurrentBar, ta.StopLossPrice, ta.ProfitTargetPrice));
+			}
+			
+			SetStopLossSignal(ta);
+			SetProfitTargetSignal(ta);			
+			CurrentTrade.TradeAction = ta;
+			return true;
 		}
 		
 		// ====unused====
@@ -406,10 +433,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			double prc = 0;
 			switch(srt) {
 				case SupportResistanceType.Support:
-					prc = GetLowestPrice(BarsLookback);
+					prc = GetLowestPrice(BarsLookback, true);
 					break;
 				case SupportResistanceType.Resistance:
-					prc = GetHighestPrice(BarsLookback);
+					prc = GetHighestPrice(BarsLookback, true);
 					break;
 			}
 			Print(CurrentBar + ": GetStopLossPrice=" + prc);
@@ -420,10 +447,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			double prc = 0;
 			switch(srt) {
 				case SupportResistanceType.Support:
-					prc = GetLowestPrice(BarsLookback);
+					prc = GetLowestPrice(BarsLookback, true);
 					break;
 				case SupportResistanceType.Resistance:
-					prc = GetHighestPrice(BarsLookback);
+					prc = GetHighestPrice(BarsLookback, true);
 					break;
 			}
 			Print(CurrentBar + ": GetProfitTargetPrice=" + prc);
@@ -617,7 +644,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		private int cp_EnBarsBeforeInflection = 2;
 				
-		private int barsLookback = 1;// 15;
+		private int barsLookback = 5;// 15;
 		
 		//SMI parameters
 		private int	range			= 8;

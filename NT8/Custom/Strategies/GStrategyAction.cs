@@ -52,7 +52,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Take the triggers from command, perform/rule, and indicator signals
 		/// to generate tradeAction for current Bar or next Bar(most likely current Bar);
 		/// This function could be overridden by custom strategy to define
-		/// different logics/priorities to handle the triggers
+		/// different logics/priorities to handle the triggers;
+		/// CurrentTrade.TradeAction stores the TradeAction that has taken or will be taken;
+		/// GetTradeAction(barNo) provides the TradeAction that is generated from the triggers;
 		/// </summary>
 		public virtual void SetTradeAction() {
 			//Read signals from command(cur bar), 
@@ -65,10 +67,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		
+		/// <summary>
+		/// Set new Entry TradeSignal
+		/// and SL/PT TradeSignals
+		/// </summary>
+		/// <returns></returns>
 		public virtual bool SetNewEntryTradeAction() {
 			return false;
 		}
 		
+		/// <summary>
+		/// Set SL/PT TradedSignals;
+		/// Get cmd and event trigger signals;
+		/// Indicator signals will depend;
+		/// </summary>
+		/// <returns></returns>
 		public virtual bool SetExitTradeAction() {
 			return false;
 		}
@@ -77,30 +90,40 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return null;
 		}
 		
+		/// <summary>
+		/// 
+		/// </summary>
 		public virtual void TakeTradeAction() {
-			CurrentTrade.TradeAction = GetTradeAction(CurrentBar);
-			if(CurrentTrade.TradeAction == null) {
-				Print(String.Format("{0}:TakeTradeAction called, CurrentTrade.TradeAction=null", CurrentBar));
-				return;
-			} else {
-			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":TakeTradeAction"
-			+ ";entrySignalName="// + CurrentTrade.TradeAction.EntrySignal.SignalName
-			+ ";CurrentTrade.TDID=" //+ CurrentTrade.TradeID
-			+ ";OcoID=" //+ CurrentTrade.OcoID
-			+ ";HasPosition=" + HasPosition());
-			}
-				
-			switch(CurrentTrade.TradeAction.TradeActionType) {
-				case TradeActionType.EntrySimple:
-				case TradeActionType.Bracket:
-					PutEntryTrade();
-					break;
-				case TradeActionType.ExitOCO:
-					PutExitTrade();
-					break;
-				case TradeActionType.ExitSimple:
-					PutLiquidateTrade();
-					break;
+			//CurrentTrade.TradeAction = GetTradeAction(CurrentBar);//??
+			try {
+				TradeAction ta = CurrentTrade.TradeAction;
+				if(ta == null || ta.Executed) {
+					IndicatorProxy.PrintLog(true, IsLiveTrading(),
+						String.Format("{0}:TakeTradeAction called, CurrentTrade.TradeAction=null or Executed==true", CurrentBar));
+					return;
+				}
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":TakeTradeAction"
+				+ ";entrySignalName="// + ta.EntrySignal.SignalName
+				+ ";CurrentTrade.TDID=" + CurrentTrade.TradeID
+				+ ";OcoID=" + CurrentTrade.OcoID
+				+ ";HasPosition=" + HasPosition());
+								
+				ta.Executed = true;
+				switch(ta.TradeActionType) {
+					case TradeActionType.EntrySimple:
+					case TradeActionType.Bracket:
+						PutEntryTrade();
+						break;
+					case TradeActionType.ExitOCO:
+						PutExitTrade();
+						break;
+					case TradeActionType.ExitSimple:
+						PutLiquidateTrade();
+						break;
+				}
+			} catch(Exception ex) {
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+					CurrentBar + ":Exception TakeTradeAction--" + ex.StackTrace);
 			}
 		}		
 		#endregion

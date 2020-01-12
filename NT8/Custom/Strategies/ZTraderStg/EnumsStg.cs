@@ -80,7 +80,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// ScaledIn: abs(old) < abs(new);
 	/// ScaledOut: abs(old) > abs(new); 
 	/// </summary>
-	public enum PositionStatus {NewEstablished, Liquidate, Hold, ScaledIn, ScaledOut};
+	public enum PositionStatus {NewEstablished, Liquidate, Hold, Flat, ScaledIn, ScaledOut, UnKnown};
 		
 	public enum MoneyMgmtPolicy {SimpleSLPT, TrailingSLPT, PositionScaleInOut};
 }

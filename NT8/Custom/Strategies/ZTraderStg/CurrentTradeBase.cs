@@ -137,6 +137,8 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			MktPosition = MarketPosition.Flat;
 			PosUnrealizedPnL = 0;
 			barsSinceEnOrd = 0;
+			BracketOrder = new BracketOrderBase();
+			TradeAction = null;
 			
 			//TM variables
 //			TradeDirection = InstStrategy.TM_TradingDirection;
@@ -212,11 +214,109 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			}
 		}
 		
+		public void UpdateCurPos(Cbi.Position position, double averagePrice, 
+			int quantity, Cbi.MarketPosition marketPosition) {
+			
+				PosAvgPrice = averagePrice;
+				PosQuantity = quantity;
+				MktPosition = marketPosition;
+				PosUnrealizedPnL = position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, InstStrategy.Close[0]);
+		}
+		
 		#endregion
 		
 		#region Event Handler Methods
 		/// <summary>
-		/// New position created: setup SL/PT orders;
+		/// 
+		/// </summary>
+		/// <param name="order"></param>
+		/// <param name="limitPrice"></param>
+		/// <param name="stopPrice"></param>
+		/// <param name="quantity"></param>
+		/// <param name="filled"></param>
+		/// <param name="averageFillPrice"></param>
+		/// <param name="orderState"></param>
+		/// <param name="time"></param>
+		/// <param name="error"></param>
+		/// <param name="comment"></param>
+		public virtual void OnCurOrderUpdate(Cbi.Order order, double limitPrice, double stopPrice, 
+			int quantity, int filled, double averageFillPrice, 
+			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
+		{
+			InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+				String.Format("{0}:OnCurOrderUpdate, limitPrice={1}, stopPrice={2}, quantity={3},\t\n filled={4}, averageFillPrice={5}, orderState={6}",
+				InstStrategy.CurrentBar, limitPrice, stopPrice, quantity, filled, averageFillPrice, orderState));
+			try {
+//			    if (order.Name == "myEntryOrder" && orderState != OrderState.Filled)
+//			      entryOrder = order;
+
+			 
+//			    if (entryOrder != null && entryOrder == order)
+//			    {
+//			        Print(order.ToString());
+//			        if (order.OrderState == OrderState.Filled)
+//			              entryOrder = null;
+//			    }
+			} catch(Exception ex) {
+				InstStrategy.Print("Exception=" + ex.StackTrace);
+			}
+		}
+		
+		/// <summary>
+		/// NewTrade: Setup EnOrder
+		/// EndTrade: Clean up En, SL, PT orders 
+		/// </summary>
+		/// <param name="execution"></param>
+		/// <param name="executionId"></param>
+		/// <param name="price"></param>
+		/// <param name="quantity"></param>
+		/// <param name="marketPosition"></param>
+		/// <param name="orderId"></param>
+		/// <param name="time"></param>
+		public virtual void OnCurExecutionUpdate(Execution execution, string executionId,
+			double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
+		{
+			try {
+				InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(), 
+				InstStrategy.CurrentBar + ":OnCurExecutionUpdate"
+				+ ";executionId=" + executionId
+				+ ";orderId=" + orderId
+				+ ";execution.Order.Name=" + execution.Order.Name
+				+ ";marketPosition=" + marketPosition
+				+ ";quantity=" + quantity
+				+ ";price=" + price
+				);
+				PositionStatus ps = InstStrategy.GetPositionStatus(PosQuantity);
+				switch(ps) {
+					case PositionStatus.NewEstablished://New position created, setup SL/PT
+						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+						String.Format("{0}:OnCurExecutionUpdate PositionStatus.NewEstablished, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
+							InstStrategy.CurrentBar, MktPosition, PosQuantity, marketPosition, quantity));
+						break;
+					case PositionStatus.Liquidate://Positions were closed, trade is done, init a new trade;
+						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+						String.Format("{0}:OnCurExecutionUpdate PositionStatus.Liquidate, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
+							InstStrategy.CurrentBar, MktPosition, PosQuantity, marketPosition, quantity));
+						//InitNewTrade();
+						break;
+					case PositionStatus.Hold:
+						break;
+					case PositionStatus.Flat:
+						break;
+					case PositionStatus.ScaledIn:
+						break;
+					case PositionStatus.ScaledOut:
+						break;
+					case PositionStatus.UnKnown:
+						break;						
+				}
+			} catch(Exception ex) {
+				InstStrategy.Print("Exception=" + ex.StackTrace);
+			}
+		}
+		
+		/// <summary>
+		/// New position created: update position, setup SL/PT orders(the same bar);
 		/// Old position closed: Start a new trade;
 		/// Position is being held: check performane to adjust SL/PT orders;
 		/// All flat: wait for Command/TradeSignal, or detect new position created;
@@ -224,16 +324,58 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		/// </summary>
 		/// <param name="position"></param>
 		/// <param name="averagePrice"></param>
-		/// <param name="quantity"></param>
-		/// <param name="marketPosition"></param>
+		/// <param name="quantity">always>0</param>
+		/// <param name="marketPosition">flat/long/short</param>
 		public virtual void OnCurPositionUpdate(Cbi.Position position, double averagePrice, 
 			int quantity, Cbi.MarketPosition marketPosition)
 		{
-			try{
+			try	{
 				InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
 					String.Format("{0}:OnCurPositionUpdate - AvgPrc: {1}, Quant={2}, MktPos={3}, marketPosition={4}, PnL={5}",
 						InstStrategy.CurrentBar, PosAvgPrice, PosQuantity, MktPosition, marketPosition, PosUnrealizedPnL));
 				//Position pos = position.MemberwiseClone();
+				PositionStatus ps = InstStrategy.GetPositionStatus(PosQuantity);
+				switch(ps) {
+					case PositionStatus.NewEstablished://New position created, setup SL/PT(the same bar)
+						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+						String.Format("{0}:PositionStatus.NewEstablished, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
+							InstStrategy.CurrentBar, MktPosition, PosQuantity, marketPosition, quantity));
+						UpdateCurPos(position, averagePrice, quantity, marketPosition);
+						InstStrategy.CheckExitSignals();
+						InstStrategy.SetExitTradeAction();
+						InstStrategy.TakeTradeAction();
+						break;
+					case PositionStatus.Liquidate://Positions were closed, trade is done, init a new trade;
+						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+						String.Format("{0}:PositionStatus.Liquidate, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
+							InstStrategy.CurrentBar, MktPosition, PosQuantity, marketPosition, quantity));
+						InitNewTrade();
+						break;
+					case PositionStatus.Hold://Position is held, change SL/PT by rule/performance, scale in/out occured;
+						//=> this case is replaced by CheckPerformance() from OnBarUpdate, it won't happen here, only scale in/out will happen
+						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+							String.Format("{0}:Position is Held, MktPos={1}, marketPosition={2}, PosQuant={3}, Quant={4}", 
+							InstStrategy.CurrentBar, MktPosition, marketPosition, PosQuantity, quantity));
+//						InstStrategy.CalProfitTargetAmt(PosAvgPrice, InstStrategy.MM_ProfitFactor);
+//						InstStrategy.CalExitOcoPrice(PosAvgPrice, InstStrategy.MM_ProfitFactor);
+//						InstStrategy.SetSimpleExitOCO(TradeAction.EntrySignal.SignalName);
+						break;
+					case PositionStatus.Flat:
+						break;
+					case PositionStatus.ScaledIn:
+						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+							String.Format("{0}:PositionStatus.ScaledIn, MktPos={1}, marketPosition={2}, PosQuant={3}, Quant={4}", 
+							InstStrategy.CurrentBar, MktPosition, marketPosition, PosQuantity, quantity));
+						break;
+					case PositionStatus.ScaledOut:
+						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+							String.Format("{0}:PositionStatus.ScaledOut, MktPos={1}, marketPosition={2}, PosQuant={3}, Quant={4}", 
+							InstStrategy.CurrentBar, MktPosition, marketPosition, PosQuantity, quantity));
+						break;
+					case PositionStatus.UnKnown:
+						break;						
+				}
+				/*
 				if (MktPosition == MarketPosition.Flat)
 				{
 					if(marketPosition == MarketPosition.Flat) {
@@ -263,56 +405,14 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	//				SetBracketOrder.OCOOrder.ProfitTargetOrder(OrderSignalName.EntryShort.ToString());
 	//				SetBracketOrder.OCOOrder.StopLossOrder(OrderSignalName.EntryShort.ToString());
 				}
-			} catch(Exception ex) {
-				InstStrategy.Print("Exception=" + ex.StackTrace);
-			}
-			
-			PosAvgPrice = averagePrice;
-			PosQuantity = quantity;
-			MktPosition = marketPosition;
-			PosUnrealizedPnL = position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, InstStrategy.Close[0]);
-		}
-
-		public virtual void OnCurExecutionUpdate(Execution execution, string executionId,
-			double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
-		{
-			InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(), 
-				InstStrategy.CurrentBar + ":OnCurExecutionUpdate"
-			+ ";marketPosition=" + marketPosition
-			+ ";quantity=" + quantity
-			+ ";price=" + price);
-			try {
-			} catch(Exception ex) {
-				InstStrategy.Print("Exception=" + ex.StackTrace);
-			}
-		}
-		
-		public virtual void OnCurOrderUpdate(Cbi.Order order, double limitPrice, double stopPrice, 
-			int quantity, int filled, double averageFillPrice, 
-			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
-		{
-			InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
-				String.Format("{0}:OnCurOrderUpdate, limitPrice={1}, stopPrice={2}, quantity={3},\t\n filled={4}, averageFillPrice={5}, orderState={6}",
-				InstStrategy.CurrentBar, limitPrice, stopPrice, quantity, filled, averageFillPrice, orderState));
-			try {
-//			    if (order.Name == "myEntryOrder" && orderState != OrderState.Filled)
-//			      entryOrder = order;
-
-			 
-//			    if (entryOrder != null && entryOrder == order)
-//			    {
-//			        Print(order.ToString());
-//			        if (order.OrderState == OrderState.Filled)
-//			              entryOrder = null;
-//			    }
+				*/
 			} catch(Exception ex) {
 				InstStrategy.Print("Exception=" + ex.StackTrace);
 			}
 		}
 		#endregion
 		
-		#region Properties
-		
+		#region Properties		
 		/// <summary>
 		/// Removed since the type is defined at TradeAction;
 		/// TradeType is not clear concept, a trade includs entry, exit, etc.
@@ -406,14 +506,11 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			get; set;
 		}
 		
-		//private GStrategyBase InstStrategy = null;
-		
-		
+		//private GStrategyBase InstStrategy = null;		
 		//Order Objects
 		private BracketOrderBase bracketOrder = new BracketOrderBase();
 		//private TrailingSLOrderBase trailingSLOrder = new TrailingSLOrderBase();
-//		public EntryExitOrderType BracketOrder.ExitOrderType = EntryExitOrderType.SimpleOCO;
-		
+//		public EntryExitOrderType BracketOrder.ExitOrderType = EntryExitOrderType.SimpleOCO;		
 		#endregion
 	}
 }

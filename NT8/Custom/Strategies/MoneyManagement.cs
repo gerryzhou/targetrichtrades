@@ -221,7 +221,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				case EntryExitOrderType.SimpleOCO: // set simple PT, SL
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":isBelowBreakeven, pl_tics=" + pl_tics);
 					IndicatorProxy.TraceMessage(this.Name, prtLevel);
-					SetSimpleExitOCO(CurrentTrade.TradeAction.EntrySignal.SignalName);
+					SetSimpleExitOCO();
 					break;
 			}
 			
@@ -428,12 +428,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public bool isOcoPriceValid() {
 			bool isValid = false;
-			if(CurrentTrade.TradeAction.StopLossPrice > 0 && CurrentTrade.TradeAction.ProfitTargetPrice > 0) {
+			TradeAction ta = CurrentTrade.TradeAction;
+			if(ta.StopLossPrice != null && ta.StopLossPrice > 0 &&
+				ta.ProfitTargetPrice != null && ta.ProfitTargetPrice > 0) {
 				if(GetMarketPosition() == MarketPosition.Long) {
-					isValid = (CurrentTrade.TradeAction.ProfitTargetPrice > CurrentTrade.TradeAction.StopLossPrice);
+					isValid = (ta.ProfitTargetPrice > ta.StopLossPrice);
 				}
 				else if(GetMarketPosition() == MarketPosition.Short) {
-					isValid = (CurrentTrade.TradeAction.ProfitTargetPrice < CurrentTrade.TradeAction.StopLossPrice);
+					isValid = (ta.ProfitTargetPrice < ta.StopLossPrice);
 				}
 			}
 			return isValid;
@@ -486,10 +488,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return amt;
 		}
 		
-		public double GetHighestPrice(int barsAgo) {
-			double hiPrc = High[1];
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="barsAgo"></param>
+		/// <param name="includeCurBar"></param>
+		/// <returns></returns>
+		public double GetHighestPrice(int barsAgo, bool includeCurBar) {
+			double hiPrc = includeCurBar? High[0] : High[1];
 			if(barsAgo > 0) {
-				hiPrc = High[HighestBar(High, barsAgo)];
+				hiPrc = Math.Max(hiPrc, High[HighestBar(High, barsAgo)]);
 			}
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				CurrentBar + ":hiPrc=" + hiPrc 
@@ -497,10 +505,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return hiPrc;
 		}
 
-		public double GetLowestPrice(int barsAgo) {
-			double loPrc = Low[1];
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="barsAgo">LowestBar(Low, Bars.BarsSinceNewTradingDay);</param>
+		/// <param name="includeCurBar"></param>
+		/// <returns></returns>
+		public double GetLowestPrice(int barsAgo, bool includeCurBar) {
+			double loPrc = includeCurBar? Low[0] : Low[1];
 			if(barsAgo > 0) {
-				loPrc = Low[LowestBar(Low, barsAgo)];
+				loPrc = Math.Min(loPrc, Low[LowestBar(Low, barsAgo)]);
 			}
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				CurrentBar + ":loPrc=" + loPrc
@@ -513,6 +527,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return maIns.RoundToTickSize(Typical[barsAgo]);
 		}
 		
+		public virtual double GetEntryPrice(SupportResistanceType srt) {
+			return 0;
+		}
+		
+		public virtual double GetStopLossPrice(SupportResistanceType srt) {
+			return 0;
+		}
+		
+		public virtual double GetProfitTargetPrice(SupportResistanceType srt) {
+			return 0;
+		}		
 		#endregion
 
 		#region Depricated methods
@@ -614,7 +639,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			} // PT no change, BE SL
 			else {
 				IndicatorProxy.TraceMessage(this.Name, prtLevel);
-				SetSimpleExitOCO(CurrentTrade.TradeAction.EntrySignal.SignalName.ToString());
+				SetSimpleExitOCO();
 			} // set simple PT, SL
 			
 //			if(Position.Quantity == 0)
