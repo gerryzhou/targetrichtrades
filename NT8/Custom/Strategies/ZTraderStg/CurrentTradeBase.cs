@@ -115,7 +115,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 //		public double DailyLossLmt = -200;//-300 the daily loss limit amount
 //		public double ProfitFactor = 0.5;//PT/SL ratio
-		public int MaxQuantity = 1; //Quantity of the total contracts allowed to trade for the strategy
+		//public int MaxOpenPosition = 1; //Quantity of the total contracts allowed to trade for the strategy
 
 //		public double profitTargetPrice = 0;//Runtime var. For trailing PT using the price to set OCO order
 //		public double stopLossPrice = 0;//Runtime var; Using price to set OCO order, since Amt could be negative		
@@ -222,7 +222,29 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 				MktPosition = marketPosition;
 				PosUnrealizedPnL = position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, InstStrategy.Close[0]);
 		}
-		
+
+		/// <summary>
+		/// Update the tradeAction
+		/// </summary>
+		/// <param name="execution"></param>
+		/// <param name="executionId"></param>
+		/// <param name="price"></param>
+		/// <param name="quantity"></param>
+		/// <param name="marketPosition"></param>
+		/// <param name="orderId"></param>
+		/// <param name="time"></param>
+		public void UpdateCurExecution(Execution execution, string executionId,
+			double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time) {
+			this.BracketOrder.EntryOrder = execution.Order;
+			if(TradeAction != null) {
+				TradeAction.Executed = true;
+				
+				PosAvgPrice = price;
+//				PosQuantity = quantity;
+//				MktPosition = marketPosition;
+//				PosUnrealizedPnL = position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, InstStrategy.Close[0]);
+			}
+		}		
 		#endregion
 		
 		#region Event Handler Methods

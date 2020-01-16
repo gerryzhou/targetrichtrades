@@ -537,7 +537,43 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public virtual double GetProfitTargetPrice(SupportResistanceType srt) {
 			return 0;
-		}		
+		}
+		
+		/// <summary>
+		/// Get the default OCO exit order prices if no valid prieces were assigned
+		/// by Indicator signals or command, perform/rule, etc.
+		/// </summary>
+		/// <param name="mp"></param>
+		/// <param name="enPrc"></param>
+		/// <param name="ta"></param>
+		/// <returns></returns>
+		public virtual TradeAction GetOcoPrice(double enPrc, TradeAction ta) {
+			double slOffset, ptOffset;
+			if(enPrc <= 0)
+				enPrc = Close[0];
+			MarketPosition mp = GetMarketPosition();
+			
+			switch(MM_SLCalculationMode) {
+				case CalculationMode.Currency:
+					slOffset = GetPriceByCurrency(MM_StopLossAmt);
+					break;
+			}
+			switch(MM_PTCalculationMode) {
+				case CalculationMode.Currency:
+					ptOffset = GetPriceByCurrency(MM_ProfitTargetAmt);
+					break;
+			}
+			
+			if(mp == MarketPosition.Long) {
+				ta.StopLossPrice = enPrc - GetPriceByCurrency(MM_StopLossAmt);
+				ta.ProfitTargetPrice = enPrc + GetPriceByCurrency(MM_ProfitTargetAmt);
+			} else if(mp == MarketPosition.Short) {
+				ta.StopLossPrice = enPrc + GetPriceByCurrency(MM_StopLossAmt);
+				ta.ProfitTargetPrice = enPrc - GetPriceByCurrency(MM_ProfitTargetAmt);
+			}
+			
+			return ta;
+		}
 		#endregion
 
 		#region Depricated methods

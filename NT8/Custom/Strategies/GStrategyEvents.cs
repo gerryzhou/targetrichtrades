@@ -41,7 +41,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnBarUpdate()
 		{
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
-				String.Format("{0}:===========OnBarUpdate============", CurrentBar));
+				String.Format("{0}:===========OnBarUpdate======HasPosition={1}, IsLiveTrading={2}",
+				CurrentBar, HasPosition(), IsLiveTrading()));
 			IndicatorProxy.TraceMessage(this.Name, PrintOut);
 			//Print(CurrentBar.ToString() + " -- GSZTraderBase - Add your custom strategy logic here.");
 			if(CurrentBar <= BarsRequiredToTrade)

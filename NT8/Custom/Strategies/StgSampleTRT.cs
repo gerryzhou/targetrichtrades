@@ -133,6 +133,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			giSMI.Update();
 			giPbSAR.Update();
 			Print(CurrentBar + ":CheckNewEntrySignals called -----------" + giSMI.LastInflection);
+
+			if(NewTradeAllowed())
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: CheckNewEntrySignals called....NewOrderAllowed", CurrentBar));
+			else {
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: CheckNewEntrySignals called....NewOrderNotAllowed", CurrentBar));
+				return false;
+			}
 			
 			IndicatorSignal indSig = giSMI.GetLastIndicatorSignalByName(CurrentBar, giSMI.SignalName_Inflection);
 			
@@ -286,6 +293,26 @@ namespace NinjaTrader.NinjaScript.Strategies
 				action.StopLossSignal = evtSig[0];
 			else if(indTdSig != null && indTdSig.Count>0)
 				action.StopLossSignal = indTdSig[0];
+			else {
+				TradeSignal slSig = new TradeSignal();
+				slSig.BarNo = CurrentBar;
+				slSig.SignalType = TradeSignalType.StopLoss;
+				slSig.Order_Type = OrderType.Market;
+				slSig.SignalSource = TradeSignalSource.Event;
+				slSig.OrderCalculationMode = CalculationMode.Price;
+				slSig.Quantity = 1;
+				
+				if(CurrentTrade.MktPosition == MarketPosition.Long) {
+					slSig.Action = OrderAction.Sell;
+					//slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Support);
+				}
+				else if(CurrentTrade.MktPosition == MarketPosition.Short) {
+					slSig.Action = OrderAction.Buy;
+					//slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Resistance);
+				}
+				else return;
+				action.StopLossSignal = slSig; 
+			}
 		}
 
 		/// <summary>
@@ -305,6 +332,25 @@ namespace NinjaTrader.NinjaScript.Strategies
 				action.ProfitTargetSignal = evtSig[0];
 			else if(indTdSig != null && indTdSig.Count>0)
 				action.ProfitTargetSignal = indTdSig[0];
+			else {
+				TradeSignal ptSig = new TradeSignal();
+				ptSig.BarNo = CurrentBar;
+				ptSig.SignalType = TradeSignalType.ProfitTarget;
+				ptSig.Order_Type = OrderType.Limit;
+				ptSig.SignalSource = TradeSignalSource.Event;
+				ptSig.OrderCalculationMode = CalculationMode.Price;
+				ptSig.Quantity = 1;
+				if(CurrentTrade.MktPosition == MarketPosition.Long) {
+					ptSig.Action = OrderAction.Sell;
+					//ptSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Resistance);
+				}
+				else if(CurrentTrade.MktPosition == MarketPosition.Short) {
+					ptSig.Action = OrderAction.Buy;
+					//ptSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Support);
+				}
+				else return;
+				action.ProfitTargetSignal = ptSig;
+			}
 		}
 		
 		protected override bool PatternMatched()
@@ -335,7 +381,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region Trade Actions
 		public override bool SetNewEntryTradeAction() {
 			//CheckIndicatorSignals();
-			Print(CurrentBar + ": SetNewEntryTradeAction called....");
+			if(NewTradeAllowed())
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: SetNewEntryTradeAction called....NewOrderAllowed", CurrentBar));
+			else {
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: SetNewEntryTradeAction called....NewOrderNotAllowed", CurrentBar));
+				return false;
+			}
+			
 			TradeAction ta = new TradeAction();
 			ta.BarNo = CurrentBar;
 			ta.ActionName = "SampleTRT-Entry";
@@ -351,7 +403,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public override bool SetExitTradeAction() {
 			TradeAction ta = CurrentTrade.TradeAction;//GetTradeAction(CurrentBar);
-			if(ta == null || ta.Executed) {
+			if(ta == null || ta.Executed) { //but ta not set after entry filled
 				ta = new TradeAction();
 				ta.BarNo = CurrentBar;
 				ta.ActionName = "SampleTRT-ExitOCO";
@@ -399,8 +451,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return false;
 		}
 		
-		public override bool NewOrderAllowed() {
-			return true;
+		public override bool NewTradeAllowed() {
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+				String.Format("{0}: NewOrderAllowed called....CurrentTrade.PosQuantity={1}, HasPosition={2}, TM_MaxOpenPosition={3}",
+			CurrentBar, CurrentTrade.PosQuantity, HasPosition(), TM_MaxOpenPosition));
+			if(CurrentTrade.PosQuantity < TM_MaxOpenPosition)
+				return true;
+			else 
+				return false;
 		}		
 		#endregion
 		

@@ -102,7 +102,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
-				CurrentBar + ":OnPositionUpdate"
+				CurrentBar + ":OnPositionUpdate, CurrentTrade not updated -- "
 				+ ";BarsSinceExit, BarsSinceEntry="
 				+ bsx + "," + bse
 				+ ";IsUnmanaged=" + IsUnmanaged
@@ -110,6 +110,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				+ ";GetMarketPosition=" + GetMarketPosition()
 				+ ";marketPosition=" + marketPosition
 				+ ";HasPosition=" + HasPosition()
+				+ ";CurrentTrade.PosQuantity=" + CurrentTrade.PosQuantity
+				+ ";CurrentTrade.MktPosition=" + CurrentTrade.MktPosition
 				+ ";quantity=" + quantity
 				+ ";GetAvgPrice=" + GetAvgPrice()
 				+ ";averagePrice=" + averagePrice);
@@ -118,7 +120,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if(CurrentTrade.MktPosition != null && CurrentTrade.PosAvgPrice != null
 				&& CurrentTrade.PosQuantity != null && CurrentTrade.PosUnrealizedPnL != null)
 			IndicatorProxy.PrintLog(true, IsLiveTrading(),			
-			String.Format("OnPositionUpdate:{0}, CurrentTrade updated -- AvgPrc: {1}, Quant={2}, MktPos={3}, PnL={4}",
+			String.Format("{0}: OnPositionUpdate, CurrentTrade updated -- CurrentTrade.PosAvgPrice: {1}, CurrentTrade.PosQuantit={2}, CurrentTrade.MktPosition={3}, PnL={4}",
 					CurrentBar, CurrentTrade.PosAvgPrice, CurrentTrade.PosQuantity, CurrentTrade.MktPosition, CurrentTrade.PosUnrealizedPnL));
 		}
 		

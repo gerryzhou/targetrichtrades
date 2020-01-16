@@ -137,7 +137,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return prc;
 		}
 		
-		public virtual bool NewOrderAllowed()
+		public virtual bool NewTradeAllowed()
 		{
 			if(BarsInProgress !=0) return false;
 			
@@ -229,7 +229,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewLongLimitOrderUM"
 			+";CurrentTrade.TradeAction.EntrySignal.SignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 			SubmitOrderUnmanaged(0, OrderAction.Buy, OrderType.Limit, 
-			CurrentTrade.MaxQuantity, CurrentTrade.TradeAction.EntryPrice, 0, "", CurrentTrade.TradeAction.EntrySignal.SignalName);
+			CurrentTrade.TradeAction.EntrySignal.Quantity, CurrentTrade.TradeAction.EntryPrice, 0, "", CurrentTrade.TradeAction.EntrySignal.SignalName);
 			
 			CurrentTrade.barsSinceEnOrd = 0;
 		}
@@ -244,7 +244,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewShortLimitOrderUM"
 			+";CurrentTrade.TradeAction.EntrySignal.SignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 			SubmitOrderUnmanaged(0, OrderAction.SellShort, OrderType.Limit,
-			CurrentTrade.MaxQuantity, CurrentTrade.TradeAction.EntryPrice, 0, "", CurrentTrade.TradeAction.EntrySignal.SignalName);
+			CurrentTrade.TradeAction.EntrySignal.Quantity, CurrentTrade.TradeAction.EntryPrice, 0, "", CurrentTrade.TradeAction.EntrySignal.SignalName);
 			
 			//double prc = (TM_EnTrailing && TM_EnCounterPBBars>0) ? Close[0]+TM_EnOffsetPnts : High[0]+TM_EnOffsetPnts;
 			
@@ -502,10 +502,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public virtual void SetSimpleExitOCO() {
-			if(!isOcoPriceValid())
-				throw new Exception("Invalid OCO price:"
-				+ "stopLossPrice=" + CurrentTrade.TradeAction.StopLossPrice
-				+ ";profitTargetPrice=" + CurrentTrade.TradeAction.ProfitTargetPrice);
+			TradeAction ta = CurrentTrade.TradeAction;
+			try {
+			if(!isOcoPriceValid()) {
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + "Invalid OCO price:"
+				+ "stopLossPrice=" + ta.StopLossPrice
+				+ ";profitTargetPrice=" + ta.ProfitTargetPrice);
+				
+				ta = GetOcoPrice(-1, ta);
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + "GetOcoPrice:"
+				+ "stopLossPrice=" + ta.StopLossPrice
+				+ ";profitTargetPrice=" + ta.ProfitTargetPrice);
+			}
 			if(IsUnmanaged) {
 				SetSimpleExitOCOUM();
 				return;
@@ -513,14 +521,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int prtLevel = 0;
 			IndicatorProxy.TraceMessage(this.Name, prtLevel);
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ": SetSimpleExitOCO-" 
-			+ CurrentTrade.TradeAction.EntrySignal.SignalName + "-avg=" + GetAvgPrice());
+			+ ta.EntrySignal.SignalName + "-avg=" + GetAvgPrice());
 			IndicatorProxy.TraceMessage(this.Name, prtLevel);
 			MM_StopLossAmt = MM_StopLossAmt;
 			MM_ProfitTargetAmt = MM_ProfitTargetAmt;
 			MM_SLCalculationMode = CalculationMode.Currency;
 			MM_PTCalculationMode = CalculationMode.Currency;
-			SetStopLossOrder(CurrentTrade.TradeAction.StopLossSignal.SignalName);
-			SetProfitTargetOrder(CurrentTrade.TradeAction.ProfitTargetSignal.SignalName);
+			SetStopLossOrder(ta.StopLossSignal.SignalName);
+			SetProfitTargetOrder(ta.ProfitTargetSignal.SignalName);
+			} catch (Exception ex) {
+				IndicatorProxy.PrintLog(true, IsLiveTrading(),
+					CurrentBar + ": SetSimpleExitOCO Exception - " + ex.Message); 
+			}
 		}
 		
 		/// <summary>
@@ -1200,6 +1212,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             set{tm_BarsSincePtSl = Math.Max(1, value);}
         }
 		
+		[Description("Max open position")]
+ 		[Range(0, int.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MaxOpenPosition", GroupName = GPS_TRADE_MGMT, Order = ODG_MaxOpenPosition)]
+        public int TM_MaxOpenPosition
+        {
+            get{return tm_MaxOpenPosition;}
+            set{tm_MaxOpenPosition = Math.Max(1, value);}
+        }
+		
 		#endregion
 
 		#region Variables for Properties
@@ -1214,6 +1235,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private int tm_BarsHoldEnOrd = 3;
 		private int tm_EnCounterPBBars = 2;
 		private int tm_BarsSincePtSl = 1;
+		private int tm_MaxOpenPosition = 3;
 		
 		#endregion
 	}

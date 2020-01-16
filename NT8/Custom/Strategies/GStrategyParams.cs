@@ -97,6 +97,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public const int ODG_BarsHoldEnOrd = 8;
 		public const int ODG_EnCounterPBBars = 9;
 		public const int ODG_BarsSincePTSL = 10;
+		public const int ODG_MaxOpenPosition = 11;
 //		public const int ODG_ = ;
 		
 		#endregion

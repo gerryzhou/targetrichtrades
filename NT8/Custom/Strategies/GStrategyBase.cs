@@ -76,7 +76,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Description									= @"GS Z-Trader base;";
 			Name										= "GSZTraderBase";
 			Calculate									= Calculate.OnPriceChange;
+			//This property does not work for unmanaged order entry;
 			EntriesPerDirection							= 1;
+			//QuantityType = QuantityType.DefaultQuantity;
+			SetOrderQuantity							= SetOrderQuantity.DefaultQuantity;
+			DefaultQuantity								= 1;
 			EntryHandling								= EntryHandling.AllEntries;
 			//SyncAccountPosition = true;
 			IsExitOnSessionCloseStrategy				= true;
@@ -95,9 +99,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			// Disable this property for performance gains in Strategy Analyzer optimizations
 			// See the Help Guide for additional information
 			IsInstantiatedOnEachOptimizationIteration	= true;
-			//QuantityType = QuantityType.DefaultQuantity;
-			SetOrderQuantity							= SetOrderQuantity.DefaultQuantity;
-			DefaultQuantity								= 1;
 			WaitForOcoClosingBracket					= false;
 			
 			//CustomColor1					= Brushes.Orange;
