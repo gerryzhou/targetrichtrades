@@ -180,7 +180,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#region OnData/AccountUpdate Functions
 		/// <summary>
-		/// Only updated on live/sim trading, not triggered at back-testing
+		/// Only updated on live/sim trading, not triggered at back-testing;
+		/// The evernt posted tick by tick at sim/living trading with poistion hold;
 		/// </summary>
 		/// <param name="account"></param>
 		/// <param name="accountItem"></param>

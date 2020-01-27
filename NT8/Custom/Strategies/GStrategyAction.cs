@@ -97,9 +97,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//CurrentTrade.TradeAction = GetTradeAction(CurrentBar);//??
 			try {
 				TradeAction ta = CurrentTrade.TradeAction;
-				if(ta == null || ta.Executed) {
+				if(ta == null || ta.ActionStatus == TradeActionStatus.Executed) {
 					IndicatorProxy.PrintLog(true, IsLiveTrading(),
-						String.Format("{0}:TakeTradeAction called, CurrentTrade.TradeAction=null or Executed==true", CurrentBar));
+						String.Format("{0}:TakeTradeAction called, CurrentTrade.TradeAction=null or Executed=={1}",
+						CurrentBar, ta.ActionStatus.ToString()));
 					return;
 				}
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":TakeTradeAction"
@@ -107,9 +108,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				+ ";CurrentTrade.TDID=" + CurrentTrade.TradeID
 				+ ";OcoID=" + CurrentTrade.OcoID
 				+ ";HasPosition=" + HasPosition());
-								
-				ta.Executed = true;
-				switch(ta.TradeActionType) {
+				
+				ta.ActionStatus = TradeActionStatus.Executed;
+				switch(ta.ActionType) {
 					case TradeActionType.EntrySimple:
 					case TradeActionType.Bracket:
 						PutEntryTrade();
@@ -151,7 +152,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			TradeActionType saType, SupportResistanceRange<double> snr) {
 			
 			TradeAction sa = new TradeAction();
-			sa.TradeActionType = saType;
+			sa.ActionType = saType;
 			//sa.SnR = snr;
 			TradeAction tact = new TradeAction();
 			tact.BarNo = barNo;

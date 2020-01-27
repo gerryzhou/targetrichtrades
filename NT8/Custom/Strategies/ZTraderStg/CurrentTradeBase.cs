@@ -237,7 +237,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time) {
 			this.BracketOrder.EntryOrder = execution.Order;
 			if(TradeAction != null) {
-				TradeAction.Executed = true;
+				TradeAction.ActionStatus = TradeActionStatus.Executed;
 				
 				PosAvgPrice = price;
 //				PosQuantity = quantity;
@@ -279,6 +279,32 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 //			        if (order.OrderState == OrderState.Filled)
 //			              entryOrder = null;
 //			    }
+				//GetBracketOrderSubType(order);
+							
+				//InstStrategy.IndicatorProxy.TraceMessage(this.Name, 1);
+			    if (BracketOrder.EntryOrder != null && BracketOrder.EntryOrder == order)
+			    {
+					if (orderState == OrderState.Cancelled ||
+						//order.OrderState == OrderState.Filled ||
+						orderState == OrderState.Rejected ||
+						orderState == OrderState.Unknown)
+					{
+						barsSinceEnOrd = 0;
+						BracketOrder.EntryOrder = null;
+					}
+			    }
+				
+				//InstStrategy.IndicatorProxy.TraceMessage(this.Name, 1);
+			    if (BracketOrder.TrailingSLOrder.EntryOrder != null && BracketOrder.TrailingSLOrder.EntryOrder == order)
+			    {
+					if (orderState == OrderState.Cancelled || 
+						orderState == OrderState.Rejected || 
+						orderState == OrderState.Unknown)
+					{
+						barsSinceEnOrd = 0;
+						BracketOrder.TrailingSLOrder.EntryOrder = null;
+					}
+			    }
 			} catch(Exception ex) {
 				InstStrategy.Print("Exception=" + ex.StackTrace);
 			}
@@ -519,14 +545,22 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public double PosUnrealizedPnL
 		{
 			get; set;
-		}		
-
+		}
+		
+		[Browsable(false), XmlIgnore]
+		public ExitBy ExitTradeBy
+		{
+			get; set;
+		}
+		
 		[Display(Name="InstStg", Description="Strategy instance for Current Trade")]
 		[Browsable(false), XmlIgnore]
 		public GStrategyBase InstStrategy
 		{ 
 			get; set;
 		}
+		
+		
 		
 		//private GStrategyBase InstStrategy = null;		
 		//Order Objects

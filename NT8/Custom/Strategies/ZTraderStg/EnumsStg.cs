@@ -32,7 +32,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// -1=ExitOnly(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
 	/// -2=Stop trading(no entry/exit, liquidate positions and cancel all entry/exit orders);
 	/// -3=Cancel Orders(no entry/exit, cancel all orders)
-	public enum AlgoModeType {Trading=1, Liquidate=0, SemiAlgo=2, ExitOnly=-1, StopTrading=-2, CancelOrders=-3};
+	public enum AlgoModeType {Trading=1, Liquidate=0, SemiAlgo=2, ExitOnly=-1, StopTrading=-2, CancelOrders=-3}
 	//public enum SessionBreak {AfternoonClose, EveningOpen, MorningOpen, NextDay};
 	
 	/// <summary>
@@ -40,13 +40,13 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// 2=ChangeParams, change the trading parameters;
 	/// 3=InjectContext, provide the current market context;
 	/// </summary>
-	public enum CommandType {ChangeAlgoType=1, ChangeParams=2, InjectContext=3, None=4};
+	public enum CommandType {ChangeAlgoType=1, ChangeParams=2, InjectContext=3, None=4}
 	
-	public enum TradingDirection {Up=1, Down=-1, Both=0};
+	public enum TradingDirection {Up=1, Down=-1, Both=0}
 	
-	public enum TradingStyle {TrendFollowing=1, CounterTrend=-1, Ranging=0};
+	public enum TradingStyle {TrendFollowing=1, CounterTrend=-1, Ranging=0}
 	
-	public enum TradeType {Entry=1, Exit=-1, Liquidate=-2, Reverse=2, NoTrade=0};
+	public enum TradeType {Entry=1, Exit=-1, Liquidate=-2, Reverse=2, NoTrade=0}
 	
 	/// <summary>
 	/// Bracket, entry+exit OCO, which is default TradeActionType 
@@ -58,20 +58,22 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// ExitTrailingStopLoss, Trailing stop loss exit
 	/// </summary>
 	public enum TradeActionType {Bracket, EntrySimple, EntryOCO, EntryTrailing, 
-		ExitSimple, ExitOCO, ExitTrailingSL, ExitTrailingPT, UnKnown};
+		ExitSimple, ExitOCO, ExitTrailingSL, ExitTrailingPT, UnKnown}
 	
-	public enum TradeSignalType {Entry, Liquidate, ScaleIn, ScaleOut, StopLoss, TrailingStopLoss, ProfitTarget};
+	public enum TradeActionStatus {New, Updated, Executed, UnKnown}
 	
-	public enum TradeSignalSource {Indicator, Event, Command, PerformRule};
+	public enum TradeSignalType {Entry, Liquidate, ScaleIn, ScaleOut, StopLoss, TrailingStopLoss, ProfitTarget}
+	
+	public enum TradeSignalSource {Indicator, Event, Command, PerformRule}
 	
 	public enum OrderSignalName {EntryLongLmt, EntryShortLmt, EntryLongMkt, EntryShortMkt, EntryLongStopMkt, EntryShortStopMkt, 
-		ExitLong, ExitShort, ProfitTarget, StopLoss, TrailStop, ExitOnSessionClose, UnKnown};
+		ExitLong, ExitShort, ProfitTarget, StopLoss, TrailStop, ExitOnSessionClose, UnKnown}
 	
-	public enum BracketOrderSubType {Entry, ProfitTarget, StoppLoss, UnKnown};
+	public enum BracketOrderSubType {Entry, ProfitTarget, StoppLoss, UnKnown}
 	
-	public enum EntryExitOrderType {Limit, Market, TrailingEntry, SimpleOCO, BreakEven, LockMinProfit, TrailingStopLoss};
+	public enum EntryExitOrderType {Limit, Market, TrailingEntry, SimpleOCO, BreakEven, LockMinProfit, TrailingStopLoss}
 	
-	public enum ExitBy {Signal, RRR, Time, BarCount, HoldWinner, TrailingStopLoss}; //RRR=Risk/Reward Ratio;
+	public enum ExitBy {Signal, RRR, Time, BarCount, HoldWinner, TrailingStopLoss} //RRR=Risk/Reward Ratio;
 	
 	/// <summary>
 	/// NewEstablished: old=0, new!=0;
@@ -80,7 +82,9 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// ScaledIn: abs(old) < abs(new);
 	/// ScaledOut: abs(old) > abs(new); 
 	/// </summary>
-	public enum PositionStatus {NewEstablished, Liquidate, Hold, Flat, ScaledIn, ScaledOut, UnKnown};
+	public enum PositionStatus {NewEstablished, Liquidate, Hold, Flat, ScaledIn, ScaledOut, UnKnown}
+	
+	public enum PriceGap {Tighter, Wider}
 		
-	public enum MoneyMgmtPolicy {SimpleSLPT, TrailingSLPT, PositionScaleInOut};
+	public enum MoneyMgmtPolicy {SimpleSLPT, TrailingSLPT, PositionScaleInOut}
 }

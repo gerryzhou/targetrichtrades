@@ -80,7 +80,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		public virtual bool CheckIndicatorSignals(){
 			if(HasPosition() == 0) {
-				return CheckNewEntrySignals() && CheckExitOCOSignals();
+				return CheckNewEntrySignals();// && CheckExitOCOSignals();
 			} else {
 				return CheckExitSignals();
 			}
@@ -183,12 +183,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			list_signal.Add(signal);
 			//listSignals.Add(barNo, list_signal);
 			listSignals[barNo] = list_signal;
-			Print(String.Format("{0}:AddTradeSignal list_signal.Count={1}, listSignals.Count={2}", CurrentBar, list_signal.Count, listSignals.Count));
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+				String.Format("{0}: AddTradeSignal list_signal.Count={1}, listSignals.Count={2}", CurrentBar, list_signal.Count, listSignals.Count));
 			if(listSignals.Count < 5)
 				foreach(KeyValuePair<int, List<TradeSignal>> m in listSignals) {
 					List<TradeSignal> mm = m.Value as List<TradeSignal>;
 					foreach(TradeSignal ts in mm) {
-						Print(String.Format("{0}:AddTradeSignal SortedDictionary key={1}, SignalType={2}", CurrentBar, m.Key, ts.SignalType.ToString()));
+						IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+							String.Format("{0}: AddTradeSignal SortedDictionary key={1}, SignalType={2}", CurrentBar, m.Key, ts.SignalType.ToString()));
 					}
 				}
 		}
@@ -240,8 +242,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			listSignals.TryGetValue(barNo, out list_signal);
 			//	return null;
 			//else
-			Print(String.Format("{0}:GetTradeSignals list_signal.Count={1}, listSignals.Count={2}", CurrentBar, list_signal, listSignals.Count));
-				return list_signal;
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+				String.Format("{0}: GetTradeSignals list_signal.Count={1}, listSignals.Count={2}", CurrentBar, list_signal, listSignals.Count));
+			return list_signal;
 		}
 
 		/// <summary>
@@ -297,14 +300,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public List<TradeSignal> GetTradeSignalByType(int barNo, SortedDictionary<int, List<TradeSignal>> listSignals, TradeSignalType signal_type) {
 			List<TradeSignal> list_signal = GetTradeSignals(barNo, listSignals);
-			Print(String.Format("{0}:GetTradeSignalByType signal_type={1}, list_signal={2}, listSignals.Count={3}",
-			CurrentBar, signal_type, list_signal, listSignals.Count));
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+				String.Format("{0}: GetTradeSignalByType signal_type={1}, list_signal={2}, listSignals.Count={3}",
+				CurrentBar, signal_type, list_signal, listSignals.Count));
 			if(list_signal != null) {				
 				List<TradeSignal> list_sigByType = new List<TradeSignal>();
 				foreach(TradeSignal sig in list_signal) {
 					//if(list_signal.Count >= 1)
 					if(signal_type == sig.SignalType) {
-						Print(String.Format("{0}:GetTradeSignalByType== signal_type={1}, sig.SignalType={2}, list_signal.Count={3}", 
+						IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+							String.Format("{0}: GetTradeSignalByType== signal_type={1}, sig.SignalType={2}, list_signal.Count={3}", 
 							CurrentBar, signal_type, sig.SignalType, list_signal.Count));
 						list_sigByType.Add(sig);
 					}
@@ -464,19 +469,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
         
 		#region Properties
-		public SortedDictionary<int, List<TradeSignal>> CommandSignals {
+		protected SortedDictionary<int, List<TradeSignal>> CommandSignals {
 			get{
 				return this.commandSignals;
 			}
 		}
 		
-		public SortedDictionary<int, List<TradeSignal>> EventSignals {
+		protected SortedDictionary<int, List<TradeSignal>> EventSignals {
 			get{
 				return this.eventSignals;
 			}
 		}
 		
-		public SortedDictionary<int, List<TradeSignal>> IndicatorTradeSignals {
+		protected SortedDictionary<int, List<TradeSignal>> IndicatorTradeSignals {
 			get{
 				return this.indTdSignals;
 			}

@@ -34,7 +34,25 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	{		
 		#region Methods
 		public TradeAction() {
-			this.Executed = false;
+			this.ActionStatus = TradeActionStatus.New;
+		}
+		
+		public virtual bool IsEntryAction() {
+			if(this.ActionType != null &&
+				(this.ActionType == TradeActionType.Bracket || this.ActionType == TradeActionType.EntrySimple ||
+				this.ActionType == TradeActionType.EntryOCO || this.ActionType == TradeActionType.EntryTrailing))
+				return true;
+			else
+				return false;
+		}
+		
+		public virtual bool IsExitAction() {
+			if(this.ActionType != null &&
+				(this.ActionType == TradeActionType.ExitSimple || this.ActionType == TradeActionType.ExitOCO ||
+				this.ActionType == TradeActionType.ExitTrailingSL || this.ActionType == TradeActionType.ExitTrailingPT))
+				return true;
+			else
+				return false;
 		}
 		#endregion
 		
@@ -63,11 +81,18 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		/// </summary>
 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		[DefaultValueAttribute(TradeActionType.Bracket)]
-		public TradeActionType TradeActionType
+		public TradeActionType ActionType
 		{
 			get; set;
 		}
-				
+		
+		/// <summary>
+		/// The action has been executed or not:
+		/// New, Updated, Executed, or UnKnown
+		/// </summary>
+		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		public TradeActionStatus ActionStatus  { get; set; }
+		
 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		[DefaultValueAttribute(null)]
 		public TradeSignal EntrySignal {
@@ -125,13 +150,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		public int TrailingProfitTargetTics {
 			get{ return ProfitTargetSignal.PriceOffset; }
 			set { ProfitTargetSignal.PriceOffset = value; }
-		}
-		
-		/// <summary>
-		/// The action has been taken or not
-		/// </summary>
-		public bool Executed { get; set; }
-		
+		}	
 		#endregion
 	}
 }

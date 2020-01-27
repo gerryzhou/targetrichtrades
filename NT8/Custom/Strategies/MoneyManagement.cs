@@ -457,6 +457,47 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			return isValid;
 		}
+
+		public virtual double GetValidSLPTPrice(double enPrc, List<double> prices, PriceGap pg, SupportResistanceType srt) {
+			//double avgPrc = GetAvgPrice();
+			double prcGap = pg==PriceGap.Tighter? double.MaxValue : 0;
+			double prc = 0;
+
+			switch(srt) {
+				case SupportResistanceType.Resistance: //PriceGap.Tighter:
+					foreach(double p in prices) {
+						if(p > enPrc) {
+							double pGap = p - enPrc;
+							if(pg == PriceGap.Tighter) {
+								prcGap = Math.Min(prcGap, pGap);
+							}
+							else if (pg == PriceGap.Wider) {
+								prcGap = Math.Max(prcGap, pGap);
+							}
+						}
+					}
+					if(prcGap > 0 && prcGap < double.MaxValue)
+						prc = enPrc + prcGap;
+					break;
+				case SupportResistanceType.Support: //PriceGap.Wider:
+					foreach(double p in prices) {
+						if(p < enPrc) {
+							double pGap = enPrc - p;
+							if(pg == PriceGap.Tighter) {
+								prcGap = Math.Min(prcGap, pGap);
+							}
+							else if (pg == PriceGap.Wider) {
+								prcGap = Math.Max(prcGap, pGap);
+							}
+						}
+					}
+					if(prcGap > 0 && prcGap < double.MaxValue)
+						prc = enPrc - prcGap;
+					break;
+			}				
+			
+			return prc;
+		}
 		
 		public double GetPriceByCurrency(double amt) {
 			return amt/Bars.Instrument.MasterInstrument.PointValue;
@@ -527,6 +568,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return maIns.RoundToTickSize(Typical[barsAgo]);
 		}
 		
+		
 		public virtual double GetEntryPrice(SupportResistanceType srt) {
 			return 0;
 		}
@@ -534,9 +576,85 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual double GetStopLossPrice(SupportResistanceType srt) {
 			return 0;
 		}
+
+		public virtual double GetValidStopLossPrice(List<double> prices, PriceGap pg) {
+			double prc = 0;
+			double curPrc = Close[0]; //GetAvgPrice();
+			switch(GetMarketPosition()) {
+				case MarketPosition.Long:
+					prc = GetValidSLPTPrice(curPrc, prices, pg, SupportResistanceType.Support);
+					break;
+				case MarketPosition.Short:
+					prc = GetValidSLPTPrice(curPrc, prices, pg, SupportResistanceType.Resistance);
+					break;
+			}
+			
+			return prc;
+		}
+		
+		public virtual double GetValidStopLossPrice(double enPrc) {
+			double prc = 0, slOffset = 0;
+			if(enPrc <= 0)
+				enPrc = Close[0];
+			
+			switch(MM_SLCalculationMode) {
+				case CalculationMode.Currency:
+					slOffset = GetPriceByCurrency(MM_StopLossAmt);
+					break;
+			}
+
+			switch(GetMarketPosition()) {
+				case MarketPosition.Long:
+					prc = enPrc - slOffset;
+					break;
+				case MarketPosition.Short:
+					prc = enPrc + slOffset;
+					break;
+			}
+			
+			return prc;
+		}
 		
 		public virtual double GetProfitTargetPrice(SupportResistanceType srt) {
 			return 0;
+		}
+		
+		public virtual double GetValidProfitTargetPrice(List<double> prices, PriceGap pg) {
+			double prc = 0;
+			double avgPrc = GetAvgPrice();
+			switch(GetMarketPosition()) {
+				case MarketPosition.Long:
+					prc = GetValidSLPTPrice(avgPrc, prices, pg, SupportResistanceType.Resistance);
+					break;
+				case MarketPosition.Short:
+					prc = GetValidSLPTPrice(avgPrc, prices, pg, SupportResistanceType.Support);
+					break;
+			}
+			
+			return 0;
+		}
+		
+		public virtual double GetValidProfitTargetPrice(double enPrc) {
+			double prc = 0, ptOffset = 0;
+			if(enPrc <= 0)
+				enPrc = Close[0];
+			
+			switch(MM_PTCalculationMode) {
+				case CalculationMode.Currency:
+					ptOffset = GetPriceByCurrency(MM_ProfitTargetAmt);
+					break;
+			}
+
+			switch(GetMarketPosition()) {
+				case MarketPosition.Long:
+					prc = enPrc + ptOffset;
+					break;
+				case MarketPosition.Short:
+					prc = enPrc - ptOffset;
+					break;
+			}
+			
+			return prc;
 		}
 		
 		/// <summary>
@@ -895,6 +1013,24 @@ namespace NinjaTrader.NinjaScript.Strategies
             get{return mm_ProfitFactor;}
             set{mm_ProfitFactor = Math.Max(0, value);}
         }		
+		
+		[Description("Stop Loss Price Gap Preference")]
+ 		[NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SLPriceGapPref", GroupName = GPS_MONEY_MGMT, Order = ODG_SLPriceGapPref)]	
+        public PriceGap MM_SLPriceGapPref
+        {
+            get{return mm_SLPriceGapPref;}
+            set{mm_SLPriceGapPref = value;}
+        }
+
+		[Description("Profit Target Price Gap Preference")]
+ 		[NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PTPriceGapPref", GroupName = GPS_MONEY_MGMT, Order = ODG_PTPriceGapPref)]	
+        public PriceGap MM_PTPriceGapPref
+        {
+            get{return mm_PTPriceGapPref;}
+            set{mm_PTPriceGapPref = value;}
+        }
 		#endregion
 		
 		#region Variables for Properties		
@@ -926,6 +1062,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		private double mm_DailyLossLmt = -200;
 		private double mm_ProfitFactor = 2;
+		
+		private PriceGap mm_SLPriceGapPref = PriceGap.Tighter;
+		
+		private PriceGap mm_PTPriceGapPref = PriceGap.Wider;		
 		
 		#endregion
 	}

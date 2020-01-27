@@ -114,7 +114,19 @@ Notes for implementation:
 	i.e., tradeoff is that with more signals, it will be tight stop loss, low quality;
 	with less signals, it could be higher quality, but wide stop loss;
 	b) lowest/highest of N bars back(include entry bar);
-	c) Risk/Reward Ration with Profit target;
+	c) Risk/Reward Ration with Stop Loss or Profit target;
+** What if the StopLoss/ProfitTarget prices are invalid or too wide, how to determine the prices in order by the factors below?
+	a) Last inflection;
+	b) lowest/highest of N bars back(include entry bar);
+	c) Risk/Reward Ration with Stop Loss or Profit target;
+Implemented the functions to pick a valid SL or PT price from a group of support/resistance like a), b), etc.
+Provided the selection for tighter or wider SL/PT;
+
+
+** Show up a real trade to demostrate the decision making process; will it move the SL/PT after entry? or just wait for hitting SL/PT?
+** Will it still take the trade if the SL/PT are too wide or Risk/Reward Ratio is not good?
+** Restricted the trading hours to 8:30-3:00 CT?
+ 
 ** Still too much lagging for 8 ticks range chart; 
 	ways to solve lagging: a) introduce new dimension like volume, timming, pattern, score
 ** SMITMA >= 40 for entry short, <= -40 for entry long; also needs upper bound: 80?

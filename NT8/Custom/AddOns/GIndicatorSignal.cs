@@ -170,8 +170,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if(list_signal != null) {
 				foreach(IndicatorSignal sig in list_signal) {
 					if(sig.SignalAction != null && 
-						signal_actiontype.Equals(sig.SignalAction.SignalActionType))
-						return sig;
+						signal_actiontype.Equals(sig.SignalAction.SignalActionType)) {
+							if(barNo < 400)
+								Print(String.Format("{0}: GetIndicatorSignalByActionType -- barNo={1}, SignalActionType={2}",
+								CurrentBar, barNo, signal_actiontype.ToString()));
+							return sig;
+						}
 				}
 			}
 			
@@ -188,7 +192,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 			int k = barNo;
 			foreach(int kk in this.indicatorSignals.Keys.Reverse()) {				
 				if(kk < k) {
-					Print(CurrentBar + ": kk,k=" + kk + "," + k);
+					if(barNo < 400)
+						Print(String.Format("{0}: GetLastIndicatorSignalByActionType -- kk,k={1},{2}; SignalActionType={3}",
+						CurrentBar, kk, k, signal_actiontype.ToString()));
 					IndicatorSignal sig = GetIndicatorSignalByActionType(k, signal_actiontype);
 					if(sig != null) return sig;
 					k = kk;

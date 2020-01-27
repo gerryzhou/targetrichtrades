@@ -80,6 +80,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public const int ODG_TLSLCalculationMode = 18;
 		public const int ODG_DailyLossLmt = 19;
 		public const int ODG_ProfitFactor = 20;
+		public const int ODG_SLPriceGapPref = 21;
+		public const int ODG_PTPriceGapPref = 22;
 //		public const int ODG_ = ;
 
 		#endregion
@@ -98,6 +100,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public const int ODG_EnCounterPBBars = 9;
 		public const int ODG_BarsSincePTSL = 10;
 		public const int ODG_MaxOpenPosition = 11;
+		public const int ODG_ExitTradeBy = 12;
 //		public const int ODG_ = ;
 		
 		#endregion
