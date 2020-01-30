@@ -49,6 +49,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//See Help Guide for additional information.
 				IsSuspendedWhileInactive					= true;
 				ShowOpenHL									= true;
+				ShowLastdayClose							= true;
 				TM_OpenStartH = 8;
 				TM_OpenStartM = 30;
 				TM_OpenEndH = 9;
@@ -58,8 +59,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 				AddPlot(new Stroke(Brushes.Red, 1), PlotStyle.Dot, "OverNightRst");
 				AddPlot(new Stroke(Brushes.DarkGreen, 1), PlotStyle.Hash, "OpenSpt");
 				AddPlot(new Stroke(Brushes.DarkRed, 1), PlotStyle.Hash, "OpenRst");
-				AddPlot(new Stroke(Brushes.ForestGreen, 1), PlotStyle.Dot, "LastDaySpt");
-				AddPlot(new Stroke(Brushes.LightCoral, 1), PlotStyle.Dot, "LastDayRst");
+				AddPlot(new Stroke(Brushes.ForestGreen, DashStyleHelper.Dash, 1), PlotStyle.Square, "LastDaySpt");
+				AddPlot(new Stroke(Brushes.LightCoral, 	DashStyleHelper.Dash, 1), PlotStyle.Square, "LastDayRst");
+				AddPlot(new Stroke(Brushes.Blue, 		DashStyleHelper.Dash, 2), PlotStyle.Square, "LastDayClose");
 			}
 			else if (State == State.Configure)
 			{
@@ -86,6 +88,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 					LastDaySpt[0] = Bars.GetDayBar(1).Low;//Values[4][0] = Bars.GetDayBar(1).Low;
 					LastDayRst[0] = Bars.GetDayBar(1).High;//Values[5][0] = Bars.GetDayBar(1).High;
 				}
+				if(ShowLastdayClose)
+					LastDayClose[0]	= Bars.GetDayBar(1).Close;
+				
 				if(ShowOvernightHL) {
 					if(GetOvernightHigh() > 0) {
 						OverNightRst[0] = overnight_hi;
@@ -155,6 +160,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private const int ODI_ShowOvernightHL = 1;
 		private const int ODI_ShowOpenHL = 2;
 		private const int ODI_ShowLastdayHL = 3;
+		private const int ODI_ShowLastdayClose = 4;
 		
 		[Description("Show Overnight HL")]
 		[NinjaScriptProperty]
@@ -173,7 +179,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[Display(ResourceType = typeof(Custom.Resource), Name="ShowLastdayHL", Order=ODI_ShowLastdayHL, GroupName=GPI_CUSTOM_PARAMS)]
 		public bool ShowLastdayHL
 		{ get; set; }
-		
+
+		[Description("Show Lastday Close")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name="ShowLastdayClose", Order=ODI_ShowLastdayClose, GroupName=GPI_CUSTOM_PARAMS)]
+		public bool ShowLastdayClose
+		{ get; set; }
+
 //		[Description("Hour of opening start")]
 // 		[Range(0, 23), NinjaScriptProperty]		
 //		[Display(Name="OpenStartH", Order=0, GroupName="Timming")]
@@ -228,6 +240,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 			get { return Values[5]; }			
 		}
 		
+		[Browsable(false)]
+		[XmlIgnore]
+		public Series<double> LastDayClose
+		{
+			get { return Values[6]; }			
+		}
+		
 		private double overnight_hi;
 		private double overnight_lo;
 		
@@ -243,18 +262,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GISnR[] cacheGISnR;
-		public GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL)
+		public GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
 		{
-			return GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL);
+			return GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose);
 		}
 
-		public GISnR GISnR(ISeries<double> input, bool showOvernightHL, bool showOpenHL, bool showLastdayHL)
+		public GISnR GISnR(ISeries<double> input, bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
 		{
 			if (cacheGISnR != null)
 				for (int idx = 0; idx < cacheGISnR.Length; idx++)
-					if (cacheGISnR[idx] != null && cacheGISnR[idx].ShowOvernightHL == showOvernightHL && cacheGISnR[idx].ShowOpenHL == showOpenHL && cacheGISnR[idx].ShowLastdayHL == showLastdayHL && cacheGISnR[idx].EqualsInput(input))
+					if (cacheGISnR[idx] != null && cacheGISnR[idx].ShowOvernightHL == showOvernightHL && cacheGISnR[idx].ShowOpenHL == showOpenHL && cacheGISnR[idx].ShowLastdayHL == showLastdayHL && cacheGISnR[idx].ShowLastdayClose == showLastdayClose && cacheGISnR[idx].EqualsInput(input))
 						return cacheGISnR[idx];
-			return CacheIndicator<GISnR>(new GISnR(){ ShowOvernightHL = showOvernightHL, ShowOpenHL = showOpenHL, ShowLastdayHL = showLastdayHL }, input, ref cacheGISnR);
+			return CacheIndicator<GISnR>(new GISnR(){ ShowOvernightHL = showOvernightHL, ShowOpenHL = showOpenHL, ShowLastdayHL = showLastdayHL, ShowLastdayClose = showLastdayClose }, input, ref cacheGISnR);
 		}
 	}
 }
@@ -263,14 +282,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL)
+		public Indicators.GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
 		{
-			return indicator.GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL);
+			return indicator.GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose);
 		}
 
-		public Indicators.GISnR GISnR(ISeries<double> input , bool showOvernightHL, bool showOpenHL, bool showLastdayHL)
+		public Indicators.GISnR GISnR(ISeries<double> input , bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
 		{
-			return indicator.GISnR(input, showOvernightHL, showOpenHL, showLastdayHL);
+			return indicator.GISnR(input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose);
 		}
 	}
 }
@@ -279,14 +298,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL)
+		public Indicators.GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
 		{
-			return indicator.GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL);
+			return indicator.GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose);
 		}
 
-		public Indicators.GISnR GISnR(ISeries<double> input , bool showOvernightHL, bool showOpenHL, bool showLastdayHL)
+		public Indicators.GISnR GISnR(ISeries<double> input , bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
 		{
-			return indicator.GISnR(input, showOvernightHL, showOpenHL, showLastdayHL);
+			return indicator.GISnR(input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose);
 		}
 	}
 }

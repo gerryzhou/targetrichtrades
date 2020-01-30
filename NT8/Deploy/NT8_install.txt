@@ -1,0 +1,4 @@
+1) Unzip Custom.zip
+2) Copy and rename the Document/NinjaTrader 8 to NinjaTrader 8-backup
+3) Copy Addons, Inidcators, Config, Strategies to Document/NinjaTrader 8/Custom
+4) Created c:\www\log, c:\www\cmd

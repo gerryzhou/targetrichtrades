@@ -63,6 +63,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private GIAwesomeOscillator awOscillator;
 		private GIKAMA giKAMA;
 		private GIPbSAR giPbSAR;
+		private GISnR giSnR;
+		private GISnRPriorWM giSnRPriorWM;
+		
 		private int barNo_EnInflection = -1;
 		
 		private double c0 = 0, hi3 = Double.MaxValue, lo3 = Double.MinValue;
@@ -98,16 +101,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 				awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
 				giKAMA = GIKAMA(FastKAMA, PeriodKAMA, SlowKAMA);
 				giPbSAR = GIPbSAR(AccPbSAR, AccMaxPbSAR, AccStepPbSAR);
+				giSnR = GISnR(false, false, false, true);
+				giSnRPriorWM = GISnRPriorWM(true, false, false, false, true, false, false, false);
 				
 				AddChartIndicator(giSMI);
 				AddChartIndicator(awOscillator);
 				AddChartIndicator(giKAMA);
 				AddChartIndicator(giPbSAR);
+				AddChartIndicator(giSnR);
+				AddChartIndicator(giSnRPriorWM);
 				Print("GISMI called:" + "EMAPeriod1=" + EMAPeriod1 + "EMAPeriod2=" + EMAPeriod2 + "Range=" + Range + "SMITMAPeriod=" + SMITMAPeriod);
 			}
 			else if (State == State.Configure)
 			{
 				Print(this.Name + " Set Configure called.... CurrentTrade=" + CurrentTrade);
+				AddDataSeries(Data.BarsPeriodType.Day, 1);
 			}
 		}
 

@@ -71,7 +71,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//IndicatorProxy = GIndicatorProxy(1);
 				giSMI = GISMI(3, 5, 5, 8, 50);
 				awOscillator = GIAwesomeOscillator(5, 34, 5, MovingAvgType.SMA, false);
-				giSnR = GISnR(false, true, false);
+				giSnR = GISnR(false, true, false, true);
 				
 				//smaSlow = SMA(Slow);
 

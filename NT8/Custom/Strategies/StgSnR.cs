@@ -64,6 +64,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				// See the Help Guide for additional information
 //				IsInstantiatedOnEachOptimizationIteration	= true;
 				ShowLastDayHL								= false;
+				ShowLastDayClose							= true;
 				ShowOpenHL									= true;
 				ShowOvernightHL								= false;
 				//AddPlot(new Stroke(Brushes.LimeGreen, 2), PlotStyle.Hash, "Spt");
@@ -75,7 +76,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//IndicatorProxy = new GIndicatorBase();
 				//IndicatorProxy = GIndicatorProxy(1);
 				giSMI = GISMI(3, 5, 5, 8, 50);
-				giSnR = GISnR(ShowOvernightHL, ShowOpenHL, ShowLastDayHL);
+				giSnR = GISnR(ShowOvernightHL, ShowOpenHL, ShowLastDayHL, ShowLastDayClose);
 				//awOscillator = GIAwesomeOscillator(5, 34, 5, MovingAvgType.SMA);
 
 				AddChartIndicator(giSMI);
@@ -224,6 +225,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[NinjaScriptProperty]
 		[Display(Name="ShowLastDayHL", Description="Show High/Low of last day", Order=3, GroupName="CustomParams")]
 		public bool ShowLastDayHL
+		{ get; set; }
+		
+		[NinjaScriptProperty]
+		[Display(Name="ShowLastDayClose", Description="Show Close of last day", Order=4, GroupName="CustomParams")]
+		public bool ShowLastDayClose
 		{ get; set; }
 		
         [Description("Bars count before inflection for entry")]
