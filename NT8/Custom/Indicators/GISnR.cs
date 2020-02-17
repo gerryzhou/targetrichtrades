@@ -68,7 +68,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				AddDataSeries(Data.BarsPeriodType.Day, 1);
 			}
 			else if (State == State.DataLoaded)
-			{				
+			{
 				CustmSeries = new Series<double>(this);
 				getHLByTimeRange = GIGetHighLowByTimeRange(High, TM_OpenStartH, TM_OpenStartM, TM_OpenEndH, TM_OpenEndM);
 			}

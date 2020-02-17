@@ -148,6 +148,20 @@ namespace NinjaTrader.NinjaScript.AddOns
             Dictionary<string, object> dict = serializer.Deserialize<Dictionary<string, object>>(json);
 			return dict;
 		}
+
+		/// <summary>
+		/// Load the config/cmd file into the object
+		/// </summary>
+		/// <param name="config_file"></param>
+		/// <returns></returns>
+		public static Dictionary<string, object> LoadJson2Obj(string json_path) {
+			//string json_path = GetConfigFileDir() + config_file;
+			string json = System.IO.File.ReadAllText(json_path);
+            //DataContractJsonSerializer ser = new DataContractJsonSerializer();
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            Dictionary<string, object> dict = serializer.Deserialize<Dictionary<string, object>>(json);
+			return dict;
+		}
 		
 		/// <summary>
 		/// Transfer the key/value from the original CMD JSON into a new dictionary
@@ -238,6 +252,51 @@ namespace NinjaTrader.NinjaScript.AddOns
 //			}
 			return val;
 		}
+		
+		public static bool DisplayDictionary(Dictionary<string, object> dict, int level, StringBuilder tbOutput)
+        {
+            bool bSuccess = false;
+            int indentLevel = level++;
+			if(tbOutput == null)
+				tbOutput = new StringBuilder();
+
+            foreach (string strKey in dict.Keys)
+            {
+                string strOutput = "".PadLeft(indentLevel * 8 ) + strKey + ":";
+                tbOutput.Append("\r\n" + strOutput);
+
+                object o = dict[strKey];
+                if (o is Dictionary<string, object>)
+                {
+                    DisplayDictionary((Dictionary<string, object>)o, indentLevel, tbOutput);
+                }
+                else if (o is ArrayList)
+                {
+                    foreach (object oChild in ((ArrayList)o))
+                    {
+                        if (oChild is string)
+                        {
+                            strOutput = ((string) oChild);
+                            tbOutput.Append(strOutput + ",");
+                        }
+                        else if (oChild is Dictionary<string, object>)
+                        {
+                            DisplayDictionary((Dictionary<string, object>)oChild, indentLevel, tbOutput);
+                            tbOutput.Append("\r\n");
+                        }
+                    }
+                }
+                else
+                {
+                    strOutput = o.ToString();
+                    tbOutput.Append(strOutput);
+                }
+            }
+
+            indentLevel--;
+
+            return bSuccess;
+        }
 		
 		#region Properties
 		[Browsable(false), XmlIgnore]

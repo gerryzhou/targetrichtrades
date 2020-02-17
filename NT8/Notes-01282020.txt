@@ -156,10 +156,21 @@ Provided the selection for tighter or wider SL/PT;
 ** Monthly support/resistance, prior month;
 ** Hold close of last day, long only, vs, short only;
 ** Exit if breakout 8/9/10 EMA;
+** Ingridents: SnR(volatility), timing, trending(Channel+cycle)--MarketContext supervised, oscillator(entry?), Trade/MoneyManagerment(PT/SL), sizing(probability), 
+** Hedging: VIX/QQQ;
+** Limit of each factor: pure mechanical system, naked system, individual indicator, supervised system, Quant system, AI system (mathematically sound? measurable? );
 
+** Three sessions: US-Evening, EU-Morning, US-Morning;
+** Monthly close -- efficitive one/two week later;
+** Weekly close -- efficitive one/two days later;
+** Four Market Context -- OpenBreakout/Trend-channel/Range-channel/Reversal(V,W, or inverted channel)
 
-
-
+**When to scale-in? 
+	When the winning rate expected higher, scale-in;
+	When the winning rate expected lower, scale-out;
+**When to increase/decrease risk amount?
+	Periodically (Daily/Weekly/Monthly/Quaterly/Annually) change depends on the performance of last period;
+	Pyramid by the PnL: C(n) = R(n-1) * C(n-1), where C is the capital to risk, R is the % of return;
 
 
 

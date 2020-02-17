@@ -1,17 +1,17 @@
 {
-"Strategy":[
+"StrategyCmd":[
 	{"CommandType": ["None", "CommandType", "The type of command - ChangeAlgoType; ChangeParams; InjectContext; None;"]},
 	{"AlgoMode":["Trading", "AlgoModeType", ""]},
 	{"PrintOut":["2", "Int32", ""]},
 	{"BackTest":["False", "Boolean", ""]}
 	],
 	
-"Indicator":[
+"IndicatorCmd":[
 	{"EnBarsBeforeInflection":["2", "Int32", "Bars count before inflection for entry"]},
 	{"BarsLookback":["20", "Int32", ""]}
 	],
 
-"Trigger":[
+"TriggerCmd":[
 	{"TG_TradeStartH":["8", "Int32", ""]},
 	{"TG_TradeStartM":["45", "Int32", ""]},
 	{"TG_TradeEndH":["14", "Int32", ""]},
@@ -28,7 +28,7 @@
 	{"TG_EnPullbackMaxPnts":["200", "Double", ""]}
 	],
 
-"MoneyManagement":[
+"MoneyManagementCmd":[
 	{"MM_ProfitFactor":["2.5", "Double", "PT/SL ratio"]},
 	{"MM_PTCalculationMode":["Currency", "CalculationMode", "Profit target CalMode"]},
 	{"MM_PTTrailing":["False", "Boolean", "Trailing profit target or not"]},
@@ -51,7 +51,7 @@
 	{"MM_DailyLossLmt":["-200", "Double", "The daily loss limit amount"]}
 	],
 
-"TradeManagement":[
+"TradeManagementCmd":[
 	{"TM_TradingDirection":["Up", "TradingDirection", ""]},
 	{"TM_TradingStyle":["TrendFollowing", "TradingStyle", ""]},
 	{"TM_EnTrailing":["False", "Boolean", ""]},
@@ -64,14 +64,14 @@
 	{"TM_BarsSincePTSL":["15", "Int32", ""]}
 	],
 
-"MarketContext":[
+"MarketContextCmd":[
 	{
 		"CTX_Daily":
-			[
-				"20170606;8401401:UpWide#10-16-3-5",
-				"20170607;8401151:DnWide#10-16-3-5;11521459:UpTight#10-16-3-5",
-				"20170608;8401123:UpTight#10-16-3-5;11301459:DnTight#10-16-3-5"
-			]
+			{
+				"20170606": [{"Time":8401401, "CTX": "UpWide#10-16-3-5"}],
+				"20170607": [{"Time":8401151, "CTX": "DnWide#10-16-3-5"}, {"Time":11521459, "CTX": "UpTight#10-16-3-5"}],
+				"20170608": [{"Time":8401123, "CTX": "UpTight#10-16-3-5"}, {"Time":11301459, "CTX" "DnTight#10-16-3-5"}]
+			}
 	}
 	]
 }

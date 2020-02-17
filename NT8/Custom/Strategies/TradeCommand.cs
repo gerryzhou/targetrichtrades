@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Xml.Serialization;
 using System.Reflection;
 using System.IO;
+using System.Runtime.Serialization;
 
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;

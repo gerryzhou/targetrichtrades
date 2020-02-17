@@ -91,7 +91,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
-				Print(this.Name + " Set DataLoaded called....");				
+				Print(this.Name + " Set DataLoaded called....");
 				AddChartIndicator(IndicatorProxy);
 				SetPrintOut(1);
 				IndicatorProxy.LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
