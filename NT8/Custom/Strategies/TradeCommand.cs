@@ -198,7 +198,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if(ele != null && ele.Date != null && ele.TimeCtxs != null) {
 					Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Date, ele.TimeCtxs));
 					foreach(TimeCtx tctx in ele.TimeCtxs) {
-						Print(String.Format("ele.Date={0}, TimeCtx.tctx.Time={1}, tctx.PriceAction={2}", ele.Date, tctx.Time, tctx.PriceAction));
+						Print(String.Format("ele.Date={0}, TimeCtx.tctx.Time={1}, tctx.ChannelType={2}, tctx.MinUp={3}, tctx.Support={4}",
+						ele.Date, tctx.Time, tctx.ChannelType, tctx.MinUp, tctx.Support));
 					}
 				}
 			}

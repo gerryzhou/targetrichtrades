@@ -5,7 +5,9 @@
          "TimeCtxs":[
             {
                "Time":8401401,
-               "PriceAction":"UpWide#10-16-3-5"
+			   "ChannelType":"UpWide",
+			   "Support":8666.25, "Resistance":9501.75,
+               "MinUp":10, "MaxUp":16, "MinDn":3, "MaxDn":5
             }
          ]
       },
@@ -14,11 +16,15 @@
          "TimeCtxs":[
             {
                "Time":8401151,
-               "PriceAction":"DnWide#10-16-3-5"
+               "ChannelType":"UpTight",
+			   "Support":8600.75, "Resistance":9600.75,
+               "MinUp":12, "MaxUp":16, "MinDn":3, "MaxDn":5
             },
             {
                "Time":11521459,
-               "PriceAction":"UpTight#10-16-3-5"
+               "ChannelType":"RngTight",
+			   "Support":8978.25, "Resistance":9270.75,
+               "MinUp":10, "MaxUp":16, "MinDn":4, "MaxDn":6
             }
          ]
       },
@@ -27,11 +33,15 @@
          "TimeCtxs":[
             {
                "Time":8401123,
-               "PriceAction":"UpTight#10-16-3-5"
+               "ChannelType":"DnWide",
+			   "Support":8806.50, "Resistance":9980.25,
+               "MinUp":8, "MaxUp":18, "MinDn":3, "MaxDn":5
             },
             {
                "Time":11301459,
-               "PriceAction":"DnTight#10-16-3-5"
+               "ChannelType":"RngWide",
+			   "Support":8365.75, "Resistance":9789.50,
+               "MinUp":15, "MaxUp":20, "MinDn":5, "MaxDn":8
             }
          ]
       }

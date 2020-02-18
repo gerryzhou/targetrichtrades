@@ -88,9 +88,19 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 		
 	public class TimeCtx {
 		public string Time{get;set;}
-		public string PriceAction{get;set;}
+		public string ChannelType{get;set;}
+		public double Support{get;set;}
+		public double Resistance{get;set;}
+		public int MinUp{get;set;}
+		public int MaxUp{get;set;}
+		public int MinDn{get;set;}
+		public int MaxDn{get;set;}
 	}
 }
+
+
+
+
 
 
 
