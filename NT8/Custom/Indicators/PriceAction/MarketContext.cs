@@ -67,7 +67,42 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 		#endregion
 	*/		
 	}
+
+//	public class CTXDaily {
+//		public string Date{get;set;}
+//		public List<MarketContext> TimeCtx{get;set;}
+//	}
+//	public class CTXWeekly {
+//		public string Date{get;set;}
+//		public List<MarketContext> TimeCtx{get;set;}
+//	}
+	
+	public class MktContext{
+		public DateCtx[] MktCtxDaily{get;set;}
+	}
+	
+	public class DateCtx {
+		public string Date{get;set;}
+		public TimeCtx[] TimeCtxs{get;set;}
+	}
+		
+	public class TimeCtx {
+		public string Time{get;set;}
+		public string PriceAction{get;set;}
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

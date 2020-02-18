@@ -53,6 +53,8 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
     public enum PriceActionType { UpTight=1, UpWide=2, DnTight=4, DnWide=8, RngTight=16, RngWide=32, UnKnown=64 }
 	public enum PriceSubtype { Close, Open, High, Low, Median, Typical }
 	
+	public enum ChannelType { UpTight=1, UpWide=2, DnTight=4, DnWide=8, RngTight=16, RngWide=32, UnKnown=64 }
+	
 	public enum MarketCycleType {
 		W1Early, W1Middle, W1End,
 		W2Early, W2Middle, W2End,
@@ -69,6 +71,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	
 	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4 }
 }
+
 
 
 

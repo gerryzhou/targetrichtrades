@@ -403,7 +403,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":"
 				+ ";ToShortDateString=" + Time[0].ToString()
 				+ ";paType=" + pa.paType.ToString()
-				+ ";maxDownTicks=" + pa.maxDownTicks
+				+ ";maxDownTicks=" + pa.voltality
 				);
 			SignalActionType sat = giSMI.IsLastBarInflection();
 			Direction dir = GetDirection(giPbSAR);

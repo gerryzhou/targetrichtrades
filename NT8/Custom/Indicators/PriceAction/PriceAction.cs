@@ -38,23 +38,34 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
     public class PriceAction
     {
         public PriceActionType paType;
-        public int minUpTicks;
-        public int maxUpTicks;
-        public int minDownTicks;
-        public int maxDownTicks;
+		public ChannelType channelType;
+		public Volatility voltality;
+//        public int minUpTicks;
+//        public int maxUpTicks;
+//        public int minDownTicks;
+//        public int maxDownTicks;
 		
-        public PriceAction(PriceActionType pat, int min_UpTicks, int max_UpTicks, int min_DnTicks, int max_DnTicks)
+        public PriceAction(PriceActionType pat)
         {
             this.paType = pat;
-            this.minUpTicks = min_UpTicks;
-            this.maxUpTicks = max_UpTicks;
-            this.minDownTicks = min_DnTicks;
-            this.maxDownTicks = max_DnTicks;
+//            this.minUpTicks = min_UpTicks;
+//            this.maxUpTicks = max_UpTicks;
+//            this.minDownTicks = min_DnTicks;
+//            this.maxDownTicks = max_DnTicks;
         }
-    }
+        public PriceAction(PriceActionType pat, Volatility volatility)
+        {
+            this.paType = pat;
+			this.voltality = volatility;
+        }
+	}
 }
 	
 	
+
+
+
+
 
 
 

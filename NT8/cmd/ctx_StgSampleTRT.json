@@ -1,0 +1,41 @@
+{
+   "MktCtxDaily":[
+      {
+         "Date":"20170606",
+         "TimeCtxs":[
+            {
+               "Time":8401401,
+               "PriceAction":"UpWide#10-16-3-5"
+            }
+         ]
+      },
+      {
+         "Date":"20170607",
+         "TimeCtxs":[
+            {
+               "Time":8401151,
+               "PriceAction":"DnWide#10-16-3-5"
+            },
+            {
+               "Time":11521459,
+               "PriceAction":"UpTight#10-16-3-5"
+            }
+         ]
+      },
+      {
+         "Date":"20170608",
+         "TimeCtxs":[
+            {
+               "Time":8401123,
+               "PriceAction":"UpTight#10-16-3-5"
+            },
+            {
+               "Time":11301459,
+               "PriceAction":"DnTight#10-16-3-5"
+            }
+         ]
+      }
+   ]
+}
+
+

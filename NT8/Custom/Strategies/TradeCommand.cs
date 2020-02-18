@@ -1,5 +1,6 @@
 #region Using declarations
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -23,6 +24,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 using NinjaTrader.NinjaScript.AddOns;
@@ -70,13 +72,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public string GetCmdFilePath() {
-			List<string> names = new List<string>(){"CmdPathRoot","CmdFileName"};
+			List<string> names = new List<string>(){"CmdPathRoot","CmdFileName","CTXFileName"};
 			Dictionary<string,object> dic =	GUtils.GetConfigItems(GUtils.MainConfigFile, names);
 			object dir = null, name = null;
 			dic.TryGetValue("CmdPathRoot", out dir);
 			dic.TryGetValue("CmdFileName", out name);
 			string path = dir.ToString() + name.ToString();
 			Print("GetCmdFilePath=" + path);
+			return path;
+		}
+		
+		public string GetCTXFilePath() {
+			List<string> names = new List<string>(){"CmdPathRoot","CmdFileName","CTXFileName","MenuFileName"};
+			Dictionary<string,object> dic =	GUtils.GetConfigItems(GUtils.MainConfigFile, names);
+			object dir = null, name = null;
+			dic.TryGetValue("CmdPathRoot", out dir);
+			dic.TryGetValue("CTXFileName", out name);
+			string path = dir.ToString() + name.ToString();
+			Print("GetCTXFilePath=" + path);
 			return path;
 		}
 		
@@ -160,10 +173,42 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//paraMap.Add(ele.Key, ele.Value.ToString());
 				Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", ele.Key, ele.Value.ToString()));
 			}
+			//List<Dictionary<string, object>> mkt_ctx = paraDict["MarketContextCmd"] as List<Dictionary<string, object>>;
+			ArrayList mkt_ctx = paraDict["MarketContextCmd"] as ArrayList;
+			Print(String.Format("mkt_ctx={0}, mkt_ctx.count={1}", mkt_ctx.GetType().ToString(), mkt_ctx.Count));
+			Dictionary<string, object> ctx_dict = mkt_ctx[0] as Dictionary<string, object>;//["CTX_Daily"]
+			foreach(KeyValuePair<string, object> ele2 in ctx_dict) {
+				//paraMap.Add(ele.Key, ele.Value.ToString());
+				Print(String.Format("ele2.Key={0}, ele2.Value.ToString()={1}", ele2.Key, ele2.Value.ToString()));
+			}
+			//Print(String.Format("ctx_dict={0}, ctx_dict.count={1}", ctx_dict.GetType().ToString(), ctx_dict.Count));
+			GUtils.ParseCTXJson(ctx_dict, IndicatorProxy);
+			return paraDict;
+		}
+
+		/// <summary>
+		/// not used yet, 
+		/// </summary>
+		/// <returns></returns>
+		public MktContext ReadCmdParaObj() {		
+			MktContext paraDict = GUtils.LoadJson2Obj(GetCTXFilePath());
+			Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", paraDict, paraDict.MktCtxDaily));
+			foreach(DateCtx ele in paraDict.MktCtxDaily) {
+				Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Date, ele.TimeCtxs));
+				if(ele != null && ele.Date != null && ele.TimeCtxs != null) {
+					Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Date, ele.TimeCtxs));
+					foreach(TimeCtx tctx in ele.TimeCtxs) {
+						Print(String.Format("ele.Date={0}, TimeCtx.tctx.Time={1}, tctx.PriceAction={2}", ele.Date, tctx.Time, tctx.PriceAction));
+					}
+				}
+			}
+//			foreach(KeyValuePair<string, List<TimeCTX>> ele in paraDict.cmdMarketContext.ctx_daily.ctx) {
+//				//paraMap.Add(ele.Key, ele.Value.ToString());
+//				Print(String.Format("ele.Key={0}, ele.Value.ToString()=", ele.Key));
+//			}
 			
 			return paraDict;
 		}
-				
         #region Properties
 		[Description("Command Type")]
  		[Browsable(false), XmlIgnore]

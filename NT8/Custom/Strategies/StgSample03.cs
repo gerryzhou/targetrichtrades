@@ -138,7 +138,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":"
 				+ ";ToShortDateString=" + Time[0].ToString()
 				+ ";paType=" + pa.paType.ToString()
-				+ ";maxDownTicks=" + pa.maxDownTicks
+				+ ";maxDownTicks=" + pa.voltality
 				);
 			return false;
 			//barsAgoMaxPbSAREn Bars Since PbSAR reversal. Enter the amount of the bars ago maximum for PbSAR entry allowed

@@ -120,7 +120,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				TraceMessage(this.Name, prt_lev);
 				Print("t,pat,minUp,maxUp,minDn,maxDn=" +
 				t + "," + pat + "," + minUp + "," + maxUp + "," + minDn + "," + maxDn);
-				mkt_ctxs.Add(new MarketContext(t, new PriceAction(pat, minUp, maxUp, minDn, maxDn)));
+				
+				mkt_ctxs.Add(new MarketContext(t, new PriceAction(pat, new Volatility(minUp, maxUp, minDn, maxDn))));
 			}
 //				if(mkt_ctxs.Count > 0) {
 //					Dict_SpvPR.Add(line_pa[0], mkt_ctxs);
@@ -174,7 +175,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <returns></returns>
 		public PriceAction GetPriceAction(DateTime dt) {
 			
-			PriceAction pa = new PriceAction(PriceActionType.UnKnown, -1, -1, -1, -1);
+			PriceAction pa = new PriceAction(PriceActionType.UnKnown, new Volatility(-1, -1, -1, -1));
 			
 			//int key_date = GetDateByDateTime(dt);
 			string key_date = GetDateStrByDateTime(dt);
@@ -303,7 +304,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				int.TryParse(v[2], out minDn);
 				int.TryParse(v[3], out maxDn);					
 				TraceMessage(this.Name, prt_lev);
-				mkt_ctxs.Add(t, new PriceAction(pat, minUp, maxUp, minDn, maxDn));
+				mkt_ctxs.Add(t, new PriceAction(pat, new Volatility(minUp, maxUp, minDn, maxDn)));
 			}
 //				if(mkt_ctxs.Count > 0) {
 //					Dict_SpvPR.Add(line_pa[0], mkt_ctxs);
@@ -381,7 +382,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		public PriceAction Dep_GetPriceAction(DateTime dt) {
 			
-			PriceAction pa = new PriceAction(PriceActionType.UnKnown, -1, -1, -1, -1);
+			PriceAction pa = new PriceAction(PriceActionType.UnKnown, new Volatility(-1, -1, -1, -1));
 			
 			//int key_date = GetDateByDateTime(dt);
 			string key_date = GetDateStrByDateTime(dt);
