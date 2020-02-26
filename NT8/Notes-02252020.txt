@@ -1,0 +1,231 @@
+Dev plan:
+1) Add spv for trade entry(done), todo: hooo up with entry signal; 
+	1-2)hook up trade management(done);
+2) Multiple markets testing;
+3-1) Breakout Pattern-1: open/morning breakout the overnight range(first hour, first 30 minutes range),
+ target vs range as the risk; (3-4 bars breakout setup on the SnR line)
+3-2) Breakout Pattern-2: open/morning breakout, the first pullback evaluation: 38.2/50/61.8
+3-3) Breakout Pattern-3: breakout the narrow range: three types of range a) flat range, b) expanding wedge, c) shrinking wedge;
+ to find the trade, count the legs in the range, for a) three legs formed before breakout;
+ for b) at least two points expanding; the first big leg breakout attempt could be false breakout, it happened to morning open breakout; 
+ for c) at least shrink to half of the initial range, with two or three points shrinking;
+ combined with volatility measurement to define stop loss and target;
+3-4) Breakout Pattern-4: beat the strongest head(false breakout): the breakout from a narrow range got reversed; at the end of the trend, the last breakout got reversed;
+5) Trending/pullback Pattern-1: early-trend pullback, mid-trend pullback, late-trend pullback;
+5-1) Pullback Pivot: left 20+, right 5+, i.e. (20+, 5+)
+5-2) Trending pivot: breakout the pullback pivot, create a new (5+, 5+) pivot
+6) ES noon time range Pattern-1: resume or reversal?
+7) ZiZag: add percentage of the underling ZZ size as the threshold to generate new ZZ/pivot point;
+8) Volatility measurement: ZZ by 25% retracement;
+9) Volume: check the first volume burst in the morning as the session start, 8:35 - 9:00;
+10) Signal combination: volatility+direction+momentum;
+10-1) Define a list of signals for each bar to look back previous signals;(done)
+11) Market Context definition for spvPR: 
+12) Reversal pattern:
+12-1) 1-2-3-4 reversal: after the trend lasts at least 30 mins; 1-the first reversal attempt failed; 2-the last trend resumption creat new high/low; 3-two bar reversal or hammer/wick appears; 4-the first pull-back of the reversal swing is the entry point;
+ 
+
+
+Meeting minutes 03/01/2019
+Gann: 50%, 75%, 25% instead of Fib ratios;
+
+Find trades with SnR and SMI:
+trending market: the red inflection keep trending up, the SMI keep up, buy at the previous green inflection, until get the divergence action: SMI moving down, get out the trade;
+The measurement of the 50% of the SnR of the morning opening;
+negative inflection: red, or resistance;
+
+Test inflections against SMI readings to determine trend -matching inflections against SMI readings to determine if still holding momentum
+Look for divergence,
+ if not, we can set up a trade in the direction of trend with risk at parameters of prior inflections;
+If divergent, meaning smi not following direction of price, we are looking for a trade of reversal;
+FOr a short, we locate the last high of the red diamond, and the last high of the cyan diamond and when we lose that level, we go short
+(*Maybe too late to entry until lose that spt level;
+*how long to hold the entry order, and how to deal with next signal? );
+Testing for divergence
+At inflection, measure the SMI reading
+For negative inflection
+When next negative inflection shows, measure SMI reading
+If negative inflection of n-1 has a lower high price than the negative inflection of candle n, 
+AND SMI of n-1 candle is HIGHER than SMI of n candle, then we have divergence
+
+Order: entry order cancellation-look back to decide if the market condition has been changed or not; 
+
+Issues:
+1) Exception handling: the expected condition does not exist;
+2) Risk parameters: if it's too large, take the trade or not?
+
+June 27, 2019
+circle for smi (-50, 50), diamond for >50 or <-50
+
+record the cross and level of the cross for SMI;
+the current price - KAMA, if the number is >= 0, we know the price is above KAMA,
+if the corss is <-40, then support defined as 5 candles low (stop level);
+resistance will be the  prior cross and it's the first target;
+** the peaks between (-40, 40) will be circles instead of diamond;
+the target will be high/low of the diamond;
+Only cross over from -40, 40 up/down to 40,-40 will be trigger;
+
+**Perhaps circles to identify crossovers in SMI between -50 and 50 and use diamonds for crossovers above 50 and below -50
+** Goal to make the SMI less sensitive for th 1 min chart for scalping
+** Measurement of interest - distance in ticks from the price to the KAMA
+** Record the cross and the level at the cross of the SMI that is (Current price)
+current price - KAMA >=0 then we know the price is above the KAMA and the KAMA gives us relative support
+** If level cross in SMI is <=40 (let's play with that #), we it's an extreme level so it sends us to the second shell
+support then defined as 5 candle low, Ultimate risk threshold there
+Resistance will be the prior cross and the first target
+(let's assume we always move with number of contract 2 or more
+Peaks and valleys give us support and resistance
+Peaks and valleys between -40 and 40 give us new regions of support and resistance
+Candle that holds inflection diamond will give us the target - use the high for long target and the low for short target
+Only positive crossovers in deep oversold territory
+Only negative crossovers in high overbought territory
+We need to work on the SMI some more - change levels...
+
+Hook up signal with trading:
+** 8,8,8,8,12, TMA_Period for cyan/red 6?
+** Red diamond sell, cyan diamond buy;
+** KAMA as trending indicator; 2,10,30?
+** 
+
+Plan for the next few months(priority?):
+** Sim and Live TRT strategy; -> Mirror trading;
+** Position size scaling, 2 or more contracts entry,exit,scaling in/out;
+** Demo and presentation at NY Expo;
+** Add the SnR to the TRT; 31 Oct/2nd week of Nov;
+** Results publishing;
+** Results analysis, bug fixing, improvement of the framework (testing by other traders);
+** Supervised Algo: input from human(web, mobile), real time parameters adjustment;
+**
+
+Longer term(priority?):
+** Ninjatrader Add-on selling;
+** Managed futures program; Form a group?
+** Development of Ninjatrader Algo trading course for beginners;
+** More ....
+
+Notes for implementation:
+** Setup testing environment: devl -> testing/bug fixing/improvement -> Simulation trading -> Living trading
+** Trending indicator: PbSAR instead of KAMA;
+** Range chart vs Time chart: range chart fits trend/wave, time chart fits range/volatility;
+** Stop loss set as being beyond the entry bar instead of the diamond bar;
+	a) Last inflection (significant one like high volume, market open/close, VWAP, etc.), 
+	maybe better to use it as Profit target instead of stop loss since it could be too wide;
+	Or it could introduce too many noisy ones if producing more inflections by changing the parameters;
+	i.e., tradeoff is that with more signals, it will be tight stop loss, low quality;
+	with less signals, it could be higher quality, but wide stop loss;
+	b) lowest/highest of N bars back(include entry bar);
+	c) Risk/Reward Ration with Stop Loss or Profit target;
+** What if the StopLoss/ProfitTarget prices are invalid or too wide, how to determine the prices in order by the factors below?
+	a) Last inflection;
+	b) lowest/highest of N bars back(include entry bar);
+	c) Risk/Reward Ration with Stop Loss or Profit target;
+Implemented the functions to pick a valid SL or PT price from a group of support/resistance like a), b), etc.
+Provided the selection for tighter or wider SL/PT;
+
+
+** Show up a real trade to demostrate the decision making process; will it move the SL/PT after entry? or just wait for hitting SL/PT?
+** Will it still take the trade if the SL/PT are too wide or Risk/Reward Ratio is not good?
+** Restricted the trading hours to 8:30-3:00 CT?
+ 
+** Still too much lagging for 8 ticks range chart; 
+	ways to solve lagging: a) introduce new dimension like volume, timming, pattern, score
+** SMITMA >= 40 for entry short, <= -40 for entry long; also needs upper bound: 80?
+** Profit target using 2*StopLoss instead of diamond; 
+	Reason: this setup is based on momentum, it's good for scalping other than betting for swing (lower down the winning rate),
+	so the money management strategy should match this feature;
+** ExitBy: Signal, RRR (Risk/Reward Ratio), Time, BarCount, HoldWinner, TrailingStopLoss
+** When diamond detected, find the real inflection back N bars, and the previous diamond as support/resistance (also can find the real one back N bars),
+	calculate the distance from the current entry price to the real inflection (risk), 
+	and the distance from current entry price to the previous support/resistance (reward);
+** Best Setup: after a well-established trend enterting the late stage, 
+	the first big pullback will be fade(close to the trend line), take the diamond there; not good for tight channel;
+** Overall, the diamond is good for wide channel; not good for tight channel(very few indicators are good for tight channel);
+** Way to win by the algo: 1) figure out context(human knowledge, AI);
+	2) use/evaluate the specific appoache to trade under the specific market condition;
+	3) Goal: win as much as possible if mached; lose at a fixed controllable level if mis-mached; Increase the winning rate;
+** Win by Logic+Math, using contradiction+MoneyManagement to have a pair of hedged algos;
+	1) Hedge two instruments;
+	2) Game theory: increase size after a series of losses;
+	3) Evaluate the pressure, magnetism of S/R, 
+		and the extensions magnetism/pressure using backtesting for each instruments, 
+		to find out which combination defines a good S/R; Quantify the quality of S/R with a score/category
+
+** Trade 6:00 am CT - Close;
+** Last day hi/lo;
+** Below open: trade short only, otherwise, long only;
+** Monthly support/resistance, prior month;
+** Hold close of last day, long only, vs, short only;
+** Exit if breakout 8/9/10 EMA;
+
+Progress:
+** Monthly/weekly/daily close indicator, MA, MA strategy, momentum strategy;
+** Priority: profitable strategy, separate market context with trade discovery;
+** System design update
+	# how to transfer manual trading result to algo;
+	# implementation the protocol for backend and frontend transmission
+** Lessons from Jim Simons, Edward Thorp (Cooperative, Mathematically sound)
+** Edge of TRT: leading key reversal; needs more: evaluate under different context, add math to control size;
+	# Monthly close -- efficitive one/two week later; entry/exit point;
+	# Weekly close -- efficitive one/two days later; entry/exit point;
+	# Daily close -- difference in open, noon, afternoon/close;
+** VIX/QQQ hedge strategy, mean reversion
+
+Systematic approach:
+** What are we developing? Profitable(do not have to be perfect), easy to manage the sale&subscription
+** Strategy development: Separate MarketContext(backend) with trade discovery(frontend);
+** Ingredients of the model(find the missing piece to make the strategy profitable):
+	# SnR(volatility),
+	# Timing,
+	# Ttrending(Channel+cycle)--MarketContext supervised, 
+	# Oscillator(entry/exit?),
+	# Trade/MoneyManagerment(PT/SL),
+	# Sizing(probability), 
+** Limit of each factor: 
+	pure mechanical system, naked system, individual indicator, supervised system, Quant system, AI system (mathematically sound? measurable?);
+** Evaluation of probability of winning,
+** Edge from arbitrage: Hedging VIX/QQQ;
+** Invite a friend to join;
+
+Categorization of the MarketContext:
+** Classical patterns: Jim Simons 8 patterns, etc.
+** Three sessions: US-Evening, EU-Morning, US-Morning;
+** Four Market Context -- OpenBreakout/Trend-channel/Range-channel/Reversal(V,W channel or inverted V, M channel)
+
+Categorization of Trade
+** Breakout
+** Trending
+** Counter trend
+** Reversal (or Early trending)
+** Summaried the pattern and define the parameters
+
+Discover the trade
+** Anomalous patterns
+** Controversial
+** Hedge: single instrument, pair instruments;
+
+**When to scale-in? 
+	When the winning rate expected higher, scale-in;
+	When the winning rate expected lower, scale-out;
+**When to increase/decrease risk amount?
+	Periodically (Daily/Weekly/Monthly/Quaterly/Annually) change depends on the performance of last period;
+	Pyramid by the PnL: C(n) = R(n-1) * C(n-1), where C is the capital to risk, R is the % of return;
+
+Business considerations:
+** Profitable properiatory system (do not have to be perfect, short-term goal),
+	Sale/subscription to individual/institute;
+	Managed/Hedge fund;
+** Cooperative algo platform (long-term, fixed income)
+	Purpose: help traders build/improve algos with less cost;
+			help beginner algo developers to learn and improve;
+			help veteran algo developers to earn money;
+			build new algos by cooperation (group based, competition);
+	Open platform: Free or Charge a small fee to enroll/membership; start with an open source framework, the algo development forum to enroll;
+	Fees: Registration, monthly/annual membership; administration of project/systems sale;
+	Training developer: free, group, one-on-one
+	Project: development, management
+
+	
+	
+
+
+
