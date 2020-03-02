@@ -176,7 +176,7 @@ Systematic approach:
 ** Ingredients of the model(find the missing piece to make the strategy profitable):
 	# SnR(volatility),
 	# Timing,
-	# Ttrending(Channel+cycle)--MarketContext supervised, 
+	# Trending(Channel+cycle)--MarketContext supervised, 
 	# Oscillator(entry/exit?),
 	# Trade/MoneyManagerment(PT/SL),
 	# Sizing(probability), 
@@ -187,9 +187,15 @@ Systematic approach:
 ** Invite a friend to join;
 
 Categorization of the MarketContext:
-** Classical patterns: Jim Simons 8 patterns, etc.
+** Classical patterns: Jim Simons 8 patterns, etc. -- most likely continuation breakout patterns;
 ** Three sessions: US-Evening, EU-Morning, US-Morning;
 ** Four Market Context -- OpenBreakout/Trend-channel/Range-channel/Reversal(V,W channel or inverted V, M channel)
+** Life cycle of a trend: 
+	# Reversal/consolidation(Range could be wide or tight), 
+	# Early-trend(first new trend leg will be re-tested), 
+	# Mid-trend(buy and hold? or looking for continuation patterns, such as Jim Simons 8 patterns), 
+	# Late-trend(the first reversal attempt will fail), 
+	# Reversal/consolidation
 
 Categorization of Trade
 ** Breakout
