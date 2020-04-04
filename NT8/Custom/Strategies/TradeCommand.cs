@@ -14,6 +14,8 @@ using System.Xml.Serialization;
 using System.Reflection;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Net.Http;
+using System.Web;
 
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
@@ -190,7 +192,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// not used yet, 
 		/// </summary>
 		/// <returns></returns>
-		public MktContext ReadCmdParaObj() {		
+		public MktContext ReadCmdParaObj() {
+			ReadRestfulJson();
 			MktContext paraDict = GUtils.LoadJson2Obj(GetCTXFilePath());
 			Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", paraDict, paraDict.MktCtxDaily));
 			foreach(DateCtx ele in paraDict.MktCtxDaily) {
@@ -210,6 +213,34 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			return paraDict;
 		}
+		
+		public void ReadRestfulJson() {
+			HttpClient http = new HttpClient();
+			http.DefaultRequestHeaders.Add(RequestConstants.UserAgent, RequestConstants.UserAgentValue);
+			string baseUrl = "https://restcountries.eu/rest/v2/name/";
+
+			string queryFilter = "?fields=name;capital;currencies";
+
+			//Console.WriteLine("Enter your country name:");
+
+			//string searchTerm = Console.ReadLine();
+
+			//string url = baseUrl + searchTerm + queryFilter;
+			string url = "https://api.github.com/repos/restsharp/restsharp/releases";
+			HttpResponseMessage response = http.GetAsync(new Uri(url)).Result;
+
+			string responseBody = response.Content.ReadAsStringAsync().Result;
+		
+			List<GitHubRelease> paraDict = GUtils.LoadJsonStr2Obj(responseBody);
+			Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", paraDict.GetType().ToString(), paraDict.Count));
+					foreach(GitHubRelease tctx in paraDict) {
+						Print(String.Format("name={0}, pub_at={1}",
+						tctx.Name, tctx.PublishedAt));
+					}
+			Print(String.Format("ReadRestfulJson={0}", responseBody));
+			
+			//var countries = JsonConvert.DeserializeObject>(responseBody);
+		}
         #region Properties
 		[Description("Command Type")]
  		[Browsable(false), XmlIgnore]
@@ -218,5 +249,21 @@ namespace NinjaTrader.NinjaScript.Strategies
             get; set;
         }	
         #endregion
-	}	
+	}
+	
+	public static class RequestConstants
+    {
+        public const string BaseUrl = "https://api.github.com";
+        public const string Url = "https://api.github.com/repos/restsharp/restsharp/releases";
+        public const string UserAgent = "User-Agent";
+        public const string UserAgentValue = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
+    }
+	
+	public class GitHubRelease
+    {
+        //[JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+        //[JsonProperty(PropertyName = "published_at")]
+        public string PublishedAt { get; set; }
+    }
 }

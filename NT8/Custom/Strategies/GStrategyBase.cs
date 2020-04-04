@@ -56,7 +56,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				CurrentTrade = new CurrentTradeBase(this);
 				IndicatorProxy = GIndicatorProxy(this);//1, Account.Name);
 				//GUtils.UpdateProperties(this, ReadCmdPara(), IndicatorProxy);
-				ReadCmdParaObj();
+				//ReadCmdParaObj();
 				//	CurrentTrade.InstStrategy = ;
 				//tradeSignal = new TradeSignal();
 				CancelAccountOrders();

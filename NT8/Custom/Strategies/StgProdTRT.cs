@@ -56,7 +56,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// 	look back n bars, find the highest/lowest bar as KR; It's leading key reversal;
 	/// 
 	/// </summary>
-	public class StgSampleTRT : GStrategyBase
+	public class StgProdTRT : GStrategyBase
 	{
 		#region Variables
 		private GISMI giSMI;
@@ -78,9 +78,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			base.OnStateChange();
 			if (State == State.SetDefaults)
 			{
-				Print(this.Name + " SetDefaults called....");
-				Description									= @"The sample strategy for GSZTrader.";
-				Name										= "StgSampleTRT";
+				Print(this.Name + " StgProdTRT SetDefaults called....");
+				Description									= @"The prod strategy for TRT.";
+				Name										= "StgProdTRT";
 				Calculate									= Calculate.OnBarClose;
 				IsFillLimitOnTouch							= false;
 				TraceOrders									= false;
@@ -91,7 +91,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
-				Print(this.Name + " Set DataLoaded called....");
+				Print(this.Name + " StgProdTRT Set DataLoaded called....");
 				AddChartIndicator(IndicatorProxy);
 				SetPrintOut(1);
 				IndicatorProxy.LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
@@ -111,11 +111,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 				AddChartIndicator(giSnR);
 				AddChartIndicator(giSnRPriorWM);
 				Print("GISMI called:" + "EMAPeriod1=" + EMAPeriod1 + "EMAPeriod2=" + EMAPeriod2 + "Range=" + Range + "SMITMAPeriod=" + SMITMAPeriod);
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: StgProdTRT GetMarketContext called...", CurrentBar));
 				GetMarketContext();
 			}
 			else if (State == State.Configure)
 			{
-				Print(this.Name + " Set Configure called.... CurrentTrade=" + CurrentTrade);
+				Print(this.Name + " StgProdTRT Set Configure called.... CurrentTrade=" + CurrentTrade);
 				AddDataSeries(Data.BarsPeriodType.Day, 1);
 			}
 		}

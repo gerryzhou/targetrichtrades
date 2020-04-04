@@ -42,6 +42,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 
 		#region Methods
+		public virtual void GetMarketContext() {
+			MarketCTX = ReadCmdParaObj();
+		}
 		/// <summary>
 		/// Volatility measurement is for target, stop loss, etc.
 		/// </summary>
@@ -105,6 +108,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 		
         #region Properties
+		[Browsable(false), XmlIgnore()]
+		public MktContext MarketCTX {get;set;}
+				
         [Browsable(false), XmlIgnore()]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
         public Series<double> StartHM
         {
@@ -127,7 +133,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //		[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
 //		[Display(Name="CustomTime1", Description="CustomTime-1", Order=4, GroupName="Parameters")]
 //		public DateTime CustomTime1
-//		{ get; set; }		
+//		{ get; set; }
         #endregion
 	}
 }

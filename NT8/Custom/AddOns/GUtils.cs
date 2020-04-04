@@ -76,7 +76,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 			//Print(this.Name + ":System.Environment.CurrentDirectory=" + curPath);
 			return ud_dir; //Directory.GetParent(currentDirectory).FullName;
 		}
-		
+
 		public static string GetConfigItem(string config_file, string item_name) {
 			string json_path = GetConfigFileDir() + config_file;
 			string json = System.IO.File.ReadAllText(json_path);
@@ -163,6 +163,21 @@ namespace NinjaTrader.NinjaScript.AddOns
             MktContext dict = serializer.Deserialize<MktContext>(json);
 			return dict;
 		}
+
+		/// <summary>
+		/// Load the config/cmd string into the object
+		/// </summary>
+		/// <param name="json_str"></param>
+		/// <returns></returns>
+		public static List<GitHubRelease> LoadJsonStr2Obj(string json_str) {
+			//string json_path = GetConfigFileDir() + config_file;
+			//string json = System.IO.File.ReadAllText(json_path);
+            //DataContractJsonSerializer ser = new DataContractJsonSerializer();
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            //MktContext dict = serializer.Deserialize<MktContext>(json_str);
+			List<GitHubRelease> dict = serializer.Deserialize<List<GitHubRelease>>(json_str);
+			return dict;
+		}
 		
 		/// <summary>
 		/// Transfer the key/value from the original CMD JSON into a new dictionary
@@ -203,46 +218,54 @@ namespace NinjaTrader.NinjaScript.AddOns
 		}
 		
 		/// <summary>
-		/// "MarketContextCmd":[
-		/// {"CTX_Daily":[
-		/// {"20170606": [{"Time":8401401, "CTX": "UpWide#10-16-3-5"}]},
-		/// {"20170607": [{"Time":8401151, "CTX": "DnWide#10-16-3-5"}, {"Time":11521459, "CTX": "UpTight#10-16-3-5"}]},
-		/// {"20170608": [{"Time":8401123, "CTX": "UpTight#10-16-3-5"}, {"Time":11301459, "CTX": "DnTight#10-16-3-5"}]}
-		/// ]},
-		/// {"CTX_Weekly":[
-		/// {"20170606": [{"Time":8401401, "CTX": "UpWide#10-16-3-5"}]},
-		/// {"20170607": [{"Time":8401151, "CTX": "DnWide#10-16-3-5"}, {"Time":11521459, "CTX": "UpTight#10-16-3-5"}]},
-		/// {"20170608": [{"Time":8401123, "CTX": "UpTight#10-16-3-5"}, {"Time":11301459, "CTX": "DnTight#10-16-3-5"}]}
-		/// ]}
-		/// ]
+		//"MktCtxDaily":[
+		//      {
+		//         "Date":"20170607",
+		//         "TimeCtxs":[
+		//            {
+		//               "Time":8401151,
+		//               "ChannelType":"UpTight",
+		//			   "Support":8600.75, "Resistance":9600.75,
+		//               "MinUp":12, "MaxUp":16, "MinDn":3, "MaxDn":5
+		//            },
+		//            {
+		//               "Time":11521459,
+		//               "ChannelType":"RngTight",
+		//			   "Support":8978.25, "Resistance":9270.75,
+		//               "MinUp":10, "MaxUp":16, "MinDn":4, "MaxDn":6
+		//            }
+		//         ]
+		//      },
+		//	......
+		// ]
 		/// </summary>
 		/// <param name="dict_ori"></param>
 		/// <returns></returns>
 		public static Dictionary<string, List<MarketContext>> ParseCTXJson(Dictionary<string, object> dict_ori, GIndicatorBase indProxy) {
-			Dictionary<string, List<MarketContext>> dict_new = null;// = new Dictionary<string, List<MarketContext>>();
+			Dictionary<string, List<MarketContext>> dict_new = null; // = new Dictionary<string, List<MarketContext>>();
 			JavaScriptSerializer serializer = new JavaScriptSerializer();
 			indProxy.Print("==ParseCTXJson== " + dict_ori.Count);
 			//Get the array for parameter row at CMD JSON file
 			try{
-			foreach(ArrayList val in dict_ori.Values) {
-				indProxy.Print(string.Format("{0}, {1}", val.ToString(), val.Count));
-				
-				//List<MarketContext> list = serializer.Deserialize<List<MarketContext>>(val.ToString());
-//				foreach(Dictionary<string, object> obj in val) {
-//					indProxy.Print(string.Format("{0},{1}",	obj.GetType(), obj.Count));
-//					foreach (KeyValuePair<string, object> pa in obj) {
-//						dict_new.Add(pa.Key, pa.Value as List<MarketContext>);
-//					}
-//					//Dictionary<string, object> dict = serializer.Deserialize<Dictionary<string, object>>(obj.ToString());
-//				}
-				LoadCtxDaily(val, out dict_new, indProxy);
-				if(dict_new != null) {
-					indProxy.Print("==dict_new== " + dict_new.Count);
-					foreach (KeyValuePair<string, List<MarketContext>> pa in dict_new) {
-						indProxy.Print(string.Format("{0},{1}",	pa.Key, pa.Value[0]));
+				foreach(ArrayList val in dict_ori.Values) {
+					indProxy.Print(string.Format("{0}, {1}", val.ToString(), val.Count));
+					
+					//List<MarketContext> list = serializer.Deserialize<List<MarketContext>>(val.ToString());
+	//				foreach(Dictionary<string, object> obj in val) {
+	//					indProxy.Print(string.Format("{0},{1}",	obj.GetType(), obj.Count));
+	//					foreach (KeyValuePair<string, object> pa in obj) {
+	//						dict_new.Add(pa.Key, pa.Value as List<MarketContext>);
+	//					}
+	//					//Dictionary<string, object> dict = serializer.Deserialize<Dictionary<string, object>>(obj.ToString());
+	//				}
+					LoadCtxDaily(val, out dict_new, indProxy);
+					if(dict_new != null) {
+						indProxy.Print("==dict_new== " + dict_new.Count);
+						foreach (KeyValuePair<string, List<MarketContext>> pa in dict_new) {
+							indProxy.Print(string.Format("{0},{1}",	pa.Key, pa.Value[0]));
+						}
 					}
 				}
-			}
 			} catch(Exception ex) {
 				indProxy.Print("Exception=" + ex.StackTrace);
 			}
