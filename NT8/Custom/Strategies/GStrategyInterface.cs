@@ -43,7 +43,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		#region Methods
 		public virtual void GetMarketContext() {
-			MarketCTX = ReadCmdParaObj();
+			MarketCTX = ReadCmdParaObj<MktContext>();
+			//ReadCtxParaObj();
 		}
 		/// <summary>
 		/// Volatility measurement is for target, stop loss, etc.

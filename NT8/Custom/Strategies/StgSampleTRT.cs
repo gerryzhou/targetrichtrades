@@ -96,12 +96,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 				SetPrintOut(1);
 				IndicatorProxy.LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
 				IndicatorProxy.AddPriceActionTypeAllowed(PriceActionType.DnWide);
+				GetMarketContext();
 				
 				giSMI = GISMI(EMAPeriod1, EMAPeriod2, Range, SMITMAPeriod, SMICrossLevel);//(3, 5, 5, 8);
 				awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
 				giKAMA = GIKAMA(FastKAMA, PeriodKAMA, SlowKAMA);
 				giPbSAR = GIPbSAR(AccPbSAR, AccMaxPbSAR, AccStepPbSAR);
-				giSnR = GISnR(false, false, false, true);
+				giSnR = GISnR(false, false, false, true, true, 
+					IndicatorProxy.GetTimeByHM(TG_OpenStartH,TG_OpenStartM, false), IndicatorProxy.GetTimeByHM(TG_CloseH,TG_CloseM, false));
 				giSnRPriorWM = GISnRPriorWM(true, false, false, false, true, false, false, false);
 				
 				AddChartIndicator(giSMI);
@@ -111,7 +113,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 				AddChartIndicator(giSnR);
 				AddChartIndicator(giSnRPriorWM);
 				Print("GISMI called:" + "EMAPeriod1=" + EMAPeriod1 + "EMAPeriod2=" + EMAPeriod2 + "Range=" + Range + "SMITMAPeriod=" + SMITMAPeriod);
-				GetMarketContext();
 			}
 			else if (State == State.Configure)
 			{

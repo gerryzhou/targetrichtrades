@@ -42,7 +42,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// </summary>
 	public enum CommandType {ChangeAlgoType=1, ChangeParams=2, InjectContext=3, None=4}
 	
-	public enum TradingDirection {Up=1, Down=-1, Both=0}
+	public enum TradingDirection {Long=1, Short=-1, Both=0}
 	
 	public enum TradingStyle {TrendFollowing=1, CounterTrend=-1, Ranging=0}
 	

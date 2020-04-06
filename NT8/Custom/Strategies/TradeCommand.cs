@@ -189,23 +189,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 
 		/// <summary>
-		/// not used yet, 
+		/// Read command from Json file
 		/// </summary>
 		/// <returns></returns>
-		public MktContext ReadCmdParaObj() {
+		public T ReadCmdParaObj<T>() {
 			ReadRestfulJson();
-			MktContext paraDict = GUtils.LoadJson2Obj(GetCTXFilePath());
-			Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", paraDict, paraDict.MktCtxDaily));
-			foreach(DateCtx ele in paraDict.MktCtxDaily) {
-				Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Date, ele.TimeCtxs));
-				if(ele != null && ele.Date != null && ele.TimeCtxs != null) {
-					Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Date, ele.TimeCtxs));
-					foreach(TimeCtx tctx in ele.TimeCtxs) {
-						Print(String.Format("ele.Date={0}, TimeCtx.tctx.Time={1}, tctx.ChannelType={2}, tctx.MinUp={3}, tctx.Support={4}",
-						ele.Date, tctx.Time, tctx.ChannelType, tctx.MinUp, tctx.Support));
-					}
-				}
-			}
+			T paraDict = GUtils.LoadJson2Obj<T>(GetCTXFilePath());
+			Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", paraDict, paraDict.GetType().Name));
+			GUtils.DisplayProperties<T>(paraDict, IndicatorProxy);
+//			foreach(DateCtx ele in paraDict.MktCtxDaily) {
+//				Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Date, ele.TimeCtxs));
+//				if(ele != null && ele.Date != null && ele.TimeCtxs != null) {
+//					Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Date, ele.TimeCtxs));
+//					foreach(TimeCtx tctx in ele.TimeCtxs) {
+//						Print(String.Format("ele.Date={0}, TimeCtx.tctx.Time={1}, tctx.ChannelType={2}, tctx.MinUp={3}, tctx.Support={4}",
+//						ele.Date, tctx.Time, tctx.ChannelType, tctx.MinUp, tctx.Support));
+//					}
+//				}
+//			}
 //			foreach(KeyValuePair<string, List<TimeCTX>> ele in paraDict.cmdMarketContext.ctx_daily.ctx) {
 //				//paraMap.Add(ele.Key, ele.Value.ToString());
 //				Print(String.Format("ele.Key={0}, ele.Value.ToString()=", ele.Key));
@@ -231,16 +232,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 			string responseBody = response.Content.ReadAsStringAsync().Result;
 		
-			List<GitHubRelease> paraDict = GUtils.LoadJsonStr2Obj(responseBody);
+			List<GitHubRelease> paraDict = GUtils.LoadJsonStr2Obj<List<GitHubRelease>>(responseBody);
 			Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", paraDict.GetType().ToString(), paraDict.Count));
 					foreach(GitHubRelease tctx in paraDict) {
 						Print(String.Format("name={0}, pub_at={1}",
-						tctx.Name, tctx.PublishedAt));
+						tctx.Name, tctx.Published_At));
 					}
 			Print(String.Format("ReadRestfulJson={0}", responseBody));
 			
 			//var countries = JsonConvert.DeserializeObject>(responseBody);
 		}
+		
         #region Properties
 		[Description("Command Type")]
  		[Browsable(false), XmlIgnore]
@@ -264,6 +266,6 @@ namespace NinjaTrader.NinjaScript.Strategies
         //[JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
         //[JsonProperty(PropertyName = "published_at")]
-        public string PublishedAt { get; set; }
+        public string Published_At { get; set; }
     }
 }

@@ -66,6 +66,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				IsInstantiatedOnEachOptimizationIteration	= true;
 				ShowLastDayHL								= false;
 				ShowLastDayClose							= true;
+				ShowTodayOpen								= true;
 				ShowOpenHL									= true;
 				ShowOvernightHL								= false;
 				//AddPlot(new Stroke(Brushes.LimeGreen, 2), PlotStyle.Hash, "Spt");
@@ -77,7 +78,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//IndicatorProxy = new GIndicatorBase();
 				//IndicatorProxy = GIndicatorProxy(1);
 				giSMI = GISMI(3, 5, 5, 8, 50);
-				giSnR = GISnR(ShowOvernightHL, ShowOpenHL, ShowLastDayHL, ShowLastDayClose);
+				giSnR = GISnR(ShowOvernightHL, ShowOpenHL, ShowLastDayHL, ShowLastDayClose, ShowTodayOpen,
+				IndicatorProxy.GetTimeByHM(TG_OpenStartH,TG_OpenStartM, false), IndicatorProxy.GetTimeByHM(TG_CloseH,TG_CloseM, false));
 				//awOscillator = GIAwesomeOscillator(5, 34, 5, MovingAvgType.SMA);
 
 				AddChartIndicator(giSMI);
@@ -170,7 +172,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //					&& GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down
 //					&& IndicatorProxy.GetResistance(GetTradeSignal(CurrentBar).SnR.Resistance) > High[0]) {
 //					IndicatorProxy.TraceMessage(this.Name, prtLevel);
-//					TM_TradingDirection = TradingDirection.Down;
+//					TM_TradingDirection = TradingDirection.Short;
 //					CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
 //					CurrentTrade.stopLossPrice = IndicatorProxy.GetResistance(GetTradeSignal(CurrentBar).SnR.Resistance);
 //				}
@@ -178,7 +180,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //					&& GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up
 //					&& IndicatorProxy.GetSupport(GetTradeSignal(CurrentBar).SnR.Support) < Low[0]) {
 //					IndicatorProxy.TraceMessage(this.Name, prtLevel);
-//					TM_TradingDirection = TradingDirection.Up;
+//					TM_TradingDirection = TradingDirection.Long;
 //					CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
 //					CurrentTrade.stopLossPrice = IndicatorProxy.GetSupport(GetTradeSignal(CurrentBar).SnR.Support);
 					//Print(CurrentBar + ": GetResistance=" + IndicatorProxy.GetResistance(indicatorSignal.SnR) + ", SnR.BarNo=" + indicatorSignal.SnR.BarNo + ", SnRPriceType=" + indicatorSignal.SnR.SnRPriceType);
@@ -192,13 +194,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override void PutTrade() {
 			if(CurrentTrade.TradeAction.ActionType == TradeActionType.EntrySimple) {
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade MM_StopLossAmt=" + MM_StopLossAmt + "," + MM_StopLossAmt);
-				if(TM_TradingDirection == TradingDirection.Down) {
+				if(TM_TradingDirection == TradingDirection.Short) {
 					//CurrentTrade.TradeAction.EntrySignal.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryShort.ToString());
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Down OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 					CurrentTrade.TradeAction.EntryPrice = Close[0];
 					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
 				}
-				else if(TM_TradingDirection == TradingDirection.Up) {
+				else if(TM_TradingDirection == TradingDirection.Long) {
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 					CurrentTrade.TradeAction.EntryPrice = Close[0];
 					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());
@@ -231,6 +233,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[NinjaScriptProperty]
 		[Display(Name="ShowLastDayClose", Description="Show Close of last day", Order=4, GroupName="CustomParams")]
 		public bool ShowLastDayClose
+		{ get; set; }
+		
+		[NinjaScriptProperty]
+		[Display(Name="ShowTodayOpen", Description="Show today open", Order=4, GroupName="CustomParams")]
+		public bool ShowTodayOpen
 		{ get; set; }
 		
         [Description("Bars count before inflection for entry")]

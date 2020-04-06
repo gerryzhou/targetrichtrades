@@ -122,6 +122,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public const int ODG_OpenStartM = 12;
 		public const int ODG_OpenEndH = 13;
 		public const int ODG_OpenEndM = 14;
+		public const int ODG_CloseH = 15;
+		public const int ODG_CloseM = 16;
+		
 //		public const int ODG_ = ;
 		
 		#endregion

@@ -1,0 +1,25 @@
+* Create an unified spread
+* Measure the highs and lows for each session (EST):
+	** Pre-Market: 4:00 - 9:30 EST
+	** Market: 9:30 - 4:00 EST
+	** Post-Market: 4:00 - 20:00 EST
+* Calculation of the balanced hedging ratio (mean reversion)
+	** r*Chg1 + Chg2 = b
+	** r = (b - Chg2)/Chg1
+	
+* Calculation of shares for TQQQ/TVIX:
+	** M1 = r*M2
+	** M1 = s1*p1, M2 = s2*p2
+	** s1*p1 = r*s2*p2
+	** s2 = M1/(r*p2) = (s1*p1)/(r*p2)
+	** 
+	
+* Calculation of the Gap for new session start:
+	** 4:00 EST vs 20:00 EST prior session
+	** Use the chg/(prior prior day close) to compare with chg/(prior day), 
+		which difference is the gap
+	
+* Scale in/out:
+	** Scale in from the low of the session, scale out at the high;
+	** 
+	

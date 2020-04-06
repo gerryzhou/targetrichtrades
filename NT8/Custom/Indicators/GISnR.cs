@@ -50,6 +50,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				IsSuspendedWhileInactive					= true;
 				ShowOpenHL									= true;
 				ShowLastdayClose							= true;
+				ShowTodayOpen								= true;
 				TM_OpenStartH = 8;
 				TM_OpenStartM = 30;
 				TM_OpenEndH = 9;
@@ -62,34 +63,53 @@ namespace NinjaTrader.NinjaScript.Indicators
 				AddPlot(new Stroke(Brushes.ForestGreen, DashStyleHelper.Dash, 1), PlotStyle.Square, "LastDaySpt");
 				AddPlot(new Stroke(Brushes.LightCoral, 	DashStyleHelper.Dash, 1), PlotStyle.Square, "LastDayRst");
 				AddPlot(new Stroke(Brushes.Blue, 		DashStyleHelper.Dash, 2), PlotStyle.Square, "LastDayClose");
+				AddPlot(new Stroke(Brushes.Gold, 		DashStyleHelper.Dash, 2), PlotStyle.Square, "TodayOpen");
 			}
 			else if (State == State.Configure)
 			{
 				AddDataSeries(Data.BarsPeriodType.Day, 1);
+				//AddDataSeries(BarsPeriodType.Minute, 5);
 			}
 			else if (State == State.DataLoaded)
 			{
 				CustmSeries = new Series<double>(this);
 				getHLByTimeRange = GIGetHighLowByTimeRange(High, TM_OpenStartH, TM_OpenStartM, TM_OpenEndH, TM_OpenEndM);
+				for (int i = 0; i < TradingHours.Sessions.Count; i++)
+				{
+				  Print(String.Format("Session {0}: {1} at {2} to {3} at {4}", i, TradingHours.Sessions[i].BeginDay, TradingHours.Sessions[i].BeginTime,
+				    TradingHours.Sessions[i].EndDay, TradingHours.Sessions[i].EndTime));
+				}
 			}
 		}
 
 		protected override void OnBarUpdate()
 		{
+			if (Bars.IsFirstBarOfSession)
+    			Print(string.Format("Bar number {0} was the first bar processed of the session at {1}.",
+				CurrentBar, Time[0]));
+			  
 			GIFibonacci fib = GIFibonacci(1);
 
 			Print(CurrentBar + ":BarsInProgress, Bars.GetDayBar(1)=" + BarsInProgress + "," + Bars.GetDayBar(1));
 		    if (BarsInProgress != 0) return;
 
 			if(Bars.GetDayBar(1) != null) {
-			    Print(CurrentBar + ": day[1],[0]'s high,low are: [" + Bars.GetDayBar(1).High + "," + Bars.GetDayBar(1).Low + "]"
-				+ ",[" + CurrentDayOHL().CurrentHigh[0] + "," + CurrentDayOHL().CurrentLow[0] + "]");
+			    Print(string.Format( "{0}: day[1] Hi={1}, Lo={2}, Close={3}, day[0] high={4}, low={5}, open={6}",
+					CurrentBar, Bars.GetDayBar(1).High, Bars.GetDayBar(1).Low, Bars.GetDayBar(1).Close,
+					CurrentDayOHL().CurrentHigh[0], CurrentDayOHL().CurrentLow[0], CurrentDayOHL().CurrentOpen[0]));
 				if(ShowLastdayHL) {
 					LastDaySpt[0] = Bars.GetDayBar(1).Low;//Values[4][0] = Bars.GetDayBar(1).Low;
 					LastDayRst[0] = Bars.GetDayBar(1).High;//Values[5][0] = Bars.GetDayBar(1).High;
 				}
 				if(ShowLastdayClose)
 					LastDayClose[0]	= Bars.GetDayBar(1).Close;
+				
+				if(ShowTodayOpen) {
+					if(IsStartTimeBar(GetTimeByHM(TM_OpenStartH, TM_OpenStartM, true), ToTime(Time[0]), ToTime(Time[1])))
+						today_open = Open[0];
+					if(today_open > 0)
+						TodayOpen[0] = today_open; //CurrentDayOHL().CurrentOpen[0];
+				}
 				
 				if(ShowOvernightHL) {
 					if(GetOvernightHigh() > 0) {
@@ -161,6 +181,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private const int ODI_ShowOpenHL = 2;
 		private const int ODI_ShowLastdayHL = 3;
 		private const int ODI_ShowLastdayClose = 4;
+		private const int ODI_ShowTodayOpen = 5;
+		private const int ODI_TimeOpen = 6;
+		private const int ODI_TimeClose = 7;
 		
 		[Description("Show Overnight HL")]
 		[NinjaScriptProperty]
@@ -185,7 +208,24 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[Display(ResourceType = typeof(Custom.Resource), Name="ShowLastdayClose", Order=ODI_ShowLastdayClose, GroupName=GPI_CUSTOM_PARAMS)]
 		public bool ShowLastdayClose
 		{ get; set; }
+		
+		[Description("Show Today Open")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name="ShowTodayOpen", Order=ODI_ShowTodayOpen, GroupName=GPI_CUSTOM_PARAMS)]
+		public bool ShowTodayOpen
+		{ get; set; }
 
+		[Description("Time for Open")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name="TimeOpen", Order=ODI_TimeOpen, GroupName=GPI_CUSTOM_PARAMS)]
+		public int TimeOpen
+		{ get; set; }
+		
+		[Description("Time for Close")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name="TimeClose", Order=ODI_TimeClose, GroupName=GPI_CUSTOM_PARAMS)]
+		public int TimeClose
+		{ get; set; }		
 //		[Description("Hour of opening start")]
 // 		[Range(0, 23), NinjaScriptProperty]		
 //		[Display(Name="OpenStartH", Order=0, GroupName="Timming")]
@@ -230,25 +270,33 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[XmlIgnore]
 		public Series<double> LastDaySpt
 		{
-			get { return Values[4]; }			
+			get { return Values[4]; }
 		}
 
 		[Browsable(false)]
 		[XmlIgnore]
 		public Series<double> LastDayRst
 		{
-			get { return Values[5]; }			
+			get { return Values[5]; }
 		}
 		
 		[Browsable(false)]
 		[XmlIgnore]
 		public Series<double> LastDayClose
 		{
-			get { return Values[6]; }			
+			get { return Values[6]; }
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public Series<double> TodayOpen
+		{
+			get { return Values[7]; }
 		}
 		
 		private double overnight_hi;
 		private double overnight_lo;
+		private double today_open;
 		
 		#endregion
 
@@ -262,18 +310,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GISnR[] cacheGISnR;
-		public GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
+		public GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose, bool showTodayOpen, int timeOpen, int timeClose)
 		{
-			return GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose);
+			return GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose, showTodayOpen, timeOpen, timeClose);
 		}
 
-		public GISnR GISnR(ISeries<double> input, bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
+		public GISnR GISnR(ISeries<double> input, bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose, bool showTodayOpen, int timeOpen, int timeClose)
 		{
 			if (cacheGISnR != null)
 				for (int idx = 0; idx < cacheGISnR.Length; idx++)
-					if (cacheGISnR[idx] != null && cacheGISnR[idx].ShowOvernightHL == showOvernightHL && cacheGISnR[idx].ShowOpenHL == showOpenHL && cacheGISnR[idx].ShowLastdayHL == showLastdayHL && cacheGISnR[idx].ShowLastdayClose == showLastdayClose && cacheGISnR[idx].EqualsInput(input))
+					if (cacheGISnR[idx] != null && cacheGISnR[idx].ShowOvernightHL == showOvernightHL && cacheGISnR[idx].ShowOpenHL == showOpenHL && cacheGISnR[idx].ShowLastdayHL == showLastdayHL && cacheGISnR[idx].ShowLastdayClose == showLastdayClose && cacheGISnR[idx].ShowTodayOpen == showTodayOpen && cacheGISnR[idx].TimeOpen == timeOpen && cacheGISnR[idx].TimeClose == timeClose && cacheGISnR[idx].EqualsInput(input))
 						return cacheGISnR[idx];
-			return CacheIndicator<GISnR>(new GISnR(){ ShowOvernightHL = showOvernightHL, ShowOpenHL = showOpenHL, ShowLastdayHL = showLastdayHL, ShowLastdayClose = showLastdayClose }, input, ref cacheGISnR);
+			return CacheIndicator<GISnR>(new GISnR(){ ShowOvernightHL = showOvernightHL, ShowOpenHL = showOpenHL, ShowLastdayHL = showLastdayHL, ShowLastdayClose = showLastdayClose, ShowTodayOpen = showTodayOpen, TimeOpen = timeOpen, TimeClose = timeClose }, input, ref cacheGISnR);
 		}
 	}
 }
@@ -282,14 +330,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
+		public Indicators.GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose, bool showTodayOpen, int timeOpen, int timeClose)
 		{
-			return indicator.GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose);
+			return indicator.GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose, showTodayOpen, timeOpen, timeClose);
 		}
 
-		public Indicators.GISnR GISnR(ISeries<double> input , bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
+		public Indicators.GISnR GISnR(ISeries<double> input , bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose, bool showTodayOpen, int timeOpen, int timeClose)
 		{
-			return indicator.GISnR(input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose);
+			return indicator.GISnR(input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose, showTodayOpen, timeOpen, timeClose);
 		}
 	}
 }
@@ -298,14 +346,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
+		public Indicators.GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose, bool showTodayOpen, int timeOpen, int timeClose)
 		{
-			return indicator.GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose);
+			return indicator.GISnR(Input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose, showTodayOpen, timeOpen, timeClose);
 		}
 
-		public Indicators.GISnR GISnR(ISeries<double> input , bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose)
+		public Indicators.GISnR GISnR(ISeries<double> input , bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose, bool showTodayOpen, int timeOpen, int timeClose)
 		{
-			return indicator.GISnR(input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose);
+			return indicator.GISnR(input, showOvernightHL, showOpenHL, showLastdayHL, showLastdayClose, showTodayOpen, timeOpen, timeClose);
 		}
 	}
 }

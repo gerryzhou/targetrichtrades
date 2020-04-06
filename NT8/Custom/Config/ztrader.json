@@ -13,6 +13,6 @@
     },
 	"CmdPathRoot": "C:\\Users\\GerryZhou\\source\\repos\\targetrichtrades\\NT8\\cmd\\",
 	"CmdFileName": "cmd_StgSampleTRT.json",
-	"CTXFileName": "ctx_StgSampleTRT.json",
+	"CTXFileName": "ctx_StgProdTRT.json",
 	"MenuFileName": "menu_StgSampleTRT.json"
 }

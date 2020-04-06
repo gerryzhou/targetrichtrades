@@ -155,7 +155,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 		/// </summary>
 		/// <param name="config_file"></param>
 		/// <returns></returns>
-		public static MktContext LoadJson2Obj(string json_path) {
+		public static MktContext LoadJson2Obj1(string json_path) {
 			//string json_path = GetConfigFileDir() + config_file;
 			string json = System.IO.File.ReadAllText(json_path);
             //DataContractJsonSerializer ser = new DataContractJsonSerializer();
@@ -165,17 +165,31 @@ namespace NinjaTrader.NinjaScript.AddOns
 		}
 
 		/// <summary>
+		/// Load the config/cmd file into the object
+		/// </summary>
+		/// <param name="config_file"></param>
+		/// <returns></returns>
+		public static T LoadJson2Obj<T>(string json_path) {
+			//string json_path = GetConfigFileDir() + config_file;
+			string json = System.IO.File.ReadAllText(json_path);
+            //DataContractJsonSerializer ser = new DataContractJsonSerializer();
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            T dict = serializer.Deserialize<T>(json);
+			return dict;
+		}
+		
+		/// <summary>
 		/// Load the config/cmd string into the object
 		/// </summary>
 		/// <param name="json_str"></param>
 		/// <returns></returns>
-		public static List<GitHubRelease> LoadJsonStr2Obj(string json_str) {
+		public static T LoadJsonStr2Obj<T>(string json_str) {
 			//string json_path = GetConfigFileDir() + config_file;
 			//string json = System.IO.File.ReadAllText(json_path);
             //DataContractJsonSerializer ser = new DataContractJsonSerializer();
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             //MktContext dict = serializer.Deserialize<MktContext>(json_str);
-			List<GitHubRelease> dict = serializer.Deserialize<List<GitHubRelease>>(json_str);
+			T dict = serializer.Deserialize<T>(json_str);
 			return dict;
 		}
 		
@@ -341,6 +355,13 @@ namespace NinjaTrader.NinjaScript.AddOns
 //				pa.Key, pa.Value[0], pa.Value[1], pa.Value[2], val));
 //			}
 			return val;
+		}
+		
+		public static void DisplayProperties<T>(T obj, GIndicatorBase indProxy) {
+			indProxy.Print(string.Format("DisplayProperties GetType.Name = {0}", obj.GetType().Name));
+			foreach(PropertyInfo info in obj.GetType().GetProperties()) {
+				indProxy.Print(string.Format("Name={0}, Val={1}", info.Name, info.GetValue(obj)));
+			}			
 		}
 		
 		public static bool DisplayDictionary(Dictionary<string, object> dict, int level, StringBuilder tbOutput)

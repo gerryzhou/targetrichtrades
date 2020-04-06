@@ -61,14 +61,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region Variables
 		private GISMI giSMI;
 		private GIAwesomeOscillator awOscillator;
-		private GIKAMA giKAMA;
+		private EMA giEMA;
+		private GIVWAP giVwap;
 		private GIPbSAR giPbSAR;
 		private GISnR giSnR;
 		private GISnRPriorWM giSnRPriorWM;
 		
+		private JsonStgTRT ctxTRT;
+			
 		private int barNo_EnInflection = -1;
 		
-		private double c0 = 0, hi3 = Double.MaxValue, lo3 = Double.MinValue;
+		private double c0 = 0, hiN = Double.MaxValue, loN = Double.MinValue;
 		
 		#endregion
 		
@@ -96,23 +99,25 @@ namespace NinjaTrader.NinjaScript.Strategies
 				SetPrintOut(1);
 				IndicatorProxy.LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
 				IndicatorProxy.AddPriceActionTypeAllowed(PriceActionType.DnWide);
+				GetMarketContext();
 				
 				giSMI = GISMI(EMAPeriod1, EMAPeriod2, Range, SMITMAPeriod, SMICrossLevel);//(3, 5, 5, 8);
 				awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
-				giKAMA = GIKAMA(FastKAMA, PeriodKAMA, SlowKAMA);
+				giEMA = EMA(EMAPeriod1);
+				giVwap = GIVWAP();
 				giPbSAR = GIPbSAR(AccPbSAR, AccMaxPbSAR, AccStepPbSAR);
-				giSnR = GISnR(false, false, false, true);
+				giSnR = GISnR(false, false, false, true, true, this.ctxTRT.TimeOpen, this.ctxTRT.TimeClose);
 				giSnRPriorWM = GISnRPriorWM(true, false, false, false, true, false, false, false);
 				
 				AddChartIndicator(giSMI);
 				AddChartIndicator(awOscillator);
-				AddChartIndicator(giKAMA);
+				AddChartIndicator(giEMA);
+				AddChartIndicator(giVwap);
 				AddChartIndicator(giPbSAR);
 				AddChartIndicator(giSnR);
 				AddChartIndicator(giSnRPriorWM);
 				Print("GISMI called:" + "EMAPeriod1=" + EMAPeriod1 + "EMAPeriod2=" + EMAPeriod2 + "Range=" + Range + "SMITMAPeriod=" + SMITMAPeriod);
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: StgProdTRT GetMarketContext called...", CurrentBar));
-				GetMarketContext();
 			}
 			else if (State == State.Configure)
 			{
@@ -129,6 +134,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			try {
 				base.OnBarUpdate();
 				IndicatorProxy.TraceMessage(this.Name, PrintOut);
+				GetHiLoNPrice();
 				Print(String.Format("{0}: Stg={1}, GSZTrader={2}", CurrentBar, CurrentTrade.InstStrategy, IndicatorProxy.GSZTrader));
 			} catch (Exception ex) {
 				IndicatorProxy.Log2Disk = true;
@@ -254,35 +260,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return true;
 		}
 		
-		/// ====Unused====
-		//public override bool CheckTradeSignals() {
-//		public bool CheckTradeSignals1() {
-//			IndicatorProxy.TraceMessage(this.Name, PrintOut);
-//			List<TradeSignal> sigList = new List<TradeSignal>();
-//			TradeSignal trdSignal = new TradeSignal();
-//			Direction dir = giKAMA.GetDirection();// new Direction();
-//			PatternMatched();
-//			c0 = Close[0];
-			
-//			Print(CurrentBar + ":"
-//			+ ";c0=" + c0
-//			+ ";hi3=" + hi3
-//			+ ";lo3=" + lo3
-//			+ ";BarsLookback=" + BarsLookback);
-			
-//			if(c0 > hi3)
-//				dir.TrendDir = TrendDirection.Up;
-
-//			if(c0 < lo3)
-//				dir.TrendDir = TrendDirection.Down;
-//			trdSignal.TrendDir = dir;
-			
-//			this.AddTradeSignal(CurrentBar, trdSignal);
-//			hi3 = GetHighestPrice(BarsLookback, true);
-//			lo3 = GetLowestPrice(BarsLookback, true);
-			
-//			return false;
-//		}
 		
 		/// <summary>
 		/// Set the entry signal for TradeAction, 
@@ -490,32 +467,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return true;
 		}
 		
-		// ====unused====
-		public override bool CheckNewEntryTrade() {
-			IndicatorProxy.PrintLog(true, IsLiveTrading(), "====CheckNewEntryTrade()===" + this.Name);
-			IndicatorProxy.TraceMessage(this.Name, PrintOut);
-			CurrentTrade.InitNewEntryTrade();
-			SetTradeAction();
-//			if(GetTradeSignal(CurrentBar) != null) {
-//				if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Down)
-//				{
-//					IndicatorProxy.TraceMessage(this.Name, PrintOut);
-//					CurrentTrade.tradeDirection = TradingDirection.Down;
-//				}
-//				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
-//				{
-//					IndicatorProxy.TraceMessage(this.Name, PrintOut);
-//					CurrentTrade.tradeDirection = TradingDirection.Up;
-//				}
-				
-//				CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
-				
-//			} else {
-//				CurrentTrade.CurrentTradeType = TradeType.NoTrade);
-//			}
-			return false;
-		}
-		
 		public override bool NewTradeAllowed() {
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				String.Format("{0}: NewOrderAllowed called....CurrentTrade.PosQuantity={1}, HasPosition={2}, TM_MaxOpenPosition={3}",
@@ -615,6 +566,50 @@ namespace NinjaTrader.NinjaScript.Strategies
 				String.Format("{0}: GetProfitTargetPrice={1}, infBarNo={2}", CurrentBar, prc, infBarNo));
 			return prc;
 		}
+		
+		private void GetHiLoNPrice() {
+			if(IndicatorProxy.IsStartTimeBar(this.ctxTRT.TimeStart, ToTime(Time[0])/100, ToTime(Time[1])/100)) {
+				this.ctxTRT.S1 = GetLowestPrice(ctxTRT.BarsLookback, false);
+				this.ctxTRT.R1 = GetHighestPrice(ctxTRT.BarsLookback, false);
+				IndicatorProxy.PrintLog(true, false, 
+					string.Format("{0}: is time, S1={1}, R1={2}", CurrentBar, ctxTRT.S1, ctxTRT.R1));
+			}
+		}
+		
+		#endregion
+		
+		#region MarketContext Functions		
+		public override void GetMarketContext() {
+			ReadCtxTRT();
+		}
+		
+		/// <summary>
+		/// Load ctx from Json file
+		/// </summary>
+		/// <returns></returns>
+		public void ReadCtxTRT() {
+			ReadRestfulJson();
+			List<JsonStgTRT> paraDict = GUtils.LoadJson2Obj<List<JsonStgTRT>>(GetCTXFilePath());
+			Print(String.Format("ReadCtxTRT paraDict={0}, paraDict.Count={1}", paraDict, paraDict.Count));
+			if(paraDict != null && paraDict.Count > 0) {
+				this.ctxTRT = paraDict[0];
+				GUtils.DisplayProperties<JsonStgTRT>(ctxTRT, IndicatorProxy);
+			}
+			foreach(JsonStgTRT ele in paraDict) {
+				//Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Symbol, ele.Date));
+//				if(ele != null && ele.Date != null && ele.TimeCtxs != null) {
+//					Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Date, ele.TimeCtxs));
+//					foreach(TimeCtx tctx in ele.TimeCtxs) {
+//						Print(String.Format("ele.Date={0}, TimeCtx.tctx.Time={1}, tctx.ChannelType={2}, tctx.MinUp={3}, tctx.Support={4}",
+//						ele.Date, tctx.Time, tctx.ChannelType, tctx.MinUp, tctx.Support));
+//					}
+//				}				
+			}
+//			foreach(KeyValuePair<string, List<TimeCTX>> ele in paraDict.cmdMarketContext.ctx_daily.ctx) {
+//				//paraMap.Add(ele.Key, ele.Value.ToString());
+//				Print(String.Format("ele.Key={0}, ele.Value.ToString()=", ele.Key));
+//			}			
+		}		
 		#endregion
 
         #region Custom Properties
@@ -636,6 +631,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private const int ODG_AccPbSAR = 16;
 		private const int ODG_AccMaxPbSAR = 17;
 		private const int ODG_AccStepPbSAR = 18;
+
+		[Description("Strategy Client Version")]
+		[Browsable(false), XmlIgnore]
+        public string StgClientVersion
+        {
+            get { return "1.0"; }
+        }
 		
         [Description("Bars count before inflection for entry")]
  		[Range(0, double.MaxValue), NinjaScriptProperty]
@@ -832,4 +834,45 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		#endregion
 	}
+	
+	public class JsonStgTRT
+    {
+		public string Symbol{get;set;}
+		public string ChartType{get;set;}
+		public string Version{get;set;}
+		public string SessionId{get;set;}
+		public string Date{get;set;}
+		public int TimeOpen{get;set;}
+		public int TimeClose{get;set;}
+		public int TimeStart{get;set;}
+		public int TimeEnd{get;set;}
+		
+		public string ChannelType{get;set;}
+		public string TrendDirection{get;set;}
+		public string TradingStyle{get;set;}
+		public string TradingDirection{get;set;}
+		
+		public int BarsLookback{get;set;}
+		public int DaysLookback{get;set;}
+		public int MALength{get;set;}
+		
+		public int EnTicOffset{get;set;}
+		public int ExTrailTics{get;set;}
+		public int StoplossTics{get;set;}
+		
+		public double S1{get;set;}
+		public double R1{get;set;}
+		public double S2{get;set;}
+		public double R2{get;set;}
+		public double S3{get;set;}
+		public double R3{get;set;}
+		public double S4{get;set;}
+		public double R4{get;set;}
+		public double S5{get;set;}
+		public double R5{get;set;}
+		
+		public double T1{get;set;}
+		public double T2{get;set;}
+
+    }
 }

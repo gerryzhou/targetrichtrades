@@ -122,7 +122,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 		
 		#region Properties
-		
 		[Description("Account Name")]
 		[NinjaScriptProperty, XmlIgnore]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "AccName", GroupName = GPS_GSTRATEGY, Order = ODG_AccName)]		

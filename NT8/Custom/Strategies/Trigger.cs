@@ -64,8 +64,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public bool IsTradingTime(int session_start) {
 			//Bars.Session.GetNextBeginEnd(DateTime time, out DateTime sessionBegin, out DateTime sessionEnd)
-			int time_start = IndicatorProxy.GetTimeByHM(TG_TradeStartH, TG_TradeStartM);
-			int time_end = IndicatorProxy.GetTimeByHM(TG_TradeEndH, TG_TradeEndM);
+			int time_start = IndicatorProxy.GetTimeByHM(TG_TradeStartH, TG_TradeStartM, true);
+			int time_end = IndicatorProxy.GetTimeByHM(TG_TradeEndH, TG_TradeEndM, true);
 			int time_now = ToTime(Time[0]);
 			bool isTime= false;
 			if(time_start >= session_start) {
@@ -85,9 +85,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="timeM">time min</param>
 		/// <returns></returns>
 		public bool IsLiquidateTime(int timeH, int timeM) {
-			int time_now = IndicatorProxy.GetTimeByHM(Time[0].Hour, Time[0].Minute);
-			int time_lastBar = IndicatorProxy.GetTimeByHM(Time[1].Hour, Time[1].Minute);
-			int time_liq = IndicatorProxy.GetTimeByHM(timeH, timeM);
+			int time_now = IndicatorProxy.GetTimeByHM(Time[0].Hour, Time[0].Minute, true);
+			int time_lastBar = IndicatorProxy.GetTimeByHM(Time[1].Hour, Time[1].Minute, true);
+			int time_liq = IndicatorProxy.GetTimeByHM(timeH, timeM, true);
 			bool isTime= false;
 			
 			if(time_now == time_liq || (time_liq > time_lastBar && time_liq <= time_now)) {
@@ -100,19 +100,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 			switch(pa.paType) {
 				case PriceActionType.UpTight: //
 					TM_TradingStyle = TradingStyle.TrendFollowing;
-					TM_TradingDirection = TradingDirection.Up;
+					TM_TradingDirection = TradingDirection.Long;
 					break;
 				case PriceActionType.UpWide: //wide up channel
 					TM_TradingStyle = TradingStyle.CounterTrend;
-					TM_TradingDirection = TradingDirection.Up;
+					TM_TradingDirection = TradingDirection.Long;
 					break;
 				case PriceActionType.DnTight: //
 					TM_TradingStyle = TradingStyle.TrendFollowing;
-					TM_TradingDirection = TradingDirection.Down;
+					TM_TradingDirection = TradingDirection.Short;
 					break;
 				case PriceActionType.DnWide: //wide dn channel
 					TM_TradingStyle = TradingStyle.CounterTrend;
-					TM_TradingDirection = TradingDirection.Down;
+					TM_TradingDirection = TradingDirection.Short;
 					break;
 				case PriceActionType.RngTight: //
 					TM_TradingStyle = TradingStyle.Ranging;//-1;
@@ -357,7 +357,25 @@ namespace NinjaTrader.NinjaScript.Strategies
             get { return tg_OpenEndM; }
             set { tg_OpenEndM = Math.Max(0, value); }
         }		
-        #endregion
+
+		[Description("Close hour")]
+ 		[Range(0, 23), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "CloseH", GroupName = GPS_TRIGGER, Order = ODG_CloseH)]
+        public int TG_CloseH
+        {
+            get { return tg_CloseH; }
+            set { tg_CloseH = Math.Max(0, value); }
+        }
+		
+		[Description("Close minute")]
+ 		[Range(0, 59), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "CloseM", GroupName = GPS_TRIGGER, Order = ODG_CloseM)]
+        public int TG_CloseM
+        {
+            get { return tg_CloseM; }
+            set { tg_CloseM = Math.Max(0, value); }
+        }
+		#endregion
 		
 		#region Variables for Properties
 
@@ -376,6 +394,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         
 		private int tg_OpenEndH = 10; //Default setting for open End hour
 		private int tg_OpenEndM = 30; //Default setting for open End minute
+
+		private int tg_CloseH = 15; //Default setting for market close hour
+		private int tg_CloseM = 15; //Default setting for market close minute
 		
         private double tg_EnSwingMinPnts = 10; //10 Default setting for EnSwingMinPnts
         private double tg_EnSwingMaxPnts = 35; //16 Default setting for EnSwingMaxPnts

@@ -182,8 +182,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		//time=10000*H + 100*M + S
-		public int GetTimeByHM(int hour, int min) {
-			return 10000*hour + 100*min;
+		public int GetTimeByHM(int hour, int min, bool withSecond) {
+			if(withSecond)
+				return 10000*hour + 100*min;
+			else
+				return 100*hour + min;
 		}
 				
 		public bool IsTimeInSpan(DateTime dt, int start, int end) {
@@ -193,15 +196,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 
 		public int GetTimeDiffByHM(int hour, int min, DateTime dt) {
-			int t = GetTimeByHM(hour, min);
-			int t0 = GetTimeByHM(dt.Hour, dt.Minute);
+			int t = GetTimeByHM(hour, min, true);
+			int t0 = GetTimeByHM(dt.Hour, dt.Minute, true);
 			Print("[hour,min]=[" + hour + "," + min + "], [dt.Hour,dt.Minute]=[" + dt.Hour + "," + dt.Minute + "]," + dt.TimeOfDay);
 			return t-t0;
 		}
 		
 		public int GetTimeDiffByHM(int start_hour, int start_min, int end_hour, int end_min) {
-			int t = GetTimeByHM(end_hour, end_min);
-			int t0 = GetTimeByHM(start_hour, start_min);
+			int t = GetTimeByHM(end_hour, end_min, true);
+			int t0 = GetTimeByHM(start_hour, start_min, true);
 			Print("[start_hour,start_min]=[" + start_hour + "," + start_min + "], [end_hour,end_min]=[" + end_hour + "," + end_min + "]");
 			return t-t0;
 		}
@@ -226,6 +229,21 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			else if (time_now >= time_start && time_now <= time_end) {
 				isTime = true;
+			}
+			return isTime;
+		}
+		
+		/// <summary>
+		/// Check if now is the first bar pass the startTime
+		/// </summary>
+		/// <param name="time_start">the overnight session start time: 170000 for ES</param>
+		/// <returns></returns>
+		public bool IsStartTimeBar(int time_start, int time_now, int time_lastbar) {
+			Print(string.Format("{0}: time_now={1}, time_lastbar={2}, time_start={3}",
+				CurrentBar, time_now, time_lastbar, time_start));
+			bool isTime= false;
+			if( time_lastbar < time_start && time_now >= time_start) {
+					isTime = true;
 			}
 			return isTime;
 		}

@@ -71,7 +71,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//IndicatorProxy = GIndicatorProxy(1);
 				giSMI = GISMI(3, 5, 5, 8, 50);
 				awOscillator = GIAwesomeOscillator(5, 34, 5, MovingAvgType.SMA, false);
-				giSnR = GISnR(false, true, false, true);
+				giSnR = GISnR(false, true, false, true, true,
+				IndicatorProxy.GetTimeByHM(TG_OpenStartH,TG_OpenStartM, false), IndicatorProxy.GetTimeByHM(TG_CloseH,TG_CloseM, false));
 				
 				//smaSlow = SMA(Slow);
 
@@ -189,13 +190,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
 //				{
 //					IndicatorProxy.TraceMessage(this.Name, prtLevel);
-//					TM_TradingDirection = TradingDirection.Down;
+//					TM_TradingDirection = TradingDirection.Short;
 //				}
 //				else if(GetTradeSignal(CurrentBar).TrendDir.TrendDir == TrendDirection.Up)
 //				//&& giSMI.GetResistance(indicatorSignal.SnR.Resistance) > High[0]) {
 //				{
 //					IndicatorProxy.TraceMessage(this.Name, prtLevel);
-//					TM_TradingDirection = TradingDirection.Up;
+//					TM_TradingDirection = TradingDirection.Long;
 //				}
 				
 //				CurrentTrade.tradeStyle = TradingStyle.TrendFollowing;
@@ -213,7 +214,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public override void PutTrade() {
 			if(CurrentTrade.TradeAction.ActionType == TradeActionType.EntrySimple) {
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade MM_StopLossAmt=" + MM_StopLossAmt + "," + MM_StopLossAmt);
-				if(TM_TradingDirection == TradingDirection.Down) {
+				if(TM_TradingDirection == TradingDirection.Short) {
 					//CurrentTrade.BracketOrder.EntryOrder = 
 					//EnterShort(OrderSignalName.EntryShort.ToString());
 					//EnterShortLimit(Close[0], OrderSignalName.EntryShort.ToString());
@@ -222,7 +223,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					CurrentTrade.TradeAction.EntryPrice = Close[0];
 					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
 				}
-				else if(TM_TradingDirection == TradingDirection.Up) {
+				else if(TM_TradingDirection == TradingDirection.Long) {
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
 					EnterLong(OrderSignalName.EntryLongMkt.ToString());
 					//EnterLongLimit(Low[0]-5, OrderSignalName.EntryLong.ToString());

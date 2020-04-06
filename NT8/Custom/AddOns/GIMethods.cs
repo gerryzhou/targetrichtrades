@@ -231,6 +231,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public double GetTick4Symbol() {
 			return Instrument.MasterInstrument.TickSize;
 		}
+		
+		public double GetOpenPrice(int time_open) {
+			if(ToTime(Time[1]) < time_open && ToTime(Time[0]) >= time_open)
+				return Open[0];
+			else return -1;
+		}
+		
+		public double GetClosePrice(int time_close) {
+			if(ToTime(Time[1]) < time_close && ToTime(Time[0]) >= time_close)
+				return Close[0];
+			else return -1;
+		}
 		#endregion
 		
 		#region Properties

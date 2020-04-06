@@ -55,7 +55,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	
 	public enum ChannelType { UpTight=1, UpWide=2, DnTight=4, DnWide=8, RngTight=16, RngWide=32, UnKnown=64 }
 	
-	public enum MarketCycleType {
+	public enum MarketCycleType { //1-5 wave or ABC wave
 		W1Early, W1Middle, W1End,
 		W2Early, W2Middle, W2End,
 		W3Early, W3Middle, W3End, 
@@ -71,6 +71,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 	
 	public enum GannRatioType { R1, R2, R3, E1, E2, E3, E4 }
 }
+
 
 
 
