@@ -51,8 +51,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public const int ODG_AccName = 1;
 		public const int ODG_AlgoMode = 2;
 		public const int ODG_BackTest = 3;
-		public const int ODG_PrintOut = 4;
-		public const int ODG_StartH = 5;
+		public const int ODG_LiveModelUpdate = 4;
+		public const int ODG_ModelUpdateURL = 5;
+		public const int ODG_PrintOut = 6;
+		public const int ODG_StartH = 7;
 //		public const int ODG_ = ;
 		
 		#endregion

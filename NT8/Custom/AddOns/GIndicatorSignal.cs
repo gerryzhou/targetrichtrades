@@ -255,5 +255,31 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		#endregion
+		
+		#region Predefined Indicator Signal Name
+		[Browsable(false), XmlIgnore]
+		public string SignalName_Inflection
+		{
+			get { return "Inflection";}
+		}
+
+		[Browsable(false), XmlIgnore]
+		public string SignalName_LineCross
+		{
+			get { return "LineCross";}
+		}
+		
+		[Browsable(false), XmlIgnore]
+		public string SignalName_CrossAbove
+		{
+			get { return "CrossAbove";}
+		}
+		
+		[Browsable(false), XmlIgnore]
+		public string SignalName_CrossBelow
+		{
+			get { return "CrossBelow";}
+		}		
+		#endregion
 	}
 }

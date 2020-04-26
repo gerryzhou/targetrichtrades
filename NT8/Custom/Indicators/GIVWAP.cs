@@ -23,7 +23,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators
 {
-	public class GIVWAP : Indicator
+	public class GIVWAP : GIndicatorBase
 	{
 		double	iCumVolume			= 0;
 		double	iCumTypicalVolume	= 0;

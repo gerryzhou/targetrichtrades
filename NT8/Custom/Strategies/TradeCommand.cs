@@ -75,7 +75,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public string GetCmdFilePath() {
 			List<string> names = new List<string>(){"CmdPathRoot","CmdFileName","CTXFileName"};
-			Dictionary<string,object> dic =	GUtils.GetConfigItems(GUtils.MainConfigFile, names);
+			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
 			object dir = null, name = null;
 			dic.TryGetValue("CmdPathRoot", out dir);
 			dic.TryGetValue("CmdFileName", out name);
@@ -86,7 +86,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public string GetCTXFilePath() {
 			List<string> names = new List<string>(){"CmdPathRoot","CmdFileName","CTXFileName","MenuFileName"};
-			Dictionary<string,object> dic =	GUtils.GetConfigItems(GUtils.MainConfigFile, names);
+			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
 			object dir = null, name = null;
 			dic.TryGetValue("CmdPathRoot", out dir);
 			dic.TryGetValue("CTXFileName", out name);
@@ -170,7 +170,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public Dictionary<string,object> ReadCmdPara() {		
-			Dictionary<string,object> paraDict = GUtils.LoadJson2Dictionary(GetCmdFilePath());
+			Dictionary<string,object> paraDict = GConfig.LoadJson2Dictionary(GetCmdFilePath());
 			foreach(KeyValuePair<string, object> ele in paraDict) {
 				//paraMap.Add(ele.Key, ele.Value.ToString());
 				Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", ele.Key, ele.Value.ToString()));
@@ -184,7 +184,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Print(String.Format("ele2.Key={0}, ele2.Value.ToString()={1}", ele2.Key, ele2.Value.ToString()));
 			}
 			//Print(String.Format("ctx_dict={0}, ctx_dict.count={1}", ctx_dict.GetType().ToString(), ctx_dict.Count));
-			GUtils.ParseCTXJson(ctx_dict, IndicatorProxy);
+			GConfig.ParseCTXJson(ctx_dict, IndicatorProxy);
 			return paraDict;
 		}
 
@@ -194,7 +194,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public T ReadCmdParaObj<T>() {
 			ReadRestfulJson();
-			T paraDict = GUtils.LoadJson2Obj<T>(GetCTXFilePath());
+			T paraDict = GConfig.LoadJson2Obj<T>(GetCTXFilePath());
 			Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", paraDict, paraDict.GetType().Name));
 			GUtils.DisplayProperties<T>(paraDict, IndicatorProxy);
 //			foreach(DateCtx ele in paraDict.MktCtxDaily) {
@@ -232,7 +232,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 			string responseBody = response.Content.ReadAsStringAsync().Result;
 		
-			List<GitHubRelease> paraDict = GUtils.LoadJsonStr2Obj<List<GitHubRelease>>(responseBody);
+			List<GitHubRelease> paraDict = GConfig.LoadJsonStr2Obj<List<GitHubRelease>>(responseBody);
 			Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", paraDict.GetType().ToString(), paraDict.Count));
 					foreach(GitHubRelease tctx in paraDict) {
 						Print(String.Format("name={0}, pub_at={1}",

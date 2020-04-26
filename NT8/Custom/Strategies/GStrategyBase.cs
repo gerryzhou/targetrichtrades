@@ -158,6 +158,24 @@ namespace NinjaTrader.NinjaScript.Strategies
             set { backTest = value; }
         }
 		
+        [Description("Live update Model")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "LiveModelUpdate", GroupName = GPS_GSTRATEGY, Order = ODG_LiveModelUpdate)]		
+        public bool LiveModelUpdate
+        {
+            get { return liveModelUpdate; }
+            set { liveModelUpdate = value; }
+        }
+		
+        [Description("Model update URL")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ModelUpdateURL", GroupName = GPS_GSTRATEGY, Order = ODG_ModelUpdateURL)]		
+        public string ModelUpdateURL
+        {
+            get { return liveUpdateURL; }
+            set { liveUpdateURL = value; }
+        }
+		
         [Description("Print out level: large # print out more")]
 		[Range(-5, 5), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "PrintOut", GroupName = GPS_GSTRATEGY, Order = ODG_PrintOut)]		
@@ -211,6 +229,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private string accName = "Sim101";
 		private AlgoModeType algoMode = AlgoModeType.Trading;
 		private bool backTest = true; //if it runs for backtesting;
+		private bool liveModelUpdate = false; //if it keeps model updated bar by bar
+		private string liveUpdateURL = "https://www.tradingbook.com/modelupdate"; //model updated URL
 		private int printOut = 1; // Default setting for PrintOut
 		
 		#endregion

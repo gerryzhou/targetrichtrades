@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
+
 using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Chart;
@@ -32,7 +33,7 @@ using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 namespace NinjaTrader.NinjaScript.Strategies
 {
 	/// <summary>
-	/// Sample strategy fro GSZTrader:
+	/// Sample strategy for GSZTrader:
 	/// 1) OnStateChange();
 	/// 2) OnBarUpdate();
 	/// 3) GetIndicatorSignal();
@@ -54,7 +55,35 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// * Breakeven, or KAMA/EMA did not moving towards target in a period of time, exit?
 	/// * Use cyan/red diamond find key reversal: 
 	/// 	look back n bars, find the highest/lowest bar as KR; It's leading key reversal;
+	/// =====================StgProdTRT=====================================================
+	/// 1.	Define overall market motion for the recent past – 
+	/// Record the lowest low of the last five candles and the highest high at the open of 
+	/// the current day - candle ‘n’ (n-5, n-4, n-3, n-2, n-1) – these will be initial 
+	/// breakout or breakdown levels for the trend
+	/// Note the current 5EMA of candle ‘n’ –
+	/// a.	If the close of candle ‘n-5’ is less that the current 5EMA, the trend is positive
+	/// with the support edge at the lowest low of (n-5, n-4, n-3, n-2, n-1).  A break of this
+	/// low sends us to a YELLOW or WAIT state for a positive trend  [trend detection]
+	/// b.	IF the trend is defined as positive, entries will be defined as follows-
+	/// (a)	If VWAP is above the daily open, engage at the test of the VWAP long, and add to 
+	/// the position any test of the VWAP to max size with 1st target at prior day’s 
+	/// high (if it is higher) or the highest high of the n-5, n-4, n-3, n-2, n-1 candles 
+	/// -where we take ½ position and trail position by 20 ticks.  [entry signal]
+	/// (b)	Automatic stopout – loss of the prior day’s low.  Alternate exit at 20 ticks 
+	/// below the 5EMA, or if the VWAP drops below the daily open, or if the price loses the 
+	/// low of the measured sequence of n-5, n-4, n-3, n-2, n-1 before any of those.  [exit signal]
 	/// 
+	/// 2.	The reversal of this would be the short environment.
+	/// 
+	/// --SPECIAL EVENTS-in either the long or short environment-- 
+	/// 3.	If the chart gaps down at the opening tick but is above the low of the prior 5 days, 
+	/// there will a countertrend bounce into the moving averages – short at the open of the 
+	/// prior 4 hr candle close or long at the opening tick with the stop at the low of the 
+	/// prior 4hr minus 6 ticks into the first target of either the VWAP or 5EMA on the 4hr chart
+	/// then trail 16 ticks.  This trade can be taken repeatedly as long as the 4hr low of the 
+	/// prior candle holds.
+	/// 4.	The reverse will hold true on a gap up that is below the high of the prior 5 days, 
+	/// there will be a countertrend fade into the moving averages.
 	/// </summary>
 	public class StgProdTRT : GStrategyBase
 	{
@@ -63,7 +92,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private GIAwesomeOscillator awOscillator;
 		private EMA giEMA;
 		private GIVWAP giVwap;
-		private GIPbSAR giPbSAR;
+		//private GIPbSAR giPbSAR;
 		private GISnR giSnR;
 		private GISnRPriorWM giSnRPriorWM;
 		
@@ -105,15 +134,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 				awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
 				giEMA = EMA(EMAPeriod1);
 				giVwap = GIVWAP();
-				giPbSAR = GIPbSAR(AccPbSAR, AccMaxPbSAR, AccStepPbSAR);
-				giSnR = GISnR(false, false, false, true, true, this.ctxTRT.TimeOpen, this.ctxTRT.TimeClose);
+				//giPbSAR = GIPbSAR(AccPbSAR, AccMaxPbSAR, AccStepPbSAR);
+				giSnR = GISnR(false, false, true, true, true, this.ctxTRT.TimeOpen, this.ctxTRT.TimeClose);
 				giSnRPriorWM = GISnRPriorWM(true, false, false, false, true, false, false, false);
 				
 				AddChartIndicator(giSMI);
 				AddChartIndicator(awOscillator);
 				AddChartIndicator(giEMA);
 				AddChartIndicator(giVwap);
-				AddChartIndicator(giPbSAR);
+				//AddChartIndicator(giPbSAR);
 				AddChartIndicator(giSnR);
 				AddChartIndicator(giSnRPriorWM);
 				Print("GISMI called:" + "EMAPeriod1=" + EMAPeriod1 + "EMAPeriod2=" + EMAPeriod2 + "Range=" + Range + "SMITMAPeriod=" + SMITMAPeriod);
@@ -132,9 +161,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnBarUpdate()
 		{
 			try {
+				//if(CurrentBar == Bars.Count-2) {
+				if(State != State.Historical || CurrentBar == Bars.Count-2) {
+					Print(CurrentBar + ": InstallDir=" + NinjaTrader.Core.Globals.InstallDir);
+					//Bars.Instrument
+					//NinjaTrader.NinjaScript.Alert.AlertCallback(NinjaTrader.Cbi.Instrument.GetInstrument("MSFT"), this, "someId", NinjaTrader.Core.Globals.Now, Priority.High, "message", NinjaTrader.Core.Globals.InstallDir+@"\sounds\Alert1.wav", new SolidColorBrush(Colors.Blue), new SolidColorBrush(Colors.White), 0);
+					// Instead of PlaySound()					
+					GAlert.PlaySoundFile(IndicatorProxy);
+					//NinjaTrader.NinjaScript.Alert.AlertCallback(Bars.Instrument, this, "someId", NinjaTrader.Core.Globals.Now, Priority.High, "message", NinjaTrader.Core.Globals.InstallDir+@"\sounds\Alert1.wav", new SolidColorBrush(Colors.Blue), new SolidColorBrush(Colors.White), 0);
+				}
+				GetHiLoNPrice();
 				base.OnBarUpdate();
 				IndicatorProxy.TraceMessage(this.Name, PrintOut);
-				GetHiLoNPrice();
 				Print(String.Format("{0}: Stg={1}, GSZTrader={2}", CurrentBar, CurrentTrade.InstStrategy, IndicatorProxy.GSZTrader));
 			} catch (Exception ex) {
 				IndicatorProxy.Log2Disk = true;
@@ -144,9 +182,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 
 		#region Signal Functions
+		/// <summary>
+		/// Check the time, position, trend,
+		/// </summary>
+		/// <returns></returns>
 		public override bool CheckNewEntrySignals(){
 			giSMI.Update();
-			giPbSAR.Update();
+			//giPbSAR.Update();
 			Print(CurrentBar + ":CheckNewEntrySignals called -----------" + giSMI.LastInflection);
 
 			if(NewTradeAllowed())
@@ -167,7 +209,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Print(CurrentBar + ":stg-Last " + giSMI.SignalName_LineCross + "=" + indSigCrs.BarNo + "," + indSigCrs.SignalAction.SignalActionType.ToString());
 			
 			if(PatternMatched()) {
-				Direction dir = GetDirection(giPbSAR);
+				Direction dir = GetDirection(giSMI); //GetDirection(giPbSAR);
 				TradeSignal enSig = new TradeSignal();			
 				enSig.BarNo = CurrentBar;
 				enSig.SignalType = TradeSignalType.Entry;
@@ -187,6 +229,36 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return false;
 		}
 		
+		/// <summary>
+		/// [entry signal]
+		/// (a)	If VWAP is above the daily open, engage at the test of the VWAP long, 
+		/// and add to the position any test of the VWAP to max size with 1st target 
+		/// at prior day’s high (if it is higher) or the highest high of the n-5, n-4,
+		/// n-3, n-2, n-1 candles -where we take ½ position and trail position by 20 ticks.
+		/// </summary>
+		/// <returns></returns>
+		private bool CheckVwapCrossSignal() {
+			IndicatorSignal indSig = new IndicatorSignal();
+			indSig.SignalAction = new SignalAction();
+			indSig.SignalAction.SnR = new SupportResistanceRange<double>();
+			
+			if(CrossAbove(High, this.giVwap, 1)) {
+				indSig.SignalAction.SignalActionType = SignalActionType.CrossOver;
+			}
+			else if(CrossBelow(Low, this.giVwap, 1)) {
+				indSig.SignalAction.SignalActionType = SignalActionType.CrossUnder;
+			} else
+				return false;
+			
+			indSig.SignalName = IndicatorProxy.SignalName_LineCross;
+			indSig.SignalAction.SnR.Resistance = Math.Max(this.ctxTRT.R1, this.giSnR.LastDayRst[0]);
+			indSig.SignalAction.SnR.Support = Math.Min(this.ctxTRT.S1, this.giSnR.LastDaySpt[0]);
+			indSig.BarNo = CurrentBar;
+			indSig.IndicatorSignalType = SignalType.SimplePriceAction;
+			giVwap.AddIndicatorSignal(CurrentBar, indSig);
+			return true;
+		}
+		
 		public override bool CheckStopLossSignal() {
 //			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.StopLoss);
 //			if(indTdSig != null && indTdSig.Count>0) return false;
@@ -199,8 +271,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				String.Format("{0}: CheckStopLossSignal called ------", CurrentBar));
-			giPbSAR.Update();
-			Direction dir = GetDirection(giPbSAR);			
+			//giPbSAR.Update();
+			Direction dir = GetDirection(giSMI); //GetDirection(giPbSAR);
 			TradeSignal slSig = new TradeSignal();
 			slSig.BarNo = CurrentBar;
 			slSig.SignalType = TradeSignalType.StopLoss;
@@ -236,8 +308,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				String.Format("{0}: CheckProfitTargetSignal called ----", CurrentBar));
 
-			giPbSAR.Update();
-			Direction dir = GetDirection(giPbSAR);
+			//giPbSAR.Update();
+			Direction dir = GetDirection(giSMI);// GetDirection(giPbSAR);
 			TradeSignal ptSig = new TradeSignal();
 			ptSig.BarNo = CurrentBar;
 			ptSig.SignalType = TradeSignalType.ProfitTarget;
@@ -385,7 +457,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				+ ";maxDownTicks=" + pa.voltality
 				);
 			SignalActionType sat = giSMI.IsLastBarInflection();
-			Direction dir = GetDirection(giPbSAR);
+			Direction dir = GetDirection(giSMI);// GetDirection(giPbSAR);
 
 			if((sat == SignalActionType.InflectionDn && dir.TrendDir == TrendDirection.Up) && giSMI.IsPullBack(-SMITmaUp, -SMITmaLow) ||
 				(sat == SignalActionType.InflectionUp && dir.TrendDir == TrendDirection.Down && giSMI.IsPullBack(SMITmaLow, SMITmaUp)))
@@ -481,18 +553,25 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region Indicator Functions
 		public override Direction GetDirection(GIndicatorBase indicator) {
 			
-			IndicatorSignal lnSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_Long);
-			IndicatorSignal stSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_Short);
-			IndicatorSignal revlnSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_RevLong);
-			IndicatorSignal revstSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_RevShort);
+//			IndicatorSignal lnSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_Long);
+//			IndicatorSignal stSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_Short);
+//			IndicatorSignal revlnSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_RevLong);
+//			IndicatorSignal revstSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_RevShort);
 			
-			int lnSigBarNo = lnSig == null? -1:lnSig.BarNo;
-			int stSigBarNo = stSig == null? -1:stSig.BarNo;
-			int revlnSigBarNo = revlnSig == null? -1:revlnSig.BarNo;
-			int revstSigBarNo = revstSig == null? -1:revstSig.BarNo;
-			Direction dir = indicator.GetDirection();
+//			int lnSigBarNo = lnSig == null? -1:lnSig.BarNo;
+//			int stSigBarNo = stSig == null? -1:stSig.BarNo;
+//			int revlnSigBarNo = revlnSig == null? -1:revlnSig.BarNo;
+//			int revstSigBarNo = revstSig == null? -1:revstSig.BarNo;
 			
-			Print(CurrentBar + ":Dir=" + dir.TrendDir.ToString() + ",LastLn=" + lnSigBarNo + ", LastSt=" + stSigBarNo + ", LastRevLn=" + revlnSigBarNo + ", LastRevSt=" + revstSigBarNo);
+			Direction dir = new Direction(); //indicator.GetDirection();
+			dir.TrendDir = TrendDirection.UnKnown;
+			if(CurrentBar > this.ctxTRT.BarsLookback && CurrentBar > this.ctxTRT.MALength) {
+				if(Close[ctxTRT.BarsLookback] < giEMA[0])
+					dir.TrendDir = TrendDirection.Up;
+				if(Close[ctxTRT.BarsLookback] > giEMA[0])
+					dir.TrendDir = TrendDirection.Down;
+			}
+//			Print(CurrentBar + ":Dir=" + dir.TrendDir.ToString() + ",LastLn=" + lnSigBarNo + ", LastSt=" + stSigBarNo + ", LastRevLn=" + revlnSigBarNo + ", LastRevSt=" + revstSigBarNo);
 
 //			if(revlnSigBarNo == CurrentBar || revstSigBarNo == CurrentBar)
 //				dir.TrendDir = TrendDirection.UnKnown;
@@ -500,6 +579,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				dir.TrendDir = TrendDirection.Down;
 //			else if (lnSigBarNo == CurrentBar)
 //				dir.TrendDir = TrendDirection.Up;
+			return dir;
+		}
+		
+		private Direction GetDirectionVwap() {
+			Direction dir = new Direction();
+			dir.TrendDir = TrendDirection.UnKnown;
+			if(CurrentBar > this.ctxTRT.BarsLookback && CurrentBar > this.ctxTRT.MALength
+				&& giSnR.TodayOpen[0] > 0 && giVwap[0] > 0) 
+			{				
+				if(giVwap[0] > giSnR.TodayOpen[0]) dir.TrendDir = TrendDirection.Up;
+				else if(giVwap[0] < giSnR.TodayOpen[0]) dir.TrendDir = TrendDirection.Down;				
+			}
 			return dir;
 		}
 		
@@ -567,6 +658,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return prc;
 		}
 		
+		/// <summary>
+		/// Setup the S1, R1 with Highest high or Lowest low of the last n bars
+		/// </summary>
 		private void GetHiLoNPrice() {
 			if(IndicatorProxy.IsStartTimeBar(this.ctxTRT.TimeStart, ToTime(Time[0])/100, ToTime(Time[1])/100)) {
 				this.ctxTRT.S1 = GetLowestPrice(ctxTRT.BarsLookback, false);
@@ -589,7 +683,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public void ReadCtxTRT() {
 			ReadRestfulJson();
-			List<JsonStgTRT> paraDict = GUtils.LoadJson2Obj<List<JsonStgTRT>>(GetCTXFilePath());
+			List<JsonStgTRT> paraDict = GConfig.LoadJson2Obj<List<JsonStgTRT>>(GetCTXFilePath());
 			Print(String.Format("ReadCtxTRT paraDict={0}, paraDict.Count={1}", paraDict, paraDict.Count));
 			if(paraDict != null && paraDict.Count > 0) {
 				this.ctxTRT = paraDict[0];

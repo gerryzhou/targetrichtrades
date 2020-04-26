@@ -64,7 +64,7 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 			}
 			else if (State == State.Configure)
 			{
-				string cmdPathRoot = GUtils.GetConfigItem(GUtils.MainConfigFile, "CmdPathRoot");
+				string cmdPathRoot = GConfig.GetConfigItem(GConfig.MainConfigFile, "CmdPathRoot");
 				string config_file = GLogger.GetConfigFilePath();
 				Print(this.Name + "GLogger.GetConfigFilePath, CmdPathRoot=" + config_file + "," + cmdPathRoot);
 				XmlConfigurator.Configure(new FileInfo(@config_file));////"C:\\www\\log\\log4net.config"));

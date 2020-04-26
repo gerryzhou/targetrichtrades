@@ -61,7 +61,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 	    }
 		
 		public static string GetConfigFilePath() {
-			return GUtils.GetConfigFileDir()
+			return GConfig.GetConfigFileDir()
 				+ "log4net.config";
 		}
 	}

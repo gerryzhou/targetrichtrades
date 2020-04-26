@@ -482,18 +482,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 			
 			set {lastCrossover = value;}
 		}
-
-		[Browsable(false), XmlIgnore]
-		public string SignalName_Inflection
-		{
-			get { return "Inflection";}
-		}
-
-		[Browsable(false), XmlIgnore]
-		public string SignalName_LineCross
-		{
-			get { return "LineCross";}
-		}
 		
 		private int	range		= 8;//5;
 		private int	emaperiod1	= 8;//3;
