@@ -62,8 +62,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				AddPlot(new Stroke(Brushes.DarkRed, 1), PlotStyle.Hash, "OpenRst");
 				AddPlot(new Stroke(Brushes.ForestGreen, DashStyleHelper.Dash, 1), PlotStyle.Square, "LastDaySpt");
 				AddPlot(new Stroke(Brushes.LightCoral, 	DashStyleHelper.Dash, 1), PlotStyle.Square, "LastDayRst");
-				AddPlot(new Stroke(Brushes.Blue, 		DashStyleHelper.Dash, 2), PlotStyle.Square, "LastDayClose");
-				AddPlot(new Stroke(Brushes.Gold, 		DashStyleHelper.Dash, 2), PlotStyle.Square, "TodayOpen");
+				AddPlot(new Stroke(Brushes.Gold, 		DashStyleHelper.Dash, 2), PlotStyle.Square, "LastDayClose");
+				AddPlot(new Stroke(Brushes.Blue, 		DashStyleHelper.Dash, 2), PlotStyle.Square, "TodayOpen");
 			}
 			else if (State == State.Configure)
 			{
@@ -128,6 +128,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				}
 			}
 			
+			if(CurrentBar > 1990) DoSomething();
+				
 			//double Rst = GIGetHighLowByTimeRange(High, 8, 30, 9, 30).HighestHigh[0];
 			//double Spt = GIGetHighLowByTimeRange(Low, 8, 30, 9, 30).LowestLow[0];
 			

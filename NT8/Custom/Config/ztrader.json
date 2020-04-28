@@ -15,6 +15,6 @@
 	"CmdFileName": "cmd_StgSampleTRT.json",
 	"CTXFileName": "ctx_StgProdTRT.json",
 	"SoundFileName": "Latnwhis.wav",
-	"SoundPlayLoop": "100",
+	"SoundPlayLoop": "40",
 	"MenuFileName": "menu_StgSampleTRT.json"
 }

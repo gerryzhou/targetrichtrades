@@ -32,7 +32,14 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 	/// int quantity, double limitPrice, double stopPrice)
 	/// </summary>
 	public class TradeSignal
-	{		
+	{
+		public virtual string SignalToStr() {
+			string str = this.BarNo + ":" + this.SignalName + Environment.NewLine
+				+ "Lmt:" + this.LimitPrice + ", Stp:" + this.StopPrice
+				+ ", PrcOffset:" + this.PriceOffset;
+			return str;
+		}
+		
 		#region Protperies
 		/// <summary>
 		/// The barNo the signal refer to

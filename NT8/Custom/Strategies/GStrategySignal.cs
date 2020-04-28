@@ -116,6 +116,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual bool CheckScaleInSignal(){return false;}
 		public virtual bool CheckScaleOutSignal(){return false;}
 		
+		public virtual void AlertTradeSignal(TradeSignal tsig, string caption){}
 		
 		/// <summary>
 		/// The trade signal is to trigger entry/exit, 

@@ -529,46 +529,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return amt;
 		}
 		
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="barsAgo"></param>
-		/// <param name="includeCurBar"></param>
-		/// <returns></returns>
-		public double GetHighestPrice(int barsAgo, bool includeCurBar) {
-			double hiPrc = includeCurBar? High[0] : High[1];
-			if(barsAgo > 0) {
-				hiPrc = Math.Max(hiPrc, High[HighestBar(High, barsAgo)]);
-			}
-			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
-				CurrentBar + ":hiPrc=" + hiPrc 
-				+ ";barsAgo=" + barsAgo);
-			return hiPrc;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="barsAgo">LowestBar(Low, Bars.BarsSinceNewTradingDay);</param>
-		/// <param name="includeCurBar"></param>
-		/// <returns></returns>
-		public double GetLowestPrice(int barsAgo, bool includeCurBar) {
-			double loPrc = includeCurBar? Low[0] : Low[1];
-			if(barsAgo > 0) {
-				loPrc = Math.Min(loPrc, Low[LowestBar(Low, barsAgo)]);
-			}
-			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
-				CurrentBar + ":loPrc=" + loPrc
-				+ ";barsAgo=" + barsAgo);
-			return loPrc;
-		}
-		
-		public double GetTypicalPrice(int barsAgo) {
-			MasterInstrument maIns = Bars.Instrument.MasterInstrument;			
-			return maIns.RoundToTickSize(Typical[barsAgo]);
-		}
-		
-		
 		public virtual double GetEntryPrice(SupportResistanceType srt) {
 			return 0;
 		}

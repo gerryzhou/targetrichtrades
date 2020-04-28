@@ -558,11 +558,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorSignal indSig = null;
 			switch(srt) {
 				case SupportResistanceType.Support:
-					prcLH = GetLowestPrice(Bars_Lookback, true);
+					prcLH = IndicatorProxy.GetLowestPrice(Bars_Lookback, true);
 					indSig = giSMI.GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionDn);
 					break;
 				case SupportResistanceType.Resistance:
-					prcLH = GetHighestPrice(Bars_Lookback, true);
+					prcLH = IndicatorProxy.GetHighestPrice(Bars_Lookback, true);
 					indSig = giSMI.GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionUp);
 					break;
 			}
@@ -590,11 +590,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			switch(srt) {
 				case SupportResistanceType.Support:
 					indSig = giSMI.GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionDn);
-					prcLH = GetLowestPrice(Bars_Lookback, true);
+					prcLH = IndicatorProxy.GetLowestPrice(Bars_Lookback, true);
 					break;
 				case SupportResistanceType.Resistance:
 					indSig = giSMI.GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionUp);
-					prcLH = GetHighestPrice(Bars_Lookback, true);
+					prcLH = IndicatorProxy.GetHighestPrice(Bars_Lookback, true);
 					break;
 			}
 

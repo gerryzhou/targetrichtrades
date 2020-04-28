@@ -121,8 +121,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			trdSignal.TrendDir = dir;
 			
 //			this.AddTradeSignal(CurrentBar, trdSignal);
-			hi3 = GetHighestPrice(BarsLookback, true);
-			lo3 = GetLowestPrice(BarsLookback, true);
+			hi3 = IndicatorProxy.GetHighestPrice(BarsLookback, true);
+			lo3 = IndicatorProxy.GetLowestPrice(BarsLookback, true);
 			
 			return false;
 		}
@@ -173,12 +173,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade MM_StopLossAmt=" + MM_StopLossAmt + "," + MM_StopLossAmt);
 				if(TM_TradingDirection == TradingDirection.Short) {
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Down OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
-					CurrentTrade.TradeAction.EntryPrice = GetTypicalPrice(0);
+					CurrentTrade.TradeAction.EntryPrice = IndicatorProxy.GetTypicalPrice(0);
 					NewShortLimitOrderUM(OrderSignalName.EntryShortLmt.ToString());
 				}
 				else if(TM_TradingDirection == TradingDirection.Long) {
 					IndicatorProxy.PrintLog(true, IsLiveTrading(), "PutTrade Up OrderSignalName=" + CurrentTrade.TradeAction.EntrySignal.SignalName);
-					CurrentTrade.TradeAction.EntryPrice = GetTypicalPrice(0);
+					CurrentTrade.TradeAction.EntryPrice = IndicatorProxy.GetTypicalPrice(0);
 					NewLongLimitOrderUM(OrderSignalName.EntryLongLmt.ToString());
 				}				
 			}
