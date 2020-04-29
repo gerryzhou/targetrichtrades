@@ -803,7 +803,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		#region Event Handler
         // Define what actions to take when the event is raised.
-        void HandleCustomEvent(object sender, CustomEventArgs e)
+        void HandleCustomEvent(object sender, IndicatorEventArgs e)
         {
             Print(String.Format("{0}: {1} sent this message: {2}", CurrentBar, sender.GetType().Name, e.Message));
         }

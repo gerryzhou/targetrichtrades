@@ -50,6 +50,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				IsSuspendedWhileInactive					= true;
 				ShowOpenHL									= true;
 				ShowLastdayClose							= true;
+				ShowLastdayHL								= true;
 				ShowTodayOpen								= true;
 				TM_OpenStartH = 8;
 				TM_OpenStartM = 30;
@@ -92,15 +93,17 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 			Print(CurrentBar + ":BarsInProgress, Bars.GetDayBar(1)=" + BarsInProgress + "," + Bars.GetDayBar(1));
 		    if (BarsInProgress != 0) return;
-
+		
 			if(Bars.GetDayBar(1) != null) {
-			    Print(string.Format( "{0}: day[1] Hi={1}, Lo={2}, Close={3}, day[0] high={4}, low={5}, open={6}",
-					CurrentBar, Bars.GetDayBar(1).High, Bars.GetDayBar(1).Low, Bars.GetDayBar(1).Close,
-					CurrentDayOHL().CurrentHigh[0], CurrentDayOHL().CurrentLow[0], CurrentDayOHL().CurrentOpen[0]));
+//			    Print(string.Format( "{0}: day[1] Hi={1}, Lo={2}, Close={3}, day[0] high={4}, low={5}, open={6}",
+//					CurrentBar, Bars.GetDayBar(1).High, Bars.GetDayBar(1).Low, Bars.GetDayBar(1).Close,
+//					CurrentDayOHL().CurrentHigh[0], CurrentDayOHL().CurrentLow[0], CurrentDayOHL().CurrentOpen[0]));
 				if(ShowLastdayHL) {
-					LastDaySpt[0] = Bars.GetDayBar(1).Low;//Values[4][0] = Bars.GetDayBar(1).Low;
-					LastDayRst[0] = Bars.GetDayBar(1).High;//Values[5][0] = Bars.GetDayBar(1).High;
+					LastDaySpt[0] = Bars.GetDayBar(1) == null? double.MinValue:Bars.GetDayBar(1).Low;//Values[4][0] = Bars.GetDayBar(1).Low;
+					LastDayRst[0] = Bars.GetDayBar(1) == null? double.MaxValue:Bars.GetDayBar(1).High;//Values[5][0] = Bars.GetDayBar(1).High;
+					CheckLastDayHLEvent();
 				}
+			
 				if(ShowLastdayClose)
 					LastDayClose[0]	= Bars.GetDayBar(1).Close;
 				
@@ -126,9 +129,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 					OpenRst[0] = getHLByTimeRange.SnRRange.Resistance.SnRPrice;
 					OpenSpt[0] = getHLByTimeRange.SnRRange.Support.SnRPrice;
 				}
-			}
+			}			
 			
-			if(CurrentBar > 1990) DoSomething();
 				
 			//double Rst = GIGetHighLowByTimeRange(High, 8, 30, 9, 30).HighestHigh[0];
 			//double Spt = GIGetHighLowByTimeRange(Low, 8, 30, 9, 30).LowestLow[0];
@@ -176,6 +178,28 @@ namespace NinjaTrader.NinjaScript.Indicators
 				overnight_lo = CurrentDayOHL().CurrentLow[0];
 			}
 			return overnight_lo;
+		}
+		
+		public void CheckLastDayHLEvent() {
+			IndicatorSignal isig = new IndicatorSignal();
+			//if(CurrentBar < 300)
+				Print(String.Format("{0}:Close={1},LastDaySpt={2},LastDayRst={3}",
+				CurrentBar, Close[0], LastDaySpt[0], LastDayRst[0]));
+			if(Close[0] < LastDaySpt[0]) {
+				isig.BreakoutDir = BreakoutDirection.Down;
+				isig.SignalName = SignalName_BreakoutLastDLow;
+			} else if(Close[0] > LastDayRst[0]) {
+				isig.BreakoutDir = BreakoutDirection.Up;
+				isig.SignalName = SignalName_BreakoutLastDHigh;
+			} else
+				return;
+			
+			isig.BarNo = CurrentBar;
+			isig.IndicatorSignalType = SignalType.SimplePriceAction;
+			IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckLastDayHLEvent: ");
+			ievt.IndSignal = isig;
+			//FireEvent(ievt);
+			OnRaiseCustomEvent(ievt);
 		}
 		
 		#region Properties
@@ -300,6 +324,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private double overnight_lo;
 		private double today_open;
 		
+		#endregion
+		
+		#region
+		[Browsable(false), XmlIgnore]
+		public string SignalName_BreakoutLastDLow
+		{
+			get { return "BreakoutLastDLow";}
+		}
+
+		[Browsable(false), XmlIgnore]
+		public string SignalName_BreakoutLastDHigh
+		{
+			get { return "BreakoutLastDHigh";}
+		}
 		#endregion
 
 	}
