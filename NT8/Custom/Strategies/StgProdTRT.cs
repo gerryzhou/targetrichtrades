@@ -147,7 +147,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				giHLnBars = GIHLnBars(5);
 				
 				giHLnBars.RaiseIndicatorEvent += OnStopLossEvent;
+				giHLnBars.RaiseIndicatorEvent += OnProfitTargetEvent;
 				giSnR.RaiseIndicatorEvent += OnStopLossEvent;
+				giSnR.RaiseIndicatorEvent += OnProfitTargetEvent;
 				giVwap.RaiseIndicatorEvent += OnStopLossEvent;
 				giEMA.RaiseIndicatorEvent += OnStopLossEvent;
 				//this.RaiseStrategyEvent += OnGISnREvent;
@@ -869,6 +871,46 @@ namespace NinjaTrader.NinjaScript.Strategies
 			ta.StopLossSignal = tsig;
 			CurrentTrade.TradeAction = ta;
         }
+
+		void OnProfitTargetEvent(object sender, IndicatorEventArgs e)
+        {
+			IndicatorSignal isig = e.IndSignal;
+            Print(String.Format("{0}: {1} sent this message: {2}, B#={3}, signame={4}, bkdir={5}", 
+			CurrentBar, sender.GetType().Name, 
+			e.Message, isig.BarNo, isig.SignalName, isig.BreakoutDir.ToString()));
+			
+			TradeSignal tsig = new TradeSignal();
+			if(GetMarketPosition() == MarketPosition.Short && isig.BreakoutDir==BreakoutDirection.Down) {
+				tsig.Action = OrderAction.Buy;
+				//ptSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Resistance);
+			}
+			else if(GetMarketPosition() == MarketPosition.Long && isig.BreakoutDir==BreakoutDirection.Up) {
+				tsig.Action = OrderAction.Sell;
+				//ptSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Support);
+			} else
+				return;
+			
+			tsig.BarNo = CurrentBar;			
+			tsig.SignalType = TradeSignalType.ProfitTarget;
+			tsig.Order_Type = OrderType.Market;
+			tsig.SignalSource = TradeSignalSource.Indicator;
+			tsig.OrderCalculationMode = CalculationMode.Price;
+			tsig.Quantity = CurrentTrade.PosQuantity;
+
+			if(HasPosition() > 0 && (State != State.Historical || CurrentBar >= Bars.Count/1.5)) {
+				//Print(String.Format("{0}: Alert Stop Loss, HasPosition={1}", CurrentBar, HasPosition()));
+				AlertTradeSignal(tsig, sender.GetType().Name + ": Profit Target alert!");
+			}
+			
+			TradeAction ta = new TradeAction();
+			ta.BarNo = CurrentBar;
+			ta.ActionName = sender.GetType().Name + "-ProfitTarget";
+			ta.ActionType = TradeActionType.ExitSimple;
+			ta.ActionStatus = TradeActionStatus.New;
+			ta.StopLossSignal = tsig;
+			CurrentTrade.TradeAction = ta;
+			
+		}
 		#endregion
 		
         #region Custom Properties
