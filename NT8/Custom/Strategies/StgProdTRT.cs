@@ -139,7 +139,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				
 				giSMI = GISMI(EMAPeriod1, EMAPeriod2, Range, SMITMAPeriod, SMICrossLevel);//(3, 5, 5, 8);
 				awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
-				giEMA = GIEMA(EMAPeriod1, 20);
+				giEMA = GIEMA(EMAPeriod1, StoplossTicksEMA);
 				giVwap = GIVWAP();
 				//giPbSAR = GIPbSAR(AccPbSAR, AccMaxPbSAR, AccStepPbSAR);
 				giSnR = GISnR(false, false, true, true, true, this.ctxTRT.TimeOpen, this.ctxTRT.TimeClose);
@@ -222,6 +222,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Direction dir = GetDirection(giEMA); //GetDirection(giPbSAR);
 				TradeSignal enSig = new TradeSignal();			
 				enSig.BarNo = CurrentBar;
+				//enSig.SignalName = "StgProdTRT-Entry";
 				enSig.SignalType = TradeSignalType.Entry;
 				enSig.SignalSource = TradeSignalSource.Indicator;
 				enSig.OrderCalculationMode = CalculationMode.Price;
@@ -233,6 +234,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 					enSig.Action = OrderAction.Sell;
 				enSig.Order_Type = OrderType.Market;
 				AddTradeSignal(CurrentBar, IndicatorTradeSignals, enSig);
+				giHLnBars.RefBarLowestN = CurrentBar;
+				giHLnBars.RefBarLowestN = CurrentBar;
 				Print(CurrentBar + ":PatternMatched-- " + enSig.Action.ToString() + "," + enSig.SignalSource.ToString());
 				AlertTradeSignal(enSig, "Entry Signal Alert");
 				return true;
@@ -315,11 +318,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			slSig.Quantity = 1;
 			if(dir.TrendDir==TrendDirection.Up) {
 				slSig.Action = OrderAction.Sell;
-				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Support);
+				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Support, Close[0]);
 			}
 			else if(dir.TrendDir==TrendDirection.Down) {
 				slSig.Action = OrderAction.Buy;
-				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Resistance);
+				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Resistance, Close[0]);
 			}
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				String.Format("{0}:CheckStopLossSignal slSig.StopPrice={1}", CurrentBar, slSig.StopPrice));
@@ -540,6 +543,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		protected override bool PatternMatched()
 		{
+			double offset_sl, offset_pt;
 			//Print("CurrentBar, barsMaxLastCross, barsAgoMaxPbSAREn,=" + CurrentBar + "," + barsAgoMaxPbSAREn + "," + barsSinceLastCross);
 //			if (giParabSAR.IsSpvAllowed4PAT(curBarPriceAction.paType) && barsSinceLastCross < barsAgoMaxPbSAREn) 
 //				return true;
@@ -557,15 +561,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Direction dirvwap = GetDirectionVwap();
 				if(dir.TrendDir == TrendDirection.Up && dirvwap.TrendDir == TrendDirection.Up) {
 					IndicatorSignal vSig = giVwap.GetIndicatorSignalByActionType(CurrentBar, SignalActionType.CrossUnder);
+					offset_sl = GetStopLossOffset(SupportResistanceType.Support, Close[0]);
+					offset_pt = GetProfitTargetOffset(SupportResistanceType.Resistance, Close[0]);
+					
 					IndicatorProxy.PrintLog(true, IsLiveTrading(),
 						String.Format("{0}:{1} CheckVwapCrossSignal={2},{3}", CurrentBar, vSig.BarNo, vSig.SignalName, vSig.SignalAction.SignalActionType));
-					return true;
+					return true;//IsProfitFactorValid(offset_sl, offset_pt, this.MM_ProfitFactor);
 				}
 				if(dir.TrendDir == TrendDirection.Down && dirvwap.TrendDir == TrendDirection.Down) {
 					IndicatorSignal vSig = giVwap.GetIndicatorSignalByActionType(CurrentBar, SignalActionType.CrossOver);
+					offset_sl = GetStopLossOffset(SupportResistanceType.Resistance, Close[0]);
+					offset_pt = GetProfitTargetOffset(SupportResistanceType.Support, Close[0]);
 					IndicatorProxy.PrintLog(true, IsLiveTrading(),
 						String.Format("{0}:{1} CheckVwapCrossSignal={2},{3}", CurrentBar, vSig.BarNo, vSig.SignalName, vSig.SignalAction.SignalActionType));
-					return true;
+					return true;//IsProfitFactorValid(offset_sl, offset_pt, this.MM_ProfitFactor);
 				}
 			}
 			
@@ -582,7 +591,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			new AlertMessage(this.Owner, "Alert triggerred!" + Environment.NewLine 
 				+ tsig.SignalToStr(), caption);
 				//if(CurrentBar == Bars.Count-2) {
-			if(State != State.Historical || CurrentBar >= Bars.Count/1.1) {
+			if(State != State.Historical || CurrentBar >= Bars.Count-20) {
 				Print(CurrentBar + ": InstallDir=" + NinjaTrader.Core.Globals.InstallDir);
 				//Bars.Instrument
 				//NinjaTrader.NinjaScript.Alert.AlertCallback(NinjaTrader.Cbi.Instrument.GetInstrument("MSFT"), this, "someId", NinjaTrader.Core.Globals.Now, Priority.High, "message", NinjaTrader.Core.Globals.InstallDir+@"\sounds\Alert1.wav", new SolidColorBrush(Colors.Blue), new SolidColorBrush(Colors.White), 0);
@@ -719,69 +728,74 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return dir;
 		}
 		
-		public override double GetStopLossPrice(SupportResistanceType srt) {
-			double prc = 0, prcLH = 0, prcInfl = 0;
-			int infBarNo = -1;
-			IndicatorSignal indSig = null;
-			switch(srt) {
-				case SupportResistanceType.Support:
-					prcLH = IndicatorProxy.GetLowestPrice(Bars_Lookback, true);
-					indSig = giSMI.GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionDn);
-					break;
-				case SupportResistanceType.Resistance:
-					prcLH = IndicatorProxy.GetHighestPrice(Bars_Lookback, true);
-					indSig = giSMI.GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionUp);
-					break;
-			}
-			if(indSig != null)
-				infBarNo = indSig.BarNo;
-			if(infBarNo > 0) {
-				if (srt == SupportResistanceType.Resistance)
-					prcInfl = High[CurrentBar-infBarNo];
-				else if (srt == SupportResistanceType.Support)
-					prcInfl = Low[CurrentBar-infBarNo];
-			}
+		public override double GetStopLossOffset(SupportResistanceType srt, double price) {
+			double offset = 0;
+			offset = Math.Max(offset, giSnR.GetLastDayHLOffset(srt, price));
+			offset = Math.Max(offset, giHLnBars.GetNBarsHLOffset(srt, price));
+			offset = Math.Max(offset, giVwap.GetVwapOpenDOffset(srt, price));
+			offset = Math.Max(offset, giEMA.GetEmaOffset(srt, price));
+
+//			if(indSig != null)
+//				infBarNo = indSig.BarNo;
+//			if(infBarNo > 0) {
+//				if (srt == SupportResistanceType.Resistance)
+//					prcInfl = High[CurrentBar-infBarNo];
+//				else if (srt == SupportResistanceType.Support)
+//					prcInfl = Low[CurrentBar-infBarNo];
+//			}
 			
-			prc = GetValidStopLossPrice(new List<double>{prcLH, prcInfl}, MM_SLPriceGapPref);
-			if(prc <= 0)
-				prc = GetValidStopLossPrice(Close[0]);
+//			prc = GetValidStopLossPrice(new List<double>{prcLH, prcInfl}, MM_SLPriceGapPref);
+//			if(prc <= 0)
+//				prc = GetValidStopLossPrice(Close[0]);
 			IndicatorProxy.PrintLog(true, IsLiveTrading(),
-				String.Format("{0}: GetStopLossPrice={1}, infBarNo={2}", CurrentBar, prc, infBarNo));
-			return prc;
+				String.Format("{0}: GetStopLossOffset={1}", CurrentBar, offset));
+			return offset;
 		}
 		
-		public override double GetProfitTargetPrice(SupportResistanceType srt) {
-			double prc = 0, prcLH = 0, prcInfl = 0;
-			int infBarNo = -1;
-			IndicatorSignal indSig = null;
-			switch(srt) {
-				case SupportResistanceType.Support:
-					indSig = giSMI.GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionDn);
-					prcLH = IndicatorProxy.GetLowestPrice(Bars_Lookback, true);
-					break;
-				case SupportResistanceType.Resistance:
-					indSig = giSMI.GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionUp);
-					prcLH = IndicatorProxy.GetHighestPrice(Bars_Lookback, true);
-					break;
-			}
+		public override double GetProfitTargetOffset(SupportResistanceType srt, double price) {
+			double offset = 0;
+			offset = Math.Max(offset, giSnR.GetLastDayHLOffset(srt, price));
+			offset = Math.Max(offset, giHLnBars.GetNBarsHLOffset(srt, price));
+//			offset = Math.Max(offset, giVwap.GetVwapOpenDOffset(srt, price));
+//			offset = Math.Max(offset, giEMA.GetEmaOffset(srt, price));
 
-			if(indSig != null)
-				infBarNo = indSig.BarNo;
-
-			if(infBarNo > 0) {
-				if (srt == SupportResistanceType.Resistance)
-					prcInfl = High[CurrentBar-infBarNo];
-				else if (srt == SupportResistanceType.Support)
-					prcInfl = Low[CurrentBar-infBarNo];
-			}
-			
-			prc = GetValidProfitTargetPrice(new List<double>{prcLH, prcInfl}, MM_PTPriceGapPref);
-			if(prc <= 0)
-				prc = GetValidProfitTargetPrice(Close[0]);
 			IndicatorProxy.PrintLog(true, IsLiveTrading(),
-				String.Format("{0}: GetProfitTargetPrice={1}, infBarNo={2}", CurrentBar, prc, infBarNo));
-			return prc;
+				String.Format("{0}: GetProfitTargetOffset={1}, ProfitFactor={2}", CurrentBar, offset, this.MM_ProfitFactor));
+			return offset;
 		}
+		
+//		public override double GetProfitTargetPrice(SupportResistanceType srt) {
+//			double prc = 0, prcLH = 0, prcInfl = 0;
+//			int infBarNo = -1;
+//			IndicatorSignal indSig = null;
+//			switch(srt) {
+//				case SupportResistanceType.Support:
+//					indSig = giSMI.GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionDn);
+//					prcLH = IndicatorProxy.GetLowestPrice(Bars_Lookback, true);
+//					break;
+//				case SupportResistanceType.Resistance:
+//					indSig = giSMI.GetLastIndicatorSignalByActionType(CurrentBar-1, SignalActionType.InflectionUp);
+//					prcLH = IndicatorProxy.GetHighestPrice(Bars_Lookback, true);
+//					break;
+//			}
+
+//			if(indSig != null)
+//				infBarNo = indSig.BarNo;
+
+//			if(infBarNo > 0) {
+//				if (srt == SupportResistanceType.Resistance)
+//					prcInfl = High[CurrentBar-infBarNo];
+//				else if (srt == SupportResistanceType.Support)
+//					prcInfl = Low[CurrentBar-infBarNo];
+//			}
+			
+//			prc = GetValidProfitTargetPrice(new List<double>{prcLH, prcInfl}, MM_PTPriceGapPref);
+//			if(prc <= 0)
+//				prc = GetValidProfitTargetPrice(Close[0]);
+//			IndicatorProxy.PrintLog(true, IsLiveTrading(),
+//				String.Format("{0}: GetProfitTargetPrice={1}, infBarNo={2}", CurrentBar, prc, infBarNo));
+//			return prc;
+//		}
 		
 		/// <summary>
 		/// Setup the S1, R1 with Highest high or Lowest low of the last n bars
@@ -1107,7 +1121,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[Range(1, int.MaxValue)]
 		[NinjaScriptProperty]
-		[Display(Name="StoplossTicksEMA", Description="Tick offset amount to stopout by EMA", Order=ODG_StoplossTicksEMA, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="StoplossTicksEMA", Description="Tick offset amount to stop out by EMA", Order=ODG_StoplossTicksEMA, GroupName=GPS_CUSTOM_PARAMS)]
 		public int StoplossTicksEMA
 		{
 			get { return stoplossTicksEMA;}

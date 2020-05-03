@@ -32,6 +32,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 	{		
 		#region Money Mgmt Functions
 		
+		public virtual bool IsProfitFactorValid(double risk, double reward, double r) {
+			bool is_valid = false;
+			if(risk > 0 && reward > 0 && r <= reward/risk)
+				is_valid = true;
+			return is_valid;
+		}
+		
 		public double CalProfitTargetAmt(double price, double profitFactor) {
 			IndicatorProxy.PrintLog(true, true, 
 				CurrentBar + ":CalProfitTargetAmt;IsLiveTrading=" + IsLiveTrading() +
@@ -503,10 +510,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return 0;
 		}
 		
-		public virtual double GetStopLossPrice(SupportResistanceType srt) {
+		public virtual double GetStopLossPrice(SupportResistanceType srt, double price) {
+			return 0;
+		}
+		
+		public virtual double GetStopLossOffset(SupportResistanceType srt, double price) {
 			return 0;
 		}
 
+		public virtual double GetProfitTargetPrice(SupportResistanceType srt, double price) {
+			return 0;
+		}
+		
+		public virtual double GetProfitTargetOffset(SupportResistanceType srt, double price) {
+			return 0;
+		}
+		
 		public virtual double GetValidStopLossPrice(List<double> prices, PriceGap pg) {
 			double prc = 0;
 			double curPrc = Close[0]; //GetAvgPrice();

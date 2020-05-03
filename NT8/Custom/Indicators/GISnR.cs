@@ -180,6 +180,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return overnight_lo;
 		}
 		
+		public double GetLastDayHLOffset(SupportResistanceType srt, double price) {
+			double offset = 0;
+			switch(srt) {
+				case SupportResistanceType.Support:
+					offset = price - LastDaySpt[1];
+					break;
+				case SupportResistanceType.Resistance:
+					offset = LastDayRst[1] - price;
+					break;
+			}
+			
+			return offset;
+		}
+		
 		public void CheckLastDayHLEvent() {
 			IndicatorSignal isig = new IndicatorSignal();
 			//if(CurrentBar < 300)

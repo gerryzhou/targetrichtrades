@@ -67,6 +67,21 @@ namespace NinjaTrader.NinjaScript.Indicators
 			CheckVwapBreakoutDayHLEvent();
 		}
 		
+		public double GetVwapOpenDOffset(SupportResistanceType srt, double price) {
+			double offset = 0;
+			double openD = CurrentDayOHL().CurrentOpen[0];
+			switch(srt) {
+				case SupportResistanceType.Support:
+					offset = price - Math.Min(PlotVWAP[1], openD);
+					break;
+				case SupportResistanceType.Resistance:
+					offset = Math.Max(PlotVWAP[1], openD) - price;
+					break;
+			}
+			
+			return offset;
+		}
+
 		public void CheckVwapBreakoutDayHLEvent() {
 			IndicatorSignal isig = new IndicatorSignal();
 			double openD = CurrentDayOHL().CurrentOpen[0];

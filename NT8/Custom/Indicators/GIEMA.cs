@@ -64,6 +64,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 				CheckBreakoutEmaTicsEvent();
 		}
 		
+		public double GetEmaOffset(SupportResistanceType srt, double price) {
+			double offset = 0;
+			switch(srt) {
+				case SupportResistanceType.Support:
+					offset = price - Value[1] - GetPriceByTicks(OffsetTicks);
+					break;
+				case SupportResistanceType.Resistance:
+					offset = Value[1] + GetPriceByTicks(OffsetTicks) - price;
+					break;
+			}
+			
+			return offset;
+		}
+
 		public void CheckBreakoutEmaTicsEvent() {
 			IndicatorSignal isig = new IndicatorSignal();
 			//if(CurrentBar < 300)

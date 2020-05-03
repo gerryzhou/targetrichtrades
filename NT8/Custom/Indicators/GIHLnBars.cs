@@ -69,18 +69,33 @@ namespace NinjaTrader.NinjaScript.Indicators
 				}
 
 		}
-		
+
+		public double GetNBarsHLOffset(SupportResistanceType srt, double price) {
+			double offset = 0;
+			switch(srt) {
+				case SupportResistanceType.Support:
+					offset = price - LowestN[1];
+					break;
+				case SupportResistanceType.Resistance:
+					offset = HighestN[1] - price;
+					break;
+			}
+			
+			return offset;
+		}
+
 		public void CheckBreakoutNBarsHLEvent() {
-			if(LowestN.Count < 2 || HighestN.Count < 2)
+			if(CurrentBar-RefBarLowestN < 1 || CurrentBar-RefBarHighestN < 1)
 				return;
 			IndicatorSignal isig = new IndicatorSignal();
 			//if(CurrentBar < 300)
-				Print(String.Format("{0}:Close={1},LowestN={2},HighestN={3}",
-				CurrentBar, Close[0], LowestN[1], HighestN[1]));
-			if(Close[0] < LowestN[1]) {
+				Print(String.Format("{0}:Close={1},RefBarLowestN={2},RefBarLowestN={3},LowestN={4},HighestN={5}",
+				CurrentBar, Close[0], RefBarLowestN, RefBarHighestN,
+				LowestN[CurrentBar-RefBarLowestN], HighestN[CurrentBar-RefBarHighestN]));
+			if(Close[0] < LowestN[CurrentBar-RefBarLowestN]) {
 				isig.BreakoutDir = BreakoutDirection.Down;
 				isig.SignalName = SignalName_BreakoutNBarsLow;
-			} else if(Close[0] > HighestN[1]) {
+			} else if(Close[0] > HighestN[CurrentBar-RefBarHighestN]) {
 				isig.BreakoutDir = BreakoutDirection.Up;
 				isig.SignalName = SignalName_BreakoutNBarsHigh;
 			} else
@@ -113,6 +128,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			get { return Values[1]; }
 		}
+		
+		/// <summary>
+		/// The bar NO for the prior LowestN as reference
+		/// Used to locate LowestN for entry bar 
+		/// </summary>
+		[Browsable(false)]
+		[XmlIgnore]
+		public int RefBarLowestN
+		{ get; set; }
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public int RefBarHighestN
+		{ get; set; }
 		#endregion
 
 		#region Pre-defined signal name

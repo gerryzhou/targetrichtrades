@@ -204,11 +204,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			slSig.Quantity = 1;
 			if(dir.TrendDir==TrendDirection.Up) {
 				slSig.Action = OrderAction.Sell;
-				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Support);
+				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Support, Close[0]);
 			}
 			else if(dir.TrendDir==TrendDirection.Down) {
 				slSig.Action = OrderAction.Buy;
-				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Resistance);
+				slSig.StopPrice = GetStopLossPrice(SupportResistanceType.Resistance, Close[0]);
 			}
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				String.Format("{0}:CheckStopLossSignal slSig.StopPrice={1}", CurrentBar, slSig.StopPrice));
@@ -552,7 +552,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return dir;
 		}
 		
-		public override double GetStopLossPrice(SupportResistanceType srt) {
+		public override double GetStopLossPrice(SupportResistanceType srt, double price) {
 			double prc = 0, prcLH = 0, prcInfl = 0;
 			int infBarNo = -1;
 			IndicatorSignal indSig = null;
