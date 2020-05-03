@@ -103,8 +103,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 						CurrentBar, ta.ActionStatus.ToString()));
 					return;
 				}
+				String sigName = "UnKnown";
+				if(ta.EntrySignal != null)
+					sigName = ta.EntrySignal.SignalName;
+				if(ta.StopLossSignal != null)
+					sigName = ta.StopLossSignal.SignalName;
+				if(ta.ProfitTargetSignal != null)
+					sigName = ta.ProfitTargetSignal.SignalName;
+				if(ta.ScaleOutSignal != null)
+					sigName = ta.ScaleOutSignal.SignalName;
+								
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":TakeTradeAction"
-				+ ";entrySignalName="// + ta.EntrySignal.SignalName
+				+ ";SignalName=" + sigName
+				+ ";ActionName=" + ta.ActionName
+				+ ";ActionType=" + ta.ActionType.ToString()
 				+ ";CurrentTrade.TDID=" + CurrentTrade.TradeID
 				+ ";OcoID=" + CurrentTrade.OcoID
 				+ ";HasPosition=" + HasPosition());

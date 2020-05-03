@@ -22,6 +22,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 // This namespace holds indicators in this folder and is required. Do not change it.
@@ -59,13 +60,56 @@ namespace NinjaTrader.NinjaScript.Indicators
 		protected override void OnBarUpdate()
 		{
 			Value[0] = (CurrentBar == 0 ? Input[0] : Input[0] * constant1 + constant2 * Value[1]);
+			if(CurrentBar > Period)
+				CheckBreakoutEmaTicsEvent();
 		}
-
+		
+		public void CheckBreakoutEmaTicsEvent() {
+			IndicatorSignal isig = new IndicatorSignal();
+			//if(CurrentBar < 300)
+				Print(String.Format("{0}:Close={1},EMA={2},OffsetTicks={3}",
+				CurrentBar, Close[0], Value[0], OffsetTicks));
+			if(Close[0] < Value[1] - GetPriceByTicks(OffsetTicks)) {
+				isig.BreakoutDir = BreakoutDirection.Down;
+				isig.SignalName = SignalName_BreakoutEmaDownTics;
+			} else if(Close[0] > Value[1] + GetPriceByTicks(OffsetTicks)) {
+				isig.BreakoutDir = BreakoutDirection.Up;
+				isig.SignalName = SignalName_BreakoutEmaUpTics;
+			} else
+				return;
+			
+			isig.BarNo = CurrentBar;
+			isig.IndicatorSignalType = SignalType.SimplePriceAction;
+			IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckBreakoutEmaTicsEvent: ");
+			ievt.IndSignal = isig;
+			//FireEvent(ievt);
+			OnRaiseIndicatorEvent(ievt);
+		}
+		
 		#region Properties
 		[Range(1, int.MaxValue), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "Period", GroupName = "NinjaScriptParameters", Order = 0)]
 		public int Period
 		{ get; set; }
+		
+		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "OffsetTicks", GroupName = "NinjaScriptParameters", Order = 1)]
+		public int OffsetTicks
+		{ get; set; }
+		#endregion
+
+		#region Pre-defined signal name
+		[Browsable(false), XmlIgnore]
+		public string SignalName_BreakoutEmaDownTics
+		{
+			get { return "BreakoutEmaDownTics";}
+		}
+
+		[Browsable(false), XmlIgnore]
+		public string SignalName_BreakoutEmaUpTics
+		{
+			get { return "BreakoutEmaUpTics";}
+		}
 		#endregion
 	}
 }
@@ -77,18 +121,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GIEMA[] cacheGIEMA;
-		public GIEMA GIEMA(int period)
+		public GIEMA GIEMA(int period, int offsetTicks)
 		{
-			return GIEMA(Input, period);
+			return GIEMA(Input, period, offsetTicks);
 		}
 
-		public GIEMA GIEMA(ISeries<double> input, int period)
+		public GIEMA GIEMA(ISeries<double> input, int period, int offsetTicks)
 		{
 			if (cacheGIEMA != null)
 				for (int idx = 0; idx < cacheGIEMA.Length; idx++)
-					if (cacheGIEMA[idx] != null && cacheGIEMA[idx].Period == period && cacheGIEMA[idx].EqualsInput(input))
+					if (cacheGIEMA[idx] != null && cacheGIEMA[idx].Period == period && cacheGIEMA[idx].OffsetTicks == offsetTicks && cacheGIEMA[idx].EqualsInput(input))
 						return cacheGIEMA[idx];
-			return CacheIndicator<GIEMA>(new GIEMA(){ Period = period }, input, ref cacheGIEMA);
+			return CacheIndicator<GIEMA>(new GIEMA(){ Period = period, OffsetTicks = offsetTicks }, input, ref cacheGIEMA);
 		}
 	}
 }
@@ -97,14 +141,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GIEMA GIEMA(int period)
+		public Indicators.GIEMA GIEMA(int period, int offsetTicks)
 		{
-			return indicator.GIEMA(Input, period);
+			return indicator.GIEMA(Input, period, offsetTicks);
 		}
 
-		public Indicators.GIEMA GIEMA(ISeries<double> input , int period)
+		public Indicators.GIEMA GIEMA(ISeries<double> input , int period, int offsetTicks)
 		{
-			return indicator.GIEMA(input, period);
+			return indicator.GIEMA(input, period, offsetTicks);
 		}
 	}
 }
@@ -113,14 +157,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GIEMA GIEMA(int period)
+		public Indicators.GIEMA GIEMA(int period, int offsetTicks)
 		{
-			return indicator.GIEMA(Input, period);
+			return indicator.GIEMA(Input, period, offsetTicks);
 		}
 
-		public Indicators.GIEMA GIEMA(ISeries<double> input , int period)
+		public Indicators.GIEMA GIEMA(ISeries<double> input , int period, int offsetTicks)
 		{
-			return indicator.GIEMA(input, period);
+			return indicator.GIEMA(input, period, offsetTicks);
 		}
 	}
 }

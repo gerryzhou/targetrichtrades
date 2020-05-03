@@ -79,9 +79,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// combined. It fills InidcatorTradeSignals
 		/// </summary>
 		public virtual bool CheckIndicatorSignals(){
-			if(HasPosition() == 0) {
+			TradeType ctt = CurrentTrade.CurrentTradeType;
+			if(HasPosition() == 0 || TradeType.ScaleIn == ctt || TradeType.ScaleOut == ctt) {
 				return CheckNewEntrySignals();// && CheckExitOCOSignals();
-			} else {
+			} else {				
 				return CheckExitSignals();
 			}
 		}
@@ -101,6 +102,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public virtual bool CheckExitSignals(){
+			TradeType tt = CurrentTrade.CurrentTradeType;
+			if(tt != null && tt == TradeType.ScaleOut)
+				return CheckScaleOutSignal();
 			return CheckExitOCOSignals();
 		}
 		
@@ -156,6 +160,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public virtual void SetEntrySignal(TradeAction action) {}
+		
+		public virtual void SetScaleInSignal(TradeAction action) {}
+		public virtual void SetScaleOutSignal(TradeAction action) {}
 		
 		public virtual void SetStopLossSignal(TradeAction action) {}
 		

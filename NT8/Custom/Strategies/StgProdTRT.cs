@@ -40,6 +40,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// 4) GetTradeSignal();
 	/// 5) CheckExitTrade() or CheckNewEntryTrade();
 	/// 6) PutTrade();
+	/// 
+	/// New approach for Event fired trades:
+	/// Lock the order entry when submit order;
+	/// Unlock the order entry when order executed;
+	/// or Check tradeActino at the close of each bar;
+	/// 
 	/// Indicator Combination:
 	/// * SnR: daily high/low
 	/// * Breakout: morning breakout of the SnR, big bar cross the SnR
@@ -133,13 +139,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 				
 				giSMI = GISMI(EMAPeriod1, EMAPeriod2, Range, SMITMAPeriod, SMICrossLevel);//(3, 5, 5, 8);
 				awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
-				giEMA = GIEMA(EMAPeriod1);
+				giEMA = GIEMA(EMAPeriod1, 20);
 				giVwap = GIVWAP();
 				//giPbSAR = GIPbSAR(AccPbSAR, AccMaxPbSAR, AccStepPbSAR);
 				giSnR = GISnR(false, false, true, true, true, this.ctxTRT.TimeOpen, this.ctxTRT.TimeClose);
 				giSnRPriorWM = GISnRPriorWM(true, false, false, false, true, false, false, false);
 				giHLnBars = GIHLnBars(5);
-				giSnR.RaiseCustomEvent += HandleCustomEvent;
+				
+				giHLnBars.RaiseIndicatorEvent += OnStopLossEvent;
+				giSnR.RaiseIndicatorEvent += OnStopLossEvent;
+				giVwap.RaiseIndicatorEvent += OnStopLossEvent;
+				giEMA.RaiseIndicatorEvent += OnStopLossEvent;
+				//this.RaiseStrategyEvent += OnGISnREvent;
 				
 				AddChartIndicator(giSMI);
 				AddChartIndicator(awOscillator);
@@ -164,7 +175,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		protected override void OnBarUpdate()
 		{
 			try {
-				GetHiLoNPrice();
+				//GetHiLoNPrice();
+				//giHLnBars.Update();
 				base.OnBarUpdate();
 				IndicatorProxy.TraceMessage(this.Name, PrintOut);
 				Print(String.Format("{0}: Stg={1}, GSZTrader={2}", CurrentBar, CurrentTrade.InstStrategy, IndicatorProxy.GSZTrader));
@@ -224,6 +236,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return true;
 			} else
 				return false;
+		}
+		
+		public override bool CheckScaleInSignal(){
+			return false;
+		}
+		
+		public override bool CheckScaleOutSignal(){
+			return false;
 		}
 		
 		/// <summary>
@@ -417,6 +437,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//return enSig;
 		}
 		
+		public override void SetScaleInSignal(TradeAction action) {
+			
+		}
+		
+		public override void SetScaleOutSignal(TradeAction action) {
+			
+		}
+		
 		/// <summary>
 		/// Set the stop loss signal for TradeAction, 
 		/// with the combination of command, perform/rule, indicators signals;
@@ -552,7 +580,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			new AlertMessage(this.Owner, "Alert triggerred!" + Environment.NewLine 
 				+ tsig.SignalToStr(), caption);
 				//if(CurrentBar == Bars.Count-2) {
-			if(State != State.Historical || CurrentBar >= Bars.Count-20) {
+			if(State != State.Historical || CurrentBar >= Bars.Count/1.1) {
 				Print(CurrentBar + ": InstallDir=" + NinjaTrader.Core.Globals.InstallDir);
 				//Bars.Instrument
 				//NinjaTrader.NinjaScript.Alert.AlertCallback(NinjaTrader.Cbi.Instrument.GetInstrument("MSFT"), this, "someId", NinjaTrader.Core.Globals.Now, Priority.High, "message", NinjaTrader.Core.Globals.InstallDir+@"\sounds\Alert1.wav", new SolidColorBrush(Colors.Blue), new SolidColorBrush(Colors.White), 0);
@@ -624,9 +652,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 			}
 			
-			SetStopLossSignal(ta);
-			SetProfitTargetSignal(ta);			
-			CurrentTrade.TradeAction = ta;
+//			SetStopLossSignal(ta);
+//			SetProfitTargetSignal(ta);			
+//			CurrentTrade.TradeAction = ta;
 			
 			IndicatorProxy.PrintLog(true, IsLiveTrading(),
 				String.Format("{0}:SetExitTradeAction after set ta, StopLossPrice={1}, ProfitTargetPrice={2}",
@@ -636,7 +664,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public override bool NewTradeAllowed() {
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
-				String.Format("{0}: NewOrderAllowed called....CurrentTrade.PosQuantity={1}, HasPosition={2}, TM_MaxOpenPosition={3}",
+				String.Format("{0}: NewOrderAllowed called in StgProdTRT...CurrentTrade.PosQuantity={1}, HasPosition={2}, TM_MaxOpenPosition={3}",
 			CurrentBar, CurrentTrade.PosQuantity, HasPosition(), TM_MaxOpenPosition));
 			if(CurrentTrade.PosQuantity < TM_MaxOpenPosition)
 				return true;
@@ -801,11 +829,45 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}		
 		#endregion
 
-		#region Event Handler
+		#region Indicator Event Handler
         // Define what actions to take when the event is raised.
-        void HandleCustomEvent(object sender, IndicatorEventArgs e)
+        void OnStopLossEvent(object sender, IndicatorEventArgs e)
         {
-            Print(String.Format("{0}: {1} sent this message: {2}", CurrentBar, sender.GetType().Name, e.Message));
+			IndicatorSignal isig = e.IndSignal;
+            Print(String.Format("{0}: {1} sent this message: {2}, B#={3}, signame={4}, bkdir={5}", 
+			CurrentBar, sender.GetType().Name, 
+			e.Message, isig.BarNo, isig.SignalName, isig.BreakoutDir.ToString()));
+			
+			TradeSignal tsig = new TradeSignal();
+			if(GetMarketPosition() == MarketPosition.Short && isig.BreakoutDir==BreakoutDirection.Up) {
+				tsig.Action = OrderAction.Buy;
+				//ptSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Resistance);
+			}
+			else if(GetMarketPosition() == MarketPosition.Long && isig.BreakoutDir==BreakoutDirection.Down) {
+				tsig.Action = OrderAction.Sell;
+				//ptSig.LimitPrice = GetProfitTargetPrice(SupportResistanceType.Support);
+			} else
+				return;
+			
+			tsig.BarNo = CurrentBar;			
+			tsig.SignalType = TradeSignalType.StopLoss;
+			tsig.Order_Type = OrderType.Market;
+			tsig.SignalSource = TradeSignalSource.Indicator;
+			tsig.OrderCalculationMode = CalculationMode.Price;
+			tsig.Quantity = CurrentTrade.PosQuantity;
+
+			if(HasPosition() > 0 && (State != State.Historical || CurrentBar >= Bars.Count/2)) {
+				//Print(String.Format("{0}: Alert Stop Loss, HasPosition={1}", CurrentBar, HasPosition()));
+				AlertTradeSignal(tsig, "Stop loss alert!");
+			}
+			
+			TradeAction ta = new TradeAction();
+			ta.BarNo = CurrentBar;
+			ta.ActionName = sender.GetType().Name + "-Stoploss";
+			ta.ActionType = TradeActionType.ExitSimple;
+			ta.ActionStatus = TradeActionStatus.New;
+			ta.StopLossSignal = tsig;
+			CurrentTrade.TradeAction = ta;
         }
 		#endregion
 		

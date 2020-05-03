@@ -85,6 +85,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 						CheckPerformance();
 					//Produce trade signals from indicator indicator signals
 					CheckIndicatorSignals();
+					//Set trade action replaced by the event hanlder from indicator signals
 					SetTradeAction();
 					//PutTrade();
 					TakeTradeAction();
@@ -214,5 +215,64 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 		}
 		#endregion
+
+		#region Custom Event Handler
+        // Declare the event using EventHandler<T>
+        public event EventHandler<StrategyEventArgs> RaiseStrategyEvent;
+
+        public virtual void FireEvent(StrategyEventArgs e)
+        {
+            // Write some code that does something useful here
+            // then raise the event. You can also raise an event
+            // before you execute a block of code.
+            //OnRaiseCustomEvent(new IndicatorEventArgs(this.GetType().Name, " did something: "));
+			OnRaiseStrategyEvent(e);
+        }
+
+        // Wrap event invocations inside a protected virtual method
+        // to allow derived classes to override the event invocation behavior
+        protected virtual void OnRaiseStrategyEvent(StrategyEventArgs e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            EventHandler<StrategyEventArgs> handler = RaiseStrategyEvent;
+
+            // Event will be null if there are no subscribers
+            if (handler != null)
+            {
+                // Format the string to send inside the CustomEventArgs parameter
+                e.Message += String.Format("Hello, at {0:HH:mm} now.", DateTime.Now); //$" at {DateTime.Now}"; available at C# 6
+
+                // Use the () operator to raise the event.
+                handler(this, e);
+            }
+        }
+		#endregion
 	}
+	
+    // Define a class to hold strategy event info
+    public class StrategyEventArgs : EventArgs
+    {
+        public StrategyEventArgs(string name, string msg)
+        {
+			EventName = name;
+            Message = msg;
+        }
+
+        public string Message
+        {
+            get; set;
+        }
+		
+        public string EventName
+        {
+            get; set;
+        }
+		
+		public TradeSignal TdSignal
+        {
+            get; set;
+        }
+    }
 }

@@ -39,17 +39,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// </summary>
 
 		
-		#region Methods
-		
+		#region Methods		
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="barsAgo"></param>
 		/// <param name="includeCurBar"></param>
 		/// <returns></returns>
-		public double GetHighestPrice(int barsAgo, bool includeCurBar) {
+		public double GetHighestPrice(int barsAgo, bool includeCurBar) {			
 			double hiPrc = includeCurBar? High[0] : High[1];
 			if(barsAgo > 0) {
+//				for(int i=0; i<barsAgo; i++) {
+//					Print(String.Format("{0}:GetHighestPrice={1}", CurrentBar, High[i]));
+//				}
 				hiPrc = Math.Max(hiPrc, High[HighestBar(High, barsAgo)]);
 			}
 			PrintLog(true, false, 
@@ -78,6 +80,42 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public double GetTypicalPrice(int barsAgo) {
 			MasterInstrument maIns = Bars.Instrument.MasterInstrument;			
 			return maIns.RoundToTickSize(Typical[barsAgo]);
+		}
+		
+		public double GetTickValue() {
+			MasterInstrument maIns = Bars.Instrument.MasterInstrument;
+			//Print("TickSize, name, pointvalue=" + maIns.TickSize + "," + maIns.Name + "," + maIns.PointValue);
+			return maIns.TickSize*maIns.PointValue;
+		}
+		
+		public double GetPriceByCurrency(double amt) {
+			return amt/Bars.Instrument.MasterInstrument.PointValue;
+		}
+		
+		public double GetPriceByTicks(int tics) {
+			return TickSize*tics;
+		}
+		
+		public double MovePriceByTicks(double prc, int tics) {
+			return prc + GetPriceByTicks(tics);
+		}
+
+		public double MovePriceByCurrency(double prc, double amt) {
+			return prc + GetPriceByCurrency(amt);			
+		}
+		
+		public int GetTicksByCurrency(double amt) {
+			int tic = -1;
+			if(amt > 0)
+				tic = (int)(amt/GetTickValue());
+			return tic;
+		}
+		
+		public double GetCurrencyByTicks(int tics) {
+			double amt = -1;
+			if(tics > 0)
+				amt = tics*GetTickValue();
+			return amt;
 		}
 		
 		#endregion

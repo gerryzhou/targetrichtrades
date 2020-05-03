@@ -40,7 +40,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		#region Event Handler
         // Declare the event using EventHandler<T>
-        public event EventHandler<IndicatorEventArgs> RaiseCustomEvent;
+        public event EventHandler<IndicatorEventArgs> RaiseIndicatorEvent;
 
         public virtual void FireEvent(IndicatorEventArgs e)
         {
@@ -48,23 +48,23 @@ namespace NinjaTrader.NinjaScript.Indicators
             // then raise the event. You can also raise an event
             // before you execute a block of code.
             //OnRaiseCustomEvent(new IndicatorEventArgs(this.GetType().Name, " did something: "));
-			OnRaiseCustomEvent(e);
+			OnRaiseIndicatorEvent(e);
         }
 
         // Wrap event invocations inside a protected virtual method
         // to allow derived classes to override the event invocation behavior
-        protected virtual void OnRaiseCustomEvent(IndicatorEventArgs e)
+        protected virtual void OnRaiseIndicatorEvent(IndicatorEventArgs e)
         {
             // Make a temporary copy of the event to avoid possibility of
             // a race condition if the last subscriber unsubscribes
             // immediately after the null check and before the event is raised.
-            EventHandler<IndicatorEventArgs> handler = RaiseCustomEvent;
+            EventHandler<IndicatorEventArgs> handler = RaiseIndicatorEvent;
 
             // Event will be null if there are no subscribers
             if (handler != null)
             {
                 // Format the string to send inside the CustomEventArgs parameter
-                e.Message += String.Format("Hello, at {0:HH:mm} now.", DateTime.Now); //$" at {DateTime.Now}"; available at C# 6
+                e.Message += String.Format("{0} RaiseIndicatorEvent at {1:HH:mm} now.", this.GetType().Name, Time[0]); //$" at {DateTime.Now}"; available at C# 6
 
                 // Use the () operator to raise the event.
                 handler(this, e);
@@ -92,7 +92,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		private string event_name;
         private string message;
-		private IndicatorSignal indSignal;
 
         public string Message
         {
@@ -108,8 +107,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		public IndicatorSignal IndSignal
         {
-            get { return indSignal; }
-            set { indSignal = value; }
+            get; set;
         }
     }
 }

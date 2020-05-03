@@ -220,18 +220,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <param name="time_end">end time</param>
 		/// <param name="session_start">the overnight session start time: 170000 for ES</param>
 		/// <returns></returns>
-		public bool IsTradingTime(int time_start, int time_end, int session_start) {
-			int time_now = ToTime(Time[0]);
-			bool isTime= false;
-			if(time_start >= session_start) {
-				if(time_now >= time_start || time_now <= time_end)
-					isTime = true;
-			}
-			else if (time_now >= time_start && time_now <= time_end) {
-				isTime = true;
-			}
-			return isTime;
-		}
+//		public bool IsTradingTime(int time_start, int time_end, int session_start) {
+//			int time_now = ToTime(Time[0]);
+//			bool isTime= false;
+//			if(time_start >= session_start) {
+//				if(time_now >= time_start || time_now <= time_end)
+//					isTime = true;
+//			}
+//			else if (time_now >= time_start && time_now <= time_end) {
+//				isTime = true;
+//			}
+//			return isTime;
+//		}
 		
 		/// <summary>
 		/// Check if now is the first bar pass the startTime

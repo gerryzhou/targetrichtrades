@@ -18,6 +18,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -63,8 +64,31 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 
 			PlotVWAP[0] = (iCumTypicalVolume / iCumVolume);
+			CheckVwapBreakoutDayHLEvent();
 		}
-
+		
+		public void CheckVwapBreakoutDayHLEvent() {
+			IndicatorSignal isig = new IndicatorSignal();
+			double openD = CurrentDayOHL().CurrentOpen[0];
+			//if(CurrentBar < 300)
+				Print(String.Format("{0}:PlotVWAP={1},OpenD={2}",
+				CurrentBar, PlotVWAP[0], openD));
+			if(PlotVWAP[0] < openD) {
+				isig.BreakoutDir = BreakoutDirection.Down;
+				isig.SignalName = SignalName_BreakoutOpenD;
+			} else if(PlotVWAP[0] > openD) {
+				isig.BreakoutDir = BreakoutDirection.Up;
+				isig.SignalName = SignalName_BreakoutOpenD;
+			} else
+				return;
+			
+			isig.BarNo = CurrentBar;
+			isig.IndicatorSignalType = SignalType.SimplePriceAction;
+			IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckVwapBreakoutDayHLEvent: ");
+			ievt.IndSignal = isig;
+			//FireEvent(ievt);
+			OnRaiseIndicatorEvent(ievt);
+		}
 		#region Properties
 
 		[Browsable(false)]
@@ -74,7 +98,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 			get { return Values[0]; }
 		}
 		#endregion
-
+		
+		#region Pre-defined signal name
+		[Browsable(false), XmlIgnore]
+		public string SignalName_BreakoutOpenD
+		{
+			get { return "BreakoutOpenD";}
+		}
+		#endregion
 	}
 }
 

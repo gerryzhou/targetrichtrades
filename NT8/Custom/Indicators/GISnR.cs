@@ -199,7 +199,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckLastDayHLEvent: ");
 			ievt.IndSignal = isig;
 			//FireEvent(ievt);
-			OnRaiseCustomEvent(ievt);
+			OnRaiseIndicatorEvent(ievt);
 		}
 		
 		#region Properties
@@ -326,7 +326,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		#endregion
 		
-		#region
+		#region Pre-defined signal name
 		[Browsable(false), XmlIgnore]
 		public string SignalName_BreakoutLastDLow
 		{

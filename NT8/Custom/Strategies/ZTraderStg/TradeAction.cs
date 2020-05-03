@@ -93,9 +93,18 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		public TradeActionStatus ActionStatus  { get; set; }
 		
+		/// <summary>
+		/// Include regular entry and scale in entry
+		/// </summary>
 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
 		[DefaultValueAttribute(null)]
 		public TradeSignal EntrySignal {
+			get; set;
+		}
+		
+		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		[DefaultValueAttribute(null)]
+		public TradeSignal ScaleOutSignal {
 			get; set;
 		}
 		
@@ -115,6 +124,23 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		/// Entry price
 		/// </summary>
 		public double EntryPrice {
+			get{
+				if(EntrySignal == null) return -1;
+				else if(OrderType.StopMarket.Equals(EntrySignal.Order_Type))
+					return EntrySignal.StopPrice;
+				else return EntrySignal.LimitPrice;
+			}
+			set {
+				if(OrderType.StopMarket.Equals(EntrySignal.Order_Type))
+					EntrySignal.StopPrice = value;
+				else EntrySignal.LimitPrice = value;
+			}
+		}
+		
+		/// <summary>
+		/// Exit price, for scale out
+		/// </summary>
+		public double ExitPrice {
 			get{
 				if(EntrySignal == null) return -1;
 				else if(OrderType.StopMarket.Equals(EntrySignal.Order_Type))

@@ -22,6 +22,8 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.AddOns;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 // This namespace holds indicators in this folder and is required. Do not change it.
@@ -46,8 +48,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 				IsOverlay					= true;
 				IsSuspendedWhileInactive	= true;
 				Period						= 5;
-
-				AddPlot(Brushes.Goldenrod, NinjaTrader.Custom.Resource.NinjaScriptIndicatorNameEMA);
+				Calculate					= Calculate.OnBarClose;
+				AddPlot(Brushes.Goldenrod, "LowestN");
+				AddPlot(Brushes.Goldenrod, "HighestN");
 			}
 			else if (State == State.Configure)
 			{
@@ -58,10 +61,39 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
-			Values[0][0] = (CurrentBar == 0 ? Low[0] : GetLowestPrice(Period, false));
-			Values[1][0] = (CurrentBar == 0 ? High[0] : GetHighestPrice(Period, false));
-		}
+			if(CurrentBar > Period) {
+				LowestN[0] = CurrentBar < Period ? Low[0] : GetLowestPrice(Period, false);
+//				LowestN[0] = (CurrentBar < Period ? Low[0] : GetLowestPrice(Period, false));
+				HighestN[0] = CurrentBar < Period ? High[0] : GetHighestPrice(Period, false);
+				CheckBreakoutNBarsHLEvent();
+				}
 
+		}
+		
+		public void CheckBreakoutNBarsHLEvent() {
+			if(LowestN.Count < 2 || HighestN.Count < 2)
+				return;
+			IndicatorSignal isig = new IndicatorSignal();
+			//if(CurrentBar < 300)
+				Print(String.Format("{0}:Close={1},LowestN={2},HighestN={3}",
+				CurrentBar, Close[0], LowestN[1], HighestN[1]));
+			if(Close[0] < LowestN[1]) {
+				isig.BreakoutDir = BreakoutDirection.Down;
+				isig.SignalName = SignalName_BreakoutNBarsLow;
+			} else if(Close[0] > HighestN[1]) {
+				isig.BreakoutDir = BreakoutDirection.Up;
+				isig.SignalName = SignalName_BreakoutNBarsHigh;
+			} else
+				return;
+			
+			isig.BarNo = CurrentBar;
+			isig.IndicatorSignalType = SignalType.SimplePriceAction;
+			IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckBreakoutNBarsHLEvent: ");
+			ievt.IndSignal = isig;
+			//FireEvent(ievt);
+			OnRaiseIndicatorEvent(ievt);
+		}
+		
 		#region Properties
 		[Range(1, int.MaxValue), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "Period", GroupName = "NinjaScriptParameters", Order = 0)]
@@ -80,6 +112,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public Series<double> HighestN
 		{
 			get { return Values[1]; }
+		}
+		#endregion
+
+		#region Pre-defined signal name
+		[Browsable(false), XmlIgnore]
+		public string SignalName_BreakoutNBarsLow
+		{
+			get { return "BreakoutNBarsLow";}
+		}
+
+		[Browsable(false), XmlIgnore]
+		public string SignalName_BreakoutNBarsHigh
+		{
+			get { return "BreakoutNBarsHigh";}
 		}
 		#endregion
 	}

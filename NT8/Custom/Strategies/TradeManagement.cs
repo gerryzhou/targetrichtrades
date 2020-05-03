@@ -87,6 +87,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public virtual void PutLiquidateTrade() {
+			if(IsUnmanaged)
+				NewStopLossOrderUM();
 		}
 			
 		/// <summary>
@@ -200,7 +202,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 			
 			//indicatorProxy.TraceMessage(this.Name, prtLevel);
-			if (IsTradingTime(170000) && HasPosition() == 0)
+			if (IsTradingTime(180000))// && HasPosition() == 0)
 			{
 				if (CurrentTrade.BracketOrder.EntryOrder == null || CurrentTrade.BracketOrder.EntryOrder.OrderState != OrderState.Working || TM_EnTrailing)
 				{					
@@ -317,6 +319,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			CurrentTrade.barsSinceEnOrd = 0;
 		}
+		
+		/// <summary>
+		/// Submit unmanaged long limit order, set the order object in OnOrderUpdate handler
+		/// </summary>
+		/// <param name="msg"></param>
+		public virtual void NewStopLossOrderUM()
+		{
+			TradeAction ta = CurrentTrade.TradeAction;
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewStopLossOrderUM"
+			+";CurrentTrade.TradeAction.StopLossSignal.SignalName=" + ta.StopLossSignal.SignalName
+			+";StopLossSignal.Quantity=" + ta.StopLossSignal.Quantity);
+			SubmitOrderUnmanaged(0, ta.StopLossSignal.Action, ta.StopLossSignal.Order_Type, 
+			ta.StopLossSignal.Quantity, 0, 0, "", ta.StopLossSignal.SignalName);
+			
+			CurrentTrade.barsSinceEnOrd = 0;
+		}
+
 		#endregion
 			
 		#region Entry Order functions
@@ -362,6 +381,46 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		
+		public virtual void NewScaleInOrder() {
+			if (CurrentTrade.BracketOrder.EntryOrder !=null &&
+				CurrentTrade.BracketOrder.EntryOrder.OrderState == OrderState.Working) {
+					CancelEntryOrders();
+			}
+			if(IsUnmanaged) {
+				NewScaleInOrderUM();
+			} else {
+				NewScaleInOrderMG();
+			}
+			CurrentTrade.barsSinceEnOrd = 0;
+		}
+		
+		public virtual void NewScaleInOrderMG() {
+		}
+		
+		/// <summary>
+		/// Submit unmanaged entry simple order, set the order object in OnOrderUpdate handler
+		/// </summary>
+		public virtual void NewScaleInOrderUM() {
+			TradeSignal tSig = CurrentTrade.TradeAction.EntrySignal;
+			try {
+				//tSig.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewScaleInOrderUM"
+				+";EntrySignal.SignalName=" + tSig.SignalName
+				+";EntrySignal.Action=" + tSig.Action.ToString()
+				+";EntrySignal.OrderType=" + tSig.Order_Type.ToString()
+				+";EntrySignal.Quantity=" + tSig.Quantity
+				+";EntrySignal.OrderCalculationMode=" + tSig.OrderCalculationMode.ToString()
+				+";EntrySignal.LimitPrice=" + tSig.LimitPrice
+				+";EntrySignal.StopPrice=" + tSig.StopPrice);
+
+				SubmitOrderUnmanaged(0, tSig.Action, tSig.Order_Type, tSig.Quantity,
+				tSig.LimitPrice, tSig.StopPrice, "", tSig.SignalName);
+				
+				CurrentTrade.barsSinceEnOrd = 0;
+			} catch(Exception ex) {
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}:NewScaleInOrderUM EX={1}", CurrentBar, ex.StackTrace));
+			}
+		}
 		#endregion
 		
 		#region Exit Order functions
@@ -656,6 +715,38 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		
+		public virtual void SetScaleOutOrder() {
+			CancelExitOCO();
+			if(IsUnmanaged) {
+				SetScaleOutOrderUM();
+				return;
+			}
+		}
+		
+		public virtual void SetScaleOutOrderUM() {
+			TradeAction ta = CurrentTrade.TradeAction;
+			if(ta == null || ta.ScaleOutSignal == null) {
+				IndicatorProxy.PrintLog(true, IsLiveTrading(),
+					CurrentBar + ":SetScaleOutOrderUM ta==null or ScaleOutSignal==null"); 
+				return;
+			}
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":SetScaleOutOrderUM" 
+			+ ";CurrentTrade.TradeAction.ScaleOutSignal.SignalName=" + ta.ScaleOutSignal.SignalName
+			+ ";CurrentTrade.TDID=" + CurrentTrade.TradeID
+			+ ";GetExitOrderAction()=" + GetExitOrderAction().ToString()			
+			+ ";ExitPrice=" + ta.ExitPrice
+			+ ";ScaleOutSignal.Quantity=" + ta.ScaleOutSignal.Quantity
+			+ ";avgPrc=" + GetAvgPrice()
+			+ ";Position.Quantity=" + HasPosition());
+
+			try{
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":SetScaleOutOrderUM--SubmitOrderUnmanaged");
+				SubmitOrderUnmanaged(0, ta.ScaleOutSignal.Action, OrderType.Market, ta.ScaleOutSignal.Quantity,
+				0, ta.ExitPrice, "", ta.ScaleOutSignal.SignalName);
+			} catch(Exception ex) {
+				throw new Exception("Ex SetScaleOutOrderUM:" + ex.Message);
+			}
+		}
 		//SetParabolicStop(string fromEntrySignal, CalculationMode mode, double value, bool isSimulatedStop, double acceleration, double accelerationMax, double accelerationStep)
 		#endregion
 		

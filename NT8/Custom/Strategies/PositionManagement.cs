@@ -43,12 +43,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return pos;
 		}
 		
-		public double GetTickValue() {
-			MasterInstrument maIns = Bars.Instrument.MasterInstrument;
-			//Print("TickSize, name, pointvalue=" + maIns.TickSize + "," + maIns.Name + "," + maIns.PointValue);
-			return maIns.TickSize*maIns.PointValue;
-		}
-		
 		public double GetAvgPrice() {
 			MasterInstrument maIns = Bars.Instrument.MasterInstrument;
 			if(IsLiveTrading())

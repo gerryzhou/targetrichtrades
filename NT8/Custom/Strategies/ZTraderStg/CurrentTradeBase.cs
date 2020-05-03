@@ -206,7 +206,7 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 			this.TradeAction.TrailingProfitTargetTics = 0;
 			switch(InstStrategy.MM_TLSLCalculationMode) {
 				case CalculationMode.Currency:
-					InstStrategy.MM_TrailingStopLossTic = InstStrategy.GetTicksByCurrency(InstStrategy.MM_TrailingStopLossAmt);
+					InstStrategy.MM_TrailingStopLossTic = InstStrategy.IndicatorProxy.GetTicksByCurrency(InstStrategy.MM_TrailingStopLossAmt);
 					break;
 				
 				case CalculationMode.Percent:
@@ -462,15 +462,13 @@ namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 		
 		#region Properties		
 		/// <summary>
-		/// Removed since the type is defined at TradeAction;
-		/// TradeType is not clear concept, a trade includs entry, exit, etc.
-		/// The tradeAction will define the type of action
+		/// TradeType is back to accommondate scale in/out, a trade includs entry, exit, etc.
+		/// The tradeAction will define the type of action take for order entry
 		/// </summary>
-//		[Browsable(false), XmlIgnore]
-//		public TradeType CurrentTradeType {
-//			get{ return tradeType;}
-//			set { tradeType = value;}
-//		}
+		[Browsable(false), XmlIgnore]
+		public TradeType CurrentTradeType {
+			get; set;
+		}
 		/// <summary>
 		/// The unique ID for each trade
 		/// TD-yyyyMMddHHmmssfff
