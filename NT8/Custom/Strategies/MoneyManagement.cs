@@ -32,14 +32,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 	{		
 		#region Money Mgmt Functions
 		
-		public virtual bool IsProfitFactorValid(double risk, double reward, double r) {
+		public virtual bool IsProfitFactorValid(double risk, double reward, double pfMin, double pfMax) {
 			bool is_valid = false;
-			if(risk > 0 && reward > 0 && r <= reward/risk)
+			if(risk > 0 && reward > 0 && pfMin <= reward/risk && pfMax >= reward/risk)
 				is_valid = true;
 			return is_valid;
 		}
 		
-		public double CalProfitTargetAmt(double price, double profitFactor) {
+		public double CalProfitTargetAmt(double price, double profitFactorMin, double profitFactorMax) {
 			IndicatorProxy.PrintLog(true, true, 
 				CurrentBar + ":CalProfitTargetAmt;IsLiveTrading=" + IsLiveTrading() +
 				";=GetMarketPosition()" + GetMarketPosition().ToString() +
@@ -50,8 +50,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				);			
 			switch(MM_SLCalculationMode) {
 				case CalculationMode.Currency:
-					if(profitFactor > 0)
-						MM_ProfitTargetAmt = profitFactor*MM_StopLossAmt;
+					if(profitFactorMax > 0)
+						MM_ProfitTargetAmt = profitFactorMax*MM_StopLossAmt;
 					break;
 //				case CalculationMode.Price:
 //					if(profitFactor == 0)
@@ -77,7 +77,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <param name="avgPrice">Avg entry price</param>
 		/// <param name="profitFactor">PT/SL>0</param>
-		public void CalExitOcoPrice(double avgPrice, double profitFactor) {
+		public void CalExitOcoPrice(double avgPrice, double profitFactorMin, double profitFactorMax) {
 			int prtLevel = 0;
 			IndicatorProxy.TraceMessage(this.Name, prtLevel);
 			IndicatorProxy.PrintLog(true, true, 
@@ -90,8 +90,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				);
 			switch(MM_SLCalculationMode) {
 				case CalculationMode.Currency:
-					if(profitFactor > 0)
-						MM_ProfitTargetAmt = profitFactor*MM_StopLossAmt;
+					if(profitFactorMax > 0)
+						MM_ProfitTargetAmt = profitFactorMax*MM_StopLossAmt;
 					if(GetMarketPosition() == MarketPosition.Long) {
 						CurrentTrade.TradeAction.StopLossPrice = avgPrice - IndicatorProxy.GetPriceByCurrency(MM_StopLossAmt);
 						CurrentTrade.TradeAction.ProfitTargetPrice = avgPrice + IndicatorProxy.GetPriceByCurrency(MM_ProfitTargetAmt);
@@ -102,8 +102,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 					}
 					break;
 				case CalculationMode.Ticks:
-					if(profitFactor > 0)
-						MM_ProfitTgtTic = (int)(profitFactor*MM_StopLossTic);
+					if(profitFactorMax > 0)
+						MM_ProfitTgtTic = (int)(profitFactorMax*MM_StopLossTic);
 					if(GetMarketPosition() == MarketPosition.Long) {
 						CurrentTrade.TradeAction.StopLossPrice = avgPrice - IndicatorProxy.GetPriceByTicks(MM_StopLossTic);
 						CurrentTrade.TradeAction.ProfitTargetPrice = avgPrice + IndicatorProxy.GetPriceByTicks(MM_ProfitTgtTic);
@@ -396,6 +396,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 			double plrt = SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit;//Performance.RealtimeTrades.TradesPerformance.Currency.CumProfit;
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				CurrentBar + "-" + AccName + ": Cum all PnL= " + pl + ", Cum runtime PnL= " + plrt);
+			if (IndicatorProxy.IsLastBarOnChart() > 0 && SystemPerformance.AllTrades.Count > 0)
+			{
+			    foreach (Trade myTrade in SystemPerformance.AllTrades)
+			    {
+			    	if (myTrade.Entry.MarketPosition == MarketPosition.Long)
+			        	IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+						String.Format("#{0}, ProfitCurrency={1}", myTrade.TradeNumber, myTrade.ProfitCurrency));
+			    }
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+					String.Format("There are {0} trades, NetProfit={1}",
+					SystemPerformance.AllTrades.Count, SystemPerformance.AllTrades.TradesPerformance.NetProfit));
+			}
 			return plrt;
 		}
 		
@@ -954,14 +966,23 @@ namespace NinjaTrader.NinjaScript.Strategies
             set{mm_DailyLossLmt = Math.Min(-100, value);}
         }
 
-		[Description("Profit Factor")]
+		[Description("Profit Factor Min")]
  		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitFactor", GroupName = GPS_MONEY_MGMT, Order = ODG_ProfitFactor)]	
-        public double MM_ProfitFactor
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitFactorMin", GroupName = GPS_MONEY_MGMT, Order = ODG_ProfitFactorMin)]	
+        public double MM_ProfitFactorMin
         {
-            get{return mm_ProfitFactor;}
-            set{mm_ProfitFactor = Math.Max(0, value);}
-        }		
+            get{return mm_ProfitFactorMin;}
+            set{mm_ProfitFactorMin = Math.Max(0, value);}
+        }
+		
+		[Description("Profit Factor Max")]
+ 		[Range(0, double.MaxValue), NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ProfitFactorMax", GroupName = GPS_MONEY_MGMT, Order = ODG_ProfitFactorMax)]	
+        public double MM_ProfitFactorMax
+        {
+            get{return mm_ProfitFactorMax;}
+            set{mm_ProfitFactorMax = Math.Max(0, value);}
+        }
 		
 		[Description("Stop Loss Price Gap Preference")]
  		[NinjaScriptProperty, XmlIgnore]
@@ -1010,7 +1031,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private CalculationMode mm_TLSLCalculationMode = CalculationMode.Ticks;
 		
 		private double mm_DailyLossLmt = -200;
-		private double mm_ProfitFactor = 2;
+		private double mm_ProfitFactorMin = 0.1;
+		private double mm_ProfitFactorMax = 2.5;
 		
 		private PriceGap mm_SLPriceGapPref = PriceGap.Tighter;
 		

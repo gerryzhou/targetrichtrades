@@ -844,8 +844,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (execution.Order != null && execution.Order.OrderState == OrderState.Filled) {
 				if(HasPosition() != 0) {
 					//SetEntryOrder(OrderSignalName.EntryShort, execution.Order);					
-					CalProfitTargetAmt(price, MM_ProfitFactor);
-					CalExitOcoPrice(GetAvgPrice(), MM_ProfitFactor);
+					CalProfitTargetAmt(price, MM_ProfitFactorMin, MM_ProfitFactorMax);
+					CalExitOcoPrice(GetAvgPrice(), MM_ProfitFactorMin, MM_ProfitFactorMax);
 					SetSimpleExitOCO();
 				}
 				//if(TG_PrintOut > -1)

@@ -81,9 +81,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public const int ODG_BECalculationMode = 17;
 		public const int ODG_TLSLCalculationMode = 18;
 		public const int ODG_DailyLossLmt = 19;
-		public const int ODG_ProfitFactor = 20;
-		public const int ODG_SLPriceGapPref = 21;
-		public const int ODG_PTPriceGapPref = 22;
+		public const int ODG_ProfitFactorMin = 20;
+		public const int ODG_ProfitFactorMax = 21;
+		public const int ODG_SLPriceGapPref = 22;
+		public const int ODG_PTPriceGapPref = 23;
 //		public const int ODG_ = ;
 
 		#endregion

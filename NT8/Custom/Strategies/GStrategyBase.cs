@@ -77,10 +77,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Name										= "GSZTraderBase";
 			Calculate									= Calculate.OnPriceChange;
 			//This property does not work for unmanaged order entry;
-			EntriesPerDirection							= 1;
+			EntriesPerDirection							= 2;
 			//QuantityType = QuantityType.DefaultQuantity;
 			SetOrderQuantity							= SetOrderQuantity.DefaultQuantity;
-			DefaultQuantity								= 1;
+			DefaultQuantity								= 5;			
 			EntryHandling								= EntryHandling.AllEntries;
 			//SyncAccountPosition = true;
 			IsExitOnSessionCloseStrategy				= true;

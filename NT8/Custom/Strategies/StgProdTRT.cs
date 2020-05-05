@@ -180,6 +180,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//GetHiLoNPrice();
 				//giHLnBars.Update();
 				base.OnBarUpdate();
+				CheckPerformance();
 				IndicatorProxy.TraceMessage(this.Name, PrintOut);
 				Print(String.Format("{0}: Stg={1}, GSZTrader={2}", CurrentBar, CurrentTrade.InstStrategy, IndicatorProxy.GSZTrader));
 			} catch (Exception ex) {
@@ -560,21 +561,27 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Direction dir = GetDirection(giEMA);// GetDirection(giPbSAR);
 				Direction dirvwap = GetDirectionVwap();
 				if(dir.TrendDir == TrendDirection.Up && dirvwap.TrendDir == TrendDirection.Up) {
-					IndicatorSignal vSig = giVwap.GetIndicatorSignalByActionType(CurrentBar, SignalActionType.CrossUnder);
+//					IndicatorSignal vSig = giVwap.GetIndicatorSignalByActionType(CurrentBar, SignalActionType.CrossUnder);
 					offset_sl = GetStopLossOffset(SupportResistanceType.Support, Close[0]);
 					offset_pt = GetProfitTargetOffset(SupportResistanceType.Resistance, Close[0]);
 					
-					IndicatorProxy.PrintLog(true, IsLiveTrading(),
-						String.Format("{0}:{1} CheckVwapCrossSignal={2},{3}", CurrentBar, vSig.BarNo, vSig.SignalName, vSig.SignalAction.SignalActionType));
-					return true;//IsProfitFactorValid(offset_sl, offset_pt, this.MM_ProfitFactor);
+//					IndicatorProxy.PrintLog(true, IsLiveTrading(),
+//						String.Format("{0}:{1} CheckVwapCrossSignal={2},{3}", CurrentBar, vSig.BarNo, vSig.SignalName, vSig.SignalAction.SignalActionType));
+					if(this.MM_ProfitFactorMin > 0 && this.MM_ProfitFactorMax > 0)
+						return IsProfitFactorValid(offset_sl, offset_pt, this.MM_ProfitFactorMin, this.MM_ProfitFactorMax);
+					else
+						return true;
 				}
 				if(dir.TrendDir == TrendDirection.Down && dirvwap.TrendDir == TrendDirection.Down) {
-					IndicatorSignal vSig = giVwap.GetIndicatorSignalByActionType(CurrentBar, SignalActionType.CrossOver);
+//					IndicatorSignal vSig = giVwap.GetIndicatorSignalByActionType(CurrentBar, SignalActionType.CrossOver);
 					offset_sl = GetStopLossOffset(SupportResistanceType.Resistance, Close[0]);
 					offset_pt = GetProfitTargetOffset(SupportResistanceType.Support, Close[0]);
-					IndicatorProxy.PrintLog(true, IsLiveTrading(),
-						String.Format("{0}:{1} CheckVwapCrossSignal={2},{3}", CurrentBar, vSig.BarNo, vSig.SignalName, vSig.SignalAction.SignalActionType));
-					return true;//IsProfitFactorValid(offset_sl, offset_pt, this.MM_ProfitFactor);
+//					IndicatorProxy.PrintLog(true, IsLiveTrading(),
+//						String.Format("{0}:{1} CheckVwapCrossSignal={2},{3}", CurrentBar, vSig.BarNo, vSig.SignalName, vSig.SignalAction.SignalActionType));
+					if(this.MM_ProfitFactorMin > 0 && this.MM_ProfitFactorMax > 0)
+						return IsProfitFactorValid(offset_sl, offset_pt, this.MM_ProfitFactorMin, this.MM_ProfitFactorMax);
+					else
+						return true;
 				}
 			}
 			
@@ -591,7 +598,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			new AlertMessage(this.Owner, "Alert triggerred!" + Environment.NewLine 
 				+ tsig.SignalToStr(), caption);
 				//if(CurrentBar == Bars.Count-2) {
-			if(State != State.Historical || CurrentBar >= Bars.Count-20) {
+			if(State != State.Historical || CurrentBar >= Bars.Count-2) {
 				Print(CurrentBar + ": InstallDir=" + NinjaTrader.Core.Globals.InstallDir);
 				//Bars.Instrument
 				//NinjaTrader.NinjaScript.Alert.AlertCallback(NinjaTrader.Cbi.Instrument.GetInstrument("MSFT"), this, "someId", NinjaTrader.Core.Globals.Now, Priority.High, "message", NinjaTrader.Core.Globals.InstallDir+@"\sounds\Alert1.wav", new SolidColorBrush(Colors.Blue), new SolidColorBrush(Colors.White), 0);
@@ -760,7 +767,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			offset = Math.Max(offset, giEMA.GetEmaOffset(srt, price));
 
 			IndicatorProxy.PrintLog(true, IsLiveTrading(),
-				String.Format("{0}: GetProfitTargetOffset={1}, ProfitFactor={2}", CurrentBar, offset, this.MM_ProfitFactor));
+				String.Format("{0}: GetProfitTargetOffset={1}, ProfitFactorMin={2}, ProfitFactorMax={3}", CurrentBar, offset, this.MM_ProfitFactorMin, this.MM_ProfitFactorMax));
 			return offset;
 		}
 		
