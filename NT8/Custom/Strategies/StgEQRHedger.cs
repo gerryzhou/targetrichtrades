@@ -74,6 +74,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				AddChartIndicator(rsi);
 				AddChartIndicator(adx);
 				AddChartIndicator(giPctSpd);
+				Print(String.Format("{0}: IsUnmanaged={1}", this.GetType().Name, IsUnmanaged));
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));
 			}			
 		}
@@ -106,8 +107,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					Draw.Square(this, "My Square" + CurrentBar, false, 0, High[0] + TickSize, Brushes.DodgerBlue);
 
 					// Enter a long position via a limit order at the current ask price
-					//EnterLongLimit(GetCurrentAsk(), "RSI");
-					Print(String.Format("{0}: IsUnmanaged={1}", CurrentBar, IsUnmanaged));
+					//EnterLongLimit(GetCurrentAsk(), "RSI");					
 					//EnterLong(1);
 					EnterLong(0, 1, "RSI");
 					EnterShort(1, 1, "RSI");

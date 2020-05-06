@@ -24,19 +24,26 @@ using NinjaTrader.NinjaScript.DrawingTools;
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators
 {
-	public class GIPctSpd : Indicator
+	/// <summary>
+	/// CapRatio: ES:RTY=1.7:1, NQ:RTY=2.1:1, NQ:ES=1.25:1
+	/// </summary>
+	public class GIPctSpd : GIndicatorBase
 	{
-		private Series<double> PctSpd;
-		private Series<double> RocSpd;
+		private Series<double> PctChgMax;
+		private Series<double> PctChgMin;
+		private Series<double> RocChg;
 		private PriorDayOHLC lastDayOHLC;
-
+		double PctSpdMax, PctSpdMin;
+		//The BarsInProgress for PctChgMax and PctChgMin
+		int PctChgMaxBip=-1, PctChgMinBip=-1;
+		
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
 			{
 				Description									= @"Calculate %chg spread for the underlining data series, pick the most %chg and least %chg instrument to calculate the spread;";
 				Name										= "GIPctSpd";
-				Calculate									= Calculate.OnBarClose;
+				Calculate									= Calculate.OnPriceChange;
 				IsOverlay									= false;
 				DisplayInDataBox							= true;
 				DrawOnPricePanel							= false;
@@ -47,7 +54,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//Disable this property if your indicator requires custom values that cumulate with each new market data event. 
 				//See Help Guide for additional information.
 				IsSuspendedWhileInactive					= true;
-				RocPeriod					= 8;
+				RocPeriod									= 8;
+				TM_OpenStartH								= 8;
+				TM_OpenStartM								= 0;
 				AddPlot(Brushes.Aqua, "PlotPctSpd");
 				AddPlot(Brushes.Orange, "PlotRocSpd");
 				AddLine(Brushes.Blue, 0, "LineZero");
@@ -59,9 +68,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			else if (State == State.DataLoaded)
 			{				
-				PctSpd = new Series<double>(this);
-				RocSpd = new Series<double>(this);
-				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));
+				PctChgMax = new Series<double>(this);
+				PctChgMin = new Series<double>(this);
+				RocChg = new Series<double>(this);
+				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", 
+					this.GetType().Name, BarsArray.Length));
 			}
 		}
 
@@ -69,8 +80,41 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			if(CurrentBar < BarsRequiredToPlot)
 				return;
-			lastDayOHLC = PriorDayOHLC(BarsArray[BarsArray.Length-1]);
-			Print(String.Format("{0}: {1} PriorClose={2}", CurrentBar, this.GetType().Name, lastDayOHLC.PriorClose[0]));
+			//;
+			if(BarsInProgress >= 0) {
+				int cutoff = GetTimeByHM(TM_OpenStartH, TM_OpenStartM, false);
+				int t0 = GetTimeByHM(Time[0].Hour, Time[0].Minute, false);
+				int t1 = GetTimeByHM(Time[1].Hour, Time[1].Minute, false);
+				if(t0 >= cutoff && t1 < cutoff) {
+					Print("Cutoff time=" + cutoff);
+				}
+				lastDayOHLC = PriorDayOHLC(BarsArray[BarsInProgress]);
+				double cl = Closes[BarsInProgress][0];
+				double lcl = PriorDayOHLC(BarsArray[BarsInProgress]).PriorClose[0];
+				if(lcl > 0) {
+					double chg = Math.Round(100*(cl-lcl)/lcl, 2);
+					Print("Chg=" + chg.ToString() + ", Time[0]=" + Time[0]);
+					if(PctChgMax[0] == null || chg >= PctChgMax[0]) {
+						PctChgMax[0] = chg;
+						PctChgMaxBip = BarsInProgress;
+					}
+					if(PctChgMin[0] == null || chg <= PctChgMin[0]) {
+						PctChgMin[0] = chg;
+						PctChgMinBip = BarsInProgress;
+					}
+				Print(String.Format("{0}: {1} BarsInProgress={2}, Close[0]={3}, PriorClose={4}, chg={5}, PctChgMaxBip={6}, PctChgMinBip={7}", 
+					CurrentBar, this.GetType().Name, BarsInProgress, cl, lcl,
+					chg, PctChgMaxBip, PctChgMinBip));
+				}
+				
+				if(PctChgMax[0] != null && PctChgMin[0] != null) {
+				//if(BarsInProgress == BarsArray.Length-1)
+				PlotPctSpd[0] = (PctChgMax[0] - PctChgMin[0]);
+	//				PctChgMaxBip = -1;
+	//				PctChgMinBip = -1;
+				}
+			}
+			//else PlotPctSpd[1] = 1;
 		}
 
 		#region Properties
