@@ -57,7 +57,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				RocPeriod									= 8;
 				TM_OpenStartH								= 8;
 				TM_OpenStartM								= 0;
-				AddPlot(Brushes.Aqua, "PlotPctSpd");
+				BarsRequiredToPlot							= 128;
+				AddPlot(Brushes.Red, "PlotPctSpd");
 				AddPlot(Brushes.Orange, "PlotRocSpd");
 				AddLine(Brushes.Blue, 0, "LineZero");
 			}
@@ -80,33 +81,74 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			if(CurrentBar < BarsRequiredToPlot)
 				return;
-			//;
-			if(BarsInProgress >= 0) {
-				int cutoff = GetTimeByHM(TM_OpenStartH, TM_OpenStartM, false);
-				int t0 = GetTimeByHM(Time[0].Hour, Time[0].Minute, false);
-				int t1 = GetTimeByHM(Time[1].Hour, Time[1].Minute, false);
-				if(t0 >= cutoff && t1 < cutoff) {
-					Print("Cutoff time=" + cutoff);
+			//Setup the max and min instruments for the day
+			if(IsCutoffTime(TM_OpenStartH, TM_OpenStartM)) {
+				double chg = GetPctChg(BarsInProgress);
+				if(BarsInProgress == 0) {
+					PctChgMax[0] = chg;
+					PctChgMaxBip = 0;
+					PctChgMin[0] = chg;
+					PctChgMinBip = 0;
+					Print(String.Format("{0}: {1} BarsInProgress={2}, chg={3}, PctChgMaxBip={4}, PctChgMinBip={5}", 
+						CurrentBar, this.GetType().Name, BarsInProgress,
+						chg, PctChgMaxBip, PctChgMinBip));
 				}
-				lastDayOHLC = PriorDayOHLC(BarsArray[BarsInProgress]);
-				double cl = Closes[BarsInProgress][0];
-				double lcl = PriorDayOHLC(BarsArray[BarsInProgress]).PriorClose[0];
-				if(lcl > 0) {
-					double chg = Math.Round(100*(cl-lcl)/lcl, 2);
-					Print("Chg=" + chg.ToString() + ", Time[0]=" + Time[0]);
-					if(PctChgMax[0] == null || chg >= PctChgMax[0]) {
-						PctChgMax[0] = chg;
-						PctChgMaxBip = BarsInProgress;
-					}
-					if(PctChgMin[0] == null || chg <= PctChgMin[0]) {
+				else {
+					if(chg >= PctChgMax[0]) {
+							PctChgMax[0] = chg;
+							PctChgMaxBip = BarsInProgress;
+						}
+					if(chg <= PctChgMin[0]) {
 						PctChgMin[0] = chg;
 						PctChgMinBip = BarsInProgress;
 					}
-				Print(String.Format("{0}: {1} BarsInProgress={2}, Close[0]={3}, PriorClose={4}, chg={5}, PctChgMaxBip={6}, PctChgMinBip={7}", 
-					CurrentBar, this.GetType().Name, BarsInProgress, cl, lcl,
-					chg, PctChgMaxBip, PctChgMinBip));
+					Print(String.Format("{0}: {1} BarsInProgress={2}, chg={3}, PctChgMaxBip={4}, PctChgMinBip={5}", 
+						CurrentBar, this.GetType().Name, BarsInProgress,
+						chg, PctChgMaxBip, PctChgMinBip));
 				}
 				
+				if (BarsInProgress == BarsArray.Length-1) {
+					Print(String.Format("{0}: [{1}] PctChgMaxBip={2}, PctChgMax={3}, PctChgMinBip={4}, PctChgMin={5}", 
+						CurrentBar, Time[0],
+						PctChgMaxBip, PctChgMax[0], PctChgMinBip, PctChgMin[0]));
+				}
+			}//end of cutoff time
+			else{ //Not the cutoff time
+				if(BarsInProgress == PctChgMaxBip)
+					PctChgMax[0] = GetPctChg(PctChgMaxBip);
+				if(BarsInProgress == PctChgMinBip)
+					PctChgMin[0] = GetPctChg(PctChgMinBip);
+				
+				if(BarsInProgress == BarsArray.Length-1 && PctChgMax[0] > -100 && PctChgMin[0] > -100) {
+					PlotPctSpd[0] = (PctChgMax[0] - PctChgMin[0]);
+					Print(String.Format("{0}: [{1}] {2}: MaxBip={3}, %Max={4}, MinBip={5}, %Min={6}, %Spd={7}", 
+						CurrentBar, Time[0], GetLongShortText(),
+						PctChgMaxBip, PctChgMax[0], PctChgMinBip, PctChgMin[0], PlotPctSpd[0]));
+					DrawTextValue();
+				}
+			}
+			return;
+			if(BarsInProgress >= 0) {
+				if(IsCutoffTime(TM_OpenStartH, TM_OpenStartM)) {
+					double chg = GetPctChg(BarsInProgress);
+					if(chg >= -100) {
+						if(BarsInProgress == 0 || chg >= PctChgMax[0]) {
+							PctChgMax[0] = chg;
+							PctChgMaxBip = BarsInProgress;
+						}
+						if(BarsInProgress == 0 || chg <= PctChgMin[0]) {
+							PctChgMin[0] = chg;
+							PctChgMinBip = BarsInProgress;
+						}						
+						Print(String.Format("{0}: {1} BarsInProgress={2}, chg={3}, PctChgMaxBip={4}, PctChgMinBip={5}", 
+							CurrentBar, this.GetType().Name, BarsInProgress,
+							chg, PctChgMaxBip, PctChgMinBip));
+					} else {
+						throw new Exception(String.Format("{0}: Invalid PctChg for {1}", 
+						CurrentBar, Instruments[BarsInProgress]));
+						return;
+					}
+				}
 				if(PctChgMax[0] != null && PctChgMin[0] != null) {
 				//if(BarsInProgress == BarsArray.Length-1)
 				PlotPctSpd[0] = (PctChgMax[0] - PctChgMin[0]);
@@ -115,6 +157,36 @@ namespace NinjaTrader.NinjaScript.Indicators
 				}
 			}
 			//else PlotPctSpd[1] = 1;
+		}
+		
+		private double GetPctChg(int bip) {
+			double chg = -101;
+			lastDayOHLC = PriorDayOHLC(BarsArray[BarsInProgress]);
+			double cl = Closes[BarsInProgress][0];
+			double lcl = PriorDayOHLC(BarsArray[BarsInProgress]).PriorClose[0];
+			if(lcl > 0) {
+				chg = Math.Round(100*(cl-lcl)/lcl, 2);
+				Print(Instruments[BarsInProgress].FullName + " Chg=" + chg.ToString() + ", Time[0]=" + Time[0]);
+			}
+			else Print(Instruments[BarsInProgress].FullName + " PriorClose=0, Time[0]=" + Time[0]);
+			return chg;
+		}
+		
+		private void DrawTextValue() {			
+			Draw.TextFixed(this, "NinjaScriptInfo", GetLongShortText(), TextPosition.TopLeft,
+				Brushes.LimeGreen, new SimpleFont("Arial", 18), Brushes.Transparent, Brushes.Transparent, 0);
+		}
+		
+		private string GetLongShortText() {
+			String txt = "N/A";
+			if(PlotPctSpd[0] != null && PctChgMaxBip >= 0 && PctChgMinBip >= 0) {
+				if(PlotPctSpd[0] > 0) {
+					txt = "L " + (PctChgMaxBip+1).ToString() + " : S " + (PctChgMinBip+1).ToString();
+				} else {
+					txt = "S " + (PctChgMaxBip+1).ToString() + " : L " + (PctChgMinBip+1).ToString();
+				}
+			}
+			return txt;
 		}
 
 		#region Properties
