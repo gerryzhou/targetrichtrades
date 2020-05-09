@@ -33,7 +33,6 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 		/// <summary>
 		/// </summary>
 		[Browsable(false), XmlIgnore()]
-		[DefaultValueAttribute(TrendDirection.UnKnown)]
 		public TrendDirection TrendDir
 		{
 			get { return trendDir; }
@@ -42,6 +41,7 @@ namespace NinjaTrader.NinjaScript.Indicators.PriceActions
 		#endregion
 	}
 }
+
 
 
 

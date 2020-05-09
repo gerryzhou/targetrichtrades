@@ -19,6 +19,9 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.AddOns;
+using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Indicators.PriceActions;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -33,9 +36,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private Series<double> PctChgMin;
 		private Series<double> RocChg;
 		private PriorDayOHLC lastDayOHLC;
-		double PctSpdMax, PctSpdMin;
-		//The BarsInProgress for PctChgMax and PctChgMin
-		int PctChgMaxBip=-1, PctChgMinBip=-1;
+		//int PctChgMaxBip=-1, PctChgMinBip=-1;
 		
 		protected override void OnStateChange()
 		{
@@ -57,6 +58,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				RocPeriod									= 8;
 				TM_OpenStartH								= 8;
 				TM_OpenStartM								= 0;
+				PctChgMaxBip								= -1;
+				PctChgMinBip								= -1;
 				BarsRequiredToPlot							= 128;
 				AddPlot(Brushes.Red, "PlotPctSpd");
 				AddPlot(Brushes.Orange, "PlotRocSpd");
@@ -79,10 +82,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
-			if(CurrentBar < BarsRequiredToPlot)
+			if(CurrentBars[BarsInProgress] < BarsRequiredToPlot)
 				return;
+//			if(IsCutoffTime(BarsInProgress, 10, 20)) {
+//				Print(String.Format("{0}:[{1}] PutTradeByPctSpd EnEx Bip{2}: PctSpd={3}, MaxBip={4}, MinBip={5}",
+//				CurrentBar, Times[BarsInProgress][0], BarsInProgress, PlotPctSpd[0], PctChgMaxBip, PctChgMinBip));
+//			}
+			
 			//Setup the max and min instruments for the day
-			if(IsCutoffTime(TM_OpenStartH, TM_OpenStartM)) {
+			if(IsCutoffTime(BarsInProgress, TM_OpenStartH, TM_OpenStartM)) {
 				double chg = GetPctChg(BarsInProgress);
 				if(BarsInProgress == 0) {
 					PctChgMax[0] = chg;
@@ -102,13 +110,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 						PctChgMin[0] = chg;
 						PctChgMinBip = BarsInProgress;
 					}
-					Print(String.Format("{0}: {1} BarsInProgress={2}, chg={3}, PctChgMaxBip={4}, PctChgMinBip={5}", 
+					Print(String.Format("{0}: {1} Bip={2}, chg={3}, %MaxBip={4}, %MinBip={5}", 
 						CurrentBar, this.GetType().Name, BarsInProgress,
 						chg, PctChgMaxBip, PctChgMinBip));
 				}
 				
 				if (BarsInProgress == BarsArray.Length-1) {
-					Print(String.Format("{0}: [{1}] PctChgMaxBip={2}, PctChgMax={3}, PctChgMinBip={4}, PctChgMin={5}", 
+					Print(String.Format("{0}: [{1}] MaxBip={2}, %Max={3}, MinBip={4}, %Min={5}", 
 						CurrentBar, Time[0],
 						PctChgMaxBip, PctChgMax[0], PctChgMinBip, PctChgMin[0]));
 				}
@@ -121,15 +129,17 @@ namespace NinjaTrader.NinjaScript.Indicators
 				
 				if(BarsInProgress == BarsArray.Length-1 && PctChgMax[0] > -100 && PctChgMin[0] > -100) {
 					PlotPctSpd[0] = (PctChgMax[0] - PctChgMin[0]);
-					Print(String.Format("{0}: [{1}] {2}: MaxBip={3}, %Max={4}, MinBip={5}, %Min={6}, %Spd={7}", 
+					Print(String.Format("{0}: [{1}] Non-CutoffTime {2}: MaxBip={3}, %Max={4}, MinBip={5}, %Min={6}, %Spd={7}", 
 						CurrentBar, Time[0], GetLongShortText(),
 						PctChgMaxBip, PctChgMax[0], PctChgMinBip, PctChgMin[0], PlotPctSpd[0]));
 					DrawTextValue();
+					CheckTradeEvent();
 				}
 			}
 			return;
+
 			if(BarsInProgress >= 0) {
-				if(IsCutoffTime(TM_OpenStartH, TM_OpenStartM)) {
+				if(IsCutoffTime(BarsInProgress, TM_OpenStartH, TM_OpenStartM)) {
 					double chg = GetPctChg(BarsInProgress);
 					if(chg >= -100) {
 						if(BarsInProgress == 0 || chg >= PctChgMax[0]) {
@@ -188,7 +198,69 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			return txt;
 		}
+		
+		public void CheckTradeEvent() {
+			int en_H = 9, en_M = 2, ex_H = 9, ex_M = 40;		
+			
+			//entry at 9:02 am ct
+			if(IsCutoffTime(BarsInProgress, en_H, en_M)) {
+				Print(String.Format("{0}:CheckTradeEvent En Bip{1}: PctSpd={2}, MaxBip={3}, MinBip={4}",
+				CurrentBars[BarsInProgress], BarsInProgress, PlotPctSpd[0], PctChgMaxBip, PctChgMinBip));
+					
+				IndicatorSignal isig = new IndicatorSignal();
+				Direction dir = new Direction();
+	//			Print(String.Format("{0}: [{1}] Non-CutoffTime {2}: MaxBip={3}, %Max={4}, MinBip={5}, %Min={6}, %Spd={7}", 
+	//				CurrentBar, Time[0], GetLongShortText(),
+	//				PctChgMaxBip, PctChgMax[0], PctChgMinBip, PctChgMin[0], PlotPctSpd[0]));
 
+				if(PctChgMaxBip != PctChgMinBip) {
+					if(PlotPctSpd[0] > 0) {
+						dir.TrendDir = TrendDirection.Up;
+						isig.SignalName = SignalName_EntryOnOpenLong;
+					} else if(PlotPctSpd[0] < 0) {
+						dir.TrendDir = TrendDirection.Down;
+						isig.SignalName = SignalName_EntryOnOpenShort;
+					}
+				} else
+					return;
+				
+				isig.BarNo = CurrentBars[BarsInProgress];
+				isig.TrendDir = dir;
+				isig.IndicatorSignalType = SignalType.SimplePriceAction;
+				IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckTradeEvent En: ");
+				ievt.IndSignal = isig;
+				//FireEvent(ievt);
+				OnRaiseIndicatorEvent(ievt);
+			}
+			else if(IsCutoffTime(BarsInProgress, ex_H, ex_M)) {
+				Print(String.Format("{0}:CheckTradeEvent Ex Bip{1}: PctSpd={2}, MaxBip={3}, MinBip={4}", 
+				CurrentBars[BarsInProgress], BarsInProgress, PlotPctSpd[0], PctChgMaxBip, PctChgMinBip));
+					
+				IndicatorSignal isig = new IndicatorSignal();
+				Direction dir = new Direction();
+	//			Print(String.Format("{0}: [{1}] Non-CutoffTime {2}: MaxBip={3}, %Max={4}, MinBip={5}, %Min={6}, %Spd={7}", 
+	//				CurrentBar, Time[0], GetLongShortText(),
+	//				PctChgMaxBip, PctChgMax[0], PctChgMinBip, PctChgMin[0], PlotPctSpd[0]));
+
+				if(PlotPctSpd[0] > 0) {
+					dir.TrendDir = TrendDirection.Up;
+					isig.SignalName = SignalName_ExitForOpen;
+				} else if(PlotPctSpd[0] < 0) {
+					dir.TrendDir = TrendDirection.Down;
+					isig.SignalName = SignalName_ExitForOpen;
+				} else
+					return;
+				
+				isig.BarNo = CurrentBars[BarsInProgress];
+				isig.TrendDir = dir;
+				isig.IndicatorSignalType = SignalType.SimplePriceAction;
+				IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckTradeEvent Ex: ");
+				ievt.IndSignal = isig;
+				//FireEvent(ievt);
+				OnRaiseIndicatorEvent(ievt);
+			}
+		}
+		
 		#region Properties
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
@@ -210,8 +282,39 @@ namespace NinjaTrader.NinjaScript.Indicators
 			get { return Values[1]; }
 		}
 
+		//The BarsInProgress for PctChgMax and PctChgMin
+		[Browsable(false)]
+		[XmlIgnore]
+		public int PctChgMaxBip
+		{
+			get;set;
+		}
+		[Browsable(false)]
+		[XmlIgnore]
+		public int PctChgMinBip
+		{
+			get;set;
+		}
 		#endregion
+		
+		#region Pre-defined signal name
+		[Browsable(false), XmlIgnore]
+		public string SignalName_EntryOnOpenLong
+		{
+			get { return "EntryOnOpenLong";}
+		}
 
+		public string SignalName_EntryOnOpenShort
+		{
+			get { return "EntryOnOpenShort";}
+		}
+
+		[Browsable(false), XmlIgnore]
+		public string SignalName_ExitForOpen
+		{
+			get { return "ExitForOpen";}
+		}
+		#endregion
 	}
 }
 

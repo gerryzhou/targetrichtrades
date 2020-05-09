@@ -252,11 +252,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// Check if now is cutoff time
 		/// </summary>		/// 
 		/// <returns></returns>
-		public bool IsCutoffTime(int time_h, int time_m) {
+		public bool IsCutoffTime(int bip, int time_h, int time_m) {
 			bool isTime= false;
-			int cutoff = GetTimeByHM(TM_OpenStartH, TM_OpenStartM, false);
-			int t0 = GetTimeByHM(Time[0].Hour, Time[0].Minute, false);
-			int t1 = GetTimeByHM(Time[1].Hour, Time[1].Minute, false);
+			int cutoff = GetTimeByHM(time_h, time_m, false);
+			int t0 = GetTimeByHM(Times[bip][0].Hour, Times[bip][0].Minute, false);
+			int t1 = GetTimeByHM(Times[bip][1].Hour, Times[bip][1].Minute, false);
 			if(t0 >= cutoff && t1 < cutoff) {
 				isTime = true;
 				Print(string.Format("{0}: Cutoff time={1}",	CurrentBar, t0));

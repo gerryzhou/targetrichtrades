@@ -181,6 +181,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//giHLnBars.Update();
 				base.OnBarUpdate();
 				CheckPerformance();
+//				if(giSnR.IsCutoffTime(BarsInProgress, 11, 20)) {
+//				Print(String.Format("{0}:[{1}] IsCutoffTime EnEx Bip{2}: ",
+//				CurrentBar, Times[BarsInProgress][0], BarsInProgress));
+//			}
 				IndicatorProxy.TraceMessage(this.Name, PrintOut);
 				Print(String.Format("{0}: Stg={1}, GSZTrader={2}", CurrentBar, CurrentTrade.InstStrategy, IndicatorProxy.GSZTrader));
 			} catch (Exception ex) {
