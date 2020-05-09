@@ -91,7 +91,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			
 			//Setup the max and min instruments for the day
 			if(IsCutoffTime(BarsInProgress, TM_OpenStartH, TM_OpenStartM)) {
-				double chg = GetPctChg(BarsInProgress);
+				double chg = Math.Abs(GetPctChg(BarsInProgress));
 				if(BarsInProgress == 0) {
 					PctChgMax[0] = chg;
 					PctChgMaxBip = 0;
@@ -138,34 +138,34 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			return;
 
-			if(BarsInProgress >= 0) {
-				if(IsCutoffTime(BarsInProgress, TM_OpenStartH, TM_OpenStartM)) {
-					double chg = GetPctChg(BarsInProgress);
-					if(chg >= -100) {
-						if(BarsInProgress == 0 || chg >= PctChgMax[0]) {
-							PctChgMax[0] = chg;
-							PctChgMaxBip = BarsInProgress;
-						}
-						if(BarsInProgress == 0 || chg <= PctChgMin[0]) {
-							PctChgMin[0] = chg;
-							PctChgMinBip = BarsInProgress;
-						}						
-						Print(String.Format("{0}: {1} BarsInProgress={2}, chg={3}, PctChgMaxBip={4}, PctChgMinBip={5}", 
-							CurrentBar, this.GetType().Name, BarsInProgress,
-							chg, PctChgMaxBip, PctChgMinBip));
-					} else {
-						throw new Exception(String.Format("{0}: Invalid PctChg for {1}", 
-						CurrentBar, Instruments[BarsInProgress]));
-						return;
-					}
-				}
-				if(PctChgMax[0] != null && PctChgMin[0] != null) {
-				//if(BarsInProgress == BarsArray.Length-1)
-				PlotPctSpd[0] = (PctChgMax[0] - PctChgMin[0]);
+//			if(BarsInProgress >= 0) {
+//				if(IsCutoffTime(BarsInProgress, TM_OpenStartH, TM_OpenStartM)) {
+//					double chg = GetPctChg(BarsInProgress);
+//					if(chg >= -100) {
+//						if(BarsInProgress == 0 || chg >= PctChgMax[0]) {
+//							PctChgMax[0] = chg;
+//							PctChgMaxBip = BarsInProgress;
+//						}
+//						if(BarsInProgress == 0 || chg <= PctChgMin[0]) {
+//							PctChgMin[0] = chg;
+//							PctChgMinBip = BarsInProgress;
+//						}						
+//						Print(String.Format("{0}: {1} BarsInProgress={2}, chg={3}, PctChgMaxBip={4}, PctChgMinBip={5}", 
+//							CurrentBar, this.GetType().Name, BarsInProgress,
+//							chg, PctChgMaxBip, PctChgMinBip));
+//					} else {
+//						throw new Exception(String.Format("{0}: Invalid PctChg for {1}", 
+//						CurrentBar, Instruments[BarsInProgress]));
+//						return;
+//					}
+//				}
+//				if(PctChgMax[0] != null && PctChgMin[0] != null) {
+//				//if(BarsInProgress == BarsArray.Length-1)
+//				PlotPctSpd[0] = (PctChgMax[0] - PctChgMin[0]);
 	//				PctChgMaxBip = -1;
 	//				PctChgMinBip = -1;
-				}
-			}
+//				}
+//			}
 			//else PlotPctSpd[1] = 1;
 		}
 		
@@ -200,7 +200,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		public void CheckTradeEvent() {
-			int en_H = 9, en_M = 2, ex_H = 11, ex_M = 30;		
+			int en_H = 9, en_M = 2, ex_H = 10, ex_M = 30;		
 			
 			//entry at 9:02 am ct
 			if(IsCutoffTime(BarsInProgress, en_H, en_M)) {
@@ -227,7 +227,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				isig.BarNo = CurrentBars[BarsInProgress];
 				isig.TrendDir = dir;
 				isig.IndicatorSignalType = SignalType.SimplePriceAction;
-				IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckTradeEvent En: ");
+				IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, String.Format(" [{0}] {1}", Times[BarsInProgress][0], GetLongShortText()));
 				ievt.IndSignal = isig;
 				//FireEvent(ievt);
 				OnRaiseIndicatorEvent(ievt);

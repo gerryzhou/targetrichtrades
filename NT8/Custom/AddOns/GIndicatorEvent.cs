@@ -64,7 +64,7 @@ namespace NinjaTrader.NinjaScript.Indicators
             if (handler != null)
             {
                 // Format the string to send inside the CustomEventArgs parameter
-                e.Message += String.Format("{0} RaiseIndicatorEvent at {1:HH:mm} now.", this.GetType().Name, Time[0]); //$" at {DateTime.Now}"; available at C# 6
+                e.Message += String.Format(" {0} IndicatorEvent [{1:HH:mm}]", this.GetType().Name, Time[0]); //$" at {DateTime.Now}"; available at C# 6
 
                 // Use the () operator to raise the event.
                 handler(this, e);

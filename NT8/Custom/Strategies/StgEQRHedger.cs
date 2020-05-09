@@ -58,6 +58,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				OrderFillResolution							= OrderFillResolution.Standard;
 				EntriesPerDirection							= 1;
 				DefaultQuantity								= 5;
+				MM_ProfitFactorMax							= 1;
+				MM_ProfitFactorMin							= 0;
 				//IsInstantiatedOnEachOptimizationIteration = false;
 			}
 			else if (State == State.Configure)
@@ -82,6 +84,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				AddChartIndicator(giPctSpd);
 				
 				giPctSpd.RaiseIndicatorEvent += OnTradeByPctSpd;
+				SetPrintOut(1);
 				Print(String.Format("{0}: IsUnmanaged={1}", this.GetType().Name, IsUnmanaged));
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));
 			}			
@@ -92,6 +95,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (CurrentBar < BarsRequiredToTrade)
 				return;
 			giPctSpd.Update();
+			IndicatorProxy.Update();
 //			if(BarsInProgress == BarsArray.Length-1)
 //				OnTradeByPctSpd();
 			// Note: Bars are added to the BarsArray and can be accessed via an index value
@@ -140,6 +144,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorSignal isig = e.IndSignal;
 			Print(String.Format("{0}:OnTradeByPctSpd triggerred {1} Bip{2}: PctSpd={3}, MaxBip={4}, MinBip={5}",
 			CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, giPctSpd.PlotPctSpd[0], giPctSpd.PctChgMaxBip, giPctSpd.PctChgMinBip));
+			int q_max = GetTradeQuantity(giPctSpd.PctChgMaxBip, this.MM_ProfitFactorMax);
+			int q_min = GetTradeQuantity(giPctSpd.PctChgMinBip, this.MM_ProfitFactorMin);
 			
 			//exit at 9:40 am ct
 			if(isig.SignalName == giPctSpd.SignalName_ExitForOpen) {
@@ -149,34 +155,35 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Long) {
 					Print(String.Format("{0}:OnTradeByPctSpd ExLn Bip={1}: MaxBipQuant={2}, MinBipQuant={3}", 
 					CurrentBars[BarsInProgress], BarsInProgress,
-					GetTradeQuantity(giPctSpd.PctChgMaxBip), GetTradeQuantity(giPctSpd.PctChgMinBip)));
-					ExitLong(giPctSpd.PctChgMaxBip, GetTradeQuantity(giPctSpd.PctChgMaxBip), "GIExLn", String.Empty);
-					ExitShort(giPctSpd.PctChgMinBip, GetTradeQuantity(giPctSpd.PctChgMinBip), "GIExSt", String.Empty);
+					q_max, q_min));
+					ExitLong(giPctSpd.PctChgMaxBip, q_max, "GIExLn", String.Empty);
+					ExitShort(giPctSpd.PctChgMinBip, q_min, "GIExSt", String.Empty);
 				}
 				//else if(isig.TrendDir.TrendDir == TrendDirection.Down) {
 				else if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Short) {
 					Print(String.Format("{0}:OnTradeByPctSpd ExSt Bip={1}: MaxBipQuant={2}, MinBipQuant={3}", 
 					CurrentBars[BarsInProgress], BarsInProgress,
-					GetTradeQuantity(giPctSpd.PctChgMaxBip), GetTradeQuantity(giPctSpd.PctChgMinBip)));
-					ExitShort(giPctSpd.PctChgMaxBip, GetTradeQuantity(giPctSpd.PctChgMaxBip), "GIExSt", String.Empty);
-					ExitLong(giPctSpd.PctChgMinBip, GetTradeQuantity(giPctSpd.PctChgMinBip), "GIExLn", String.Empty);
+					q_max, q_min));
+					ExitShort(giPctSpd.PctChgMaxBip, q_max, "GIExSt", String.Empty);
+					ExitLong(giPctSpd.PctChgMinBip, q_min, "GIExLn", String.Empty);
 				}
 
 			} else { //entry at 9:02 am ct
-				Print(String.Format("{0}:OnTradeByPctSpd En Bip={1}: PctSpd={2}, MaxBip={3}, MinBip={4}", CurrentBar, BarsInProgress, giPctSpd.PlotPctSpd[0], giPctSpd.PctChgMaxBip, giPctSpd.PctChgMinBip));
+				Print(String.Format("{0}:OnTradeByPctSpd En Bip={1}: PctSpd={2}, MaxBip={3}, MinBip={4}", 
+				CurrentBar, BarsInProgress, giPctSpd.PlotPctSpd[0], giPctSpd.PctChgMaxBip, giPctSpd.PctChgMinBip));
 				if(isig.TrendDir.TrendDir == TrendDirection.Up) {
-					Print(String.Format("{0}:OnTradeByPctSpd Ln Bip={1}: PctSpd={2}, MaxBipQuant={3}, MinBipQuant={4}", 
-					CurrentBars[BarsInProgress], BarsInProgress, giPctSpd.PlotPctSpd[0],
-					GetTradeQuantity(giPctSpd.PctChgMaxBip), GetTradeQuantity(giPctSpd.PctChgMinBip)));
-					EnterLong(giPctSpd.PctChgMaxBip, GetTradeQuantity(giPctSpd.PctChgMaxBip), "GIPctSpd");
-					EnterShort(giPctSpd.PctChgMinBip, GetTradeQuantity(giPctSpd.PctChgMinBip), "GIPctSpd");
+					IndicatorProxy.PrintLog(true, IsLiveTrading(),String.Format("{0}:{1} Ln Bip={2}: PctSpd={3}, MaxBipQuant={4}, MinBipQuant={5}", 
+					CurrentBars[BarsInProgress], e.Message, BarsInProgress, giPctSpd.PlotPctSpd[0],
+					q_max, q_min));
+					EnterLong(giPctSpd.PctChgMaxBip, q_max, "GIPctSpd");
+					EnterShort(giPctSpd.PctChgMinBip, q_min, "GIPctSpd");
 				}
 				else if(isig.TrendDir.TrendDir == TrendDirection.Down) {
-					Print(String.Format("{0}:OnTradeByPctSpd St Bip={1}: PctSpd={2}, MaxBipQuant={3}, MinBipQuant={4}", 
-					CurrentBars[BarsInProgress], BarsInProgress, giPctSpd.PlotPctSpd[0],
-					GetTradeQuantity(giPctSpd.PctChgMaxBip), GetTradeQuantity(giPctSpd.PctChgMinBip)));
-					EnterShort(giPctSpd.PctChgMaxBip, GetTradeQuantity(giPctSpd.PctChgMaxBip), "GIPctSpd");
-					EnterLong(giPctSpd.PctChgMinBip, GetTradeQuantity(giPctSpd.PctChgMinBip), "GIPctSpd");
+					IndicatorProxy.PrintLog(true, IsLiveTrading(),String.Format("{0}:{1} St Bip={2}: PctSpd={3}, MaxBipQuant={4}, MinBipQuant={5}", 
+					CurrentBars[BarsInProgress], e.Message, BarsInProgress, giPctSpd.PlotPctSpd[0],
+					q_max, q_min));
+					EnterShort(giPctSpd.PctChgMaxBip, q_max, "GIPctSpd");
+					EnterLong(giPctSpd.PctChgMinBip, q_min, "GIPctSpd");
 				}
 			}
 			
@@ -185,11 +192,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <summary>
 		/// CapRatio: ES:RTY=1.7:1, NQ:RTY=2.1:1, NQ:ES=1.25:1
 		/// </summary>		
-		private int GetTradeQuantity(int idx) {
+		private int GetTradeQuantity(int idx, double ratio) {
 			switch(idx) {
-				case 0: return 5;
-				case 1: return 4;
-				case 2: return 8;
+				case 0: return ratio>0? (int)ratio*5 : 5;
+				case 1: return ratio>0? (int)ratio*4 :4;
+				case 2: return ratio>0? (int)ratio*8 :8;
 				default: return -1;
 			}
 		}
