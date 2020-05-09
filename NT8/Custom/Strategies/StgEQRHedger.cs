@@ -146,14 +146,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Print(String.Format("{0}:OnTradeByPctSpd Ex Bip={1}: MaxBip={2}, PosMax={3},  MinBip={4}, PosMin={5}", 
 				CurrentBars[BarsInProgress], BarsInProgress, giPctSpd.PctChgMaxBip, Positions[giPctSpd.PctChgMaxBip], giPctSpd.PctChgMinBip, Positions[giPctSpd.PctChgMinBip]));
 				
-				if(isig.TrendDir.TrendDir == TrendDirection.Up) {
+				if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Long) {
 					Print(String.Format("{0}:OnTradeByPctSpd ExLn Bip={1}: MaxBipQuant={2}, MinBipQuant={3}", 
 					CurrentBars[BarsInProgress], BarsInProgress,
 					GetTradeQuantity(giPctSpd.PctChgMaxBip), GetTradeQuantity(giPctSpd.PctChgMinBip)));
 					ExitLong(giPctSpd.PctChgMaxBip, GetTradeQuantity(giPctSpd.PctChgMaxBip), "GIExLn", String.Empty);
 					ExitShort(giPctSpd.PctChgMinBip, GetTradeQuantity(giPctSpd.PctChgMinBip), "GIExSt", String.Empty);
 				}
-				else if(isig.TrendDir.TrendDir == TrendDirection.Up) {
+				//else if(isig.TrendDir.TrendDir == TrendDirection.Down) {
+				else if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Short) {
 					Print(String.Format("{0}:OnTradeByPctSpd ExSt Bip={1}: MaxBipQuant={2}, MinBipQuant={3}", 
 					CurrentBars[BarsInProgress], BarsInProgress,
 					GetTradeQuantity(giPctSpd.PctChgMaxBip), GetTradeQuantity(giPctSpd.PctChgMinBip)));

@@ -200,7 +200,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		public void CheckTradeEvent() {
-			int en_H = 9, en_M = 2, ex_H = 9, ex_M = 40;		
+			int en_H = 9, en_M = 2, ex_H = 11, ex_M = 30;		
 			
 			//entry at 9:02 am ct
 			if(IsCutoffTime(BarsInProgress, en_H, en_M)) {
@@ -242,14 +242,16 @@ namespace NinjaTrader.NinjaScript.Indicators
 	//				CurrentBar, Time[0], GetLongShortText(),
 	//				PctChgMaxBip, PctChgMax[0], PctChgMinBip, PctChgMin[0], PlotPctSpd[0]));
 
-				if(PlotPctSpd[0] > 0) {
-					dir.TrendDir = TrendDirection.Up;
-					isig.SignalName = SignalName_ExitForOpen;
-				} else if(PlotPctSpd[0] < 0) {
-					dir.TrendDir = TrendDirection.Down;
-					isig.SignalName = SignalName_ExitForOpen;
-				} else
-					return;
+				dir.TrendDir = TrendDirection.UnKnown;
+				isig.SignalName = SignalName_ExitForOpen;
+//				if(PlotPctSpd[0] > 0) {
+//					dir.TrendDir = TrendDirection.Up;
+//					isig.SignalName = SignalName_ExitForOpen;
+//				} else if(PlotPctSpd[0] < 0) {
+//					dir.TrendDir = TrendDirection.Down;
+//					isig.SignalName = SignalName_ExitForOpen;
+//				} else
+//					return;
 				
 				isig.BarNo = CurrentBars[BarsInProgress];
 				isig.TrendDir = dir;
