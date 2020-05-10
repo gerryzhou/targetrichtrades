@@ -290,6 +290,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[Display(Name="OpenEndM", Order=ODI_OpenEndM, GroupName=GPI_TIMING)]
 		public int TM_OpenEndM
 		{ get; set; }
+		
+		[Description("Hour of closing")]
+ 		[Range(0, 23), NinjaScriptProperty]		
+		[Display(Name="ClosingH", Order=ODI_ClosingH, GroupName=GPI_TIMING)]
+		public int TM_ClosingH
+		{ get; set; }
+
+		[Description("Minute of closing")]
+		[Range(0, 59), NinjaScriptProperty]
+		[Display(Name="ClosingM", Order=ODI_ClosingM, GroupName=GPI_TIMING)]
+		public int TM_ClosingM
+		{ get; set; }
 			
 		#endregion
 		
@@ -299,6 +311,9 @@ namespace NinjaTrader.NinjaScript.Indicators
         
 		private int tm_OpenEndH = 10; //Default setting for open End hour
 		private int tm_OpenEndM = 30; //Default setting for open End minute
+		
+		private int tm_ClosingH = 11; //Default setting for closing hour
+		private int tm_ClosingM = 15; //Default setting for closing minute
 		#endregion
 	}
 }

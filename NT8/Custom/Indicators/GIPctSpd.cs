@@ -58,6 +58,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 				RocPeriod									= 8;
 				TM_OpenStartH								= 8;
 				TM_OpenStartM								= 0;
+				TM_OpenEndH									= 9;
+				TM_OpenEndM									= 2;
+				TM_ClosingH									= 10;
+				TM_ClosingM									= 45;
 				PctChgMaxBip								= -1;
 				PctChgMinBip								= -1;
 				BarsRequiredToPlot							= 128;
@@ -200,7 +204,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		public void CheckTradeEvent() {
-			int en_H = 9, en_M = 2, ex_H = 10, ex_M = 30;		
+			int en_H = TM_OpenEndH, en_M = TM_OpenEndM, ex_H = TM_ClosingH, ex_M = TM_ClosingM;		
 			
 			//entry at 9:02 am ct
 			if(IsCutoffTime(BarsInProgress, en_H, en_M)) {

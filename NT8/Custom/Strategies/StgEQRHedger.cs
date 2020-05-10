@@ -36,8 +36,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 	public class StgEQRHedger : GStrategyBase
 	{
 		private RSI rsi;
+		private RSI rsi1;
+		private RSI rsi2;
 		private ADX adx;
 		private ADX adx1;
+		private ADX adx2;
 
 		private GIPctSpd giPctSpd;
 
@@ -58,8 +61,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 				OrderFillResolution							= OrderFillResolution.Standard;
 				EntriesPerDirection							= 1;
 				DefaultQuantity								= 5;
+				StopTargetHandling							= StopTargetHandling.PerEntryExecution;
 				MM_ProfitFactorMax							= 1;
 				MM_ProfitFactorMin							= 0;
+				TG_TradeEndH								= 10;
+				TG_TradeEndM								= 45;
 				//IsInstantiatedOnEachOptimizationIteration = false;
 			}
 			else if (State == State.Configure)
@@ -75,7 +81,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (State == State.DataLoaded)
 			{
 				rsi = RSI(14, 1);
+				rsi1 = RSI(BarsArray[1], 14, 1);
+				rsi2 = RSI(BarsArray[2], 14, 1);
 				adx = ADX(14);
+				adx1 = ADX(BarsArray[1], 14);
+				adx2 = ADX(BarsArray[2], 14);
+				
 				giPctSpd = GIPctSpd(8);
 				// Add RSI and ADX indicators to the chart for display
 				// This only displays the indicators for the primary Bars object (main instrument) on the chart
@@ -84,6 +95,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				AddChartIndicator(giPctSpd);
 				
 				giPctSpd.RaiseIndicatorEvent += OnTradeByPctSpd;
+				giPctSpd.TM_ClosingH = TG_TradeEndH;
+				giPctSpd.TM_ClosingM = TG_TradeEndM;
 				SetPrintOut(1);
 				Print(String.Format("{0}: IsUnmanaged={1}", this.GetType().Name, IsUnmanaged));
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));
@@ -96,12 +109,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return;
 			giPctSpd.Update();
 			IndicatorProxy.Update();
+			if(CheckPnLByBarsSinceEn())
+				OnExitPositions(null);
 //			if(BarsInProgress == BarsArray.Length-1)
 //				OnTradeByPctSpd();
 			// Note: Bars are added to the BarsArray and can be accessed via an index value
 			// E.G. BarsArray[1] ---> Accesses the 1 minute Bars added above
-			if (adx1 == null)
-				adx1 = ADX(BarsArray[1], 14);
+//			if (adx1 == null)
+//				adx1 = ADX(BarsArray[1], 14);
 
 			// OnBarUpdate() will be called on incoming tick events on all Bars objects added to the strategy
 			// We only want to process events on our primary Bars object (main instrument) (index = 0) which
@@ -138,6 +153,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				ExitShort(2, 1, "ExitRSI", "RSI");
 			}
 		}
+		
+		#region En/Ex signals
+		private bool CheckPnLByBarsSinceEn() {
+			bool call_ex = false;
+			int bse = BarsSinceEntryExecution(giPctSpd.PctChgMaxBip, String.Empty, 0);
+			double ur_pnl = CheckUnrealizedPnLBip(giPctSpd.PctChgMaxBip);
+			if(bse == TM_BarsToCheckPnL && ur_pnl < 0)
+				call_ex = true;
+			return call_ex;
+		}
+		#endregion
+		
 		#region Indicator Event Handler
         // Define what actions to take when the event is raised.
         void OnTradeByPctSpd(object sender, IndicatorEventArgs e) {
@@ -151,23 +178,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if(isig.SignalName == giPctSpd.SignalName_ExitForOpen) {
 				Print(String.Format("{0}:OnTradeByPctSpd Ex Bip={1}: MaxBip={2}, PosMax={3},  MinBip={4}, PosMin={5}", 
 				CurrentBars[BarsInProgress], BarsInProgress, giPctSpd.PctChgMaxBip, Positions[giPctSpd.PctChgMaxBip], giPctSpd.PctChgMinBip, Positions[giPctSpd.PctChgMinBip]));
-				
-				if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Long) {
-					Print(String.Format("{0}:OnTradeByPctSpd ExLn Bip={1}: MaxBipQuant={2}, MinBipQuant={3}", 
-					CurrentBars[BarsInProgress], BarsInProgress,
-					q_max, q_min));
-					ExitLong(giPctSpd.PctChgMaxBip, q_max, "GIExLn", String.Empty);
-					ExitShort(giPctSpd.PctChgMinBip, q_min, "GIExSt", String.Empty);
-				}
-				//else if(isig.TrendDir.TrendDir == TrendDirection.Down) {
-				else if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Short) {
-					Print(String.Format("{0}:OnTradeByPctSpd ExSt Bip={1}: MaxBipQuant={2}, MinBipQuant={3}", 
-					CurrentBars[BarsInProgress], BarsInProgress,
-					q_max, q_min));
-					ExitShort(giPctSpd.PctChgMaxBip, q_max, "GIExSt", String.Empty);
-					ExitLong(giPctSpd.PctChgMinBip, q_min, "GIExLn", String.Empty);
-				}
-
+				OnExitPositions(e);
 			} else { //entry at 9:02 am ct
 				Print(String.Format("{0}:OnTradeByPctSpd En Bip={1}: PctSpd={2}, MaxBip={3}, MinBip={4}", 
 				CurrentBar, BarsInProgress, giPctSpd.PlotPctSpd[0], giPctSpd.PctChgMaxBip, giPctSpd.PctChgMinBip));
@@ -189,6 +200,33 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 		}
 		
+		void OnExitPositions(IndicatorEventArgs e) {
+			int q_max = GetTradeQuantity(giPctSpd.PctChgMaxBip, this.MM_ProfitFactorMax);
+			int q_min = GetTradeQuantity(giPctSpd.PctChgMinBip, this.MM_ProfitFactorMin);
+
+			if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Long) {
+				Print(String.Format("{0}:OnTradeByPctSpd ExLn Bip={1}: BarsSinceEntry={2}, UnrealizedPnL={3}, MaxBipQuant={4}, MinBipQuant={5}", 
+				CurrentBars[BarsInProgress], BarsInProgress, 
+				BarsSinceEntryExecution(giPctSpd.PctChgMaxBip, String.Empty, 0), CheckUnrealizedPnLBip(giPctSpd.PctChgMaxBip),
+				q_max, q_min));
+				ExitLong(giPctSpd.PctChgMaxBip, q_max, "GIExLn", String.Empty);
+				ExitShort(giPctSpd.PctChgMinBip, q_min, "GIExSt", String.Empty);
+			}
+			//else if(isig.TrendDir.TrendDir == TrendDirection.Down) {
+			else if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Short) {
+				Print(String.Format("{0}:OnTradeByPctSpd ExSt Bip={1}: BarsSinceEntry={2}, UnrealizedPnL={3}, MaxBipQuant={4}, MinBipQuant={5}", 
+				CurrentBars[BarsInProgress], BarsInProgress,
+				BarsSinceEntryExecution(giPctSpd.PctChgMaxBip, String.Empty, 0), CheckUnrealizedPnLBip(giPctSpd.PctChgMaxBip),
+				q_max, q_min));
+				ExitShort(giPctSpd.PctChgMaxBip, q_max, "GIExSt", String.Empty);
+				ExitLong(giPctSpd.PctChgMinBip, q_min, "GIExLn", String.Empty);
+			}			
+		}
+		
+		void OnEntryPositions(IndicatorEventArgs e) {
+			
+		}
+
 		/// <summary>
 		/// CapRatio: ES:RTY=1.7:1, NQ:RTY=2.1:1, NQ:ES=1.25:1
 		/// </summary>		

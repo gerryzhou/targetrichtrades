@@ -73,6 +73,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public const int ODI_OpenStartM = 2;
 		public const int ODI_OpenEndH = 3;
 		public const int ODI_OpenEndM = 4;
+		public const int ODI_ClosingH = 5;
+		public const int ODI_ClosingM = 6;
 		#endregion
 		
 		#region MovingAverage

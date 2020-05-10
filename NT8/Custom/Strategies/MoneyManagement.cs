@@ -369,6 +369,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
 		}
 		
+		public double CheckUnrealizedPnLBip(int bip) {
+			if(bip < 0 || bip >= BarsArray.Length) bip = 0;
+			if(IsLiveTrading())
+				return PositionsAccount[bip].GetUnrealizedProfitLoss(PerformanceUnit.Currency, Closes[bip][0]);
+			else 
+				return Positions[bip].GetUnrealizedProfitLoss(PerformanceUnit.Currency, Closes[bip][0]);
+		}
+		
 		public int CheckUnrealizedPnLTicks() {
 			return IndicatorProxy.GetTicksByCurrency(CheckUnrealizedPnL());
 		}		
