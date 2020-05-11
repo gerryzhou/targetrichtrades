@@ -46,24 +46,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 		        return getrandom.Next(min, max);
 		    }
 		}
-		
-		public static string GetUserDir() {
-			string ud_dir = NinjaTrader.Core.Globals.UserDataDir
-				+ "bin" + Path.DirectorySeparatorChar
-				+ "Custom" + Path.DirectorySeparatorChar;
 
-			//Print(this.Name + ":NinjaTrader.Core.Globals.UserDataDir=" + NinjaTrader.Core.Globals.UserDataDir);
-			string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-			//Print(this.Name + ":Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)=" + currentDirectory);
-			string appPath = System.AppDomain.CurrentDomain.BaseDirectory;
-			//Print(this.Name + ":System.AppDomain.CurrentDomain.BaseDirectory=" + appPath);
-			string entryPath = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-			//Print(this.Name + ":System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)=" + entryPath);
-			string curPath = System.Environment.CurrentDirectory;
-			//Print(this.Name + ":System.Environment.CurrentDirectory=" + curPath);
-			return ud_dir; //Directory.GetParent(currentDirectory).FullName;
-		}
-		
 		/// <summary>
 		/// Update the properties for obj with the values in the dictionary
 		/// </summary>

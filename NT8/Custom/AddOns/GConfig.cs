@@ -36,8 +36,11 @@ namespace NinjaTrader.NinjaScript.AddOns
 {
 	public class GConfig
 	{	
-		public static string GetConfigFileDir() {
-			string ud_dir = GUtils.GetUserDir() + "Config" + Path.DirectorySeparatorChar;
+		public static string GetUserDir() {
+			string ud_dir = NinjaTrader.Core.Globals.UserDataDir
+				+ "bin" + Path.DirectorySeparatorChar
+				+ "Custom" + Path.DirectorySeparatorChar;
+
 			//Print(this.Name + ":NinjaTrader.Core.Globals.UserDataDir=" + NinjaTrader.Core.Globals.UserDataDir);
 			string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 			//Print(this.Name + ":Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)=" + currentDirectory);
@@ -49,7 +52,34 @@ namespace NinjaTrader.NinjaScript.AddOns
 			//Print(this.Name + ":System.Environment.CurrentDirectory=" + curPath);
 			return ud_dir; //Directory.GetParent(currentDirectory).FullName;
 		}
+		
+		public static string GetTemplatesDir() {
+			string tp_dir = NinjaTrader.Core.Globals.UserDataDir
+				+ "templates" + Path.DirectorySeparatorChar;
+			return tp_dir;
+		}
+		
+		public static string GetConfigFileDir() {
+			string cfg_dir = GetTemplatesDir() + "Config" + Path.DirectorySeparatorChar;
+			return cfg_dir; //Directory.GetParent(currentDirectory).FullName;
+		}
 
+		public static string GetLogConfigFilePath() {
+			return GetConfigFileDir()
+				+ "log4net.config";
+		}
+
+		public static string GetSoundFileDir() {
+			string sd_dir = GetTemplatesDir() + "Sounds" + Path.DirectorySeparatorChar;
+			return sd_dir; //Directory.GetParent(currentDirectory).FullName;
+		}
+
+		public static string GetLogDir() {
+			string log_dir = NinjaTrader.Core.Globals.UserDataDir
+				+ "log" + Path.DirectorySeparatorChar;
+			return log_dir;
+		}
+		
 		public static string GetConfigItem(string config_file, string item_name) {
 			string json_path = GetConfigFileDir() + config_file;
 			string json = System.IO.File.ReadAllText(json_path);

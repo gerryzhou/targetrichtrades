@@ -65,15 +65,17 @@ namespace NinjaTrader.NinjaScript.Indicators.ZTraderInd
 			else if (State == State.Configure)
 			{
 				string cmdPathRoot = GConfig.GetConfigItem(GConfig.MainConfigFile, "CmdPathRoot");
-				string config_file = GLogger.GetConfigFilePath();
-				Print(this.Name + "GLogger.GetConfigFilePath, CmdPathRoot=" + config_file + "," + cmdPathRoot);
-				XmlConfigurator.Configure(new FileInfo(@config_file));////"C:\\www\\log\\log4net.config"));
+				string log_config_file = GConfig.GetLogConfigFilePath();
+				Print(String.Format("{0}:GLogger.GetLogConfigFilePath={1}, CmdPathRoot={2}",
+				this.Name, log_config_file, cmdPathRoot));
+				XmlConfigurator.Configure(new FileInfo(@log_config_file));////"C:\\www\\log\\log4net.config"));
 				//GZLogger.ConfigureFileAppender( "C:\\www\\log\\log_test.txt" );
+				GLogger.Initialize(GConfig.GetLogDir());
 			}
 			else if (State == State.DataLoaded)
 			{				
 				CustData = new Series<double>(this);				
-				SetLogFile(GetFileNameByDateTime(DateTime.Now, @"C:\www\log\", GSZTrader.AccName, GetSymbol(), "log"));
+				//SetLogFile(GetFileNameByDateTime(DateTime.Now, @"C:\www\log\", GSZTrader.AccName, GetSymbol(), "log"));
 				BackTest = GSZTrader.BackTest;
 				dailyPattern = LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
 			}

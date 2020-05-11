@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<NinjaTrader>
+  <Risk xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Name>SimRisk</Name>
+    <MasterInstrumentsSerializable>
+      <string>ES|0|500|True|400|1|2|400|500</string>
+    </MasterInstrumentsSerializable>
+    <Version>3269</Version>
+  </Risk>
+</NinjaTrader>

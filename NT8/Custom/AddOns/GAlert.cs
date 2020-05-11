@@ -37,19 +37,6 @@ namespace NinjaTrader.NinjaScript.AddOns
 	public class GAlert
 	{
 		protected static volatile bool PlayAlert = true;
-		public static string GetSoundFileDir() {
-			string ud_dir = GUtils.GetUserDir() + "Sounds" + Path.DirectorySeparatorChar;
-			//Print(this.Name + ":NinjaTrader.Core.Globals.UserDataDir=" + NinjaTrader.Core.Globals.UserDataDir);
-			string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-			//Print(this.Name + ":Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)=" + currentDirectory);
-			string appPath = System.AppDomain.CurrentDomain.BaseDirectory;
-			//Print(this.Name + ":System.AppDomain.CurrentDomain.BaseDirectory=" + appPath);
-			string entryPath = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-			//Print(this.Name + ":System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)=" + entryPath);
-			string curPath = System.Environment.CurrentDirectory;
-			//Print(this.Name + ":System.Environment.CurrentDirectory=" + curPath);
-			return ud_dir; //Directory.GetParent(currentDirectory).FullName;
-		}
 
 		public static void PlaySoundLoop(SoundPlay sp) {//A Task return type will eventually yield a void
 			while(PlayAlert && sp.SoundLoop > 0 && !String.IsNullOrEmpty(sp.SoundLoopFile)) {
@@ -70,7 +57,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 			object name = null, loop = null;
 			if(dic.TryGetValue("SoundFileName", out name) &&
 				dic.TryGetValue("SoundPlayLoop", out loop)) {
-				string path = GetSoundFileDir() + name.ToString();
+				string path = GConfig.GetSoundFileDir() + name.ToString();
 				indProxy.Print("GetSoundFilePath,SoundPlayLoop=" + path + ", " + loop);
 
 				SoundPlay soundplay = new SoundPlay(path, loop.ToString());				

@@ -16,6 +16,7 @@ using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Repository.Hierarchy;
+using log4net.Repository;
 using log4net.Core;
 using log4net.Layout;
 
@@ -35,7 +36,29 @@ namespace NinjaTrader.NinjaScript.AddOns
 {	
 	public class GLogger
 	{
-	    public static void ConfigureFileAppender( string logFile )
+		public static void Initialize(string logDirectory)
+		{
+		    //get the current logging repository for this application
+		    ILoggerRepository repository = LogManager.GetRepository();
+		    //get all of the appenders for the repository
+		    IAppender[] appenders = repository.GetAppenders();
+		    //only change the file path on the 'FileAppenders'
+		    foreach (IAppender appender in (from iAppender in appenders
+		                                    where iAppender is FileAppender
+		                                    select iAppender))
+		    {
+		        FileAppender fileAppender = appender as FileAppender;
+		        //set the path to your logDirectory using the original file name defined
+		        //in configuration
+				//Print(String.Format("Path.GetFileName(fileAppender.File)=", Path.GetFileName(fileAppender.File)));
+		        fileAppender.File = Path.Combine(logDirectory, Path.GetFileName(fileAppender.File));
+		        //make sure to call fileAppender.ActivateOptions() to notify the logging
+		        //sub system that the configuration for this appender has changed.
+		        fileAppender.ActivateOptions();
+		    }
+		}
+		
+		public static void ConfigureFileAppender( string logFile )
 	    {
 	        var fileAppender = GetFileAppender( logFile );
 	        BasicConfigurator.Configure( fileAppender );
@@ -59,10 +82,5 @@ namespace NinjaTrader.NinjaScript.AddOns
 
 	        return appender;
 	    }
-		
-		public static string GetConfigFilePath() {
-			return GConfig.GetConfigFileDir()
-				+ "log4net.config";
-		}
 	}
 }

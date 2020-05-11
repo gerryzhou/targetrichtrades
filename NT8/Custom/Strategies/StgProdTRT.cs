@@ -602,7 +602,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			new AlertMessage(this.Owner, "Alert triggerred!" + Environment.NewLine 
 				+ tsig.SignalToStr(), caption);
 				//if(CurrentBar == Bars.Count-2) {
-			if(State != State.Historical || CurrentBar >= Bars.Count-2) {
+			if(State != State.Historical || CurrentBar >= Bars.Count-20) {
 				Print(CurrentBar + ": InstallDir=" + NinjaTrader.Core.Globals.InstallDir);
 				//Bars.Instrument
 				//NinjaTrader.NinjaScript.Alert.AlertCallback(NinjaTrader.Cbi.Instrument.GetInstrument("MSFT"), this, "someId", NinjaTrader.Core.Globals.Now, Priority.High, "message", NinjaTrader.Core.Globals.InstallDir+@"\sounds\Alert1.wav", new SolidColorBrush(Colors.Blue), new SolidColorBrush(Colors.White), 0);
