@@ -1,0 +1,34 @@
+[
+{
+	"Symbol":"NQ 06-20",
+	"ChartType":"5m",
+	"Version":"1.0",
+	"SessionId":"opew24ur08amfm0e",
+	"Date":"20200407",
+	"TimeOpen": 830, "TimeClose": 830,
+	"TimeStart": 830, "TimeEnd": 1445,
+	
+	"ChannelType":"UpWide",
+	"TrendDirection":"Up",
+	"TradingStyle":"CounterTrend",
+	"TradingDirection":"Long",
+	
+	"BarsLookback": 5,
+	"DaysLookback": 5,
+	"MALength": 5,
+	
+	"EnTicOffset": 0,
+	"ExTrailTics": 16,
+	"StoplossTics": 20,
+	
+	"S1": 7420, "R1": 7655.25,
+	"S2": 7283.75, "R2": 7879.5,
+	"S3": 7102.5, "R3": 8012.75,
+	"S4": 6885.25, "R4": 8100,
+	"S5": 6504.5, "R5": 8235.25,
+	
+	"T1": 7356.5, "T2": 7206.75
+}
+]
+
+
