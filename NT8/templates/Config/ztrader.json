@@ -1,21 +1,21 @@
 {
     "GIndicator": {
         "TargetFolderLocations": {
-            "TestFolder1": "Some path",
-            "TestFolder2": "Another path"
+            "TestFolder1": "path1",
+            "TestFolder2": "path2"
         }
     },
     "GStrategy": {
         "TargetFolderLocations": {
-            "TestFolder1": "Some path",
-            "TestFolder2": "Another path"
+            "TestFolder1": "path1",
+            "TestFolder2": "path2"
         }
     },
-	"CmdPathRoot": "C:\\Users\\GerryZhou\\source\\repos\\targetrichtrades\\NT8\\cmd\\",
-	"CmdFileName": "cmd_StgSampleTRT.json",
+	"CmdPathRoot": "Strategy",
+	"CmdFileName": "cmd_StgProdTRT.json",
 	"CTXFileName": "ctx_StgProdTRT.json",
-	"AlertBarsBack": "20",
+	"AlertBarsBack": 8,
 	"SoundFileName": "Latnwhis.wav",
-	"SoundPlayLoop": "40",
-	"MenuFileName": "menu_StgSampleTRT.json"
+	"SoundPlayLoop": "4",
+	"MenuFileName": "menu_StgProdTRT.json"
 }

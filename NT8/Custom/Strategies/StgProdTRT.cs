@@ -136,6 +136,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				IndicatorProxy.LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
 				IndicatorProxy.AddPriceActionTypeAllowed(PriceActionType.DnWide);
 				GetMarketContext();
+				GAlert.LoadAlerConfig(IndicatorProxy);
 				
 				giSMI = GISMI(EMAPeriod1, EMAPeriod2, Range, SMITMAPeriod, SMICrossLevel);//(3, 5, 5, 8);
 				awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
@@ -602,8 +603,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			new AlertMessage(this.Owner, "Alert triggerred!" + Environment.NewLine 
 				+ tsig.SignalToStr(), caption);
 				//if(CurrentBar == Bars.Count-2) {
-			if(State != State.Historical || CurrentBar >= Bars.Count-20) {
-				Print(CurrentBar + ": InstallDir=" + NinjaTrader.Core.Globals.InstallDir);
+			Print(String.Format("{0}: InstallDir={1}, GAlert.AlertBarsBack={2}", 
+				CurrentBar, NinjaTrader.Core.Globals.InstallDir, GAlert.AlertBarsBack));
+			if(State != State.Historical || CurrentBar >= Bars.Count-GAlert.AlertBarsBack) {
+				
 				//Bars.Instrument
 				//NinjaTrader.NinjaScript.Alert.AlertCallback(NinjaTrader.Cbi.Instrument.GetInstrument("MSFT"), this, "someId", NinjaTrader.Core.Globals.Now, Priority.High, "message", NinjaTrader.Core.Globals.InstallDir+@"\sounds\Alert1.wav", new SolidColorBrush(Colors.Blue), new SolidColorBrush(Colors.White), 0);
 				// Instead of PlaySound()

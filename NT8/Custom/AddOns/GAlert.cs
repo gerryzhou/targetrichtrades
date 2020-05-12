@@ -37,6 +37,9 @@ namespace NinjaTrader.NinjaScript.AddOns
 	public class GAlert
 	{
 		protected static volatile bool PlayAlert = true;
+		public static int AlertBarsBack = -1;
+		public static string SoundLoopFilePath = String.Empty;
+		public static int SoundLoopCount = 40;
 
 		public static void PlaySoundLoop(SoundPlay sp) {//A Task return type will eventually yield a void
 			while(PlayAlert && sp.SoundLoop > 0 && !String.IsNullOrEmpty(sp.SoundLoopFile)) {
@@ -52,34 +55,62 @@ namespace NinjaTrader.NinjaScript.AddOns
 		}
 	
 		public static void PlaySoundFile(AlertMessage msg, GIndicatorBase indProxy) {
-			List<string> names = new List<string>(){"SoundFileName", "SoundPlayLoop"};
-			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
-			object name = null, loop = null;
-			if(dic.TryGetValue("SoundFileName", out name) &&
-				dic.TryGetValue("SoundPlayLoop", out loop)) {
-				string path = GConfig.GetSoundFileDir() + name.ToString();
-				indProxy.Print("GetSoundFilePath,SoundPlayLoop=" + path + ", " + loop);
+//			List<string> names = new List<string>(){"SoundFileName", "SoundPlayLoop"};
+//			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
+			if(String.IsNullOrEmpty(SoundLoopFilePath)) {
+				LoadAlerConfig(indProxy);
+			}
+			SoundPlay soundplay = new SoundPlay(SoundLoopFilePath, SoundLoopCount);				
+			
+			PlayAlert = true;
+			indProxy.Print(String.Format("AlertBarsBackStr={0}, GetSoundFilePath={1}, SoundPlayLoopStr={2}",
+			 		AlertBarsBack, SoundLoopFilePath, SoundLoopCount));
+			
+			Thread thdSoundPlay = new Thread(() => PlaySoundLoop(soundplay));
+			Thread thdMsgShow = new Thread(() => ShowMessage(msg));
 
-				SoundPlay soundplay = new SoundPlay(path, loop.ToString());				
+			thdSoundPlay.Start();
+			thdMsgShow.Start();
+//			object name = null, loop = null;
+//			if(dic.TryGetValue("SoundFileName", out name) &&
+//				dic.TryGetValue("SoundPlayLoop", out loop)) {
+//				string path = GConfig.GetSoundFileDir() + name.ToString();
+//				indProxy.Print("GetSoundFilePath,SoundPlayLoop=" + path + ", " + loop);
+
+//				SoundPlay soundplay = new SoundPlay(path, loop.ToString());				
 				
-				PlayAlert = true;
+//				PlayAlert = true;
 
-				Thread thdSoundPlay = new Thread(() => PlaySoundLoop(soundplay));
-				Thread thdMsgShow = new Thread(() => ShowMessage(msg));
+//				Thread thdSoundPlay = new Thread(() => PlaySoundLoop(soundplay));
+//				Thread thdMsgShow = new Thread(() => ShowMessage(msg));
 
-				thdSoundPlay.Start();
-				thdMsgShow.Start();
+//				thdSoundPlay.Start();
+//				thdMsgShow.Start();
+//			}
+		}
+		
+		public static void LoadAlerConfig(GIndicatorBase indProxy) {
+			List<string> names = new List<string>(){"AlertBarsBack", "SoundFileName", "SoundPlayLoop"};
+			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
+			object altBarsBack, name = null, loop = null;
+			if(dic.TryGetValue("AlertBarsBack", out altBarsBack) &&
+				dic.TryGetValue("SoundFileName", out name) &&
+				dic.TryGetValue("SoundPlayLoop", out loop)) {
+				SoundLoopFilePath = GConfig.GetSoundFileDir() + name.ToString();
+				int.TryParse(altBarsBack.ToString(), out AlertBarsBack);
+				int.TryParse(loop.ToString(), out SoundLoopCount);
+				indProxy.Print(String.Format("AlertBarsBackStr={0}, GetSoundFilePath={1}, SoundPlayLoopStr={2}",
+					AlertBarsBack, SoundLoopFilePath, SoundLoopCount));
 			}
 		}
 	}
 	
 	public class SoundPlay {
 		public string SoundLoopFile = "";
-		public short SoundLoop = 12;
-		public SoundPlay(string path, string loop) {
-			if(Int16.TryParse(loop.ToString(), out SoundLoop)) {
-				SoundLoopFile = path;
-			}
+		public int SoundLoop = 12;
+		public SoundPlay(string path, int loop) {
+			SoundLoopFile = path;
+			SoundLoop = loop;
 		}
 	}
 	
