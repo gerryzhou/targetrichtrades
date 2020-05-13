@@ -63,7 +63,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 			SoundPlay soundplay = new SoundPlay(SoundLoopFilePath, SoundLoopCount);				
 			
 			PlayAlert = true;
-			indProxy.Print(String.Format("AlertBarsBackStr={0}, GetSoundFilePath={1}, SoundPlayLoopStr={2}",
+			indProxy.Print(String.Format("PlaySoundFile AlertBarsBackStr={0}, GetSoundFilePath={1}, SoundPlayLoopStr={2}",
 			 		AlertBarsBack, SoundLoopFilePath, SoundLoopCount));
 			
 			Thread thdSoundPlay = new Thread(() => PlaySoundLoop(soundplay));
@@ -99,7 +99,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 				SoundLoopFilePath = GConfig.GetSoundFileDir() + name.ToString();
 				int.TryParse(altBarsBack.ToString(), out AlertBarsBack);
 				int.TryParse(loop.ToString(), out SoundLoopCount);
-				indProxy.Print(String.Format("AlertBarsBackStr={0}, GetSoundFilePath={1}, SoundPlayLoopStr={2}",
+				indProxy.Print(String.Format("LoadAlerConfig AlertBarsBackStr={0}, GetSoundFilePath={1}, SoundPlayLoopStr={2}",
 					AlertBarsBack, SoundLoopFilePath, SoundLoopCount));
 			}
 		}

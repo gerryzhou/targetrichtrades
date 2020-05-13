@@ -4,21 +4,13 @@
 //
 
 #region Using declarations
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Windows.Media;
-using System.Xml.Serialization;
 using NinjaTrader.NinjaScript.Indicators;
 #endregion
 
 //This namespace holds strategies in this folder and is required. Do not change it.
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
+    public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
 		private		Indicator	indicator;
 

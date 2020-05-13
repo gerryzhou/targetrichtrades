@@ -3,52 +3,37 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Xml.Serialization;
 using NinjaTrader.Cbi;
-using NinjaTrader.Gui;
-using NinjaTrader.Gui.Chart;
-using NinjaTrader.Gui.SuperDom;
-using NinjaTrader.Gui.Tools;
-using NinjaTrader.Data;
-using NinjaTrader.NinjaScript;
-using NinjaTrader.Core.FloatingPoint;
-using NinjaTrader.NinjaScript.Indicators;
-using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies.ZTraderStg
 {
-	/// <summary>
-	/// The class holds current trade, including positions, orders, tradeAction etc.
-	/// All the trading parameters from strategy are held in the CurrentTrade;
-	/// All the parameters from the signal are held in TradeAction 
-	/// CurrentTrade->TradeAction->TradeSignal;
-	/// 
-	/// OrderMgmt: setup SL/PT, breakeven: when to setup? Triggerred by PerformRule;
-	/// decide new trade, new pos: exe event or pos event?
-	/// Signal triggerred order change? when to change the orders? OnBarUpdate
-	/// Event triggerred order change? when to change the orders? OnBarUpdate: breakeven, trailing stop,
-	/// Command triggerred order change? when to change the orders? OnBarUpdate
-	/// PerformRule triggerred order change? when to change the orders? OnBarUpdate, the last trigger; 
-	/// Priority of the three changes: command (change algo mode, change params, injectContext),
-	/// signal/event(exclusive, event trigger new order allowed, init SL/PT; signal trigger entry/exit),
-	/// performRule (trigger money mgmt rules, change SL/PT, break-even, trailing stop; trigger trailing entry, exit by price change)
-	/// Command/rule/performance triggered change: change TradeSignal, fire the change the same bar; 
-	/// treat command as if a signal(how to define the signal with regular signal, add to the list, type of command signal);
-	/// Signal triggered change: signal changed, fire the change the same bar;
-	/// Event triggered change: change the signal first, fire the change on the event handler;
-	/// Sequence of the triggers: OnBarUpdate take the command, then the performace checking apply rule trigger changes,
-	/// the signal trigger and event trigger could come mixed, it has no preset order.
-	/// 
-	/// </summary>
-	public class CurrentTradeBase {
+    /// <summary>
+    /// The class holds current trade, including positions, orders, tradeAction etc.
+    /// All the trading parameters from strategy are held in the CurrentTrade;
+    /// All the parameters from the signal are held in TradeAction 
+    /// CurrentTrade->TradeAction->TradeSignal;
+    /// 
+    /// OrderMgmt: setup SL/PT, breakeven: when to setup? Triggerred by PerformRule;
+    /// decide new trade, new pos: exe event or pos event?
+    /// Signal triggerred order change? when to change the orders? OnBarUpdate
+    /// Event triggerred order change? when to change the orders? OnBarUpdate: breakeven, trailing stop,
+    /// Command triggerred order change? when to change the orders? OnBarUpdate
+    /// PerformRule triggerred order change? when to change the orders? OnBarUpdate, the last trigger; 
+    /// Priority of the three changes: command (change algo mode, change params, injectContext),
+    /// signal/event(exclusive, event trigger new order allowed, init SL/PT; signal trigger entry/exit),
+    /// performRule (trigger money mgmt rules, change SL/PT, break-even, trailing stop; trigger trailing entry, exit by price change)
+    /// Command/rule/performance triggered change: change TradeSignal, fire the change the same bar; 
+    /// treat command as if a signal(how to define the signal with regular signal, add to the list, type of command signal);
+    /// Signal triggered change: signal changed, fire the change the same bar;
+    /// Event triggered change: change the signal first, fire the change on the event handler;
+    /// Sequence of the triggers: OnBarUpdate take the command, then the performace checking apply rule trigger changes,
+    /// the signal trigger and event trigger could come mixed, it has no preset order.
+    /// 
+    /// </summary>
+    public class CurrentTradeBase {
 		
 		public CurrentTradeBase(GStrategyBase instStg) {
 			InstStrategy = instStg;

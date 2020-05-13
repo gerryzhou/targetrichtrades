@@ -4,23 +4,7 @@
 //
 #region Using declarations
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Xml.Serialization;
-using NinjaTrader.Cbi;
-using NinjaTrader.Gui;
-using NinjaTrader.Gui.Chart;
-using NinjaTrader.Gui.SuperDom;
-using NinjaTrader.Data;
-using NinjaTrader.NinjaScript;
-using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
@@ -31,12 +15,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// <summary>
 	/// Hedge by itself: one trend following, the other is counter trend;
 	/// </summary>
-	public class StgSelfHedger : GStrategyBase
+	public class StgSelfHedger : GStrategyBaseEx
 	{
 		private RSI rsi;
 		private ADX adx;
 		private ADX adx1;
 
+		public StgSelfHedger () {
+			VendorLicense("TheTradingBook", "Default", "thetradingbook.com", "support@tradingbook.com",null);
+		}
 		protected override void OnStateChange()
 		{
 			base.OnStateChange();

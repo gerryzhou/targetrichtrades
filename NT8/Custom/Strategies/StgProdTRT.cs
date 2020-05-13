@@ -3,24 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Xml.Serialization;
 
 using NinjaTrader.Cbi;
-using NinjaTrader.Gui;
-using NinjaTrader.Gui.Chart;
-using NinjaTrader.Gui.SuperDom;
-using NinjaTrader.Gui.Tools;
 using NinjaTrader.Data;
-using NinjaTrader.NinjaScript;
-using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
-using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.AddOns;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.NinjaScript.Indicators.PriceActions;
@@ -94,13 +81,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 	public class StgProdTRT : GStrategyBase
 	{
 		#region Variables
-		private GISMI giSMI;
-		private GIAwesomeOscillator awOscillator;
+		//private GISMI giSMI;
+		//private GIAwesomeOscillator awOscillator;
 		private GIEMA giEMA;
 		private GIVWAP giVwap;
 		//private GIPbSAR giPbSAR;
 		private GISnR giSnR;
-		private GISnRPriorWM giSnRPriorWM;
+		//private GISnRPriorWM giSnRPriorWM;
 		private GIHLnBars giHLnBars;
 		
 		private JsonStgTRT ctxTRT;
@@ -138,13 +125,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 				GetMarketContext();
 				GAlert.LoadAlerConfig(IndicatorProxy);
 				
-				giSMI = GISMI(EMAPeriod1, EMAPeriod2, Range, SMITMAPeriod, SMICrossLevel);//(3, 5, 5, 8);
-				awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
+				//giSMI = GISMI(EMAPeriod1, EMAPeriod2, Range, SMITMAPeriod, SMICrossLevel);//(3, 5, 5, 8);
+				//awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
 				giEMA = GIEMA(EMAPeriod1, StoplossTicksEMA);
 				giVwap = GIVWAP();
 				//giPbSAR = GIPbSAR(AccPbSAR, AccMaxPbSAR, AccStepPbSAR);
 				giSnR = GISnR(false, false, true, true, true, this.ctxTRT.TimeOpen, this.ctxTRT.TimeClose);
-				giSnRPriorWM = GISnRPriorWM(true, false, false, false, true, false, false, false);
+				//giSnRPriorWM = GISnRPriorWM(true, false, false, false, true, false, false, false);
 				giHLnBars = GIHLnBars(5);
 				
 				giHLnBars.RaiseIndicatorEvent += OnStopLossEvent;
@@ -155,15 +142,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 				giEMA.RaiseIndicatorEvent += OnStopLossEvent;
 				//this.RaiseStrategyEvent += OnGISnREvent;
 				
-				AddChartIndicator(giSMI);
-				AddChartIndicator(awOscillator);
+				//AddChartIndicator(giSMI);
+				//AddChartIndicator(awOscillator);
 				AddChartIndicator(giEMA);
 				AddChartIndicator(giVwap);
 				//AddChartIndicator(giPbSAR);
 				AddChartIndicator(giSnR);
-				AddChartIndicator(giSnRPriorWM);
-				Print("GISMI called:" + "EMAPeriod1=" + EMAPeriod1 + "EMAPeriod2=" + EMAPeriod2 + "Range=" + Range + "SMITMAPeriod=" + SMITMAPeriod);
-				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: StgProdTRT GetMarketContext called...", CurrentBar));
+				//AddChartIndicator(giSnRPriorWM);
+//				Print("GISMI called:" + "EMAPeriod1=" + EMAPeriod1 + "EMAPeriod2=" + EMAPeriod2 + "Range=" + Range + "SMITMAPeriod=" + SMITMAPeriod);
+//				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: StgProdTRT GetMarketContext called...", CurrentBar));
 			}
 			else if (State == State.Configure)
 			{
@@ -314,7 +301,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 			}
 			
-			Direction dir = GetDirection(giSMI); //GetDirection(giPbSAR);
+			Direction dir = GetDirection(giEMA); //GetDirection(giPbSAR);
 			TradeSignal slSig = new TradeSignal();
 			slSig.BarNo = CurrentBar;
 			slSig.SignalType = TradeSignalType.StopLoss;
@@ -404,7 +391,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				String.Format("{0}: CheckProfitTargetSignal called ----", CurrentBar));
 
 			//giPbSAR.Update();
-			Direction dir = GetDirection(giSMI);// GetDirection(giPbSAR);
+			Direction dir = GetDirection(giEMA);// GetDirection(giPbSAR);
 			TradeSignal ptSig = new TradeSignal();
 			ptSig.BarNo = CurrentBar;
 			ptSig.SignalType = TradeSignalType.ProfitTarget;
@@ -603,7 +590,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			new AlertMessage(this.Owner, "Alert triggerred!" + Environment.NewLine 
 				+ tsig.SignalToStr(), caption);
 				//if(CurrentBar == Bars.Count-2) {
-			Print(String.Format("{0}: InstallDir={1}, GAlert.AlertBarsBack={2}", 
+			Print(String.Format("{0}: InstallDir ={1}, GAlert.AlertBarsBack={2}", 
 				CurrentBar, NinjaTrader.Core.Globals.InstallDir, GAlert.AlertBarsBack));
 			if(State != State.Historical || CurrentBar >= Bars.Count-GAlert.AlertBarsBack) {
 				
