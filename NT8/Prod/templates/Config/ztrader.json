@@ -1,0 +1,21 @@
+{
+    "GIndicator": {
+        "TargetFolderLocations": {
+            "TestFolder1": "path1",
+            "TestFolder2": "path2"
+        }
+    },
+    "GStrategy": {
+        "TargetFolderLocations": {
+            "TestFolder1": "path1",
+            "TestFolder2": "path2"
+        }
+    },
+	"CmdPathRoot": "Strategy",
+	"CmdFileName": "cmd_StgProdTRT.json",
+	"CTXFileName": "ctx_StgProdTRT.json",
+	"AlertBarsBack": 250,
+	"SoundFileName": "Latnwhis.wav",
+	"SoundPlayLoop": "4",
+	"MenuFileName": "menu_StgProdTRT.json"
+}

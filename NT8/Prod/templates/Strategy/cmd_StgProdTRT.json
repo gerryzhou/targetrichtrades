@@ -1,0 +1,81 @@
+{
+"StrategyCmd":[
+	{"CommandType": ["None", "CommandType", "The type of command - ChangeAlgoType; ChangeParams; InjectContext; None;"]},
+	{"AlgoMode":["Trading", "AlgoModeType", ""]},
+	{"PrintOut":["2", "Int32", ""]},
+	{"BackTest":["False", "Boolean", ""]}
+	],
+	
+"IndicatorCmd":[
+	{"EnBarsBeforeInflection":["2", "Int32", "Bars count before inflection for entry"]},
+	{"BarsLookback":["20", "Int32", ""]}
+	],
+
+"TriggerCmd":[
+	{"TG_TradeStartH":["8", "Int32", ""]},
+	{"TG_TradeStartM":["45", "Int32", ""]},
+	{"TG_TradeEndH":["14", "Int32", ""]},
+	{"TG_TradeEndM":["59", "Int32", ""]},
+	{"TG_OpenStartH":["8", "Int32", ""]},
+	{"TG_OpenStartM":["45", "Int32", ""]},
+	{"TG_OpenEndH":["14", "Int32", ""]},
+	{"TG_OpenEndM":["59", "Int32", ""]},
+	{"TG_TradeLiqH":["15", "Int32", ""]},
+	{"TG_TradeLiqM":["08", "Int32", ""]},
+	{"TG_EnSwingMinPnts":["200", "Double", ""]},
+	{"TG_EnSwingMaxPnts":["200", "Double", ""]},
+	{"TG_EnPullbackMinPnts":["200", "Double", ""]},
+	{"TG_EnPullbackMaxPnts":["200", "Double", ""]}
+	],
+
+"MoneyManagementCmd":[
+	{"MM_ProfitFactor":["2.5", "Double", "PT/SL ratio"]},
+	{"MM_PTCalculationMode":["Currency", "CalculationMode", "Profit target CalMode"]},
+	{"MM_PTTrailing":["False", "Boolean", "Trailing profit target or not"]},
+	{"MM_ProfitTargetAmt":["450", "Double", "Default(450-650 USD) setting for ProfitTarget $Amount"]},
+	{"MM_ProfitTgtTic":["40", "Int32", "Ticks of profit target"]},
+	{"MM_ProfitTgtIncTic":["16", "Int32", "Default tick Amt for increasing ProfitTarget with trailing PT order"]},
+	{"MM_ProfitLockMinTic":["16", "Int32", "Default ticks Amt for Min Profit locking"]},
+	{"MM_ProfitLockMaxTic":["80", "Int32", "Default ticks Amt for Max Profit locking"]},
+	{"MM_SLCalculationMode":["Currency", "CalculationMode", "Stoploss CalMode"]},
+	{"MM_StopLossAmt":["50", "Double", "Default $ amount setting for StopLoss"]},
+	{"MM_StopLossTic":["200", "Int32", "Default tick setting for StopLoss"]},
+	{"MM_StopLossIncTic":["200", "Int32", "Default tick Amt for increasing StopLoss"]},
+	{"MM_SLTrailing":["False", "Boolean", "Trailing stop loss or not"]},
+	{"MM_TLSLCalculationMode":["Ticks", "CalculationMode", "Trailing SL CalMode"]},
+	{"MM_TrailingStopLossTic":["200", "Int32", "Ticks for trailing stop loss order"]},
+	{"MM_TrailingStopLossAmt":["200", "Double", "Default setting for trailing Stop Loss Amt"]},
+	{"MM_TrailingStopLossPercent":["200", "Double", "Percent for trailing stop loss order"]},
+	{"MM_BECalculationMode":["Currency", "CalculationMode", "Breakeven CalMode"]},
+	{"MM_BreakEvenAmt":["200", "Double", "The profits amount to trigger setting up breakeven order"]},
+	{"MM_DailyLossLmt":["-200", "Double", "The daily loss limit amount"]}
+	],
+
+"TradeManagementCmd":[
+	{"TM_TradingDirection":["Up", "TradingDirection", ""]},
+	{"TM_TradingStyle":["TrendFollowing", "TradingStyle", ""]},
+	{"TM_EnTrailing":["False", "Boolean", ""]},
+	{"TM_EnOffsetPnts":["1.5", "Double", ""]},
+	{"TM_MinutesChkEnOrder":["15", "Int32", "How long to wait before checking an entry order filled or not"]},
+	{"TM_MinutesChkPnL":["15", "Int32", "How long to wait before checking P&L"]},
+	{"TM_BarsToCheckPnL":["15", "Int32", "Bar count to check P&L since the entry"]},
+	{"TM_BarsHoldEnOrd":["15", "Int32", "Bars count since en order was issued"]},
+	{"TM_EnCounterPBBars":["15", "Int32", ""]},
+	{"TM_BarsSincePTSL":["15", "Int32", ""]}
+	],
+
+"MarketContextCmd":[
+	{"CTX_Daily":[
+		{"20170606": [{"Time":8401401, "CTX": "UpWide#10-16-3-5"}]},
+		{"20170607": [{"Time":8401151, "CTX": "DnWide#10-16-3-5"}, {"Time":11521459, "CTX": "UpTight#10-16-3-5"}]},
+		{"20170608": [{"Time":8401123, "CTX": "UpTight#10-16-3-5"}, {"Time":11301459, "CTX": "DnTight#10-16-3-5"}]}
+	]},
+	{"CTX_Weekly":[
+		{"20170606": [{"Time":8401401, "CTX": "UpWide#10-16-3-5"}]},
+		{"20170607": [{"Time":8401151, "CTX": "DnWide#10-16-3-5"}, {"Time":11521459, "CTX": "UpTight#10-16-3-5"}]},
+		{"20170608": [{"Time":8401123, "CTX": "UpTight#10-16-3-5"}, {"Time":11301459, "CTX": "DnTight#10-16-3-5"}]}
+	]}
+	]
+}
+
+
