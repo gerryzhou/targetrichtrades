@@ -11,7 +11,6 @@ using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.AddOns;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.NinjaScript.Indicators.PriceActions;
-using NinjaTrader.NinjaScript.Indicators.ZTraderPattern;
 using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 
 #endregion
@@ -19,66 +18,66 @@ using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
 //This namespace holds Strategies in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	/// <summary>
-	/// Sample strategy for GSZTrader:
-	/// 1) OnStateChange();
-	/// 2) OnBarUpdate();
-	/// 3) GetIndicatorSignal();
-	/// 4) GetTradeSignal();
-	/// 5) CheckExitTrade() or CheckNewEntryTrade();
-	/// 6) PutTrade();
-	/// 
-	/// New approach for Event fired trades:
-	/// Lock the order entry when submit order;
-	/// Unlock the order entry when order executed;
-	/// or Check tradeActino at the close of each bar;
-	/// 
-	/// Indicator Combination:
-	/// * SnR: daily high/low
-	/// * Breakout: morning breakout of the SnR, big bar cross the SnR
-	/// * Reversal Pivot: 9:00-11 AM morning session high/low
-	/// * Pullback Pivot: left 20+, right 5+, i.e. (20+, 5+)
-	/// * Trending pivot: breakout the pullback pivot, create a new (5+, 5+) pivot
-	/// Long/Short rules:
-	/// * KAMA indicates trend(not helpful); Use ParabolicSAR(0.002,0.1,0.002) as trending indicator; 
-	/// * Long: cyan diamond, Short: red diamond;
-	/// * Trend-following long/short entry;
-	/// * Stop loss: last n (five?) bars hi/lo;
-	/// * Profit Target: next support/resistance, cyan/red diamond;
-	/// * Breakeven, or KAMA/EMA did not moving towards target in a period of time, exit?
-	/// * Use cyan/red diamond find key reversal: 
-	/// 	look back n bars, find the highest/lowest bar as KR; It's leading key reversal;
-	/// =====================StgProdTRT=====================================================
-	/// 1.	Define overall market motion for the recent past – 
-	/// Record the lowest low of the last five candles and the highest high at the open of 
-	/// the current day - candle ‘n’ (n-5, n-4, n-3, n-2, n-1) – these will be initial 
-	/// breakout or breakdown levels for the trend
-	/// Note the current 5EMA of candle ‘n’ –
-	/// a.	If the close of candle ‘n-5’ is less that the current 5EMA, the trend is positive
-	/// with the support edge at the lowest low of (n-5, n-4, n-3, n-2, n-1).  A break of this
-	/// low sends us to a YELLOW or WAIT state for a positive trend  [trend detection]
-	/// b.	IF the trend is defined as positive, entries will be defined as follows-
-	/// (a)	If VWAP is above the daily open, engage at the test of the VWAP long, and add to 
-	/// the position any test of the VWAP to max size with 1st target at prior day’s 
-	/// high (if it is higher) or the highest high of the n-5, n-4, n-3, n-2, n-1 candles 
-	/// -where we take ½ position and trail position by 20 ticks.  [entry signal]
-	/// (b)	Automatic stopout – loss of the prior day’s low.  Alternate exit at 20 ticks 
-	/// below the 5EMA, or if the VWAP drops below the daily open, or if the price loses the 
-	/// low of the measured sequence of n-5, n-4, n-3, n-2, n-1 before any of those.  [exit signal]
-	/// 
-	/// 2.	The reversal of this would be the short environment.
-	/// 
-	/// --SPECIAL EVENTS-in either the long or short environment-- 
-	/// 3.	If the chart gaps down at the opening tick but is above the low of the prior 5 days, 
-	/// there will a countertrend bounce into the moving averages – short at the open of the 
-	/// prior 4 hr candle close or long at the opening tick with the stop at the low of the 
-	/// prior 4hr minus 6 ticks into the first target of either the VWAP or 5EMA on the 4hr chart
-	/// then trail 16 ticks.  This trade can be taken repeatedly as long as the 4hr low of the 
-	/// prior candle holds.
-	/// 4.	The reverse will hold true on a gap up that is below the high of the prior 5 days, 
-	/// there will be a countertrend fade into the moving averages.
-	/// </summary>
-	public class StgProdTRT : GStrategyBase
+    /// <summary>
+    /// Sample strategy for GSZTrader:
+    /// 1) OnStateChange();
+    /// 2) OnBarUpdate();
+    /// 3) GetIndicatorSignal();
+    /// 4) GetTradeSignal();
+    /// 5) CheckExitTrade() or CheckNewEntryTrade();
+    /// 6) PutTrade();
+    /// 
+    /// New approach for Event fired trades:
+    /// Lock the order entry when submit order;
+    /// Unlock the order entry when order executed;
+    /// or Check tradeActino at the close of each bar;
+    /// 
+    /// Indicator Combination:
+    /// * SnR: daily high/low
+    /// * Breakout: morning breakout of the SnR, big bar cross the SnR
+    /// * Reversal Pivot: 9:00-11 AM morning session high/low
+    /// * Pullback Pivot: left 20+, right 5+, i.e. (20+, 5+)
+    /// * Trending pivot: breakout the pullback pivot, create a new (5+, 5+) pivot
+    /// Long/Short rules:
+    /// * KAMA indicates trend(not helpful); Use ParabolicSAR(0.002,0.1,0.002) as trending indicator; 
+    /// * Long: cyan diamond, Short: red diamond;
+    /// * Trend-following long/short entry;
+    /// * Stop loss: last n (five?) bars hi/lo;
+    /// * Profit Target: next support/resistance, cyan/red diamond;
+    /// * Breakeven, or KAMA/EMA did not moving towards target in a period of time, exit?
+    /// * Use cyan/red diamond find key reversal: 
+    /// 	look back n bars, find the highest/lowest bar as KR; It's leading key reversal;
+    /// =====================StgProdTRT=====================================================
+    /// 1.	Define overall market motion for the recent past – 
+    /// Record the lowest low of the last five candles and the highest high at the open of 
+    /// the current day - candle ‘n’ (n-5, n-4, n-3, n-2, n-1) – these will be initial 
+    /// breakout or breakdown levels for the trend
+    /// Note the current 5EMA of candle ‘n’ –
+    /// a.	If the close of candle ‘n-5’ is less that the current 5EMA, the trend is positive
+    /// with the support edge at the lowest low of (n-5, n-4, n-3, n-2, n-1).  A break of this
+    /// low sends us to a YELLOW or WAIT state for a positive trend  [trend detection]
+    /// b.	IF the trend is defined as positive, entries will be defined as follows-
+    /// (a)	If VWAP is above the daily open, engage at the test of the VWAP long, and add to 
+    /// the position any test of the VWAP to max size with 1st target at prior day’s 
+    /// high (if it is higher) or the highest high of the n-5, n-4, n-3, n-2, n-1 candles 
+    /// -where we take ½ position and trail position by 20 ticks.  [entry signal]
+    /// (b)	Automatic stopout – loss of the prior day’s low.  Alternate exit at 20 ticks 
+    /// below the 5EMA, or if the VWAP drops below the daily open, or if the price loses the 
+    /// low of the measured sequence of n-5, n-4, n-3, n-2, n-1 before any of those.  [exit signal]
+    /// 
+    /// 2.	The reversal of this would be the short environment.
+    /// 
+    /// --SPECIAL EVENTS-in either the long or short environment-- 
+    /// 3.	If the chart gaps down at the opening tick but is above the low of the prior 5 days, 
+    /// there will a countertrend bounce into the moving averages – short at the open of the 
+    /// prior 4 hr candle close or long at the opening tick with the stop at the low of the 
+    /// prior 4hr minus 6 ticks into the first target of either the VWAP or 5EMA on the 4hr chart
+    /// then trail 16 ticks.  This trade can be taken repeatedly as long as the 4hr low of the 
+    /// prior candle holds.
+    /// 4.	The reverse will hold true on a gap up that is below the high of the prior 5 days, 
+    /// there will be a countertrend fade into the moving averages.
+    /// </summary>
+    public class TBProdTRT : GStrategyBaseEx
 	{
 		#region Variables
 		//private GISMI giSMI;
@@ -99,14 +98,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 		
 		#region Init Functions
+		public TBProdTRT () {
+			VendorLicense("TheTradingBook", "Default", "thetradingbook.com", "support@tradingbook.com",null);
+		}
+		
 		protected override void OnStateChange()
 		{
 			base.OnStateChange();
 			if (State == State.SetDefaults)
 			{
-				Print(this.Name + " StgProdTRT SetDefaults called....");
 				Description									= @"The prod strategy for TRT.";
-				Name										= "StgProdTRT";
+				Name										= "TBProdTRT";
 				Calculate									= Calculate.OnBarClose;
 				IsFillLimitOnTouch							= false;
 				TraceOrders									= false;
@@ -114,16 +116,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 				// Disable this property for performance gains in Strategy Analyzer optimizations
 				// See the Help Guide for additional information
 				IsInstantiatedOnEachOptimizationIteration	= true;
+				Print(this.Name + " SetDefaults called....");
 			}
 			else if (State == State.DataLoaded)
 			{
-				Print(this.Name + " StgProdTRT Set DataLoaded called....");
-				AddChartIndicator(IndicatorProxy);
-				SetPrintOut(1);
+				Print(this.Name + " Set DataLoaded called....");
+				AddChartIndicator(IndicatorProxyEx);
+				/*SetPrintOut(1);
 				IndicatorProxy.LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
-				IndicatorProxy.AddPriceActionTypeAllowed(PriceActionType.DnWide);
+				IndicatorProxy.AddPriceActionTypeAllowed(PriceActionType.DnWide);*/
 				GetMarketContext();
-				GAlert.LoadAlerConfig(IndicatorProxy);
+				GAlert.LoadAlerConfig(IndicatorProxyEx);
 				
 				//giSMI = GISMI(EMAPeriod1, EMAPeriod2, Range, SMITMAPeriod, SMICrossLevel);//(3, 5, 5, 8);
 				//awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
@@ -136,8 +139,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				
 				giHLnBars.RaiseIndicatorEvent += OnStopLossEvent;
 				giHLnBars.RaiseIndicatorEvent += OnProfitTargetEvent;
-				giSnR.RaiseIndicatorEvent += OnStopLossEvent;
-				giSnR.RaiseIndicatorEvent += OnProfitTargetEvent;
+				//giSnR.RaiseIndicatorEvent += OnStopLossEvent;
+				//giSnR.RaiseIndicatorEvent += OnProfitTargetEvent;
 				giVwap.RaiseIndicatorEvent += OnStopLossEvent;
 				giEMA.RaiseIndicatorEvent += OnStopLossEvent;
 				//this.RaiseStrategyEvent += OnGISnREvent;
@@ -154,7 +157,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.Configure)
 			{
-				Print(this.Name + " StgProdTRT Set Configure called.... CurrentTrade=" + CurrentTrade);
+				//Print(this.Name + " StgProdTRT Set Configure called.... CurrentTrade=" + CurrentTrade);
 				AddDataSeries(Data.BarsPeriodType.Day, 1);
 			}
 		}
@@ -169,15 +172,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//giHLnBars.Update();
 				base.OnBarUpdate();
 				CheckPerformance();
+				CheckNewEntrySignals();
 //				if(giSnR.IsCutoffTime(BarsInProgress, 11, 20)) {
 //				Print(String.Format("{0}:[{1}] IsCutoffTime EnEx Bip{2}: ",
 //				CurrentBar, Times[BarsInProgress][0], BarsInProgress));
 //			}
-				IndicatorProxy.TraceMessage(this.Name, PrintOut);
-				Print(String.Format("{0}: Stg={1}, GSZTrader={2}", CurrentBar, CurrentTrade.InstStrategy, IndicatorProxy.GSZTrader));
+				//IndicatorProxy.TraceMessage(this.Name, PrintOut);
+				//Print(String.Format("{0}: Stg={1}, GSZTrader={2}", CurrentBar, CurrentTrade.InstStrategy, IndicatorProxy.GSZTrader));
 			} catch (Exception ex) {
-				IndicatorProxy.Log2Disk = true;
-				IndicatorProxy.PrintLog(true, true, "Exception: " + ex.StackTrace);
+				IndicatorProxyEx.Log2Disk = true;
+				IndicatorProxyEx.PrintLog(true, true, "Exception: " + ex.StackTrace);
 			}
 		}
 		#endregion
@@ -187,14 +191,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Check the time, position, trend,
 		/// </summary>
 		/// <returns></returns>
-		public override bool CheckNewEntrySignals(){
+		public bool CheckNewEntrySignals(){
 			//giPbSAR.Update();
 //			Print(CurrentBar + ":CheckNewEntrySignals called -----------" + giSMI.LastInflection);
 
 			if(NewTradeAllowed())
-				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: CheckNewEntrySignals called....NewOrderAllowed", CurrentBar));
+				IndicatorProxyEx.PrintLog(true, IsLiveTrading(), String.Format("{0}: CheckNewEntrySignals called....NewOrderAllowed", CurrentBar));
 			else {
-				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: CheckNewEntrySignals called....NewOrderNotAllowed", CurrentBar));
+				IndicatorProxyEx.PrintLog(true, IsLiveTrading(), String.Format("{0}: CheckNewEntrySignals called....NewOrderNotAllowed", CurrentBar));
 				return false;
 			}
 			
@@ -226,22 +230,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 				else if(dir.TrendDir==TrendDirection.Down) 
 					enSig.Action = OrderAction.Sell;
 				enSig.Order_Type = OrderType.Market;
-				AddTradeSignal(CurrentBar, IndicatorTradeSignals, enSig);
-				giHLnBars.RefBarLowestN = CurrentBar;
+				//AddTradeSignal(CurrentBar, IndicatorTradeSignals, enSig);
 				giHLnBars.RefBarLowestN = CurrentBar;
 				Print(CurrentBar + ":PatternMatched-- " + enSig.Action.ToString() + "," + enSig.SignalSource.ToString());
 				AlertTradeSignal(enSig, "Entry Signal Alert");
 				return true;
 			} else
 				return false;
-		}
-		
-		public override bool CheckScaleInSignal(){
-			return false;
-		}
-		
-		public override bool CheckScaleOutSignal(){
-			return false;
 		}
 		
 		/// <summary>
@@ -265,7 +260,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			} else
 				return false;
 			
-			indSig.SignalName = IndicatorProxy.SignalName_LineCross;
+			indSig.SignalName = IndicatorProxyEx.SignalName_LineCross;
 			indSig.SignalAction.SnR.Resistance = Math.Max(this.ctxTRT.R1, this.giSnR.LastDayRst[0]);
 			indSig.SignalAction.SnR.Support = Math.Min(this.ctxTRT.S1, this.giSnR.LastDaySpt[0]);
 			indSig.BarNo = CurrentBar;
@@ -274,10 +269,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return true;
 		}
 		
-		public override bool CheckStopLossSignal() {
+		public bool CheckStopLossSignal() {
 //			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.StopLoss);
 //			if(indTdSig != null && indTdSig.Count>0) return false;
-			
+/*			
 			TradeAction ta = CurrentTrade.TradeAction;
 			if( ta != null && ta.StopLossSignal != null) {
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
@@ -321,7 +316,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				String.Format("{0}:CheckStopLossSignal slSig.StopPrice={1}", CurrentBar, slSig.StopPrice));
 			
 			AddTradeSignal(CurrentBar, IndicatorTradeSignals, slSig);
-			return true;
+			*/
+			return false;
 		}
 		
 		/// <summary>
@@ -377,10 +373,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return bkdir;
 		}
 
-		public override bool CheckProfitTargetSignal() {			
+		public bool CheckProfitTargetSignal() {			
 //			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.ProfitTarget);
 //			if(indTdSig != null && indTdSig.Count>0) return false;
-
+/*
 			TradeAction ta = CurrentTrade.TradeAction;
 			if(ta != null && ta.ProfitTargetSignal != null) {
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), 
@@ -411,7 +407,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				String.Format("{0}: CheckProfitTargetSignal - ptSig.LimitPrice={1}", CurrentBar, ptSig.LimitPrice));
 			
 			AddTradeSignal(CurrentBar, IndicatorTradeSignals, ptSig);
-			return true;
+			*/
+			return false;
 		}
 		
 		
@@ -421,8 +418,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <param name="action"></param>
 		/// <returns></returns>
-		public override void SetEntrySignal(TradeAction action) {
-			List<TradeSignal> cmdSig = GetTradeSignalByType(CurrentBar, CommandSignals, TradeSignalType.Entry);
+		public void SetEntrySignal(TradeAction action) {
+/*			List<TradeSignal> cmdSig = GetTradeSignalByType(CurrentBar, CommandSignals, TradeSignalType.Entry);
 			List<TradeSignal> evtSig = GetTradeSignalByType(CurrentBar, EventSignals, TradeSignalType.Entry);
 			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.Entry);
 			
@@ -432,14 +429,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 				action.EntrySignal = evtSig[0];
 			else if(indTdSig != null && indTdSig.Count>0)
 				action.EntrySignal = indTdSig[0];
+			*/
 			//return enSig;
 		}
 		
-		public override void SetScaleInSignal(TradeAction action) {
+		public void SetScaleInSignal(TradeAction action) {
 			
 		}
 		
-		public override void SetScaleOutSignal(TradeAction action) {
+		public void SetScaleOutSignal(TradeAction action) {
 			
 		}
 		
@@ -454,8 +452,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <param name="action"></param>
 		/// <returns></returns>
-		public override void SetStopLossSignal(TradeAction action) {
-			List<TradeSignal> cmdSig = GetTradeSignalByType(CurrentBar, CommandSignals, TradeSignalType.StopLoss);
+		public void SetStopLossSignal(TradeAction action) {
+/*			List<TradeSignal> cmdSig = GetTradeSignalByType(CurrentBar, CommandSignals, TradeSignalType.StopLoss);
 			List<TradeSignal> evtSig = GetTradeSignalByType(CurrentBar, EventSignals, TradeSignalType.StopLoss);
 			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.StopLoss);
 			
@@ -467,6 +465,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				action.StopLossSignal = indTdSig[0];
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				String.Format("{0}: action.StopLossSignal=", CurrentBar, action.StopLossSignal));
+			*/
 //			else {
 //				TradeSignal slSig = new TradeSignal();
 //				slSig.BarNo = CurrentBar;
@@ -500,8 +499,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <param name="action"></param>
 		/// <returns></returns>
-		public override void SetProfitTargetSignal(TradeAction action) {
-			List<TradeSignal> cmdSig = GetTradeSignalByType(CurrentBar, CommandSignals, TradeSignalType.ProfitTarget);
+		public void SetProfitTargetSignal(TradeAction action) {
+/*			List<TradeSignal> cmdSig = GetTradeSignalByType(CurrentBar, CommandSignals, TradeSignalType.ProfitTarget);
 			List<TradeSignal> evtSig = GetTradeSignalByType(CurrentBar, EventSignals, TradeSignalType.ProfitTarget);
 			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.ProfitTarget);
 			
@@ -513,6 +512,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				action.ProfitTargetSignal = indTdSig[0];
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				String.Format("{0}: action.ProfitTargetSignal=", CurrentBar, action.ProfitTargetSignal));
+*/
 			//			else {
 //				TradeSignal ptSig = new TradeSignal();
 //				ptSig.BarNo = CurrentBar;
@@ -534,15 +534,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			}
 		}
 		
-		protected override bool PatternMatched()
+		protected bool PatternMatched()
 		{
 			double offset_sl, offset_pt;
 			//Print("CurrentBar, barsMaxLastCross, barsAgoMaxPbSAREn,=" + CurrentBar + "," + barsAgoMaxPbSAREn + "," + barsSinceLastCross);
 //			if (giParabSAR.IsSpvAllowed4PAT(curBarPriceAction.paType) && barsSinceLastCross < barsAgoMaxPbSAREn) 
 //				return true;
 //			else return false;
-			PriceAction pa = IndicatorProxy.GetPriceAction(Time[0]);
-			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":"
+			PriceAction pa = IndicatorProxyEx.GetPriceAction(Time[0]);
+			IndicatorProxyEx.PrintLog(true, IsLiveTrading(), CurrentBar + ":"
 				+ ";ToShortDateString=" + Time[0].ToString()
 				+ ";paType=" + pa.paType.ToString()
 				+ ";maxDownTicks=" + pa.voltality
@@ -598,16 +598,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//NinjaTrader.NinjaScript.Alert.AlertCallback(NinjaTrader.Cbi.Instrument.GetInstrument("MSFT"), this, "someId", NinjaTrader.Core.Globals.Now, Priority.High, "message", NinjaTrader.Core.Globals.InstallDir+@"\sounds\Alert1.wav", new SolidColorBrush(Colors.Blue), new SolidColorBrush(Colors.White), 0);
 				// Instead of PlaySound()
 				//NinjaTrader.NinjaScript.Alert.AlertCallback(Bars.Instrument, this, "someId", NinjaTrader.Core.Globals.Now, Priority.High, "message", NinjaTrader.Core.Globals.InstallDir+@"\sounds\Alert1.wav", new SolidColorBrush(Colors.Blue), new SolidColorBrush(Colors.White), 0);
-				GAlert.PlaySoundFile(altMsg, IndicatorProxy);
+				GAlert.PlaySoundFile(altMsg, IndicatorProxyEx);
 			}
 		}
 		
 		#endregion
 		
 		#region Trade Actions
-		public override bool SetNewEntryTradeAction() {
+		public bool SetNewEntryTradeAction() {
 			//CheckIndicatorSignals();
-			if(NewTradeAllowed())
+/*			if(NewTradeAllowed())
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: SetNewEntryTradeAction called....NewOrderAllowed", CurrentBar));
 			else {
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: SetNewEntryTradeAction called....NewOrderNotAllowed", CurrentBar));
@@ -624,7 +624,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.PrintLog(true, IsLiveTrading(),
 				string.Format("{0}: SetNewEntryTradeAction EnSig={1}, SLSig={2}, PTSig={3}, StopLossPrice={4}, ProfitTargetPrice={5}",
 				CurrentBar, ta.EntrySignal, ta.StopLossSignal, ta.ProfitTargetSignal, ta.StopLossPrice, ta.ProfitTargetPrice));
-			return true;
+			*/
+			return false;
 		}
 		
 		/// <summary>
@@ -634,8 +635,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Bug: ocoID duplicated setting SL/PT orders;
 		/// Bug: no exit tradeAction set if SL/PT were set and no changes in the coming bars; 
 		/// Bug: ta not set after entry filled;
-		public override bool SetExitTradeAction() {
-			TradeAction ta = CurrentTrade.TradeAction;//GetTradeAction(CurrentBar);
+		public bool SetExitTradeAction() {
+/*			TradeAction ta = CurrentTrade.TradeAction;//GetTradeAction(CurrentBar);
 			if(ta == null || //no entry action, SemiAlgo
 				(ta.IsEntryAction() && ta.ActionStatus == TradeActionStatus.Executed)) { //entry order filled
 				ta = new TradeAction();
@@ -671,22 +672,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.PrintLog(true, IsLiveTrading(),
 				String.Format("{0}:SetExitTradeAction after set ta, StopLossPrice={1}, ProfitTargetPrice={2}",
 				CurrentBar, ta.StopLossPrice, ta.ProfitTargetPrice));
-			return true;
+			*/
+			return false;
 		}
 		
-		public override bool NewTradeAllowed() {
-			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
-				String.Format("{0}: NewOrderAllowed called in StgProdTRT...CurrentTrade.PosQuantity={1}, HasPosition={2}, TM_MaxOpenPosition={3}",
-			CurrentBar, CurrentTrade.PosQuantity, HasPosition(), TM_MaxOpenPosition));
-			if(CurrentTrade.PosQuantity < TM_MaxOpenPosition)
+		public bool NewTradeAllowed() {
+			IndicatorProxyEx.PrintLog(true, IsLiveTrading(), 
+				String.Format("{0}: NewOrderAllowed called in TBProdTRT... HasPosition={1}, TM_MaxOpenPosition={2}",
+			CurrentBar, HasPosition(), TM_MaxOpenPosition));
+			if(Math.Abs(HasPosition()) < TM_MaxOpenPosition)
 				return true;
-			else 
+			else
 				return false;
 		}		
 		#endregion
 		
 		#region Indicator Functions
-		public override Direction GetDirection(GIndicatorBase indicator) {
+		public Direction GetDirection(GIndicatorBase indicator) {
 			
 //			IndicatorSignal lnSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_Long);
 //			IndicatorSignal stSig = indicator.GetLastIndicatorSignalByName(CurrentBar, giPbSAR.SignalName_Short);
@@ -729,7 +731,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return dir;
 		}
 		
-		public override double GetStopLossOffset(SupportResistanceType srt, double price) {
+		public double GetStopLossOffset(SupportResistanceType srt, double price) {
 			double offset = 0;
 			offset = Math.Max(offset, giSnR.GetLastDayHLOffset(srt, price));
 			offset = Math.Max(offset, giHLnBars.GetNBarsHLOffset(srt, price));
@@ -748,19 +750,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			prc = GetValidStopLossPrice(new List<double>{prcLH, prcInfl}, MM_SLPriceGapPref);
 //			if(prc <= 0)
 //				prc = GetValidStopLossPrice(Close[0]);
-			IndicatorProxy.PrintLog(true, IsLiveTrading(),
+			IndicatorProxyEx.PrintLog(true, IsLiveTrading(),
 				String.Format("{0}: GetStopLossOffset={1}", CurrentBar, offset));
 			return offset;
 		}
 		
-		public override double GetProfitTargetOffset(SupportResistanceType srt, double price) {
+		public double GetProfitTargetOffset(SupportResistanceType srt, double price) {
 			double offset = 0;
 			offset = Math.Max(offset, giSnR.GetLastDayHLOffset(srt, price));
 			offset = Math.Max(offset, giHLnBars.GetNBarsHLOffset(srt, price));
 //			offset = Math.Max(offset, giVwap.GetVwapOpenDOffset(srt, price));
 //			offset = Math.Max(offset, giEMA.GetEmaOffset(srt, price));
 
-			IndicatorProxy.PrintLog(true, IsLiveTrading(),
+			IndicatorProxyEx.PrintLog(true, IsLiveTrading(),
 				String.Format("{0}: GetProfitTargetOffset={1}, ProfitFactorMin={2}, ProfitFactorMax={3}", CurrentBar, offset, this.MM_ProfitFactorMin, this.MM_ProfitFactorMax));
 			return offset;
 		}
@@ -802,10 +804,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Setup the S1, R1 with Highest high or Lowest low of the last n bars
 		/// </summary>
 		private void GetHiLoNPrice() {
-			if(IndicatorProxy.IsStartTimeBar(this.ctxTRT.TimeStart, ToTime(Time[0])/100, ToTime(Time[1])/100)) {
-				this.ctxTRT.S1 = IndicatorProxy.GetLowestPrice(ctxTRT.BarsLookback, false);
-				this.ctxTRT.R1 = IndicatorProxy.GetHighestPrice(ctxTRT.BarsLookback, false);
-				IndicatorProxy.PrintLog(true, false, 
+			if(IndicatorProxyEx.IsStartTimeBar(this.ctxTRT.TimeStart, ToTime(Time[0])/100, ToTime(Time[1])/100)) {
+				this.ctxTRT.S1 = IndicatorProxyEx.GetLowestPrice(ctxTRT.BarsLookback, false);
+				this.ctxTRT.R1 = IndicatorProxyEx.GetHighestPrice(ctxTRT.BarsLookback, false);
+				IndicatorProxyEx.PrintLog(true, false, 
 					string.Format("{0}: is time, S1={1}, R1={2}", CurrentBar, ctxTRT.S1, ctxTRT.R1));
 			}
 		}
@@ -813,7 +815,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 		
 		#region MarketContext Functions		
-		public override void GetMarketContext() {
+		public void GetMarketContext() {
 			ReadCtxTRT();
 		}
 		
@@ -822,12 +824,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <returns></returns>
 		public void ReadCtxTRT() {
-			ReadRestfulJson();
+			//ReadRestfulJson();
 			List<JsonStgTRT> paraDict = GConfig.LoadJson2Obj<List<JsonStgTRT>>(GetCTXFilePath());
 			Print(String.Format("ReadCtxTRT paraDict={0}, paraDict.Count={1}", paraDict, paraDict.Count));
 			if(paraDict != null && paraDict.Count > 0) {
 				this.ctxTRT = paraDict[0];
-				GUtils.DisplayProperties<JsonStgTRT>(ctxTRT, IndicatorProxy);
+				GUtils.DisplayProperties<JsonStgTRT>(ctxTRT, IndicatorProxyEx);
 			}
 			foreach(JsonStgTRT ele in paraDict) {
 				//Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Symbol, ele.Date));
@@ -842,8 +844,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			foreach(KeyValuePair<string, List<TimeCTX>> ele in paraDict.cmdMarketContext.ctx_daily.ctx) {
 //				//paraMap.Add(ele.Key, ele.Value.ToString());
 //				Print(String.Format("ele.Key={0}, ele.Value.ToString()=", ele.Key));
-//			}
-		}
+//			}			
+		}		
 		#endregion
 
 		#region Indicator Event Handler
@@ -871,7 +873,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			tsig.Order_Type = OrderType.Market;
 			tsig.SignalSource = TradeSignalSource.Indicator;
 			tsig.OrderCalculationMode = CalculationMode.Price;
-			tsig.Quantity = CurrentTrade.PosQuantity;
+			tsig.Quantity = Math.Abs(HasPosition()); //CurrentTrade.PosQuantity;
 
 			if(HasPosition() > 0 && (State != State.Historical || CurrentBar >= Bars.Count/2)) {
 				//Print(String.Format("{0}: Alert Stop Loss, HasPosition={1}", CurrentBar, HasPosition()));
@@ -884,7 +886,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			ta.ActionType = TradeActionType.ExitSimple;
 			ta.ActionStatus = TradeActionStatus.New;
 			ta.StopLossSignal = tsig;
-			CurrentTrade.TradeAction = ta;
+			//CurrentTrade.TradeAction = ta;
         }
 
 		void OnProfitTargetEvent(object sender, IndicatorEventArgs e)
@@ -910,7 +912,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			tsig.Order_Type = OrderType.Market;
 			tsig.SignalSource = TradeSignalSource.Indicator;
 			tsig.OrderCalculationMode = CalculationMode.Price;
-			tsig.Quantity = CurrentTrade.PosQuantity;
+			tsig.Quantity = Math.Abs(HasPosition()); //CurrentTrade.PosQuantity;
 
 			if(HasPosition() > 0 && (State != State.Historical || CurrentBar >= Bars.Count/1.5)) {
 				//Print(String.Format("{0}: Alert Stop Loss, HasPosition={1}", CurrentBar, HasPosition()));
@@ -923,7 +925,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			ta.ActionType = TradeActionType.ExitSimple;
 			ta.ActionStatus = TradeActionStatus.New;
 			ta.StopLossSignal = tsig;
-			CurrentTrade.TradeAction = ta;
+			//CurrentTrade.TradeAction = ta;
 			
 		}
 		#endregion
@@ -1161,45 +1163,4 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		#endregion
 	}
-	
-	public class JsonStgTRT
-    {
-		public string Symbol{get;set;}
-		public string ChartType{get;set;}
-		public string Version{get;set;}
-		public string SessionId{get;set;}
-		public string Date{get;set;}
-		public int TimeOpen{get;set;}
-		public int TimeClose{get;set;}
-		public int TimeStart{get;set;}
-		public int TimeEnd{get;set;}
-		
-		public string ChannelType{get;set;}
-		public string TrendDirection{get;set;}
-		public string TradingStyle{get;set;}
-		public string TradingDirection{get;set;}
-		
-		public int BarsLookback{get;set;}
-		public int DaysLookback{get;set;}
-		public int MALength{get;set;}
-		
-		public int EnTicOffset{get;set;}
-		public int ExTrailTics{get;set;}
-		public int StoplossTics{get;set;}
-		
-		public double S1{get;set;}
-		public double R1{get;set;}
-		public double S2{get;set;}
-		public double R2{get;set;}
-		public double S3{get;set;}
-		public double R3{get;set;}
-		public double S4{get;set;}
-		public double R4{get;set;}
-		public double S5{get;set;}
-		public double R5{get;set;}
-		
-		public double T1{get;set;}
-		public double T2{get;set;}
-
-    }
 }

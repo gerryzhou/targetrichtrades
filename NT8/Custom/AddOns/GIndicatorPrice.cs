@@ -40,6 +40,42 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		
 		#region Methods		
+		public double GetPriceByType(int barNo, PriceSubtype priceType) {
+			Print(CurrentBar + ":GetPriceByType=" + barNo + "," + priceType);
+			double prc = 0;
+			switch(priceType) {
+				case PriceSubtype.Low:
+					prc = Bars.GetLow(barNo);
+					break;
+				case PriceSubtype.High:
+					prc = Bars.GetHigh(barNo);
+					break;
+				case PriceSubtype.Open:
+					prc = Bars.GetOpen(barNo);
+					break;
+				case PriceSubtype.Close:
+					prc = Bars.GetClose(barNo);
+					break;
+			}
+			return prc;
+		}
+		
+		public double GetTick4Symbol() {
+			return Instrument.MasterInstrument.TickSize;
+		}
+		
+		public double GetOpenPrice(int time_open) {
+			if(ToTime(Time[1]) < time_open && ToTime(Time[0]) >= time_open)
+				return Open[0];
+			else return -1;
+		}
+		
+		public double GetClosePrice(int time_close) {
+			if(ToTime(Time[1]) < time_close && ToTime(Time[0]) >= time_close)
+				return Close[0];
+			else return -1;
+		}
+		
 		/// <summary>
 		/// 
 		/// </summary>

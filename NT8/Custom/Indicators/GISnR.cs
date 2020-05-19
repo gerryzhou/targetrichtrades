@@ -1,31 +1,18 @@
 #region Using declarations
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
-using NinjaTrader.Gui.Chart;
-using NinjaTrader.Gui.SuperDom;
-using NinjaTrader.Gui.Tools;
 using NinjaTrader.Data;
-using NinjaTrader.NinjaScript;
-using NinjaTrader.Core.FloatingPoint;
-using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators
 {
-	public class GISnR : GIndicatorBase
+    public class GISnR : GIndicatorBase
 	{
 		private Series<double> CustmSeries;
 
@@ -361,7 +348,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 namespace NinjaTrader.NinjaScript.Indicators
 {
-	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
+    public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GISnR[] cacheGISnR;
 		public GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose, bool showTodayOpen, int timeOpen, int timeClose)
@@ -382,7 +369,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
-	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
+    public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
 		public Indicators.GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose, bool showTodayOpen, int timeOpen, int timeClose)
 		{
@@ -398,7 +385,7 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
+    public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
 		public Indicators.GISnR GISnR(bool showOvernightHL, bool showOpenHL, bool showLastdayHL, bool showLastdayClose, bool showTodayOpen, int timeOpen, int timeClose)
 		{

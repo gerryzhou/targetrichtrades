@@ -14,7 +14,7 @@
 	"CmdPathRoot": "Strategy",
 	"CmdFileName": "cmd_StgProdTRT.json",
 	"CTXFileName": "ctx_StgProdTRT.json",
-	"AlertBarsBack": 8,
+	"AlertBarsBack": 250,
 	"SoundFileName": "Latnwhis.wav",
 	"SoundPlayLoop": "4",
 	"MenuFileName": "menu_StgProdTRT.json"

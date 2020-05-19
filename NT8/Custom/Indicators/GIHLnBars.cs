@@ -4,37 +4,22 @@
 //
 #region Using declarations
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using NinjaTrader.Cbi;
-using NinjaTrader.Gui;
-using NinjaTrader.Gui.Chart;
-using NinjaTrader.Gui.SuperDom;
-using NinjaTrader.Data;
-using NinjaTrader.NinjaScript;
-using NinjaTrader.Core.FloatingPoint;
-using NinjaTrader.NinjaScript.DrawingTools;
-using NinjaTrader.NinjaScript.AddOns;
 using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 // This namespace holds indicators in this folder and is required. Do not change it.
 namespace NinjaTrader.NinjaScript.Indicators
 {
-	/// <summary>
-	/// Exponential Moving Average. The Exponential Moving Average is an indicator that
-	/// shows the average value of a security's price over a period of time. When calculating
-	/// a moving average. The EMA applies more weight to recent prices than the SMA.
-	/// </summary>
-	public class GIHLnBars : GIndicatorBase
+    /// <summary>
+    /// Exponential Moving Average. The Exponential Moving Average is an indicator that
+    /// shows the average value of a security's price over a period of time. When calculating
+    /// a moving average. The EMA applies more weight to recent prices than the SMA.
+    /// </summary>
+    public class GIHLnBars : GIndicatorBase
 	{
 //		private double constant1;
 //		private double constant2;
@@ -164,7 +149,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 namespace NinjaTrader.NinjaScript.Indicators
 {
-	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
+    public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GIHLnBars[] cacheGIHLnBars;
 		public GIHLnBars GIHLnBars(int period)
@@ -185,7 +170,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
-	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
+    public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
 		public Indicators.GIHLnBars GIHLnBars(int period)
 		{
@@ -201,7 +186,7 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
+    public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
 		public Indicators.GIHLnBars GIHLnBars(int period)
 		{

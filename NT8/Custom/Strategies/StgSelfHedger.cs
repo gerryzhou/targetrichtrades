@@ -6,6 +6,7 @@
 using System;
 using System.Windows.Media;
 using NinjaTrader.NinjaScript.Indicators;
+using NinjaTrader.NinjaScript.Strategies;
 using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
 
