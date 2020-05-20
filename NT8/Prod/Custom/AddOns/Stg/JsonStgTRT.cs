@@ -2,7 +2,7 @@
 #endregion
 
 //This namespace holds Add ons in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.AddOns
+namespace NinjaTrader.NinjaScript.Strategies
 {
     public class JsonStgTRT
     {

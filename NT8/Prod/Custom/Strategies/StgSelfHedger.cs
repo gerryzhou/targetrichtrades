@@ -16,7 +16,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	/// <summary>
 	/// Hedge by itself: one trend following, the other is counter trend;
 	/// </summary>
-	public class StgSelfHedger : GStrategyBaseEx
+	public class StgSelfHedger : GStrategyBase
 	{
 		private RSI rsi;
 		private ADX adx;

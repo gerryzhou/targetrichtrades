@@ -9,9 +9,8 @@ using NinjaTrader.Cbi;
 using NinjaTrader.Data;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.AddOns;
-using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
-using NinjaTrader.NinjaScript.Indicators.PriceActions;
-using NinjaTrader.NinjaScript.Strategies.ZTraderStg;
+using NinjaTrader.NinjaScript.AddOns.PriceActions;
+using NinjaTrader.NinjaScript.Strategies;
 
 #endregion
 
@@ -77,7 +76,7 @@ namespace NinjaTrader.NinjaScript.Strategies
     /// 4.	The reverse will hold true on a gap up that is below the high of the prior 5 days, 
     /// there will be a countertrend fade into the moving averages.
     /// </summary>
-    public class TBProdTRT : GStrategyBaseEx
+    public class TBProdTRT : GStrategyBase
 	{
 		#region Variables
 		//private GISMI giSMI;
@@ -121,12 +120,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (State == State.DataLoaded)
 			{
 				Print(this.Name + " Set DataLoaded called....");
-				AddChartIndicator(IndicatorProxyEx);
+				AddChartIndicator(IndicatorProxy);
 				/*SetPrintOut(1);
 				IndicatorProxy.LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
 				IndicatorProxy.AddPriceActionTypeAllowed(PriceActionType.DnWide);*/
 				GetMarketContext();
-				GAlert.LoadAlerConfig(IndicatorProxyEx);
+				GAlert.LoadAlerConfig(IndicatorProxy);
 				
 				//giSMI = GISMI(EMAPeriod1, EMAPeriod2, Range, SMITMAPeriod, SMICrossLevel);//(3, 5, 5, 8);
 				//awOscillator = GIAwesomeOscillator(FastPeriod, SlowPeriod, Smooth, MovingAvgType.SMA, false);//(5, 34, 5, MovingAvgType.SMA);
@@ -180,8 +179,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//IndicatorProxy.TraceMessage(this.Name, PrintOut);
 				//Print(String.Format("{0}: Stg={1}, GSZTrader={2}", CurrentBar, CurrentTrade.InstStrategy, IndicatorProxy.GSZTrader));
 			} catch (Exception ex) {
-				IndicatorProxyEx.Log2Disk = true;
-				IndicatorProxyEx.PrintLog(true, true, "Exception: " + ex.StackTrace);
+				IndicatorProxy.Log2Disk = true;
+				IndicatorProxy.PrintLog(true, true, "Exception: " + ex.StackTrace);
 			}
 		}
 		#endregion
@@ -196,9 +195,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			Print(CurrentBar + ":CheckNewEntrySignals called -----------" + giSMI.LastInflection);
 
 			if(NewTradeAllowed())
-				IndicatorProxyEx.PrintLog(true, IsLiveTrading(), String.Format("{0}: CheckNewEntrySignals called....NewOrderAllowed", CurrentBar));
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: CheckNewEntrySignals called....NewOrderAllowed", CurrentBar));
 			else {
-				IndicatorProxyEx.PrintLog(true, IsLiveTrading(), String.Format("{0}: CheckNewEntrySignals called....NewOrderNotAllowed", CurrentBar));
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: CheckNewEntrySignals called....NewOrderNotAllowed", CurrentBar));
 				return false;
 			}
 			
@@ -260,7 +259,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			} else
 				return false;
 			
-			indSig.SignalName = IndicatorProxyEx.SignalName_LineCross;
+			indSig.SignalName = IndicatorProxy.SignalName_LineCross;
 			indSig.SignalAction.SnR.Resistance = Math.Max(this.ctxTRT.R1, this.giSnR.LastDayRst[0]);
 			indSig.SignalAction.SnR.Support = Math.Min(this.ctxTRT.S1, this.giSnR.LastDaySpt[0]);
 			indSig.BarNo = CurrentBar;
@@ -541,8 +540,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			if (giParabSAR.IsSpvAllowed4PAT(curBarPriceAction.paType) && barsSinceLastCross < barsAgoMaxPbSAREn) 
 //				return true;
 //			else return false;
-			PriceAction pa = IndicatorProxyEx.GetPriceAction(Time[0]);
-			IndicatorProxyEx.PrintLog(true, IsLiveTrading(), CurrentBar + ":"
+			PriceAction pa = IndicatorProxy.GetPriceAction(Time[0]);
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":"
 				+ ";ToShortDateString=" + Time[0].ToString()
 				+ ";paType=" + pa.paType.ToString()
 				+ ";maxDownTicks=" + pa.voltality
@@ -598,7 +597,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//NinjaTrader.NinjaScript.Alert.AlertCallback(NinjaTrader.Cbi.Instrument.GetInstrument("MSFT"), this, "someId", NinjaTrader.Core.Globals.Now, Priority.High, "message", NinjaTrader.Core.Globals.InstallDir+@"\sounds\Alert1.wav", new SolidColorBrush(Colors.Blue), new SolidColorBrush(Colors.White), 0);
 				// Instead of PlaySound()
 				//NinjaTrader.NinjaScript.Alert.AlertCallback(Bars.Instrument, this, "someId", NinjaTrader.Core.Globals.Now, Priority.High, "message", NinjaTrader.Core.Globals.InstallDir+@"\sounds\Alert1.wav", new SolidColorBrush(Colors.Blue), new SolidColorBrush(Colors.White), 0);
-				GAlert.PlaySoundFile(altMsg, IndicatorProxyEx);
+				GAlert.PlaySoundFile(altMsg, IndicatorProxy);
 			}
 		}
 		
@@ -677,7 +676,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public bool NewTradeAllowed() {
-			IndicatorProxyEx.PrintLog(true, IsLiveTrading(), 
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				String.Format("{0}: NewOrderAllowed called in TBProdTRT... HasPosition={1}, TM_MaxOpenPosition={2}",
 			CurrentBar, HasPosition(), TM_MaxOpenPosition));
 			if(Math.Abs(HasPosition()) < TM_MaxOpenPosition)
@@ -750,7 +749,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			prc = GetValidStopLossPrice(new List<double>{prcLH, prcInfl}, MM_SLPriceGapPref);
 //			if(prc <= 0)
 //				prc = GetValidStopLossPrice(Close[0]);
-			IndicatorProxyEx.PrintLog(true, IsLiveTrading(),
+			IndicatorProxy.PrintLog(true, IsLiveTrading(),
 				String.Format("{0}: GetStopLossOffset={1}", CurrentBar, offset));
 			return offset;
 		}
@@ -762,7 +761,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			offset = Math.Max(offset, giVwap.GetVwapOpenDOffset(srt, price));
 //			offset = Math.Max(offset, giEMA.GetEmaOffset(srt, price));
 
-			IndicatorProxyEx.PrintLog(true, IsLiveTrading(),
+			IndicatorProxy.PrintLog(true, IsLiveTrading(),
 				String.Format("{0}: GetProfitTargetOffset={1}, ProfitFactorMin={2}, ProfitFactorMax={3}", CurrentBar, offset, this.MM_ProfitFactorMin, this.MM_ProfitFactorMax));
 			return offset;
 		}
@@ -804,10 +803,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Setup the S1, R1 with Highest high or Lowest low of the last n bars
 		/// </summary>
 		private void GetHiLoNPrice() {
-			if(IndicatorProxyEx.IsStartTimeBar(this.ctxTRT.TimeStart, ToTime(Time[0])/100, ToTime(Time[1])/100)) {
-				this.ctxTRT.S1 = IndicatorProxyEx.GetLowestPrice(ctxTRT.BarsLookback, false);
-				this.ctxTRT.R1 = IndicatorProxyEx.GetHighestPrice(ctxTRT.BarsLookback, false);
-				IndicatorProxyEx.PrintLog(true, false, 
+			if(IndicatorProxy.IsStartTimeBar(this.ctxTRT.TimeStart, ToTime(Time[0])/100, ToTime(Time[1])/100)) {
+				this.ctxTRT.S1 = IndicatorProxy.GetLowestPrice(ctxTRT.BarsLookback, false);
+				this.ctxTRT.R1 = IndicatorProxy.GetHighestPrice(ctxTRT.BarsLookback, false);
+				IndicatorProxy.PrintLog(true, false, 
 					string.Format("{0}: is time, S1={1}, R1={2}", CurrentBar, ctxTRT.S1, ctxTRT.R1));
 			}
 		}
@@ -829,7 +828,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Print(String.Format("ReadCtxTRT paraDict={0}, paraDict.Count={1}", paraDict, paraDict.Count));
 			if(paraDict != null && paraDict.Count > 0) {
 				this.ctxTRT = paraDict[0];
-				GUtils.DisplayProperties<JsonStgTRT>(ctxTRT, IndicatorProxyEx);
+				GUtils.DisplayProperties<JsonStgTRT>(ctxTRT, IndicatorProxy);
 			}
 			foreach(JsonStgTRT ele in paraDict) {
 				//Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Symbol, ele.Date));

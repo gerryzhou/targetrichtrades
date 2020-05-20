@@ -2,8 +2,7 @@
 using System.ComponentModel;
 using System.Xml.Serialization;
 using NinjaTrader.NinjaScript.Indicators;
-using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
-using NinjaTrader.NinjaScript.Indicators.PriceActions;
+using NinjaTrader.NinjaScript.AddOns.PriceActions;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -22,7 +21,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		#region Methods
 		public virtual void GetMarketContext() {
-			MarketCTX = ReadCmdParaObj<MktContext>();
+			//MarketCTX = ReadCmdParaObj<MktContext>();
 			//ReadCtxParaObj();
 		}
 		/// <summary>
