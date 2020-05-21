@@ -63,7 +63,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public void SetInitParams() {
 			Print(this.Name + " Set initParams called....");			
 			Description									= @"GS Z-Trader base;";
-			Name										= "GSZTraderBaseEx";
+			Name										= "GSZTraderBase";
 			//Account.All.FirstOrDefault(a => a.Name == "Sim101");
 			//this.accName								= Account.Name;
 			Calculate									= Calculate.OnPriceChange;
@@ -95,7 +95,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//CustomColor1					= Brushes.Orange;
 //			StartH	= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
 			// Use Unmanaged order methods
-        	IsUnmanaged = true;
+        	IsUnmanaged = false;
 //			AlgoMode = AlgoModeType.Trading;
 		}
 		#endregion
@@ -107,9 +107,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else return false;
 		}
 		
-//		public void SetPrintOut(int i) {
-//			PrintOut = IndicatorProxy.PrintOut + i;
-//		}
+		public void SetPrintOut(int i) {
+			PrintOut = IndicatorProxy.PrintOut + i;
+		}
 		public string GetCmdDir() {
 			List<string> names = new List<string>(){"CmdPathRoot"};
 			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
@@ -157,38 +157,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//var countries = JsonConvert.DeserializeObject>(responseBody);
 		}
 		*/
-		#endregion
-
-		public virtual void AlertTradeSignal(TradeSignal tsig, string caption){}
-
-		#region Money Mgmt Functions
-		
-		public virtual bool IsProfitFactorValid(double risk, double reward, double pfMin, double pfMax) {
-			bool is_valid = false;
-			if(risk > 0 && reward > 0 && pfMin <= reward/risk && pfMax >= reward/risk)
-				is_valid = true;
-			return is_valid;
-		}
-		public double CheckPerformance()
-		{			
-			double pl = SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit;//Performance.AllTrades.TradesPerformance.Currency.CumProfit;
-			double plrt = SystemPerformance.RealTimeTrades.TradesPerformance.Currency.CumProfit;//Performance.RealtimeTrades.TradesPerformance.Currency.CumProfit;
-			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
-				CurrentBar + "-" + this.accName + ": Cum all PnL= " + pl + ", Cum runtime PnL= " + plrt);
-			if (IndicatorProxy.IsLastBarOnChart() > 0 && SystemPerformance.AllTrades.Count > 0)
-			{
-			    foreach (Trade myTrade in SystemPerformance.AllTrades)
-			    {
-			    	if (myTrade.Entry.MarketPosition == MarketPosition.Long)
-			        	IndicatorProxy.PrintLog(true, IsLiveTrading(), 
-						String.Format("#{0}, ProfitCurrency={1}", myTrade.TradeNumber, myTrade.ProfitCurrency));
-			    }
-				IndicatorProxy.PrintLog(true, IsLiveTrading(), 
-					String.Format("There are {0} trades, NetProfit={1}",
-					SystemPerformance.AllTrades.Count, SystemPerformance.AllTrades.TradesPerformance.NetProfit));
-			}
-			return plrt;
-		}
 		#endregion
 		
 		#region Position Mgmt Functions
@@ -247,18 +215,120 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		#endregion
 
+		#region Event Handlers
+		#endregion
+		
+		#region Interfaces
+		public virtual void AlertTradeSignal(TradeSignal tsig, string caption){}
+		#endregion
+		
 		#region Properties
-//		[Browsable(false), XmlIgnore()]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
-//		public GIndicatorProxy IndicatorProxy
-//        {
-//            get;set;
-//        }
+		[Description("Account Name")]
+		[NinjaScriptProperty, XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AccName", GroupName = GPS_GSTRATEGY, Order = ODG_AccName)]		
+        public string AccName
+        {
+            get { return accName; }
+            set { accName = value; }
+        }
+		
+		/// <summary>
+		/// AlgoMode: 0=liquidate; 
+		/// 1=trading; 
+		/// 2=semi-algo(manual entry, algo exit);
+		/// -1=stop trading(no entry/exit, cancel entry orders and keep the exit order as it is if there has position);
+		/// -2=stop trading(no entry/exit, liquidate positions and cancel all entry/exit orders);
+		/// </summary>
+		/// <returns></returns>
+        [Description("Algo mode")]
+//		[NinjaScriptProperty]
+		[XmlIgnore]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "AlgoMode", GroupName = GPS_GSTRATEGY, Order = ODG_AlgoMode)]			
+		public AlgoModeType AlgoMode
+        {
+            get { return algoMode; }
+            set { algoMode = value; }
+        }
+
+        [Description("BackTesting mode or not")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BackTest", GroupName = GPS_GSTRATEGY, Order = ODG_BackTest)]		
+        public bool BackTest
+        {
+            get { return backTest; }
+            set { backTest = value; }
+        }
+		
+        [Description("Live update Model")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "LiveModelUpdate", GroupName = GPS_GSTRATEGY, Order = ODG_LiveModelUpdate)]		
+        public bool LiveModelUpdate
+        {
+            get { return liveModelUpdate; }
+            set { liveModelUpdate = value; }
+        }
+		
+        [Description("Model update URL")]
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "ModelUpdateURL", GroupName = GPS_GSTRATEGY, Order = ODG_ModelUpdateURL)]		
+        public string ModelUpdateURL
+        {
+            get { return liveUpdateURL; }
+            set { liveUpdateURL = value; }
+        }
+		
+        [Description("Print out level: large # print out more")]
+		[Range(-5, 5), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PrintOut", GroupName = GPS_GSTRATEGY, Order = ODG_PrintOut)]		
+        public int PrintOut
+        {
+            get { return printOut; }
+            set { printOut = Math.Max(-5, value); }
+        }
+		
+//		[NinjaScriptProperty]
+//		[XmlIgnore]
+//		[Display(Name="CustomColor1", Description="Color-1", Order=1, GroupName="Parameters")]
+//		public Brush CustomColor1
+//		{ get; set; }
+
+//		[Browsable(false)]
+//		public string CustomColor1Serializable
+//		{
+//			get { return Serialize.BrushToString(CustomColor1); }
+//			set { CustomColor1 = Serialize.StringToBrush(value); }
+//		}			
+
+		[Description("Time to Start Strategy")]
+		[NinjaScriptProperty]
+		//[PropertyEditor("NinjaTrader.Gui.Tools.TimeEditorKey")]
+		[Display(ResourceType = typeof(Custom.Resource), Name="StartH", Description="StartH", Order=ODG_StartH, GroupName=GPS_GSTRATEGY)]
+		public DateTime StartH
+		{ get; set; }
+
+//		[NinjaScriptProperty]
+//		[Range(1, double.MaxValue)]
+//		[Display(Name="CustomPrc1", Description="prc-1", Order=3, GroupName="Parameters")]
+//		public double CustomPrc1
+//		{ get; set; }
+
+		[Browsable(false), XmlIgnore]
+		public Series<double> CustomPlot1
+		{
+			get { return Values[0]; }
+		}
+
+		[Browsable(false), XmlIgnore]
+		public Series<double> CustomPlot2
+		{
+			get { return Values[1]; }
+		}
 		#endregion
 
 		#region Variables for Properties
 		
 		private string accName = "Sim101";
-//		private AlgoModeType algoMode = AlgoModeType.Trading;
+		private AlgoModeType algoMode = AlgoModeType.Trading;
 		private bool backTest = true; //if it runs for backtesting;
 		private bool liveModelUpdate = false; //if it keeps model updated bar by bar
 		private string liveUpdateURL = "https://thetradingbook.com/modelupdate"; //model updated URL

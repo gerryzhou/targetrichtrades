@@ -98,7 +98,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#region Init Functions
 		public TBProdTRT () {
-			VendorLicense("TheTradingBook", "Default", "thetradingbook.com", "support@tradingbook.com",null);
+			//VendorLicense("TheTradingBook", "Default", "thetradingbook.com", "support@tradingbook.com",null);
+			VendorLicense("TheTradingBook", "TBProdTRT", "thetradingbook.com", "support@tradingbook.com",null);
 		}
 		
 		protected override void OnStateChange()
@@ -852,7 +853,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         void OnStopLossEvent(object sender, IndicatorEventArgs e)
         {
 			IndicatorSignal isig = e.IndSignal;
-            Print(String.Format("{0}: {1} sent this message: {2}, B#={3}, signame={4}, bkdir={5}", 
+            Print(String.Format("{0}: {1} sent this OnStopLossEvent: {2}, B#={3}, signame={4}, bkdir={5}", 
 			CurrentBar, sender.GetType().Name, 
 			e.Message, isig.BarNo, isig.SignalName, isig.BreakoutDir.ToString()));
 			
@@ -891,7 +892,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		void OnProfitTargetEvent(object sender, IndicatorEventArgs e)
         {
 			IndicatorSignal isig = e.IndSignal;
-            Print(String.Format("{0}: {1} sent this message: {2}, B#={3}, signame={4}, bkdir={5}", 
+            Print(String.Format("{0}: {1} sent this OnProfitTargetEvent: {2}, B#={3}, signame={4}, bkdir={5}", 
 			CurrentBar, sender.GetType().Name, 
 			e.Message, isig.BarNo, isig.SignalName, isig.BreakoutDir.ToString()));
 			

@@ -79,8 +79,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 			
 		#region Properties
 		[NinjaScriptProperty]
-		[Display(Name="GSZTraderEx", Description="GSZTrader instance for indicator proxy")]
-		public GStrategyBase GSZTraderEx
+		[Display(Name="GSZTrader", Description="GSZTrader instance for indicator proxy")]
+		public GStrategyBase GSZTrader
 		{ get; set; }
 		
 		//[NinjaScriptProperty]
@@ -114,18 +114,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GIndicatorProxy[] cacheGIndicatorProxy;
-		public GIndicatorProxy GIndicatorProxy(GStrategyBase gSZTraderEx)
+		public GIndicatorProxy GIndicatorProxy(GStrategyBase gSZTrader)
 		{
-			return GIndicatorProxy(Input, gSZTraderEx);
+			return GIndicatorProxy(Input, gSZTrader);
 		}
 
-		public GIndicatorProxy GIndicatorProxy(ISeries<double> input, GStrategyBase gSZTraderEx)
+		public GIndicatorProxy GIndicatorProxy(ISeries<double> input, GStrategyBase gSZTrader)
 		{
 			if (cacheGIndicatorProxy != null)
 				for (int idx = 0; idx < cacheGIndicatorProxy.Length; idx++)
-					if (cacheGIndicatorProxy[idx] != null && cacheGIndicatorProxy[idx].GSZTraderEx == gSZTraderEx && cacheGIndicatorProxy[idx].EqualsInput(input))
+					if (cacheGIndicatorProxy[idx] != null && cacheGIndicatorProxy[idx].GSZTrader == gSZTrader && cacheGIndicatorProxy[idx].EqualsInput(input))
 						return cacheGIndicatorProxy[idx];
-			return CacheIndicator<GIndicatorProxy>(new GIndicatorProxy(){ GSZTraderEx = gSZTraderEx }, input, ref cacheGIndicatorProxy);
+			return CacheIndicator<GIndicatorProxy>(new GIndicatorProxy(){ GSZTrader = gSZTrader }, input, ref cacheGIndicatorProxy);
 		}
 	}
 }
@@ -134,14 +134,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GIndicatorProxy GIndicatorProxy(GStrategyBase gSZTraderEx)
+		public Indicators.GIndicatorProxy GIndicatorProxy(GStrategyBase gSZTrader)
 		{
-			return indicator.GIndicatorProxy(Input, gSZTraderEx);
+			return indicator.GIndicatorProxy(Input, gSZTrader);
 		}
 
-		public Indicators.GIndicatorProxy GIndicatorProxy(ISeries<double> input , GStrategyBase gSZTraderEx)
+		public Indicators.GIndicatorProxy GIndicatorProxy(ISeries<double> input , GStrategyBase gSZTrader)
 		{
-			return indicator.GIndicatorProxy(input, gSZTraderEx);
+			return indicator.GIndicatorProxy(input, gSZTrader);
 		}
 	}
 }
@@ -150,14 +150,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GIndicatorProxy GIndicatorProxy(GStrategyBase gSZTraderEx)
+		public Indicators.GIndicatorProxy GIndicatorProxy(GStrategyBase gSZTrader)
 		{
-			return indicator.GIndicatorProxy(Input, gSZTraderEx);
+			return indicator.GIndicatorProxy(Input, gSZTrader);
 		}
 
-		public Indicators.GIndicatorProxy GIndicatorProxy(ISeries<double> input , GStrategyBase gSZTraderEx)
+		public Indicators.GIndicatorProxy GIndicatorProxy(ISeries<double> input , GStrategyBase gSZTrader)
 		{
-			return indicator.GIndicatorProxy(input, gSZTraderEx);
+			return indicator.GIndicatorProxy(input, gSZTrader);
 		}
 	}
 }
