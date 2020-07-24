@@ -31,11 +31,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 	/// </summary>
 	public partial class GIndicatorBase : Indicator
 	{
-		
-		#region Methods
-		
-		#endregion
-		
+
 		#region Event Handler
         // Declare the event using EventHandler<T>
         public event EventHandler<IndicatorEventArgs> RaiseIndicatorEvent;

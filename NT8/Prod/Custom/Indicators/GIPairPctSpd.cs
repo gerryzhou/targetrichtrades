@@ -77,7 +77,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//AddDataSeries("NQ 06-20", Data.BarsPeriodType.Minute, 13, Data.MarketDataType.Last);
 				//AddDataSeries("RTY 06-20", Data.BarsPeriodType.Minute, 13, Data.MarketDataType.Last);
 				//AddDataSeries("NRGU", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
-				AddDataSeries(SecondSymbol, Data.BarsPeriodType.Minute, 4, Data.MarketDataType.Last);
+				AddDataSeries(SecondSymbol, Data.BarsPeriodType.Minute, ChartMinutes, Data.MarketDataType.Last);
 			}
 			else if (State == State.DataLoaded)
 			{
@@ -316,10 +316,22 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[Display(Name="SecondSymbol", Description="The second symbol of the pair", Order=1, GroupName="Parameters")]
 		public string SecondSymbol
 		{ get; set; }
-
+		
+		[NinjaScriptProperty]
+		[Range(1, int.MaxValue)]
+		[Display(Name="ChartMinutes", Description="Minutes for the chart", Order=2, GroupName="Parameters")]
+		public int ChartMinutes
+		{ 	get{
+				return chartMinutes;
+			}
+			set{
+				chartMinutes = value;
+			}
+		}
+		
 		[NinjaScriptProperty]
 		[Range(1, double.MaxValue)]
-		[Display(Name="CapRatio1", Description="CapRatio of first instrument", Order=2, GroupName="Parameters")]
+		[Display(Name="CapRatio1", Description="CapRatio of first instrument", Order=3, GroupName="Parameters")]
 		public double CapRatio1
 		{ 	get{
 				return capRatio1;
@@ -331,7 +343,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		[NinjaScriptProperty]
 		[Range(1, double.MaxValue)]
-		[Display(Name="CapRatio2", Description="CapRatio of 2nd instrument", Order=3, GroupName="Parameters")]
+		[Display(Name="CapRatio2", Description="CapRatio of 2nd instrument", Order=4, GroupName="Parameters")]
 		public double CapRatio2
 		{ 	get{
 				return capRatio2;
@@ -386,7 +398,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private double capRatio1 = 1;
 		private double capRatio2 = 1;
 		private double pctChgSpdThreshold = 1;
+		private int chartMinutes = 4;
 		#endregion
+		
 		#region Pre-defined signal name
 		[Browsable(false), XmlIgnore]
 		public string SignalName_EntryOnOpenLong
@@ -415,18 +429,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GIPairPctSpd[] cacheGIPairPctSpd;
-		public GIPairPctSpd GIPairPctSpd(int rocPeriod, string secondSymbol, double capRatio1, double capRatio2, double pctChgSpdThreshold)
+		public GIPairPctSpd GIPairPctSpd(int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThreshold)
 		{
-			return GIPairPctSpd(Input, rocPeriod, secondSymbol, capRatio1, capRatio2, pctChgSpdThreshold);
+			return GIPairPctSpd(Input, rocPeriod, secondSymbol, chartMinutes, capRatio1, capRatio2, pctChgSpdThreshold);
 		}
 
-		public GIPairPctSpd GIPairPctSpd(ISeries<double> input, int rocPeriod, string secondSymbol, double capRatio1, double capRatio2, double pctChgSpdThreshold)
+		public GIPairPctSpd GIPairPctSpd(ISeries<double> input, int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThreshold)
 		{
 			if (cacheGIPairPctSpd != null)
 				for (int idx = 0; idx < cacheGIPairPctSpd.Length; idx++)
-					if (cacheGIPairPctSpd[idx] != null && cacheGIPairPctSpd[idx].RocPeriod == rocPeriod && cacheGIPairPctSpd[idx].SecondSymbol == secondSymbol && cacheGIPairPctSpd[idx].CapRatio1 == capRatio1 && cacheGIPairPctSpd[idx].CapRatio2 == capRatio2 && cacheGIPairPctSpd[idx].PctChgSpdThreshold == pctChgSpdThreshold && cacheGIPairPctSpd[idx].EqualsInput(input))
+					if (cacheGIPairPctSpd[idx] != null && cacheGIPairPctSpd[idx].RocPeriod == rocPeriod && cacheGIPairPctSpd[idx].SecondSymbol == secondSymbol && cacheGIPairPctSpd[idx].ChartMinutes == chartMinutes && cacheGIPairPctSpd[idx].CapRatio1 == capRatio1 && cacheGIPairPctSpd[idx].CapRatio2 == capRatio2 && cacheGIPairPctSpd[idx].PctChgSpdThreshold == pctChgSpdThreshold && cacheGIPairPctSpd[idx].EqualsInput(input))
 						return cacheGIPairPctSpd[idx];
-			return CacheIndicator<GIPairPctSpd>(new GIPairPctSpd(){ RocPeriod = rocPeriod, SecondSymbol = secondSymbol, CapRatio1 = capRatio1, CapRatio2 = capRatio2, PctChgSpdThreshold = pctChgSpdThreshold }, input, ref cacheGIPairPctSpd);
+			return CacheIndicator<GIPairPctSpd>(new GIPairPctSpd(){ RocPeriod = rocPeriod, SecondSymbol = secondSymbol, ChartMinutes = chartMinutes, CapRatio1 = capRatio1, CapRatio2 = capRatio2, PctChgSpdThreshold = pctChgSpdThreshold }, input, ref cacheGIPairPctSpd);
 		}
 	}
 }
@@ -435,14 +449,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GIPairPctSpd GIPairPctSpd(int rocPeriod, string secondSymbol, double capRatio1, double capRatio2, double pctChgSpdThreshold)
+		public Indicators.GIPairPctSpd GIPairPctSpd(int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThreshold)
 		{
-			return indicator.GIPairPctSpd(Input, rocPeriod, secondSymbol, capRatio1, capRatio2, pctChgSpdThreshold);
+			return indicator.GIPairPctSpd(Input, rocPeriod, secondSymbol, chartMinutes, capRatio1, capRatio2, pctChgSpdThreshold);
 		}
 
-		public Indicators.GIPairPctSpd GIPairPctSpd(ISeries<double> input , int rocPeriod, string secondSymbol, double capRatio1, double capRatio2, double pctChgSpdThreshold)
+		public Indicators.GIPairPctSpd GIPairPctSpd(ISeries<double> input , int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThreshold)
 		{
-			return indicator.GIPairPctSpd(input, rocPeriod, secondSymbol, capRatio1, capRatio2, pctChgSpdThreshold);
+			return indicator.GIPairPctSpd(input, rocPeriod, secondSymbol, chartMinutes, capRatio1, capRatio2, pctChgSpdThreshold);
 		}
 	}
 }
@@ -451,14 +465,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GIPairPctSpd GIPairPctSpd(int rocPeriod, string secondSymbol, double capRatio1, double capRatio2, double pctChgSpdThreshold)
+		public Indicators.GIPairPctSpd GIPairPctSpd(int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThreshold)
 		{
-			return indicator.GIPairPctSpd(Input, rocPeriod, secondSymbol, capRatio1, capRatio2, pctChgSpdThreshold);
+			return indicator.GIPairPctSpd(Input, rocPeriod, secondSymbol, chartMinutes, capRatio1, capRatio2, pctChgSpdThreshold);
 		}
 
-		public Indicators.GIPairPctSpd GIPairPctSpd(ISeries<double> input , int rocPeriod, string secondSymbol, double capRatio1, double capRatio2, double pctChgSpdThreshold)
+		public Indicators.GIPairPctSpd GIPairPctSpd(ISeries<double> input , int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThreshold)
 		{
-			return indicator.GIPairPctSpd(input, rocPeriod, secondSymbol, capRatio1, capRatio2, pctChgSpdThreshold);
+			return indicator.GIPairPctSpd(input, rocPeriod, secondSymbol, chartMinutes, capRatio1, capRatio2, pctChgSpdThreshold);
 		}
 	}
 }

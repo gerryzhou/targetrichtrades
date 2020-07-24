@@ -29,8 +29,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private ADX adx1;
 
 		public StgSelfHedger () {
-			VendorLicense("TheTradingBook", "Default", "thetradingbook.com", "support@tradingbook.com",null);
+			VendorLicense("TheTradingBook", "StgSelfHedger", "thetradingbook.com", "support@tradingbook.com",null);
 		}
+		
 		protected override void OnStateChange()
 		{
 			base.OnStateChange();
