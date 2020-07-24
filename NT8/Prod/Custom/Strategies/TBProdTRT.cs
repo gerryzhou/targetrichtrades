@@ -139,8 +139,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				
 				giHLnBars.RaiseIndicatorEvent += OnStopLossEvent;
 				giHLnBars.RaiseIndicatorEvent += OnProfitTargetEvent;
-				//giSnR.RaiseIndicatorEvent += OnStopLossEvent;
-				//giSnR.RaiseIndicatorEvent += OnProfitTargetEvent;
+				giSnR.RaiseIndicatorEvent += OnStopLossEvent;
+				giSnR.RaiseIndicatorEvent += OnProfitTargetEvent;
 				giVwap.RaiseIndicatorEvent += OnStopLossEvent;
 				giEMA.RaiseIndicatorEvent += OnStopLossEvent;
 				//this.RaiseStrategyEvent += OnGISnREvent;
@@ -152,6 +152,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//AddChartIndicator(giPbSAR);
 				AddChartIndicator(giSnR);
 				//AddChartIndicator(giSnRPriorWM);
+				CurrentTrade.CurrentTradeType = TradeType.ScaleIn;
 //				Print("GISMI called:" + "EMAPeriod1=" + EMAPeriod1 + "EMAPeriod2=" + EMAPeriod2 + "Range=" + Range + "SMITMAPeriod=" + SMITMAPeriod);
 //				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: StgProdTRT GetMarketContext called...", CurrentBar));
 			}
@@ -171,8 +172,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//GetHiLoNPrice();
 				//giHLnBars.Update();
 				base.OnBarUpdate();
-				CheckPerformance();
-				CheckNewEntrySignals();
+				//CheckPerformance();
+				//CheckNewEntrySignals();
 //				if(giSnR.IsCutoffTime(BarsInProgress, 11, 20)) {
 //				Print(String.Format("{0}:[{1}] IsCutoffTime EnEx Bip{2}: ",
 //				CurrentBar, Times[BarsInProgress][0], BarsInProgress));
@@ -191,7 +192,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// Check the time, position, trend,
 		/// </summary>
 		/// <returns></returns>
-		public bool CheckNewEntrySignals(){
+		public override bool CheckNewEntrySignals(){
 			//giPbSAR.Update();
 //			Print(CurrentBar + ":CheckNewEntrySignals called -----------" + giSMI.LastInflection);
 
@@ -230,7 +231,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				else if(dir.TrendDir==TrendDirection.Down) 
 					enSig.Action = OrderAction.Sell;
 				enSig.Order_Type = OrderType.Market;
-				//AddTradeSignal(CurrentBar, IndicatorTradeSignals, enSig);
+				AddTradeSignal(CurrentBar, IndicatorTradeSignals, enSig);
 				giHLnBars.RefBarLowestN = CurrentBar;
 				Print(CurrentBar + ":PatternMatched-- " + enSig.Action.ToString() + "," + enSig.SignalSource.ToString());
 				AlertTradeSignal(enSig, "Entry Signal Alert");
@@ -418,8 +419,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		/// <param name="action"></param>
 		/// <returns></returns>
-		public void SetEntrySignal(TradeAction action) {
-/*			List<TradeSignal> cmdSig = GetTradeSignalByType(CurrentBar, CommandSignals, TradeSignalType.Entry);
+		public override void SetEntrySignal(TradeAction action) {
+			List<TradeSignal> cmdSig = GetTradeSignalByType(CurrentBar, CommandSignals, TradeSignalType.Entry);
 			List<TradeSignal> evtSig = GetTradeSignalByType(CurrentBar, EventSignals, TradeSignalType.Entry);
 			List<TradeSignal> indTdSig = GetTradeSignalByType(CurrentBar, IndicatorTradeSignals, TradeSignalType.Entry);
 			
@@ -429,7 +430,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				action.EntrySignal = evtSig[0];
 			else if(indTdSig != null && indTdSig.Count>0)
 				action.EntrySignal = indTdSig[0];
-			*/
+			
 			//return enSig;
 		}
 		
@@ -605,9 +606,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 		
 		#region Trade Actions
-		public bool SetNewEntryTradeAction() {
+		public override bool SetNewEntryTradeAction() {
 			//CheckIndicatorSignals();
-/*			if(NewTradeAllowed())
+			if(NewTradeAllowed())
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: SetNewEntryTradeAction called....NewOrderAllowed", CurrentBar));
 			else {
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}: SetNewEntryTradeAction called....NewOrderNotAllowed", CurrentBar));
@@ -624,8 +625,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorProxy.PrintLog(true, IsLiveTrading(),
 				string.Format("{0}: SetNewEntryTradeAction EnSig={1}, SLSig={2}, PTSig={3}, StopLossPrice={4}, ProfitTargetPrice={5}",
 				CurrentBar, ta.EntrySignal, ta.StopLossSignal, ta.ProfitTargetSignal, ta.StopLossPrice, ta.ProfitTargetPrice));
-			*/
-			return false;
+			
+			return true;
 		}
 		
 		/// <summary>
@@ -676,7 +677,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return false;
 		}
 		
-		public bool NewTradeAllowed() {
+		public override bool NewTradeAllowed() {
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				String.Format("{0}: NewOrderAllowed called in TBProdTRT... HasPosition={1}, TM_MaxOpenPosition={2}",
 			CurrentBar, HasPosition(), TM_MaxOpenPosition));
@@ -886,7 +887,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			ta.ActionType = TradeActionType.ExitSimple;
 			ta.ActionStatus = TradeActionStatus.New;
 			ta.StopLossSignal = tsig;
-			//CurrentTrade.TradeAction = ta;
+			CurrentTrade.TradeAction = ta;
         }
 
 		void OnProfitTargetEvent(object sender, IndicatorEventArgs e)
@@ -925,7 +926,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			ta.ActionType = TradeActionType.ExitSimple;
 			ta.ActionStatus = TradeActionStatus.New;
 			ta.StopLossSignal = tsig;
-			//CurrentTrade.TradeAction = ta;
+			CurrentTrade.TradeAction = ta;
 			
 		}
 		#endregion

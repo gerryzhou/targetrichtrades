@@ -44,7 +44,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return;
 
 			switch(ta.ActionType) {
-				case TradeActionType.EntrySimple:
+				case TradeActionType.EntrySimple:				
 				case TradeActionType.Bracket:
 					NewEntrySimpleOrder();
 					break;
@@ -322,8 +322,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 			
 		#region Entry Order functions
-		
+
+		/// <summary>
+		/// Scale-in is simple order, with different size
+		/// </summary>
 		public virtual void NewEntrySimpleOrder() {
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewEntrySimpleOrder");
 			if (CurrentTrade.BracketOrder.EntryOrder !=null &&
 				CurrentTrade.BracketOrder.EntryOrder.OrderState == OrderState.Working) {
 					CancelEntryOrders();
@@ -337,6 +341,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public virtual void NewEntrySimpleOrderMG() {
+			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewEntrySimpleOrderMG");
 		}
 		
 		/// <summary>

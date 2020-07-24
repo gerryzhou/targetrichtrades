@@ -15,6 +15,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	/// <summary>
 	/// Hedge by itself: one trend following, the other is counter trend;
+	/// Daily/4 hours chart: every 3+ days up, then 2+ days pullback;
+	/// Daily/4 hours chart: big bar breakout prior high/low fades quickly,
+	/// small consecutive bars breakout prior high/low fades slowly;
+	/// EMA: 21 cross 55, reversal; three times fake reversal makes a true one;
+	/// PctSpd: increase the bull leg CapRatio when reversal confirmed;
+	/// 
 	/// </summary>
 	public class StgSelfHedger : GStrategyBase
 	{

@@ -42,7 +42,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
-				//CurrentTrade = new CurrentTradeBase(this);
+				CurrentTrade = new CurrentTradeBase(this);
 				IndicatorProxy = GIndicatorProxy(this);//1, Account.Name);
 				//GUtils.UpdateProperties(this, ReadCmdPara(), IndicatorProxy);
 				//ReadCmdParaObj();
@@ -95,7 +95,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//CustomColor1					= Brushes.Orange;
 //			StartH	= DateTime.Parse("08:25", System.Globalization.CultureInfo.InvariantCulture);
 			// Use Unmanaged order methods
-        	IsUnmanaged = false;
+        	IsUnmanaged = true;
 //			AlgoMode = AlgoModeType.Trading;
 		}
 		#endregion
@@ -110,24 +110,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public void SetPrintOut(int i) {
 			PrintOut = IndicatorProxy.PrintOut + i;
 		}
-		public string GetCmdDir() {
-			List<string> names = new List<string>(){"CmdPathRoot"};
-			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
-			object dir = null;
-			dic.TryGetValue("CmdPathRoot", out dir);
-			return GConfig.GetTemplatesDir() + dir.ToString() + Path.DirectorySeparatorChar;
-		}
+//		public string GetCmdDir() {
+//			List<string> names = new List<string>(){"CmdPathRoot"};
+//			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
+//			object dir = null;
+//			dic.TryGetValue("CmdPathRoot", out dir);
+//			return GConfig.GetTemplatesDir() + dir.ToString() + Path.DirectorySeparatorChar;
+//		}
 
-		public string GetCTXFilePath() {
-			List<string> names = new List<string>(){"CTXFileName","MenuFileName"};
-			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
-			object name = null;
-			//dic.TryGetValue("CmdPathRoot", out dir);
-			dic.TryGetValue("CTXFileName", out name);
-			string path = GetCmdDir() + name.ToString();
-			Print("GetCTXFilePath=" + path);
-			return path;
-		}
+//		public string GetCTXFilePath() {
+//			List<string> names = new List<string>(){"CTXFileName","MenuFileName"};
+//			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
+//			object name = null;
+//			//dic.TryGetValue("CmdPathRoot", out dir);
+//			dic.TryGetValue("CTXFileName", out name);
+//			string path = GetCmdDir() + name.ToString();
+//			Print("GetCTXFilePath=" + path);
+//			return path;
+//		}
 /*
 		public void ReadRestfulJson() {
 			HttpClient http = new HttpClient();
@@ -213,9 +213,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			
 			return PositionStatus.UnKnown;
 		}
-		#endregion
-
-		#region Event Handlers
 		#endregion
 		
 		#region Interfaces

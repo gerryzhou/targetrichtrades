@@ -25,6 +25,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 	
 	public enum TradingStyle {TrendFollowing=1, CounterTrend=-1, Ranging=0}
 	
+	/// <summary>
+	/// Scale in/out: scale-in takes entry and stop loss; scale-out takes exit only;
+	/// </summary>
 	public enum TradeType {Entry=1, Exit=-1, Liquidate=-2, Reverse=2, ScaleIn=3, ScaleOut=-3, NoTrade=0}
 	
 	/// <summary>

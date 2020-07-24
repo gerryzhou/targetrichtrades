@@ -29,7 +29,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if (State == State.SetDefaults)
 			{
 				Description					= NinjaTrader.Custom.Resource.NinjaScriptIndicatorDescriptionEMA;
-				Name						= NinjaTrader.Custom.Resource.NinjaScriptIndicatorNameEMA;
+				Name						= "GIEMA";
 				IsOverlay					= true;
 				IsSuspendedWhileInactive	= true;
 				Period						= 14;
