@@ -74,14 +74,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 			DefaultQuantity								= 5;			
 			EntryHandling								= EntryHandling.AllEntries;
 			//SyncAccountPosition = true;
+			// Triggers the exit on close function 30 seconds prior to session end
 			IsExitOnSessionCloseStrategy				= true;
-			// Triggers the exit on close function 30 seconds prior to session end			
 			ExitOnSessionCloseSeconds					= 30;
 			IsFillLimitOnTouch							= true;
 			MaximumBarsLookBack							= MaximumBarsLookBack.Infinite;
 			OrderFillResolution							= OrderFillResolution.Standard;
 			Slippage									= 0;
 			StartBehavior								= StartBehavior.WaitUntilFlatSynchronizeAccount;
+			IncludeCommission							= true;
 			TimeInForce									= TimeInForce.Day;
 			TraceOrders									= true;
 			RealtimeErrorHandling						= RealtimeErrorHandling.IgnoreAllErrors;
@@ -157,62 +158,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//var countries = JsonConvert.DeserializeObject>(responseBody);
 		}
 		*/
-		#endregion
-		
-		#region Position Mgmt Functions
-		public int HasPosition() {
-			IndicatorProxy.TraceMessage(this.Name, 0);
-			int pos = 0;
-			if(IsLiveTrading()) {
-				//if(PositionAccount != null)
-				pos = PositionAccount.Quantity;
-			}
-			else //if(Position != null)
-				pos = Position.Quantity;
-			return pos;
-		}
-		
-		public double GetAvgPrice() {
-			MasterInstrument maIns = Bars.Instrument.MasterInstrument;
-			if(IsLiveTrading())
-				return maIns.RoundToTickSize(PositionAccount.AveragePrice);
-			else
-				return maIns.RoundToTickSize(Position.AveragePrice);
-		}
-				
-		public MarketPosition GetMarketPosition() {
-			if(IsLiveTrading())
-				return PositionAccount.MarketPosition;
-			else
-				return Position.MarketPosition;
-		}
-		
-		public double GetUnrealizedPnL() {
-			if(IsLiveTrading())
-				return PositionAccount.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
-			else return
-				Position.GetUnrealizedProfitLoss(PerformanceUnit.Currency, Close[0]);
-		}
-		
-		public PositionStatus GetPositionStatus(int prevPos) {
-			int curPos = HasPosition();
-			if(curPos == 0) {
-				if(prevPos != 0)
-					return PositionStatus.Liquidate;
-				else return PositionStatus.Flat;
-			} else {
-				if(prevPos == 0)
-					return PositionStatus.NewEstablished;
-				else if(prevPos == curPos)
-					return PositionStatus.Hold;
-				else if(Math.Abs(prevPos) < Math.Abs(curPos))
-					return PositionStatus.ScaledIn;
-				else if(Math.Abs(prevPos) > Math.Abs(curPos))
-					return PositionStatus.ScaledOut;
-			}
-			
-			return PositionStatus.UnKnown;
-		}
 		#endregion
 		
 		#region Interfaces
