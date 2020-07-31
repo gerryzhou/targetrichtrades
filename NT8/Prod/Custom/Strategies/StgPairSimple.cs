@@ -82,7 +82,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				adx2 = ADX(BarsArray[2], 14);
 				
 //				giPctSpd = GIPctSpd(8);
-				giPairPctSpd = GIPairPctSpd(RocPeriod, SecondSymbol, ChartMinutes, CapRatio1, CapRatio2, PctChgSpdThreshold, 0);
+				giPairPctSpd = GIPairPctSpd(RocPeriod, SecondSymbol, ChartMinutes, CapRatio1, CapRatio2, PctChgSpdThresholdEn, PctChgSpdThresholdEx);
 				
 				// Add RSI and ADX indicators to the chart for display
 				// This only displays the indicators for the primary Bars object (main instrument) on the chart
@@ -171,7 +171,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorSignal isig = e.IndSignal;
 			Print(String.Format("{0}:OnTradeByPairPctSpd triggerred {1} Bip{2}: PlotPctSpd={3}, PctChgSpdThresholdEn={4}",
 			CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, giPairPctSpd.PlotPctSpd[0], giPairPctSpd.PctChgSpdThresholdEn));
-			if(giPairPctSpd.PlotPctSpd[0] < 0)
+			if(giPairPctSpd.PlotPctSpd[0] <= PctChgSpdThresholdEn)
 				OnEntryPositions(e);
 			else OnExitPositions(e);
 			/*
@@ -354,16 +354,28 @@ namespace NinjaTrader.NinjaScript.Strategies
 				capRatio2 = value;
 			}
 		}
-
+		
 		[NinjaScriptProperty]
-		[Range(0, double.MaxValue)]
-		[Display(Name="PctChgSpdThreshold", Description="PctChgSpd Threshold to entry", Order=7, GroupName=GPS_CUSTOM_PARAMS)]
-		public double PctChgSpdThreshold
+		[Range(double.MinValue, double.MaxValue)]
+		[Display(Name="PctChgSpdThresholdEn", Description="PctChgSpd Threshold to entry", Order=7, GroupName=GPS_CUSTOM_PARAMS)]
+		public double PctChgSpdThresholdEn
 		{ 	get{
-				return pctChgSpdThreshold;
+				return pctChgSpdThresholdEn;
 			}
 			set{
-				pctChgSpdThreshold = value;
+				pctChgSpdThresholdEn = value;
+			}
+		}
+		
+		[NinjaScriptProperty]
+		[Range(double.MinValue, double.MaxValue)]
+		[Display(Name="PctChgSpdThresholdEx", Description="PctChgSpd Threshold to exit", Order=8, GroupName=GPS_CUSTOM_PARAMS)]
+		public double PctChgSpdThresholdEx
+		{ 	get{
+				return pctChgSpdThresholdEx;
+			}
+			set{
+				pctChgSpdThresholdEx = value;
 			}
 		}
 
@@ -400,7 +412,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private int rocPeriod = 8;
 		private double capRatio1 = 1;
 		private double capRatio2 = 1;
-		private double pctChgSpdThreshold = 1;
+		private double pctChgSpdThresholdEn = 1;
+		private double pctChgSpdThresholdEx = 1;
 		private string secondSymbol = "SCO";
 		private int chartMinutes = 4;
 		#endregion

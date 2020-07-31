@@ -170,19 +170,39 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return dt.ToString("MM/dd/yyyy HH:mm:ss");
 		}
 
+		/// <summary>
+		/// if (ToDay(Time[0]) > 20140915)
+		/// </summary>
+		/// <param name="dt"></param>
+		/// <returns></returns>
 		public int GetDateByDateTime(DateTime dt) {
-			int date = dt.Year*10000 + dt.Month*100 + dt.Day;
-			return date;
+			return ToDay(dt);
+//			int date = dt.Year*10000 + dt.Month*100 + dt.Day;
+//			return date;
 		}
 
 		public string GetDateStrByDateTime(DateTime dt) {
 			return dt.ToString("yyyyMMdd");
 		}
 		
+		/// <summary>
+		/// if (ToTime(Time[0]) >= 74500 && ToTime(Time[0]) <= 134500)
+		/// </summary>
+		/// <param name="dt"></param>
+		/// <returns></returns>
+		public int GetTimeByDateTime(DateTime dt) {
+			return ToTime(dt);
+		}
+		
+		//time=10000*H + 100*M + S
+		public int GetTimeByHMS(int hour, int min, int second) {
+			return ToTime(hour, min, second);
+		}
+		
 		//time=10000*H + 100*M + S
 		public int GetTimeByHM(int hour, int min, bool withSecond) {
 			if(withSecond)
-				return 10000*hour + 100*min;
+				return GetTimeByHMS(hour, min, 0);
 			else
 				return 100*hour + min;
 		}

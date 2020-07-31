@@ -32,8 +32,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 	/// </summary>
 	public class GIPairPctSpd : GIndicatorBase
 	{
-		private Series<double> PctChgMax;
-		private Series<double> PctChgMin;
+		private Series<double> PctChg1;
+		private Series<double> PctChg2;
 		private Series<double> RocChg;
 		private PriorDayOHLC lastDayOHLC;
 		private double[] PctChgArr = new double[]{-101, -101};
@@ -69,6 +69,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				PctChgMaxBip								= -1;
 				PctChgMinBip								= -1;
 				BarsRequiredToPlot							= 128;
+				MaximumBarsLookBack							= MaximumBarsLookBack.Infinite;
 				AddPlot(Brushes.Red, "PlotPctSpd");
 				AddPlot(Brushes.Orange, "PlotRocSpd");
 				AddLine(Brushes.Blue, 0, "LineZero");
@@ -82,8 +83,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			else if (State == State.DataLoaded)
 			{
-				PctChgMax = new Series<double>(this);
-				PctChgMin = new Series<double>(this);
+				PctChg1 = new Series<double>(this);
+				PctChg2 = new Series<double>(this);
 				RocChg = new Series<double>(this);			
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", 
 					this.GetType().Name, BarsArray.Length));
@@ -117,6 +118,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 				Print(Instruments[BarsInProgress].FullName + " Chg=" + chg.ToString() + ", Time[0]=" + Times[BarsInProgress][0]);
 			}
 			else Print(string.Format("{0}:{1}, Close={2}, PriorClose={3}, Time={4}", CurrentBar, Instruments[BarsInProgress].FullName, cl, lcl, Times[BarsInProgress][0]));
+			if(bip == 0)
+				PctChg1[0] = chg;
+			if(bip == 1)
+				PctChg2[0] = chg;
 			return chg;
 		}
 		
@@ -124,7 +129,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if(BarsInProgress == 0) return;
 			else {
 				if(PctChgArr[0] > -101 && PctChgArr[BarsInProgress] > -101) {
-					PlotPctSpd[0] = CapRatio1*PctChgArr[0] + CapRatio2*PctChgArr[BarsInProgress];
+					PlotPctSpd[0] = Math.Round(CapRatio1*PctChgArr[0] + CapRatio2*PctChgArr[BarsInProgress], 2);
 					PctChgSpdMax = Math.Max(PctChgSpdMax, PlotPctSpd[0]);
 					PctChgSpdMin = Math.Min(PctChgSpdMin, PlotPctSpd[0]);
 					PctChgSpdCount++;
@@ -142,12 +147,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private void FireThresholdEvent(double spd) {
 			IndicatorSignal isig = new IndicatorSignal();
 			//if(CurrentBar < 300)
-				Print(String.Format("{0}:Close={1}, PctChgSpd={2}, PctChgSpdThreshold={3}",
-				CurrentBar, Close[0], spd, PctChgSpdThresholdEn));
-			if(spd < 0) {
+				Print(String.Format("{0}:Close={1}, PctChgSpd={2}, PctChgSpdThresholdEn={3}, PctChgSpdThresholdEx={4}",
+				CurrentBar, Close[0], spd, PctChgSpdThresholdEn, PctChgSpdThresholdEx));
+			if(spd <= PctChgSpdThresholdEn) {
 				isig.BreakoutDir = BreakoutDirection.Down;
 				isig.SignalName = SignalName_BreakdownMV;
-			} else if(spd > 0) {
+			} else if(spd >= PctChgSpdThresholdEx) {
 				isig.BreakoutDir = BreakoutDirection.Up;
 				isig.SignalName = SignalName_BreakoutMV;
 			} else
@@ -162,10 +167,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		private void PrintPctChgSpd() {
-			if(IsLastBarOnChart() > 0) {
+			if(IsLastBarOnChart() > 0 && BarsInProgress == 0) {
 				Print(string.Format("{0}: PctChgSpdMax={1}, PctChgSpdMin={2}, PctChgSpdThresholdEn={3}", CurrentBar, PctChgSpdMax, PctChgSpdMin, PctChgSpdThresholdEn));
 				Print(string.Format("{0}: PctChgSpdWideCount={1}, {2:0.00}%, PctChgSpdNarrowCount={3}, {4:0.00}% PctChgSpdCount={5}",
 					CurrentBar, PctChgSpdWideCount, 100*PctChgSpdWideCount/PctChgSpdCount, PctChgSpdNarrowCount, 100*PctChgSpdNarrowCount/PctChgSpdCount, PctChgSpdCount));
+				for(int i=0; i < CurrentBar-BarsRequiredToPlot; i++) {
+					Print(string.Format("{0:0.00}	{1:0.00}	{2:0.00}	{3}	{4:yyyyMMdd_HHmm}", PlotPctSpd[i], PctChg1[i], PctChg2[i], CurrentBar-i, Times[0][i]));
+				}
 			}
 		}
 		
@@ -311,7 +319,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 
 		[NinjaScriptProperty]
-		[Range(0, double.MaxValue)]
+		[Range(double.MinValue, double.MaxValue)]
 		[Display(Name="PctChgSpdThresholdEn", Description="PctChgSpd Threshold to entry", Order=5, GroupName="Parameters")]
 		public double PctChgSpdThresholdEn
 		{ 	get{
@@ -323,7 +331,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		[NinjaScriptProperty]
-		[Range(0, double.MaxValue)]
+		[Range(double.MinValue, double.MaxValue)]
 		[Display(Name="PctChgSpdThresholdEx", Description="PctChgSpd Threshold to exit", Order=6, GroupName="Parameters")]
 		public double PctChgSpdThresholdEx
 		{ 	get{
