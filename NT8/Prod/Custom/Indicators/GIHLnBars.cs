@@ -74,6 +74,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				return;
 			IndicatorSignal isig = new IndicatorSignal();
 			//if(CurrentBar < 300)
+			if(PrintOut > 1)
 				Print(String.Format("{0}:Close={1},RefBarLowestN={2},RefBarLowestN={3},LowestN={4},HighestN={5}",
 				CurrentBar, Close[0], RefBarLowestN, RefBarHighestN,
 				LowestN[CurrentBar-RefBarLowestN], HighestN[CurrentBar-RefBarHighestN]));

@@ -1,5 +1,5 @@
-//
-// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
+// 
+// Copyright (C) 2015, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -40,8 +40,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				Name						= NinjaTrader.Custom.Resource.NinjaScriptIndicatorNameSUM;
 				IsSuspendedWhileInactive	= true;
 				Period						= 14;
-
-				AddPlot(Brushes.DarkCyan, NinjaTrader.Custom.Resource.NinjaScriptIndicatorNameSUM);
+				AddPlot(Brushes.Green, "SUM");
 			}
 		}
 

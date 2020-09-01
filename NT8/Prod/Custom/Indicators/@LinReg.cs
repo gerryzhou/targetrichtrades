@@ -1,5 +1,5 @@
-//
-// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
+// 
+// Copyright (C) 2015, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -54,17 +54,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 				IsOverlay					= true;
 				IsSuspendedWhileInactive	= true;
 				Period						= 14;
-
-				AddPlot(Brushes.Goldenrod, NinjaTrader.Custom.Resource.NinjaScriptIndicatorNameLinReg);
+				
+				AddPlot(Brushes.Orange, "LinReg");
 			}
 			else if (State == State.Configure)
-			{
-				avg	= divisor = intercept = myPeriod = priorSumXY
+			{	
+				avg	= divisor = intercept = myPeriod = priorSumXY 
 					= priorSumY = slope = sumX = sumX2 = sumY = sumXY = 0;
-			}
-			else if (State == State.DataLoaded)
-			{
-				sum = SUM(Inputs[0], Period);
+				sum	= SUM(Inputs[0], Period);
 			}
 		}
 
@@ -107,7 +104,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 
 		#region Properties
-		[Range(2, int.MaxValue), NinjaScriptProperty]
+		[Range(1, int.MaxValue), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "Period", GroupName = "NinjaScriptParameters", Order = 0)]
 		public int Period
 		{ get; set; }

@@ -19,11 +19,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public enum SignalBarByType { ByTime=1, ByVolume=2, ByPrice=3, ByBarNo=4 } // Identify singal bar by time/vol/price/barNo
 
 	public enum SignalType { Direction, Volatility, SnR,
-					SimplePriceAction, CombinedPriceAction, Unknown }
+					SimplePriceAction, CombinedPriceAction, ChartDraw, Unknown }
 	
 	public enum SignalActionType { TrendUp, TrendDn, BreakoutUp, BreakoutDn, PullbackUp, PullbackDn, ReversalUp, ReversalDn,
-					CrossOver, CrossUnder, Divergence, Convergence, InflectionUp, InflectionDn,
-					Flat, Unknown }
+					CrossAbove, CrossBelow, Divergence, Convergence, InflectionUp, InflectionDn,
+					Flat, BarToLeft, BarToRight, Unknown }
 	
 	//The size of High-Low of the bar
 	public enum BarRangeType { Doji, Small, Large, Huge }

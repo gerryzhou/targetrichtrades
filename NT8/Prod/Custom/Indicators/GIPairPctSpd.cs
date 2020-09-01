@@ -102,7 +102,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 //			}
 			PctChgArr[BarsInProgress] = GetPctChg(BarsInProgress);
 			SetPctChgSpread();
-			PrintPctChgSpd();
+			if(PrintOut > 1)
+				PrintPctChgSpd();
 		}
 		
 		private double GetPctChg(int bip) {
@@ -115,9 +116,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 			double lcl = PriorDayOHLC(BarsArray[BarsInProgress]).PriorClose[0];
 			if(lcl > 0 && cl > 0) {
 				chg = Math.Round(100*(cl-lcl)/lcl, 2);
-				Print(Instruments[BarsInProgress].FullName + " Chg=" + chg.ToString() + ", Time[0]=" + Times[BarsInProgress][0]);
+				Print(string.Format("{0}: {1} Chg={2}, Time{0]={3}", 
+					CurrentBar, Instruments[BarsInProgress].FullName, chg.ToString(), Times[BarsInProgress][0]));
 			}
-			else Print(string.Format("{0}:{1}, Close={2}, PriorClose={3}, Time={4}", CurrentBar, Instruments[BarsInProgress].FullName, cl, lcl, Times[BarsInProgress][0]));
+			else Print(string.Format("{0}:{1}, Close={2}, PriorClose={3}, Time={4}",
+				CurrentBar, Instruments[BarsInProgress].FullName, cl, lcl, Times[BarsInProgress][0]));
 			if(bip == 0)
 				PctChg1[0] = chg;
 			if(bip == 1)
@@ -139,7 +142,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 					}
 					else PctChgSpdNarrowCount++;
 				}
-				Print(string.Format("{0}: PctChg0={1}, PctChg1={2}, PlotPctSpd={3}, Time={4}", CurrentBar, PctChgArr[0], PctChgArr[BarsInProgress], PlotPctSpd[0], Times[BarsInProgress][0]));
+				Print(string.Format("{0}: PctChg0={1}, PctChg1={2}, PlotPctSpd={3}, Time={4}",
+					CurrentBar, PctChgArr[0], PctChgArr[BarsInProgress], PlotPctSpd[0], Times[BarsInProgress][0]));
 				PctChgArr = new double[]{-101, -101};
 			}
 		}
@@ -172,7 +176,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				Print(string.Format("{0}: PctChgSpdWideCount={1}, {2:0.00}%, PctChgSpdNarrowCount={3}, {4:0.00}% PctChgSpdCount={5}",
 					CurrentBar, PctChgSpdWideCount, 100*PctChgSpdWideCount/PctChgSpdCount, PctChgSpdNarrowCount, 100*PctChgSpdNarrowCount/PctChgSpdCount, PctChgSpdCount));
 				for(int i=0; i < CurrentBar-BarsRequiredToPlot; i++) {
-					Print(string.Format("{0:0.00}	{1:0.00}	{2:0.00}	{3}	{4:yyyyMMdd_HHmm}", PlotPctSpd[i], PctChg1[i], PctChg2[i], CurrentBar-i, Times[0][i]));
+					Print(string.Format("{0:0.00}	{1:0.00}	{2:0.00}	{3}	{4:yyyyMMdd_HHmm}",
+						PlotPctSpd[i], PctChg1[i], PctChg2[i], CurrentBar-i, Times[0][i]));
 				}
 			}
 		}

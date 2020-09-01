@@ -1,5 +1,5 @@
-//
-// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
+// 
+// Copyright (C) 2015, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -28,7 +28,7 @@ using NinjaTrader.NinjaScript.DrawingTools;
 namespace NinjaTrader.NinjaScript.Indicators
 {
 	/// <summary>
-	/// The MACD (Moving Average Convergence/Divergence) is a trend following momentum indicator
+	/// The MACD (Moving Average Convergence/Divergence) is a trend following momentum indicator 
 	/// that shows the relationship between two moving averages of prices.
 	/// </summary>
 	public class MACD : Indicator
@@ -52,11 +52,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 				IsSuspendedWhileInactive	= true;
 				Slow						= 26;
 				Smooth						= 9;
-
-				AddPlot(Brushes.DarkCyan,									NinjaTrader.Custom.Resource.NinjaScriptIndicatorNameMACD);
-				AddPlot(Brushes.Crimson,									NinjaTrader.Custom.Resource.NinjaScriptIndicatorAvg);
-				AddPlot(new Stroke(Brushes.DodgerBlue, 2),	PlotStyle.Bar,	NinjaTrader.Custom.Resource.NinjaScriptIndicatorDiff);
-				AddLine(Brushes.DarkGray,					0,				NinjaTrader.Custom.Resource.NinjaScriptIndicatorZeroLine);
+				
+				AddPlot(Brushes.Green, "Macd");
+				AddPlot(Brushes.DarkViolet, "Avg");
+				AddPlot(new Stroke(Brushes.Navy, 2), PlotStyle.Bar, "Diff");
+				AddLine(Brushes.DarkGray, 0, "Zero line");
 			}
 			else if (State == State.Configure)
 			{
@@ -66,11 +66,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				constant4	= (1 - (2.0 / (1 + Slow)));
 				constant5	= 2.0 / (1 + Smooth);
 				constant6	= (1 - (2.0 / (1 + Smooth)));
-			}
-			else if (State == State.DataLoaded)
-			{
-				fastEma = new Series<double>(this);
-				slowEma = new Series<double>(this);
+				fastEma		= new Series<double>(this);
+				slowEma		= new Series<double>(this);
 			}
 		}
 
@@ -79,7 +76,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			double input0	= Input[0];
 
 			if (CurrentBar == 0)
-			{
+			{	
 				fastEma[0]		= input0;
 				slowEma[0]		= input0;
 				Value[0]		= 0;
@@ -115,7 +112,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			get { return Values[0]; }
 		}
-
+		
 		[Browsable(false)]
 		[XmlIgnore]
 		public Series<double> Diff

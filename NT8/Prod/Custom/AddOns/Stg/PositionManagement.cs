@@ -101,6 +101,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return (int)ratio*DefaultQuantity;
 		}
 		#endregion
+		
 		#region Event Handlers
 		
 		protected override void OnPositionUpdate(Cbi.Position position, double averagePrice, 

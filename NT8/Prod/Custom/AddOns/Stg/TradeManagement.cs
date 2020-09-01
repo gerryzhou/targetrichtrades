@@ -341,7 +341,37 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public virtual void NewEntrySimpleOrderMG() {
-			IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewEntrySimpleOrderMG");
+			TradeSignal tSig = CurrentTrade.TradeAction.EntrySignal;
+			try {			
+				//tSig.SignalName = GetNewEnOrderSignalName(OrderSignalName.EntryLongLmt.ToString());
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + ":NewEntrySimpleOrderMG"
+				+";EntrySignal.SignalName=" + tSig.SignalName
+				+";EntrySignal.Action=" + tSig.Action.ToString()
+				+";EntrySignal.OrderType=" + tSig.Order_Type.ToString()
+				+";EntrySignal.Quantity=" + tSig.Quantity
+				+";EntrySignal.OrderCalculationMode=" + tSig.OrderCalculationMode.ToString()
+				+";EntrySignal.LimitPrice=" + tSig.LimitPrice
+				+";EntrySignal.StopPrice=" + tSig.StopPrice);
+
+				switch(tSig.Order_Type) {
+					case OrderType.StopMarket:
+						if(tSig.Action == OrderAction.Buy)
+							EnterLongStopMarket(tSig.BarInProgress, true, tSig.Quantity, tSig.StopPrice, tSig.SignalName);
+						else if(tSig.Action == OrderAction.SellShort)
+							EnterShortStopMarket(tSig.BarInProgress, true, tSig.Quantity, tSig.StopPrice, tSig.SignalName);
+						break;
+					case OrderType.Limit:
+						break;
+					case OrderType.Market:
+						break;
+				}
+//				SubmitOrderUnmanaged(0, tSig.Action, tSig.Order_Type, tSig.Quantity,
+//				tSig.LimitPrice, tSig.StopPrice, "", tSig.SignalName);
+				
+				CurrentTrade.barsSinceEnOrd = 0;
+			} catch(Exception ex) {
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), String.Format("{0}:NewEntrySimpleOrderUM EX={1}", CurrentBar, ex.StackTrace));
+			}
 		}
 		
 		/// <summary>

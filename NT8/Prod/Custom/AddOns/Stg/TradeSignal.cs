@@ -35,7 +35,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			get; set;
 		}
-
+		
+		/// <summary>
+		/// The bar in progress the signal/trade refer to
+		/// </summary>
+		[Range(0, int.MaxValue)]
+ 		[NinjaScriptProperty, XmlIgnore, Browsable(false)]
+		public int BarInProgress
+		{
+			get; set;
+		}
+		
 		/// <summary>
 		/// The name of the signal
 		/// Assign the Ordername with this name

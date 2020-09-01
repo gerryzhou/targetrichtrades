@@ -71,9 +71,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 			else if (State == State.Configure)
 			{
 				//AddDataSeries("NQ 06-20", Data.BarsPeriodType.Minute, 13, Data.MarketDataType.Last);
-				//AddDataSeries("RTY 06-20", Data.BarsPeriodType.Minute, 13, Data.MarketDataType.Last);
+				AddDataSeries("RTY 09-20", Data.BarsPeriodType.Minute, 4, Data.MarketDataType.Last);
 				//AddDataSeries("NRGU", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
-				AddDataSeries("SCO", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
+				//AddDataSeries("SCO", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
 			}
 			else if (State == State.DataLoaded)
 			{				
@@ -186,9 +186,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 			double lcl = PriorDayOHLC(BarsArray[BarsInProgress]).PriorClose[0];
 			if(lcl > 0) {
 				chg = Math.Round(100*(cl-lcl)/lcl, 2);
-				Print(Instruments[BarsInProgress].FullName + " Chg=" + chg.ToString() + ", Time[0]=" + Time[0]);
+				Print(string.Format("{0}:{1} Chg={2}, Time[0]={3}",
+					CurrentBar, Instruments[BarsInProgress].FullName, chg.ToString(), Time[0]));
 			}
-			else Print(Instruments[BarsInProgress].FullName + " PriorClose=0, Time[0]=" + Time[0]);
+			else Print(string.Format("{0}:{1} PriorClose=0, Time[0]={2}",
+				CurrentBar, Instruments[BarsInProgress].FullName, Time[0]));
 			return chg;
 		}
 		

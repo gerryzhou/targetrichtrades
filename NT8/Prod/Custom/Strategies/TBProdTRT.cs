@@ -254,10 +254,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			indSig.SignalAction.SnR = new SupportResistanceRange<double>();
 			
 			if(CrossAbove(Close, this.giVwap, 1)) {
-				indSig.SignalAction.SignalActionType = SignalActionType.CrossOver;
+				indSig.SignalAction.SignalActionType = SignalActionType.CrossAbove;
 			}
 			else if(CrossBelow(Close, this.giVwap, 1)) {
-				indSig.SignalAction.SignalActionType = SignalActionType.CrossUnder;
+				indSig.SignalAction.SignalActionType = SignalActionType.CrossBelow;
 			} else
 				return false;
 			

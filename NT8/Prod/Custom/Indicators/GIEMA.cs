@@ -66,7 +66,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		public void CheckBreakoutEmaTicsEvent() {
 			IndicatorSignal isig = new IndicatorSignal();
-			//if(CurrentBar < 300)
+			if(CurrentBar < 300)
 				Print(String.Format("{0}:Close={1},EMA={2},OffsetTicks={3}",
 				CurrentBar, Close[0], Value[0], OffsetTicks));
 			if(Close[0] < Value[1] - GetPriceByTicks(OffsetTicks)) {

@@ -169,8 +169,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="value"></param>
 		protected override void OnAccountItemUpdate(Cbi.Account account, Cbi.AccountItem accountItem, double value)
 		{
+			if (account == null || accountItem == null || IndicatorProxy == null) 
+				return;
+			
 			if(accountItem == AccountItem.UnrealizedProfitLoss)
-				IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), //":OnAccountItemUpdate"
 					CurrentBar + ":OnAccountItemUpdate"
 					+ ";Name=" + account.DisplayName
 					+ ";Item=" + accountItem.ToString()
