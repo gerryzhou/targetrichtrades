@@ -59,6 +59,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				MM_ProfitFactorMin							= 0;
 //				TG_TradeEndH								= 10;
 //				TG_TradeEndM								= 45;
+				TG_OpenStartH								= 8;
+				TG_OpenStartM								= 30;
 				MktPosition1								= MarketPosition.Long;
 				MktPosition2								= MarketPosition.Long;
 				//IsInstantiatedOnEachOptimizationIteration = false;
@@ -171,7 +173,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorSignal isig = e.IndSignal;
 			Print(String.Format("{0}:OnTradeByPairPctSpd triggerred {1} Bip{2}: PlotPctSpd={3}, PctChgSpdThresholdEn={4}",
 			CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, giPairPctSpd.PlotPctSpd[0], giPairPctSpd.PctChgSpdThresholdEn));
-			if(giPairPctSpd.PlotPctSpd[0] <= PctChgSpdThresholdEn)
+			if(IsTradingTime(IndicatorProxy.GetTimeByHM(TG_OpenStartH, TG_OpenStartM, true)) && giPairPctSpd.PlotPctSpd[0] <= PctChgSpdThresholdEn)
 				OnEntryPositions(e);
 			else OnExitPositions(e);
 			/*
@@ -267,7 +269,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 			}
 		}
-		
+
+		public override bool IsTradingTime(int session_start) {
+			//Bars.Session.GetNextBeginEnd(DateTime time, out DateTime sessionBegin, out DateTime sessionEnd)
+			int time_start = IndicatorProxy.GetTimeByHM(TG_TradeStartH, TG_TradeStartM, true);
+			int time_end = IndicatorProxy.GetTimeByHM(TG_TradeEndH, TG_TradeEndM, true);
+			int time_now = ToTime(Time[0]);
+			bool isTime= false;
+			if (time_now >= session_start && time_now >= time_start && time_now <= time_end) {
+				isTime = true;
+			}
+			Print(String.Format("{0}: time_now={1}, session_start={2}, time_start={3}, time_end={4}, isTime={5}",
+			CurrentBar, time_now, session_start, time_start, time_end, isTime));
+			return isTime;
+		}
 		#endregion
 
 		/// <summary>
@@ -410,11 +425,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		#region Pre Defined parameters
 		private int rocPeriod = 8;
-		private double capRatio1 = 1;
+		private double capRatio1 = 1.25;
 		private double capRatio2 = 1;
-		private double pctChgSpdThresholdEn = 1;
-		private double pctChgSpdThresholdEx = 1;
-		private string secondSymbol = "SCO";
+		private double pctChgSpdThresholdEn = -2.3;
+		private double pctChgSpdThresholdEx = 2.5;
+		private string secondSymbol = "SPY";
 		private int chartMinutes = 4;
 		#endregion
 	}

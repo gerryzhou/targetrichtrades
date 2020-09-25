@@ -34,13 +34,22 @@ namespace NinjaTrader.NinjaScript.Indicators
 	{
 		private Series<double> PctChg1;
 		private Series<double> PctChg2;
+		private Series<double> PctSpd;
 		private Series<double> RocChg;
 		private PriorDayOHLC lastDayOHLC;
 		private double[] PctChgArr = new double[]{-101, -101};
 		private double PctChgSpdMin, PctChgSpdMax;
 		
-		private double PctChgSpdWideCount, PctChgSpdNarrowCount, PctChgSpdCount = 0;
+		//PctChgSpdWideCount = PctChgSpdEnCount  +PctChgSpdExCount
+		//PctChgSpdNarrowCount = PctChgSpdCount - PctChgSpdWideCount
+		//En<0, Ex>0
+		private double PctChgSpdCount = 0, PctChgSpdEnCount = 0, PctChgSpdExCount = 0;
+		private double PctChgSpdEnSum, PctChgSpdExSum;
 		//int PctChgMaxBip=-1, PctChgMinBip=-1;
+		private StdDev stdDev;
+		private SMA	smaClose1;
+		private SMA	smaClose2;
+		private SMA	smaPctChgRatio;
 		
 		protected override void OnStateChange()
 		{
@@ -85,9 +94,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 			{
 				PctChg1 = new Series<double>(this);
 				PctChg2 = new Series<double>(this);
+				PctSpd = new Series<double>(this);
 				RocChg = new Series<double>(this);			
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", 
 					this.GetType().Name, BarsArray.Length));
+				smaClose1 = SMA(Closes[0], 5);
+				smaClose2 = SMA(Closes[1], 5);
+				smaPctChgRatio = SMA(RocChg, 50);
+				stdDev = StdDev(PlotPctSpd, 7);
+				//AddChartIndicator(stdDev);
 			}
 		}
 
@@ -102,45 +117,63 @@ namespace NinjaTrader.NinjaScript.Indicators
 //			}
 			PctChgArr[BarsInProgress] = GetPctChg(BarsInProgress);
 			SetPctChgSpread();
-			if(PrintOut > 1)
-				PrintPctChgSpd();
+			//if(PrintOut > 1)
+			//	PrintPctChgSpd();
 		}
 		
 		private double GetPctChg(int bip) {
-			double chg = -101;
+			double chg = -101, lcl = 0;
 			if(bip < 0)
 				return chg;
 			
-			lastDayOHLC = PriorDayOHLC(BarsArray[BarsInProgress]);
-			double cl = Closes[BarsInProgress][0];
-			double lcl = PriorDayOHLC(BarsArray[BarsInProgress]).PriorClose[0];
+			//lastDayOHLC = PriorDayOHLC(BarsArray[bip]);
+			double cl = Closes[bip][0];
+			//double lcl = PriorDayOHLC(BarsArray[bip]).PriorClose[0];
+			if(bip == 0)
+				lcl = smaClose1[0];
+			if(bip == 1)
+				lcl = smaClose2[0];
 			if(lcl > 0 && cl > 0) {
 				chg = Math.Round(100*(cl-lcl)/lcl, 2);
-				Print(string.Format("{0}: {1} Chg={2}, Time{0]={3}", 
-					CurrentBar, Instruments[BarsInProgress].FullName, chg.ToString(), Times[BarsInProgress][0]));
+				//Print(string.Format("{0}: {1} Chg={2}, Time{0]={3}", 
+				//	CurrentBar, Instruments[BarsInProgress].FullName, chg.ToString(), Times[BarsInProgress][0]));
+				Print(string.Format("{0}: {1} Chg={2}, Time[0]={3}", 
+					CurrentBar, Instruments[bip].FullName, chg, Times[0][0]));
 			}
-			else Print(string.Format("{0}:{1}, Close={2}, PriorClose={3}, Time={4}",
-				CurrentBar, Instruments[BarsInProgress].FullName, cl, lcl, Times[BarsInProgress][0]));
+			//else Print(string.Format("{0}:{1}, Close={2}, PriorClose={3}, Time={4}",
+			//	CurrentBar, Instruments[BarsInProgress].FullName, cl, lcl, Times[BarsInProgress][0]));
 			if(bip == 0)
 				PctChg1[0] = chg;
 			if(bip == 1)
 				PctChg2[0] = chg;
 			return chg;
 		}
-		
+	
 		private void SetPctChgSpread() {
 			if(BarsInProgress == 0) return;
 			else {
 				if(PctChgArr[0] > -101 && PctChgArr[BarsInProgress] > -101) {
+					//PlotPctSpd[0] = Math.Round(CapRatio1*PctChgArr[0] + CapRatio2*PctChgArr[BarsInProgress], 2);
+					//PlotRocSpd[0] = stdDev[0];
 					PlotPctSpd[0] = Math.Round(CapRatio1*PctChgArr[0] + CapRatio2*PctChgArr[BarsInProgress], 2);
+					RocChg[0] = Closes[0][0]/Closes[1][0];
+					PlotRocSpd[0] = RocChg[0];// stdDev[0];
 					PctChgSpdMax = Math.Max(PctChgSpdMax, PlotPctSpd[0]);
 					PctChgSpdMin = Math.Min(PctChgSpdMin, PlotPctSpd[0]);
 					PctChgSpdCount++;
-					if(PlotPctSpd[0] <= PctChgSpdThresholdEn || PlotPctSpd[0] >= PctChgSpdThresholdEx){
-						PctChgSpdWideCount++;
+					if(PlotPctSpd[0] <= PctChgSpdThresholdEn) {
+						PctChgSpdEnCount++;						
+						PctChgSpdEnSum = PctChgSpdEnSum + PlotPctSpd[0];
 						FireThresholdEvent(PlotPctSpd[0]);
 					}
-					else PctChgSpdNarrowCount++;
+					else if (PlotPctSpd[0] >= PctChgSpdThresholdEx) {
+						PctChgSpdExCount++;						
+						PctChgSpdExSum = PctChgSpdExSum + PlotPctSpd[0];
+						FireThresholdEvent(PlotPctSpd[0]);
+					}
+					//PctChgSpdWideCount = PctChgSpdEnCount  +PctChgSpdExCount
+					//PctChgSpdNarrowCount = PctChgSpdCount - PctChgSpdWideCount
+					//else PctChgSpdNarrowCount++;
 				}
 				Print(string.Format("{0}: PctChg0={1}, PctChg1={2}, PlotPctSpd={3}, Time={4}",
 					CurrentBar, PctChgArr[0], PctChgArr[BarsInProgress], PlotPctSpd[0], Times[BarsInProgress][0]));
@@ -172,13 +205,20 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		private void PrintPctChgSpd() {
 			if(IsLastBarOnChart() > 0 && BarsInProgress == 0) {
-				Print(string.Format("{0}: PctChgSpdMax={1}, PctChgSpdMin={2}, PctChgSpdThresholdEn={3}", CurrentBar, PctChgSpdMax, PctChgSpdMin, PctChgSpdThresholdEn));
-				Print(string.Format("{0}: PctChgSpdWideCount={1}, {2:0.00}%, PctChgSpdNarrowCount={3}, {4:0.00}% PctChgSpdCount={5}",
-					CurrentBar, PctChgSpdWideCount, 100*PctChgSpdWideCount/PctChgSpdCount, PctChgSpdNarrowCount, 100*PctChgSpdNarrowCount/PctChgSpdCount, PctChgSpdCount));
 				for(int i=0; i < CurrentBar-BarsRequiredToPlot; i++) {
 					Print(string.Format("{0:0.00}	{1:0.00}	{2:0.00}	{3}	{4:yyyyMMdd_HHmm}",
 						PlotPctSpd[i], PctChg1[i], PctChg2[i], CurrentBar-i, Times[0][i]));
 				}
+				Print(string.Format("{0}: PctChgSpdMax={1}, PctChgSpdMin={2}, PctChgSpdThresholdEn={3}, PctChgSpdThresholdEx={4}",
+					CurrentBar, PctChgSpdMax, PctChgSpdMin, PctChgSpdThresholdEn, PctChgSpdThresholdEx));
+				double PctChgSpdWideCount = PctChgSpdWideCount = PctChgSpdEnCount  + PctChgSpdExCount;
+				double PctChgSpdNarrowCount = PctChgSpdCount - PctChgSpdWideCount;
+				Print(string.Format("{0}: PctChgSpdEnCount={1}, {2:0.00}%, PctChgSpdExCount={3}, {4:0.00}% PctChgSpdCount={5}",
+					CurrentBar, PctChgSpdEnCount, 100*PctChgSpdEnCount/PctChgSpdCount, PctChgSpdExCount, 100*PctChgSpdExCount/PctChgSpdCount, PctChgSpdCount));
+				Print(string.Format("{0}: PctChgSpdEnAvg={1}, PctChgSpdExAvg={2}",
+					CurrentBar, PctChgSpdEnSum/PctChgSpdEnCount, PctChgSpdExSum/PctChgSpdExCount));
+				Print(string.Format("{0}: PctChgSpdWideCount={1}, {2:0.00}%, PctChgSpdNarrowCount={3}, {4:0.00}% PctChgSpdCount={5}",
+					CurrentBar, PctChgSpdWideCount, 100*PctChgSpdWideCount/PctChgSpdCount, PctChgSpdNarrowCount, 100*PctChgSpdNarrowCount/PctChgSpdCount, PctChgSpdCount));
 			}
 		}
 		
@@ -358,7 +398,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[XmlIgnore]
 		public Series<double> PlotRocSpd
 		{
-			get { return Values[1]; }
+			get { return Values[1];	}
 		}
 
 		//The BarsInProgress for PctChgMax and PctChgMin
@@ -378,69 +418,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		#region Pre Defined parameters
 		private int rocPeriod = 8;
-		private double capRatio1 = 1;
+		private double capRatio1 = 1.25;
 		private double capRatio2 = 1;		
-		private string secondSymbol = "SCO";
+		private string secondSymbol = "SPY";
 		private int chartMinutes = 4;
-		private double pctChgSpdThresholdEn = 1;
-		private double pctChgSpdThresholdEx = 1;
+		private double pctChgSpdThresholdEn = -2.3;
+		private double pctChgSpdThresholdEx = 2.5;
 		#endregion
-		
-		#region Pre-defined signal name
-		[Browsable(false), XmlIgnore]
-		public string SignalName_BreakdownMV
-		{
-			get { return "BreakdownMeanV";}
-		}
 
-		[Browsable(false), XmlIgnore]
-		public string SignalName_BreakoutMV
-		{
-			get { return "BreakoutMeanV";}
-		}
-		
-		[Browsable(false), XmlIgnore]
-		public string SignalName_EntryLongLeg1
-		{
-			get { return "EnLnLeg1";}
-		}
-		
-		[Browsable(false), XmlIgnore]
-		public string SignalName_EntryLongLeg2
-		{
-			get { return "EnLnLeg2";}
-		}
-		
-		[Browsable(false), XmlIgnore]
-		public string SignalName_EntryShortLeg1
-		{
-			get { return "EnStLeg1";}
-		}
-		
-		[Browsable(false), XmlIgnore]
-		public string SignalName_EntryShortLeg2
-		{
-			get { return "EnStLeg2";}
-		}
-		
-		[Browsable(false), XmlIgnore]
-		public string SignalName_EntryOnOpenLong
-		{
-			get { return "EntryOnOpenLong";}
-		}
-
-		[Browsable(false), XmlIgnore]
-		public string SignalName_EntryOnOpenShort
-		{
-			get { return "EntryOnOpenShort";}
-		}
-
-		[Browsable(false), XmlIgnore]
-		public string SignalName_ExitForOpen
-		{
-			get { return "ExitForOpen";}
-		}
-		#endregion
 	}
 }
 

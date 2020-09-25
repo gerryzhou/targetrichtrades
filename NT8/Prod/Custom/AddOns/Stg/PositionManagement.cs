@@ -98,7 +98,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// CapRatio: ES:RTY=1.7:1, NQ:RTY=2.1:1, NQ:ES=1.25:1
 		/// </summary>		
 		public virtual int GetTradeQuantity(int idx, double ratio) {
-			return (int)ratio*DefaultQuantity;
+			return (int)(ratio*DefaultQuantity);
 		}
 		#endregion
 		

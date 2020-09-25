@@ -310,25 +310,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			get;set;
 		}
 		#endregion
-		
-		#region Pre-defined signal name
-		[Browsable(false), XmlIgnore]
-		public string SignalName_EntryOnOpenLong
-		{
-			get { return "EntryOnOpenLong";}
-		}
 
-		public string SignalName_EntryOnOpenShort
-		{
-			get { return "EntryOnOpenShort";}
-		}
-
-		[Browsable(false), XmlIgnore]
-		public string SignalName_ExitForOpen
-		{
-			get { return "ExitForOpen";}
-		}
-		#endregion
 	}
 }
 

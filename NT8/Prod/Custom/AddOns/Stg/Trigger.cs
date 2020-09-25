@@ -53,7 +53,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <param name="time_end">end time</param>
 		/// <param name="session_start">the overnight session start time: 170000 for ES</param>
 		/// <returns></returns>
-		public bool IsTradingTime(int session_start) {
+		public virtual bool IsTradingTime(int session_start) {
 			//Bars.Session.GetNextBeginEnd(DateTime time, out DateTime sessionBegin, out DateTime sessionEnd)
 			int time_start = IndicatorProxy.GetTimeByHM(TG_TradeStartH, TG_TradeStartM, true);
 			int time_end = IndicatorProxy.GetTimeByHM(TG_TradeEndH, TG_TradeEndM, true);
@@ -66,6 +66,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (time_now >= time_start && time_now <= time_end) {
 				isTime = true;
 			}
+			Print(String.Format("{0}: time_now={1}, session_start={2}, time_start={3}, time_end={4}, isTime={5}",
+			CurrentBar, time_now, session_start, time_start, time_end, isTime));
 			return isTime;
 		}
 		
@@ -371,11 +373,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region Variables for Properties
 
 		//time=H*10000+M*100+S, S is skipped here;
-        private int tg_TradeStartH = 17; //10100 Default setting for trade Start hour
-		private int tg_TradeStartM = 1; //10100 Default setting for trade Start minute
+        private int tg_TradeStartH = 8; //10100 Default setting for trade Start hour
+		private int tg_TradeStartM = 30; //10100 Default setting for trade Start minute
 		//private int timeStart = -1; //10100 Default setting for timeStart
-        private int tg_TradeEndH = 15; // Default setting for trade End hour
-		private int tg_TradeEndM = 59; // Default setting for trade End minute
+        private int tg_TradeEndH = 14; // Default setting for trade End hour
+		private int tg_TradeEndM = 15; // Default setting for trade End minute
 		//private int timeEnd = -1; // Default setting for timeEnd
 		private int tg_TradeLiqH = 15; //Time H to liquidate
 		private int tg_TradeLiqM = 8; //Time M to liquidate

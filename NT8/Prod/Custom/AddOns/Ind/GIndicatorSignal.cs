@@ -277,7 +277,60 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public string SignalName_CrossBelow
 		{
 			get { return "CrossBelow";}
-		}		
+		}
+		
+		[Browsable(false), XmlIgnore]
+		public string SignalName_EntryOnOpenLong
+		{
+			get { return "EntryOnOpenLong";}
+		}
+
+		public string SignalName_EntryOnOpenShort
+		{
+			get { return "EntryOnOpenShort";}
+		}
+
+		[Browsable(false), XmlIgnore]
+		public string SignalName_ExitForOpen
+		{
+			get { return "ExitForOpen";}
+		}
+		
+		[Browsable(false), XmlIgnore]
+		public string SignalName_BreakdownMV
+		{
+			get { return "BreakdownMeanV";}
+		}
+
+		[Browsable(false), XmlIgnore]
+		public string SignalName_BreakoutMV
+		{
+			get { return "BreakoutMeanV";}
+		}
+		
+		[Browsable(false), XmlIgnore]
+		public string SignalName_EntryLongLeg1
+		{
+			get { return "EnLnLeg1";}
+		}
+		
+		[Browsable(false), XmlIgnore]
+		public string SignalName_EntryLongLeg2
+		{
+			get { return "EnLnLeg2";}
+		}
+		
+		[Browsable(false), XmlIgnore]
+		public string SignalName_EntryShortLeg1
+		{
+			get { return "EnStLeg1";}
+		}
+		
+		[Browsable(false), XmlIgnore]
+		public string SignalName_EntryShortLeg2
+		{
+			get { return "EnStLeg2";}
+		}
 		#endregion
 	}
 }
