@@ -280,6 +280,30 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		[Browsable(false), XmlIgnore]
+		public string SignalName_BelowStdDev
+		{
+			get { return "BelowStdDev";}
+		}
+
+		[Browsable(false), XmlIgnore]
+		public string SignalName_AboveStdDev
+		{
+			get { return "AboveStdDev";}
+		}
+				
+		[Browsable(false), XmlIgnore]
+		public string SignalName_BelowStdDevMin
+		{
+			get { return "BelowStdDevMin";}
+		}
+		
+		[Browsable(false), XmlIgnore]
+		public string SignalName_AboveStdDevMin
+		{
+			get { return "AboveStdDevMin";}
+		}
+		
+		[Browsable(false), XmlIgnore]
 		public string SignalName_EntryOnOpenLong
 		{
 			get { return "EntryOnOpenLong";}

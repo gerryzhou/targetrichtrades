@@ -274,8 +274,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 			bool isTime= false;
 			int cutoff = GetTimeByHM(time_h, time_m, false);
 			int t0 = GetTimeByHM(Times[bip][0].Hour, Times[bip][0].Minute, false);
+			int d0 = Times[bip][0].Day;
 			int t1 = GetTimeByHM(Times[bip][1].Hour, Times[bip][1].Minute, false);
-			if(t0 >= cutoff && t1 < cutoff) {
+			int d1 = Times[bip][1].Day;
+			if((d1 != d0 || t1 < cutoff ) && t0 >= cutoff) {
 				isTime = true;
 				Print(string.Format("{0}: Cutoff time={1}",	CurrentBar, t0));
 			}

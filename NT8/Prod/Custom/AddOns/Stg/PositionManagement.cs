@@ -40,6 +40,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return pos;
 		}
 		
+		public bool HasPairPosition() {
+			IndicatorProxy.TraceMessage(this.Name, 0);
+			bool pos = false;
+			if(GetMarketPosition(0) != MarketPosition.Flat 
+				&& GetMarketPosition(1) != MarketPosition.Flat) {
+				pos = true;
+			}
+			return pos;
+		}
+		
 		public double GetAvgPrice() {
 			MasterInstrument maIns = Bars.Instrument.MasterInstrument;
 			if(IsLiveTrading())

@@ -46,14 +46,17 @@ namespace NinjaTrader.NinjaScript.Indicators
 			{
 				Description					= "Pair spread by points or ratio";
 				Name						= "GISpdRS";
-				IsOverlay					= true;
+				IsOverlay					= false;
 				IsSuspendedWhileInactive	= true;
-				NumStdDev					= 1;
+				NumStdDevUp					= 1.6;
+				NumStdDevDown				= 1.6;
+				NumStdDevUpMin				= 0.5;
+				NumStdDevDownMin			= 0.5;
 				Period						= 20;
 				TM_OpenStartH								= 8;
 				TM_OpenStartM								= 0;
-				TM_OpenEndH									= 9;
-				TM_OpenEndM									= 2;
+				TM_OpenEndH									= 8;
+				TM_OpenEndM									= 34;
 				TM_ClosingH									= 10;
 				TM_ClosingM									= 45;
 
@@ -76,6 +79,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 				sma		= SMA(Spread, Period);
 				stdDev	= StdDev(Spread, Period);
 			}
+			else if (State == State.DataLoaded)
+			{
+				UpperMin = new Series<double>(this);
+				LowerMin = new Series<double>(this);
+			}
 		}
 
 		protected override void OnBarUpdate()
@@ -84,33 +92,60 @@ namespace NinjaTrader.NinjaScript.Indicators
 				Spread[0]		= Closes[0][0] - Closes[1][0];
 				double sma0		= sma[0];
 				double stdDev0	= stdDev[0];
-				Upper[0]		= sma0 + NumStdDev * stdDev0;
+				Upper[0]		= sma0 + NumStdDevUp * stdDev0;
+				UpperMin[0]		= sma0 + NumStdDevUpMin * stdDev0;
 				Middle[0]		= sma0;
-				Lower[0]		= sma0 - NumStdDev * stdDev0;
+				Lower[0]		= sma0 - NumStdDevDown * stdDev0;
+				LowerMin[0]		= sma0 - NumStdDevDownMin * stdDev0;
 				CheckTradeEvent();
 			}
 		}
 		
 		public void CheckTradeEvent() {
 			int en_H = TM_OpenEndH, en_M = TM_OpenEndM, ex_H = TM_ClosingH, ex_M = TM_ClosingM;		
-			Print(String.Format("{0}:CheckTradeEvent Bip{1}: en_H={2}, en_M={3}, ex_H={4}, ex_M={5}",
-				CurrentBars[BarsInProgress], BarsInProgress, en_H, en_M, ex_H, ex_M));
-			
-			//entry at 9:02 am ct
-			if(IsCutoffTime(BarsInProgress, en_H, en_M)) {
-				Print(String.Format("{0}:CheckTradeEvent En Bip{1}: Spread={2}, Upper={3}, Lower={4}, Middle={5}",
-				CurrentBars[BarsInProgress], BarsInProgress, Spread[0], Upper[0], Lower[0], Middle[0]));
+//			Print(String.Format("{0}:CheckTradeEvent Bip{1}: en_H={2}, en_M={3}, ex_H={4}, ex_M={5}",
+//				CurrentBars[BarsInProgress], BarsInProgress, en_H, en_M, ex_H, ex_M));
+
+//			if(IsCutoffTime(BarsInProgress, ex_H, ex_M)) {
+//				Print(String.Format("{0}:CheckTradeEvent Ex Bip{1}: Spread={2}, Upper={3}, Lower={4}, Middle={5}",
+//				CurrentBars[BarsInProgress], BarsInProgress, Spread[0], Upper[0], Lower[0], Middle[0]));
+					
+//				IndicatorSignal isig = new IndicatorSignal();
+//				Direction dir = new Direction();
+
+//				dir.TrendDir = TrendDirection.UnKnown;
+//				isig.SignalName = SignalName_ExitForOpen;			
+//				isig.BarNo = CurrentBars[BarsInProgress];
+//				isig.TrendDir = dir;
+//				isig.IndicatorSignalType = SignalType.SimplePriceAction;
+//				IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckTradeEvent Ex: ");
+//				ievt.IndSignal = isig;				
+//				OnRaiseIndicatorEvent(ievt);
+//			}
+//			else 			//entry at 9:02 am ct, if(IsCutoffTime(BarsInProgress, en_H, en_M)) 
+//			{
+//				Print(String.Format("{0}:CheckTradeEvent En Bip{1}: Spread={2}, Upper={3}, Lower={4}, Middle={5}",
+//				CurrentBars[BarsInProgress], BarsInProgress, Spread[0], Upper[0], Lower[0], Middle[0]));
 					
 				IndicatorSignal isig = new IndicatorSignal();
 				Direction dir = new Direction();
 
 				if(Spread[0] <= Lower[0]) {
 					dir.TrendDir = TrendDirection.Up;
-					isig.SignalName = SignalName_EntryOnOpenLong;
-				} else if(Spread[0] >= Upper[0]) {
-					dir.TrendDir = TrendDirection.Down;
-					isig.SignalName = SignalName_EntryOnOpenShort;
+					isig.SignalName = SignalName_BelowStdDev;
 				}
+//				else if(Spread[0] <= LowerMin[0]) {
+//					dir.TrendDir = TrendDirection.Up;
+//					isig.SignalName = SignalName_BelowStdDevMin;
+//				}
+				else if(Spread[0] >= Upper[0]) {
+					dir.TrendDir = TrendDirection.Down;
+					isig.SignalName = SignalName_AboveStdDev;
+				}
+//				else if(Spread[0] >= UpperMin[0]) {
+//					dir.TrendDir = TrendDirection.Down;
+//					isig.SignalName = SignalName_AboveStdDevMin;
+//				}
 				
 				isig.BarNo = CurrentBars[BarsInProgress];
 				isig.TrendDir = dir;
@@ -119,26 +154,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				ievt.IndSignal = isig;
 				//FireEvent(ievt);
 				OnRaiseIndicatorEvent(ievt);
-			}
-			else if(IsCutoffTime(BarsInProgress, ex_H, ex_M)) {
-//				Print(String.Format("{0}:CheckTradeEvent Ex Bip{1}: PctSpd={2}, MaxBip={3}, MinBip={4}", 
-//				CurrentBars[BarsInProgress], BarsInProgress, PlotPctSpd[0], PctChgMaxBip, PctChgMinBip));
-				Print(String.Format("{0}:CheckTradeEvent Ex Bip{1}: Spread={2}, Upper={3}, Lower={4}, Middle={5}",
-				CurrentBars[BarsInProgress], BarsInProgress, Spread[0], Upper[0], Lower[0], Middle[0]));
-					
-				IndicatorSignal isig = new IndicatorSignal();
-				Direction dir = new Direction();
-
-				dir.TrendDir = TrendDirection.UnKnown;
-				isig.SignalName = SignalName_ExitForOpen;			
-				isig.BarNo = CurrentBars[BarsInProgress];
-				isig.TrendDir = dir;
-				isig.IndicatorSignalType = SignalType.SimplePriceAction;
-				IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckTradeEvent Ex: ");
-				ievt.IndSignal = isig;
-				//FireEvent(ievt);
-				OnRaiseIndicatorEvent(ievt);
-			}
+//			}
 		}
 		
 		private string GetLongShortText() {
@@ -181,37 +197,58 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			get { return Values[3]; }
 		}
+
+		[Browsable(false)]
+		[XmlIgnore()]
+		public Series<double> UpperMin
+		{
+			get; set;
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore()]
+		public Series<double> LowerMin
+		{
+			get; set;
+		}
 		
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDev", GroupName = "NinjaScriptParameters", Order = 0)]
-		public double NumStdDev
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUp", GroupName = "NinjaScriptParameters", Order = 0)]
+		public double NumStdDevUp
+		{ get; set; }
+
+		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDown", GroupName = "NinjaScriptParameters", Order = 1)]
+		public double NumStdDevDown
+		{ get; set; }
+		
+		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUpMin", GroupName = "NinjaScriptParameters", Order = 2)]
+		public double NumStdDevUpMin
+		{ get; set; }
+
+		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDownMin", GroupName = "NinjaScriptParameters", Order = 3)]
+		public double NumStdDevDownMin
 		{ get; set; }
 
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "Period", GroupName = "NinjaScriptParameters", Order = 1)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "Period", GroupName = "NinjaScriptParameters", Order = 4)]
 		public int Period
 		{ get; set; }
 		
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name="SecondSymbol", Description="The second symbol of the pair", Order=2, GroupName="NinjaScriptParameters")]
+		[Display(ResourceType = typeof(Custom.Resource), Name="SecondSymbol", Description="The second symbol of the pair", GroupName="NinjaScriptParameters", Order=5)]
 		public string SecondSymbol
-		{ 	get{
-				return secondSymbol;
-			}
-			set{
-				secondSymbol = value;
-			}
+		{ 	get{ return secondSymbol; }
+			set{ secondSymbol = value; }
 		}
 		
 		[Range(-1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name="ChartMinutes", Description="Minutes for the chart", Order=3, GroupName="NinjaScriptParameters")]
+		[Display(ResourceType = typeof(Custom.Resource), Name="ChartMinutes", Description="Minutes for the chart", GroupName="NinjaScriptParameters", Order=6)]
 		public int ChartMinutes
-		{ 	get{
-				return chartMinutes;
-			}
-			set{
-				chartMinutes = value;
-			}
+		{ 	get{ return chartMinutes; }
+			set{ chartMinutes = value; }
 		}
 		#endregion
 		
@@ -234,18 +271,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GISpdRS[] cacheGISpdRS;
-		public GISpdRS GISpdRS(double numStdDev, int period, string secondSymbol, int chartMinutes)
+		public GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
 		{
-			return GISpdRS(Input, numStdDev, period, secondSymbol, chartMinutes);
+			return GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, period, secondSymbol, chartMinutes);
 		}
 
-		public GISpdRS GISpdRS(ISeries<double> input, double numStdDev, int period, string secondSymbol, int chartMinutes)
+		public GISpdRS GISpdRS(ISeries<double> input, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
 		{
 			if (cacheGISpdRS != null)
 				for (int idx = 0; idx < cacheGISpdRS.Length; idx++)
-					if (cacheGISpdRS[idx] != null && cacheGISpdRS[idx].NumStdDev == numStdDev && cacheGISpdRS[idx].Period == period && cacheGISpdRS[idx].SecondSymbol == secondSymbol && cacheGISpdRS[idx].ChartMinutes == chartMinutes && cacheGISpdRS[idx].EqualsInput(input))
+					if (cacheGISpdRS[idx] != null && cacheGISpdRS[idx].NumStdDevUp == numStdDevUp && cacheGISpdRS[idx].NumStdDevDown == numStdDevDown && cacheGISpdRS[idx].NumStdDevUpMin == numStdDevUpMin && cacheGISpdRS[idx].NumStdDevDownMin == numStdDevDownMin && cacheGISpdRS[idx].Period == period && cacheGISpdRS[idx].SecondSymbol == secondSymbol && cacheGISpdRS[idx].ChartMinutes == chartMinutes && cacheGISpdRS[idx].EqualsInput(input))
 						return cacheGISpdRS[idx];
-			return CacheIndicator<GISpdRS>(new GISpdRS(){ NumStdDev = numStdDev, Period = period, SecondSymbol = secondSymbol, ChartMinutes = chartMinutes }, input, ref cacheGISpdRS);
+			return CacheIndicator<GISpdRS>(new GISpdRS(){ NumStdDevUp = numStdDevUp, NumStdDevDown = numStdDevDown, NumStdDevUpMin = numStdDevUpMin, NumStdDevDownMin = numStdDevDownMin, Period = period, SecondSymbol = secondSymbol, ChartMinutes = chartMinutes }, input, ref cacheGISpdRS);
 		}
 	}
 }
@@ -254,14 +291,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GISpdRS GISpdRS(double numStdDev, int period, string secondSymbol, int chartMinutes)
+		public Indicators.GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
 		{
-			return indicator.GISpdRS(Input, numStdDev, period, secondSymbol, chartMinutes);
+			return indicator.GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, period, secondSymbol, chartMinutes);
 		}
 
-		public Indicators.GISpdRS GISpdRS(ISeries<double> input , double numStdDev, int period, string secondSymbol, int chartMinutes)
+		public Indicators.GISpdRS GISpdRS(ISeries<double> input , double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
 		{
-			return indicator.GISpdRS(input, numStdDev, period, secondSymbol, chartMinutes);
+			return indicator.GISpdRS(input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, period, secondSymbol, chartMinutes);
 		}
 	}
 }
@@ -270,14 +307,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GISpdRS GISpdRS(double numStdDev, int period, string secondSymbol, int chartMinutes)
+		public Indicators.GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
 		{
-			return indicator.GISpdRS(Input, numStdDev, period, secondSymbol, chartMinutes);
+			return indicator.GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, period, secondSymbol, chartMinutes);
 		}
 
-		public Indicators.GISpdRS GISpdRS(ISeries<double> input , double numStdDev, int period, string secondSymbol, int chartMinutes)
+		public Indicators.GISpdRS GISpdRS(ISeries<double> input , double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
 		{
-			return indicator.GISpdRS(input, numStdDev, period, secondSymbol, chartMinutes);
+			return indicator.GISpdRS(input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, period, secondSymbol, chartMinutes);
 		}
 	}
 }
