@@ -816,15 +816,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 		
 		#region MarketContext Functions		
-		public void GetMarketContext() {
-			ReadCtxTRT();
-		}
-		
+	
 		/// <summary>
 		/// Load ctx from Json file
 		/// </summary>
 		/// <returns></returns>
-		public void ReadCtxTRT() {
+		public override void ReadCtxParaObj() {
 			//ReadRestfulJson();
 			List<JsonStgTRT> paraDict = GConfig.LoadJson2Obj<List<JsonStgTRT>>(GetCTXFilePath());
 			Print(String.Format("ReadCtxTRT paraDict={0}, paraDict.Count={1}", paraDict, paraDict.Count));

@@ -13,8 +13,8 @@
     },
 	"CmdPathRoot": "Strategy",
 	"CmdFileName": "cmd_StgProdTRT.json",
-	"CTXFileName": "ctx_StgProdTRT.json",
-	"AlertBarsBack": 250,
+	"CTXFileName": "ctx_StgProdPairSpd.json",
+	"AlertBarsBack": 10,
 	"SoundFileName": "Latnwhis.wav",
 	"SoundPlayLoop": "4",
 	"MenuFileName": "menu_StgProdTRT.json"

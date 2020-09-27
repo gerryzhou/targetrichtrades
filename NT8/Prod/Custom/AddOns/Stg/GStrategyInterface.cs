@@ -1,8 +1,15 @@
 #region Using declarations
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
+
+using NinjaTrader.Cbi;
+using NinjaTrader.Data;
 using NinjaTrader.NinjaScript.Indicators;
+using NinjaTrader.NinjaScript.AddOns;
 using NinjaTrader.NinjaScript.AddOns.PriceActions;
+using NinjaTrader.NinjaScript.Strategies;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -22,8 +29,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region Methods
 		public virtual void GetMarketContext() {
 			//MarketCTX = ReadCmdParaObj<MktContext>();
-			//ReadCtxParaObj();
+			ReadCtxParaObj();
 		}
+
+		public virtual void ReadCtxParaObj() {
+//			List<JsonStgTRT> paraDict = GConfig.LoadJson2Obj<List<JsonStgTRT>>(GetCTXFilePath());
+//			Print(string.Format("ReadCtxParaObj paraDict={0}, paraDict.Count={1}", paraDict, paraDict.Count));
+//			if(paraDict != null && paraDict.Count > 0) {
+//				this.ctxTRT = paraDict[0];
+//				GUtils.DisplayProperties<JsonStgTRT>(ctxTRT, IndicatorProxy);
+//			}
+		}
+		
 		/// <summary>
 		/// Volatility measurement is for target, stop loss, etc.
 		/// </summary>

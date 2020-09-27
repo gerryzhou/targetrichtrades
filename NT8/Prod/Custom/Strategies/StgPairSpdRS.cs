@@ -5,6 +5,7 @@
 #region Using declarations
 using System;
 using System.Windows.Media;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
@@ -12,7 +13,9 @@ using System.Xml.Serialization;
 using NinjaTrader.Cbi;
 using NinjaTrader.Data;
 using NinjaTrader.NinjaScript.Indicators;
-using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.NinjaScript.AddOns;
+using NinjaTrader.NinjaScript.AddOns.PriceActions;
+using NinjaTrader.NinjaScript.Strategies;
 #endregion
 
 //This namespace holds strategies in this folder and is required. Do not change it.
@@ -25,6 +28,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 	{
 		//private GIPctSpd giPctSpd;
 		private GISpdRS giSpdRs;
+		private Dictionary<string, List<CtxPairSpd>> ctxPairSpd;
 		
 //		public StgPairSimple () {
 //			VendorLicense("TheTradingBook", "StgPairSimple", "thetradingbook.com", "support@tradingbook.com",null);
@@ -84,6 +88,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				CapRatio1 = Closes[1][0]/Closes[0][0];
 				Print(String.Format("{0}: IsUnmanaged={1}", this.GetType().Name, IsUnmanaged));
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));
+				GetMarketContext();
 			}
 		}
 
@@ -204,7 +209,44 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				default: return -1;
 //			}
 //		}
-		
+
+		/// <summary>
+		/// Load ctx from Json file
+		/// </summary>
+		/// <returns></returns>
+		public override void ReadCtxParaObj() {
+			//ReadRestfulJson();
+			ctxPairSpd = GConfig.LoadJson2Obj<Dictionary<string, List<CtxPairSpd>>>(GetCTXFilePath());
+			//Dictionary<string, object> paraDict = GConfig.LoadJson2Dictionary(GetCTXFilePath());
+			//Dictionary<string, object> paraDict = GConfig.LoadJson2Obj<Dictionary<string, object>>(GetCTXFilePath());
+			Print(String.Format("ReadCtxPairSpd paraDict={0}, paraDict.Count={1}", ctxPairSpd, ctxPairSpd.Count));
+			//if(paraDict != null && paraDict.Count > 0) {
+				//this.ctxPairSpd = paraDict[0];
+				//GUtils.DisplayProperties<JsonStgPairSpd>(ctxPairSpd, IndicatorProxy);
+			//}
+			foreach(var ele in ctxPairSpd)
+			{
+				Print(string.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Key, ele.Value));
+				foreach(CtxPairSpd ctxPS in ele.Value) {
+					Print(string.Format("ctxPS.Symbol={0}, ctxPS.TimeClose={1}", ctxPS.Symbol, ctxPS.TimeClose));
+				}
+			}
+			//foreach(JsonStgPairSpd ele in ctxPairSpd) {
+				//GUtils.DisplayProperties<JsonStgPairSpd>(ele, IndicatorProxy);
+				//Print(string.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Date, ele.CtxDaily));
+//				if(ele != null && ele.Date != null && ele.TimeCtxs != null) {
+//					Print(String.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Date, ele.TimeCtxs));
+//					foreach(TimeCtx tctx in ele.TimeCtxs) {
+//						Print(String.Format("ele.Date={0}, TimeCtx.tctx.Time={1}, tctx.ChannelType={2}, tctx.MinUp={3}, tctx.Support={4}",
+//						ele.Date, tctx.Time, tctx.ChannelType, tctx.MinUp, tctx.Support));
+//					}
+//				}				
+			//}
+//			foreach(KeyValuePair<string, List<TimeCTX>> ele in paraDict.cmdMarketContext.ctx_daily.ctx) {
+//				//paraMap.Add(ele.Key, ele.Value.ToString());
+//				Print(String.Format("ele.Key={0}, ele.Value.ToString()=", ele.Key));
+//			}			
+		}
 		#region Properties
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]

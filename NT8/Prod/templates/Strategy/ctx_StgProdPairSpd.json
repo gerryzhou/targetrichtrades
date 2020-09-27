@@ -1,0 +1,55 @@
+{
+		"20200407":
+		[
+			{
+				"Symbol":"NQ 06-20",
+				"ChartType":"5m",
+				"TimeOpen": 830, "TimeClose": 1030,
+				"TimeStart": 830, "TimeEnd": 1445,
+				
+				"ChannelType":"UpWide",
+				"TrendDirection":"Up",
+				"TradingStyle":"CounterTrend",
+				"TradingDirection":"Long",
+				
+				"BarsLookback": 5,
+				"DaysLookback": 5,
+				"MALength": 5
+			},
+			{
+				"Symbol":"NQ 06-20",
+				"ChartType":"5m",
+				"TimeOpen": 830, "TimeClose": 1130,
+				"TimeStart": 830, "TimeEnd": 1445,
+				
+				"ChannelType":"UpWide",
+				"TrendDirection":"Up",
+				"TradingStyle":"CounterTrend",
+				"TradingDirection":"Long",
+				
+				"BarsLookback": 5,
+				"DaysLookback": 5,
+				"MALength": 5
+			}
+		],
+		"20200408":
+		[
+			{
+				"Symbol":"NQ 06-20",
+				"ChartType":"5m",
+				"TimeOpen": 830, "TimeClose": 1035,
+				"TimeStart": 830, "TimeEnd": 1440,
+				
+				"ChannelType":"UpWide",
+				"TrendDirection":"Up",
+				"TradingStyle":"CounterTrend",
+				"TradingDirection":"Long",
+				
+				"BarsLookback": 5,
+				"DaysLookback": 5,
+				"MALength": 5
+			}
+		]
+}
+
+
