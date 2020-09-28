@@ -12,7 +12,7 @@ namespace NinjaTrader.NinjaScript.Strategies
     }
 	
 	public class CtxPairSpdDaily {
-		public IList<CtxPairSpd> CtxDaily{get;set;}
+		public List<CtxPairSpd> CtxDaily{get;set;}
 	}
 	
 	public class CtxPairSpd {

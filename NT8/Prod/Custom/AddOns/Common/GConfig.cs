@@ -104,7 +104,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 		/// <returns></returns>
 		public static Dictionary<string, object> GetConfigItems(string config_file, List<string> item_names) {
 			string json_path = GetConfigFileDir() + config_file;
-			string json = System.IO.File.ReadAllText(json_path);
+			string json = File.ReadAllText(json_path);
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             Dictionary<string, object> dic = serializer.Deserialize<Dictionary<string, object>>(json);
 //            string item = null;
@@ -144,11 +144,27 @@ namespace NinjaTrader.NinjaScript.AddOns
 		/// <returns></returns>
 		public static Dictionary<string, object> LoadJson2Dictionary(string json_path) {
 			//string json_path = GetConfigFileDir() + config_file;
-			string json = System.IO.File.ReadAllText(json_path);
+			string json = File.ReadAllText(json_path);
             //DataContractJsonSerializer ser = new DataContractJsonSerializer();
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             Dictionary<string, object> dict = serializer.Deserialize<Dictionary<string, object>>(json);
 			return dict;
+		}
+
+		/// <summary>
+		/// Output a dictionary to JSON file
+		/// </summary>
+		/// <param name="config_file"></param>
+		/// <returns></returns>
+		public static string Dictionary2JsonFile<T>(Dictionary<string, T> dict, string json_path) {
+			//string json_path = GetConfigFileDir() + config_file;
+			//string json = System.IO.File.ReadAllText(json_path);
+            //DataContractJsonSerializer ser = new DataContractJsonSerializer();
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+			string json = serializer.Serialize(dict);
+            //Dictionary<string, object> dict = serializer.Deserialize<Dictionary<string, object>>(json);
+			File.WriteAllText(json_path, GUtils.FormatJson(json));
+			return json;
 		}
 
 		/// <summary>
@@ -158,7 +174,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 		/// <returns></returns>
 		public static MktContext LoadJson2Obj1(string json_path) {
 			//string json_path = GetConfigFileDir() + config_file;
-			string json = System.IO.File.ReadAllText(json_path);
+			string json = File.ReadAllText(json_path);
             //DataContractJsonSerializer ser = new DataContractJsonSerializer();
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             MktContext dict = serializer.Deserialize<MktContext>(json);
@@ -172,7 +188,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 		/// <returns></returns>
 		public static T LoadJson2Obj<T>(string json_path) {
 			//string json_path = GetConfigFileDir() + config_file;
-			string json = System.IO.File.ReadAllText(json_path);
+			string json = File.ReadAllText(json_path);
             //DataContractJsonSerializer ser = new DataContractJsonSerializer();
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             T dict = serializer.Deserialize<T>(json);

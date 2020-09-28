@@ -82,6 +82,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return path;
 		}
 		
+		public string GetCTXOutputFilePath() {
+			List<string> names = new List<string>(){"CTXFileName","CTXOutputFile"};
+			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
+			object name = null;
+			//dic.TryGetValue("CmdPathRoot", out dir);
+			dic.TryGetValue("CTXOutputFile", out name);
+			string path = GetCmdDir() + name.ToString();
+			Print("GetCTXOutputFilePath=" + path);
+			return path;
+		}
+		
 		public FileInfo[] GetCmdFile(string srcDir) {
 			Print("GetCmdFile src: " + srcDir);
 		    DirectoryInfo DirInfo = new DirectoryInfo(srcDir);

@@ -227,9 +227,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			foreach(var ele in ctxPairSpd)
 			{
 				Print(string.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Key, ele.Value));
-				foreach(CtxPairSpd ctxPS in ele.Value) {
-					Print(string.Format("ctxPS.Symbol={0}, ctxPS.TimeClose={1}", ctxPS.Symbol, ctxPS.TimeClose));
-				}
+//				foreach(CtxPairSpd ctxPS in ele.Value) {
+//					Print(string.Format("ctxPS.Symbol={0}, ctxPS.TimeClose={1}", ctxPS.Symbol, ctxPS.TimeClose));
+//				}
 			}
 			//foreach(JsonStgPairSpd ele in ctxPairSpd) {
 				//GUtils.DisplayProperties<JsonStgPairSpd>(ele, IndicatorProxy);
@@ -245,7 +245,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			foreach(KeyValuePair<string, List<TimeCTX>> ele in paraDict.cmdMarketContext.ctx_daily.ctx) {
 //				//paraMap.Add(ele.Key, ele.Value.ToString());
 //				Print(String.Format("ele.Key={0}, ele.Value.ToString()=", ele.Key));
-//			}			
+//			}
+			string output = GConfig.Dictionary2JsonFile(ctxPairSpd, GetCTXOutputFilePath());
+			Print(string.Format("Dict to Json={0}", output));
 		}
 		#region Properties
 		[NinjaScriptProperty]
