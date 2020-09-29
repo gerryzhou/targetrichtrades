@@ -26,21 +26,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		#endregion
 
-		#region Methods
-		public virtual void GetMarketContext() {
-			//MarketCTX = ReadCmdParaObj<MktContext>();
-			ReadCtxParaObj();
-		}
-
-		public virtual void ReadCtxParaObj() {
-//			List<JsonStgTRT> paraDict = GConfig.LoadJson2Obj<List<JsonStgTRT>>(GetCTXFilePath());
-//			Print(string.Format("ReadCtxParaObj paraDict={0}, paraDict.Count={1}", paraDict, paraDict.Count));
-//			if(paraDict != null && paraDict.Count > 0) {
-//				this.ctxTRT = paraDict[0];
-//				GUtils.DisplayProperties<JsonStgTRT>(ctxTRT, IndicatorProxy);
-//			}
-		}
-		
+		#region Methods		
 		/// <summary>
 		/// Volatility measurement is for target, stop loss, etc.
 		/// </summary>
@@ -94,6 +80,28 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public virtual void SetDivergence(){}
 		
 		public virtual void SetMomentum(){}
+		
+		public virtual void GetMarketContext() {
+			//MarketCTX = ReadCmdParaObj<MktContext>();
+			ReadCtxParaObj();
+		}
+
+		public virtual void ReadCtxParaObj() {
+//			List<JsonStgTRT> paraDict = GConfig.LoadJson2Obj<List<JsonStgTRT>>(GetCTXFilePath());
+//			Print(string.Format("ReadCtxParaObj paraDict={0}, paraDict.Count={1}", paraDict, paraDict.Count));
+//			if(paraDict != null && paraDict.Count > 0) {
+//				this.ctxTRT = paraDict[0];
+//				GUtils.DisplayProperties<JsonStgTRT>(ctxTRT, IndicatorProxy);
+//			}
+		}
+		
+		public virtual void SetMarketContext() {
+			//MarketCTX = ReadCmdParaObj<MktContext>();
+			//ReadCtxParaObj();
+		}
+		
+		public virtual void WriteCtxParaObj() {
+		}
 		
 		/// <summary>
 		/// Detect if the market condition has changed or not since last signal

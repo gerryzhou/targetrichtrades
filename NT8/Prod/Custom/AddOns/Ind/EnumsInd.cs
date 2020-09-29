@@ -35,6 +35,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 	
 	public enum ChannelType { UpTight=1, UpWide=2, DnTight=4, DnWide=8, RngTight=16, RngWide=32, UnKnown=64 }
 	
+	public enum PositionInBand { BreakoutUp=1, Upper=2, BreakDown=4, Lower=8, MiddleUp=16, MiddleDn=32, UnKnown=64 }
+		
 	public enum MarketCycleType { //1-5 wave or ABC wave
 		W1Early, W1Middle, W1End,
 		W2Early, W2Middle, W2End,

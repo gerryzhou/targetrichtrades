@@ -25,6 +25,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		public string ChannelType{get;set;}
 		public string TrendDirection{get;set;}
+		public string PositionInBand{get;set;}
 		public string TradingStyle{get;set;}
 		public string TradingDirection{get;set;}
 		

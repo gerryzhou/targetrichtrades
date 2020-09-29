@@ -41,7 +41,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				Description	= "Pair Trading by Spread Diff or Ratio";
 				Name		= "StgPairSpdRS";
-				Calculate									= Calculate.OnBarClose;
+				Calculate									= Calculate.OnPriceChange;
 				IsFillLimitOnTouch							= false;
 				TraceOrders									= false;
 				BarsRequiredToTrade							= 128;
@@ -88,16 +88,26 @@ namespace NinjaTrader.NinjaScript.Strategies
 				CapRatio1 = Closes[1][0]/Closes[0][0];
 				Print(String.Format("{0}: IsUnmanaged={1}", this.GetType().Name, IsUnmanaged));
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));
-				GetMarketContext();
+				if(BarsPeriod.BarsPeriodType == BarsPeriodType.Day) {
+					//SetMarketContext();
+					ctxPairSpd = new Dictionary<string, List<CtxPairSpd>>();
+				}
+				else GetMarketContext();
 			}
 		}
 
 		protected override void OnBarUpdate()
 		{
-			if (CurrentBar < BarsRequiredToTrade)
+			if (CurrentBars[0] < BarsRequiredToTrade || CurrentBars[1] < BarsRequiredToTrade)
 				return;
 			giSpdRs.Update();
-
+			if(BarsPeriod.BarsPeriodType == BarsPeriodType.Day && BarsInProgress > 0){
+				if(IsLastBarOnChart(BarsInProgress) > 0) {
+					WriteCtxParaObj();
+				} else {
+					SetPairSpdCtx();
+				}
+			}
 			if (BarsInProgress != 0)
 				return;
 		}
@@ -246,13 +256,45 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				//paraMap.Add(ele.Key, ele.Value.ToString());
 //				Print(String.Format("ele.Key={0}, ele.Value.ToString()=", ele.Key));
 //			}
-			string output = GConfig.Dictionary2JsonFile(ctxPairSpd, GetCTXOutputFilePath());
-			Print(string.Format("Dict to Json={0}", output));
 		}
+		
+		/// <summary>
+		/// Write ctx to Json file
+		/// </summary>
+		/// <returns></returns>
+		public override void WriteCtxParaObj() {
+			//Print(String.Format("ReadCtxPairSpd paraDict={0}, paraDict.Count={1}", ctxPairSpd, ctxPairSpd.Count));
+			foreach(var ele in ctxPairSpd)
+			{
+				Print(string.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Key, ele.Value));
+				foreach(CtxPairSpd ctxPS in ele.Value) {
+					Print(string.Format("ctxPS.Symbol={0}, ctxPS.TimeClose={1}", ctxPS.Symbol, ctxPS.TimeClose));
+				}
+			}
+			string output = GConfig.Dictionary2JsonFile(ctxPairSpd, GetCTXOutputFilePath());
+			//Print(string.Format("Dict to Json={0}", output));
+		}
+		
+		private void SetPairSpdCtx() {			
+			string key = giSpdRs.GetDateStrByDateTime(Times[0][0]);
+			CtxPairSpd ctxps = new CtxPairSpd();
+			ctxps.Symbol = Instrument.MasterInstrument.Name;
+			ctxps.TimeOpen = 830;
+			ctxps.TimeClose = 1030;
+			ctxps.TimeStart = 830;
+			ctxps.TimeEnd = 1430;
+			ctxps.PositionInBand = giSpdRs.GetSpreadPosInBand().ToString();
+			ctxps.TrendDirection = giSpdRs.GetSpreadTrend().ToString();
+			//if()if(giSpdRs.IsSpreadFlat()) ;
+			if(ctxPairSpd.ContainsKey(key))
+				ctxPairSpd.Remove(key);
+			ctxPairSpd.Add(key, new List<CtxPairSpd>{ctxps});
+		}
+		
 		#region Properties
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="RocPeriod", Description="Rate of chage period", Order=0, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="RocPeriod", Description="Rate of change period", Order=0, GroupName=GPS_CUSTOM_PARAMS)]
 		public int RocPeriod
 		{ 	get{
 				return rocPeriod;

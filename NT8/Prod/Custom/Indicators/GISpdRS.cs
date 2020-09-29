@@ -48,6 +48,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				Name						= "GISpdRS";
 				IsOverlay					= false;
 				IsSuspendedWhileInactive	= true;
+				Calculate					= Calculate.OnPriceChange;
 				NumStdDevUp					= 1.6;
 				NumStdDevDown				= 1.6;
 				NumStdDevUpMin				= 0.5;
@@ -76,8 +77,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 				else 
 					AddDataSeries(SecondSymbol, BarsPeriodType.Day, 1, MarketDataType.Last);
 				
+				//Spread[0] = Closes[0][0] - Closes[1][0];
 				sma		= SMA(Spread, Period);
 				stdDev	= StdDev(Spread, Period);
+				
 			}
 			else if (State == State.DataLoaded)
 			{
@@ -88,7 +91,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
-			if(CurrentBar > BarsRequiredToPlot && BarsInProgress > 0) {
+			if(CurrentBars[0] > Math.Max(BarsRequiredToPlot,Period) 
+				&& CurrentBars[1] > Math.Max(BarsRequiredToPlot,Period) && BarsInProgress > 0) {
+//				Print(string.Format("CurrentBars[BarsInProgress]={0}, BarsInProgress={1}, Closes[0][0]={2}, Closes[1][0]=3",
+//					CurrentBars[BarsInProgress], BarsInProgress, Closes[0][0]));//, Closes[1][0]));
 				Spread[0]		= Closes[0][0] - Closes[1][0];
 				double sma0		= sma[0];
 				double stdDev0	= stdDev[0];
@@ -130,7 +136,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				IndicatorSignal isig = new IndicatorSignal();
 				Direction dir = new Direction();
 
-				if(Spread[0] <= Lower[0]) {
+				if(IsSpreadBreakdown()) {
 					dir.TrendDir = TrendDirection.Up;
 					isig.SignalName = SignalName_BelowStdDev;
 				}
@@ -138,7 +144,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 //					dir.TrendDir = TrendDirection.Up;
 //					isig.SignalName = SignalName_BelowStdDevMin;
 //				}
-				else if(Spread[0] >= Upper[0]) {
+				else if(IsSpreadBreakout()) {
 					dir.TrendDir = TrendDirection.Down;
 					isig.SignalName = SignalName_AboveStdDev;
 				}
@@ -155,6 +161,81 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//FireEvent(ievt);
 				OnRaiseIndicatorEvent(ievt);
 //			}
+		}
+		
+		public bool IsSpreadFlat() {
+			bool isFlat = false;
+			if(IsSpreadMiddleUp() || IsSpreadMiddleDown())
+				isFlat = true;
+			return isFlat;
+		}
+		
+		public bool IsSpreadMiddleUp() {
+			bool isMu = false;
+			if(Spread[0] < UpperMin[0] && Spread[0] >= Middle[0])
+				isMu = true;
+			return isMu;
+		}
+
+		public bool IsSpreadMiddleDown() {
+			bool isMd = false;
+			if(Spread[0] > LowerMin[0] && Spread[0] <= Middle[0])
+				isMd = true;
+			return isMd;
+		}
+		
+		public bool IsSpreadUpBand() {
+			bool isUb = false;
+			if(Spread[0] >= UpperMin[0] && Spread[0] < Upper[0])
+				isUb = true;
+			return isUb;
+		}
+
+		public bool IsSpreadLowBand() {
+			bool isLb = false;
+			if(Spread[0] <= LowerMin[0] && Spread[0] > Lower[0])
+				isLb = true;
+			return isLb;
+		}
+				
+		public bool IsSpreadBreakout() {
+			bool isBk = false;
+			if(Spread[0] >= Upper[0])
+				isBk = true;
+			return isBk;
+		}
+		
+		public bool IsSpreadBreakdown() {
+			bool isBd = false;
+			if(Spread[0] <= Lower[0])
+				isBd = true;
+			return isBd;
+		}
+		
+		public PositionInBand GetSpreadPosInBand() {
+			PositionInBand pib = PositionInBand.UnKnown;
+			if(IsSpreadBreakout())
+				pib = PositionInBand.BreakoutUp;
+			else if(IsSpreadBreakdown())
+				pib = PositionInBand.BreakDown;
+			else if(IsSpreadUpBand())
+				pib = PositionInBand.Upper;
+			else if(IsSpreadLowBand())
+				pib = PositionInBand.Lower;
+			else if(IsSpreadMiddleUp())
+				pib = PositionInBand.MiddleUp;
+			else if(IsSpreadMiddleDown())
+				pib = PositionInBand.MiddleDn;
+			return pib;
+		}
+		
+		public TrendDirection GetSpreadTrend() {
+			TrendDirection trd = TrendDirection.UnKnown;
+			if(Spread[0] > Spread[1])
+				trd = TrendDirection.Up;
+			else if (Spread[0] < Spread[1])
+				trd = TrendDirection.Down;
+			return trd;
 		}
 		
 		private string GetLongShortText() {

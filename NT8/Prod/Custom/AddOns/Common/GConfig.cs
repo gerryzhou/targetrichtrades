@@ -164,6 +164,8 @@ namespace NinjaTrader.NinjaScript.AddOns
 			string json = serializer.Serialize(dict);
             //Dictionary<string, object> dict = serializer.Deserialize<Dictionary<string, object>>(json);
 			File.WriteAllText(json_path, GUtils.FormatJson(json));
+//			JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
+//			json = JsonSerializer.Serialize<Dictionary<string, T>>(dict, options);
 			return json;
 		}
 

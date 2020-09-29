@@ -104,28 +104,35 @@ namespace NinjaTrader.NinjaScript.Indicators
 //			IndicatorSignal indicatorSignal = new IndicatorSignal();
 //        }
 		
-		public int IsLastBarOnChart() {
+		public int IsLastBarOnChart(int bip) {
 			try{				
 //				if(CurrentBar < Count - 1)
 //					return -1;
 //				if(CurrentBar < Count - 2)
 //				if(Inputs[0].Count - Bars.CurrentBar <= 2)
-				if(CurrentBar < Bars.Count - 2)
+//				PrintLog(true, !BackTest, 
+//					string.Format("IsLastBarOnChart: CurrentBar=, Bars.Count={0}", Count));
+					//+ CurrentBar);// + "," + Bars.Count);
+				if(CurrentBars[bip] < BarsArray[bip].Count - 2)
 				{
-					return -1;		
-				} 
+					return -1;
+				}
 				else {
-					PrintLog(true, !BackTest, 
-						"IsLastBarOnChart called:(CurBar,Count, Bars.Count)=" 
-						+ CurrentBar + "," + Count + "," + Bars.Count);
-					return Bars.Count;//Count;//Inputs[0].Count;
+//					PrintLog(true, !BackTest, 
+//						"IsLastBarOnChart called:(CurBar,Count, Bars.Count)=");
+						//+ CurrentBar);// + "," + Count + "," + Bars.Count);
+					return BarsArray[bip].Count;//Count;//Inputs[0].Count;
 				}
 		
 			} catch(Exception ex){
 				PrintLog(true, !BackTest, 
-					"IsLastBarOnChart error:" + ex.Message);
-				return -1;
+					"IsLastBarOnChart error:" + ex.Message);				
 			}
+			return -1;
+		}
+		
+		public int IsLastBarOnChart() {
+			return IsLastBarOnChart(0);
 		}
 		
 		public void DayWeekMonthCount() {

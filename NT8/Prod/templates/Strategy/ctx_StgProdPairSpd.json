@@ -9,6 +9,7 @@
 				
 				"ChannelType":"UpWide",
 				"TrendDirection":"Up",
+				"PositionInBand":	"Upper",
 				"TradingStyle":"CounterTrend",
 				"TradingDirection":"Long",
 				
@@ -24,6 +25,7 @@
 				
 				"ChannelType":"UpWide",
 				"TrendDirection":"Up",
+				"PositionInBand":	"Upper",
 				"TradingStyle":"CounterTrend",
 				"TradingDirection":"Long",
 				
@@ -42,6 +44,7 @@
 				
 				"ChannelType":"UpWide",
 				"TrendDirection":"Up",
+				"PositionInBand":	"Lower",
 				"TradingStyle":"CounterTrend",
 				"TradingDirection":"Long",
 				
