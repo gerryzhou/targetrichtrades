@@ -115,20 +115,23 @@ namespace NinjaTrader.NinjaScript.Indicators
 					//+ CurrentBar);// + "," + Bars.Count);
 				if(CurrentBars[bip] < BarsArray[bip].Count - 2)
 				{
+//					PrintLog(true, !BackTest, 
+//						"IsLastBarOnChart called0:(CurBar,Count, BarsArray[bip].Count)="
+//						+ CurrentBar + "," + Count + "," + BarsArray[bip].Count);
 					return -1;
 				}
 				else {
-//					PrintLog(true, !BackTest, 
-//						"IsLastBarOnChart called:(CurBar,Count, Bars.Count)=");
-						//+ CurrentBar);// + "," + Count + "," + Bars.Count);
+					PrintLog(true, !BackTest, 
+						"IsLastBarOnChart called:(CurBar,Count, BarsArray[bip].Count)="
+						+ CurrentBars[bip] + "," + Count + "," + BarsArray[bip].Count);
 					return BarsArray[bip].Count;//Count;//Inputs[0].Count;
 				}
 		
 			} catch(Exception ex){
 				PrintLog(true, !BackTest, 
-					"IsLastBarOnChart error:" + ex.Message);				
-			}
-			return -1;
+					"IsLastBarOnChart error:" + ex.Message);
+				return -1;
+			}			
 		}
 		
 		public int IsLastBarOnChart() {

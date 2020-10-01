@@ -28,8 +28,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 	{
 		//private GIPctSpd giPctSpd;
 		private GISpdRS giSpdRs;
-		private Dictionary<string, List<CtxPairSpd>> ctxPairSpd;
 		
+		//private Dictionary<string, List<CtxPairSpd>> ctxPairSpd;		
+		private CtxPairSpdDaily ctxPairSpdDaily;
 //		public StgPairSimple () {
 //			VendorLicense("TheTradingBook", "StgPairSimple", "thetradingbook.com", "support@tradingbook.com",null);
 //		}
@@ -69,14 +70,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				// Add an MSFT 1 minute Bars object to the strategy
 				//AddDataSeries("NQ 06-20", Data.BarsPeriodType.Minute, 13);				
-				AddDataSeries(SecondSymbol, BarsPeriodType.Minute, ChartMinutes);
+				if(ChartMinutes > 0)
+					AddDataSeries(SecondSymbol, BarsPeriodType.Minute, ChartMinutes, MarketDataType.Last);
+				else 
+					AddDataSeries(SecondSymbol, BarsPeriodType.Day, 1, MarketDataType.Last);
+				//AddDataSeries(SecondSymbol, BarsPeriodType.Minute, ChartMinutes);
 				SetOrderQuantity = SetOrderQuantity.Strategy; // calculate orders based off default size
 				// Sets a 20 tick trailing stop for an open position
 				//SetTrailStop(CalculationMode.Ticks, 200);
 			}
 			else if (State == State.DataLoaded)
 			{
-				giSpdRs = GISpdRS(NumStdDevUp, NumStdDevDown, NumStdDevUpMin, NumStdDevDownMin, RocPeriod, SecondSymbol, ChartMinutes);// CapRatio1, CapRatio2, PctChgSpdThresholdEn, PctChgSpdThresholdEx);
+				giSpdRs = GISpdRS(NumStdDevUp, NumStdDevDown, NumStdDevUpMin, NumStdDevDownMin, MAPeriod, ATRPeriod, SecondSymbol, ChartMinutes);// CapRatio1, CapRatio2, PctChgSpdThresholdEn, PctChgSpdThresholdEx);
 				AddChartIndicator(giSpdRs);
 				
 				giSpdRs.RaiseIndicatorEvent += OnTradeByPairSpdRs;
@@ -88,11 +93,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 				CapRatio1 = Closes[1][0]/Closes[0][0];
 				Print(String.Format("{0}: IsUnmanaged={1}", this.GetType().Name, IsUnmanaged));
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));
-				if(BarsPeriod.BarsPeriodType == BarsPeriodType.Day) {
-					//SetMarketContext();
-					ctxPairSpd = new Dictionary<string, List<CtxPairSpd>>();
-				}
-				else GetMarketContext();
+				
+				ctxPairSpdDaily = new CtxPairSpdDaily();
+//				if(BarsPeriod.BarsPeriodType == BarsPeriodType.Day) {
+//					//SetMarketContext();
+//					ctxPairSpd = new Dictionary<string, List<CtxPairSpd>>();
+//				}
+				if(BarsPeriod.BarsPeriodType != BarsPeriodType.Day)
+					GetMarketContext();
 			}
 		}
 
@@ -101,15 +109,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (CurrentBars[0] < BarsRequiredToTrade || CurrentBars[1] < BarsRequiredToTrade)
 				return;
 			giSpdRs.Update();
-			if(BarsPeriod.BarsPeriodType == BarsPeriodType.Day && BarsInProgress > 0){
-				if(IsLastBarOnChart(BarsInProgress) > 0) {
+//			Print(string.Format("CurrentBars[BarsInProgress]={0}, BarsInProgress={1}, BarsPeriod.BarsPeriodType={2}", 
+//				CurrentBars[BarsInProgress], BarsInProgress, BarsPeriod.BarsPeriodType));
+			if(BarsPeriod.BarsPeriodType == BarsPeriodType.Day && BarsInProgress > 0){				
+				if(giSpdRs.IsLastBarOnChart(BarsInProgress) > 0) {
 					WriteCtxParaObj();
 				} else {
 					SetPairSpdCtx();
 				}
+			} else {
+				GetPairSpdCtx();
 			}
-			if (BarsInProgress != 0)
-				return;
 		}
 		
 		#region En/Ex signals
@@ -128,8 +138,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         void OnTradeByPairSpdRs(object sender, IndicatorEventArgs e) {
 			IndicatorSignal isig = e.IndSignal;
-			Print(String.Format("{0}:OnTradeByPairSpdRs triggerred {1} Bip{2}: Spread={3}, Middle={4}",
-			CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, giSpdRs.Spread[0], giSpdRs.Middle[0]));
+			//Print(String.Format("{0}:OnTradeByPairSpdRs triggerred {1} Bip{2}: Spread={3}, Middle={4}",
+			//CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, giSpdRs.Spread[0], giSpdRs.Middle[0]));
 			if(e.IndSignal.SignalName != null && HasPairPosition())
 				OnExitPositions(e);
 			else if(e.IndSignal.SignalName != null && IsTradingTime(IndicatorProxy.GetTimeByHM(TG_OpenStartH, TG_OpenStartM, true)))
@@ -162,23 +172,38 @@ namespace NinjaTrader.NinjaScript.Strategies
 		void OnEntryPositions(IndicatorEventArgs e) {
 			//New entry with no poistions for both legs
 			if(HasPosition(0) <= 0 && HasPosition(1) <= 0) {
-				int quant1 = base.GetTradeQuantity(0, CapRatio1);
-				int quant2 = base.GetTradeQuantity(1, CapRatio2);
-				string sig = e.IndSignal.SignalName;
-				Print(String.Format("{0}:OnEntryPositions quant1={1}, quant2={2}: Spread={3}, Upper={4}, Lower={5}",
-				CurrentBars[BarsInProgress], quant1, quant2, giSpdRs.Spread[0], giSpdRs.Upper[0], giSpdRs.Lower[0]));
-				if(sig == giSpdRs.SignalName_AboveStdDev) {
-					if(MktPosition1 != MarketPosition.Long && MktPosition2 != MarketPosition.Short) {
-						EnterShort(0, quant1, giSpdRs.SignalName_EntryShortLeg1);
-						EnterLong(1, quant2, giSpdRs.SignalName_EntryLongLeg2);
-					}
+				string key = ctxPairSpdDaily.KeyLastDay;//giSpdRs.GetDateStrByDateTime(Times[0][0]); //
+				if(key == null) {
+					Print(string.Format("ctxPairSpdDaily.KeyLastDay CurrentBars={0}, BarsInProgress={1}, Times[][0]={2}",
+					CurrentBars[BarsInProgress], BarsInProgress, Times[BarsInProgress][0]));
+					return;
 				}
-				else if (sig == giSpdRs.SignalName_BelowStdDev) {
-					if(MktPosition1 != MarketPosition.Short && MktPosition2 != MarketPosition.Long) {
-						EnterLong(0, quant1, giSpdRs.SignalName_EntryLongLeg1);
-						EnterShort(1, quant2, giSpdRs.SignalName_EntryShortLeg2);
+				CtxPairSpd ctxps = ctxPairSpdDaily.GetDayCtx(key);
+				if(ctxps == null) return;
+				else {
+					int quant1 = base.GetTradeQuantity(0, CapRatio1);
+					int quant2 = base.GetTradeQuantity(1, CapRatio2);
+					string sig = e.IndSignal.SignalName;
+					Print(String.Format("{0}:OnEntryPositions quant1={1}, quant2={2}: Spread={3}, Upper={4}, Lower={5}",
+					CurrentBars[BarsInProgress], quant1, quant2, giSpdRs.Spread[0], giSpdRs.Upper[0], giSpdRs.Lower[0]));
+					if(TrendDirection.Down.ToString().Equals(ctxps.TrendDirection)
+						&& PositionInBand.Lower.ToString().Equals(ctxps.PositionInBand) 
+						&& sig == giSpdRs.SignalName_AboveStdDev) {
+						if(MktPosition1 != MarketPosition.Long && MktPosition2 != MarketPosition.Short) {
+							EnterShort(0, quant1, giSpdRs.SignalName_EntryShortLeg1);
+							EnterLong(1, quant2, giSpdRs.SignalName_EntryLongLeg2);
+						}
 					}
+					else if (TrendDirection.Up.ToString().Equals(ctxps.TrendDirection)
+						&& PositionInBand.Upper.ToString().Equals(ctxps.PositionInBand) 
+						&& sig == giSpdRs.SignalName_BelowStdDev) {
+						if(MktPosition1 != MarketPosition.Short && MktPosition2 != MarketPosition.Long) {
+							EnterLong(0, quant1, giSpdRs.SignalName_EntryLongLeg1);
+							EnterShort(1, quant2, giSpdRs.SignalName_EntryShortLeg2);
+						}
+					}					
 				}
+
 				
 //				if(MktPosition1 == MarketPosition.Long) {
 //					EnterLong(0, quant1, giSpdRs.SignalName_EntryLongLeg1);
@@ -203,8 +228,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (time_now >= session_start && time_now >= time_start && time_now <= time_end) {
 				isTime = true;
 			}
-			Print(String.Format("{0}: time_now={1}, session_start={2}, time_start={3}, time_end={4}, isTime={5}",
-			CurrentBar, time_now, session_start, time_start, time_end, isTime));
+//			Print(String.Format("{0}: time_now={1}, session_start={2}, time_start={3}, time_end={4}, isTime={5}",
+//			CurrentBar, time_now, session_start, time_start, time_end, isTime));
 			return isTime;
 		}
 		#endregion
@@ -226,15 +251,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public override void ReadCtxParaObj() {
 			//ReadRestfulJson();
-			ctxPairSpd = GConfig.LoadJson2Obj<Dictionary<string, List<CtxPairSpd>>>(GetCTXFilePath());
+			ctxPairSpdDaily.DictCtxPairSpd = GConfig.LoadJson2Obj<Dictionary<string, List<CtxPairSpd>>>(GetCTXFilePath());
 			//Dictionary<string, object> paraDict = GConfig.LoadJson2Dictionary(GetCTXFilePath());
 			//Dictionary<string, object> paraDict = GConfig.LoadJson2Obj<Dictionary<string, object>>(GetCTXFilePath());
-			Print(String.Format("ReadCtxPairSpd paraDict={0}, paraDict.Count={1}", ctxPairSpd, ctxPairSpd.Count));
+			Print(String.Format("ReadCtxPairSpd paraDict={0}, paraDict.Count={1}", ctxPairSpdDaily.DictCtxPairSpd, ctxPairSpdDaily.DictCtxPairSpd.Count));
 			//if(paraDict != null && paraDict.Count > 0) {
 				//this.ctxPairSpd = paraDict[0];
 				//GUtils.DisplayProperties<JsonStgPairSpd>(ctxPairSpd, IndicatorProxy);
 			//}
-			foreach(var ele in ctxPairSpd)
+			foreach(var ele in ctxPairSpdDaily.DictCtxPairSpd)
 			{
 				Print(string.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Key, ele.Value));
 //				foreach(CtxPairSpd ctxPS in ele.Value) {
@@ -264,14 +289,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public override void WriteCtxParaObj() {
 			//Print(String.Format("ReadCtxPairSpd paraDict={0}, paraDict.Count={1}", ctxPairSpd, ctxPairSpd.Count));
-			foreach(var ele in ctxPairSpd)
-			{
-				Print(string.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Key, ele.Value));
-				foreach(CtxPairSpd ctxPS in ele.Value) {
-					Print(string.Format("ctxPS.Symbol={0}, ctxPS.TimeClose={1}", ctxPS.Symbol, ctxPS.TimeClose));
-				}
-			}
-			string output = GConfig.Dictionary2JsonFile(ctxPairSpd, GetCTXOutputFilePath());
+//			foreach(var ele in ctxPairSpd)
+//			{
+//				Print(string.Format("DateCtx.ele.Key={0}, ele.Value.ToString()={1}", ele.Key, ele.Value));
+//				foreach(CtxPairSpd ctxPS in ele.Value) {
+//					Print(string.Format("ctxPS.Symbol={0}, ctxPS.TimeClose={1}", ctxPS.Symbol, ctxPS.TimeClose));
+//				}
+//			}
+			string output = GConfig.Dictionary2JsonFile(ctxPairSpdDaily.DictCtxPairSpd, GetCTXOutputFilePath());
 			//Print(string.Format("Dict to Json={0}", output));
 		}
 		
@@ -285,27 +310,48 @@ namespace NinjaTrader.NinjaScript.Strategies
 			ctxps.TimeEnd = 1430;
 			ctxps.PositionInBand = giSpdRs.GetSpreadPosInBand().ToString();
 			ctxps.TrendDirection = giSpdRs.GetSpreadTrend().ToString();
+			ctxps.PairATRRatio = giSpdRs.PairATRRatio[0];
 			//if()if(giSpdRs.IsSpreadFlat()) ;
-			if(ctxPairSpd.ContainsKey(key))
-				ctxPairSpd.Remove(key);
-			ctxPairSpd.Add(key, new List<CtxPairSpd>{ctxps});
+			ctxPairSpdDaily.AddDayCtx(key, new List<CtxPairSpd>{ctxps});
+		}
+		
+		private void GetPairSpdCtx() {
+			//Is a new day
+			if(Times[0][0].Day != Times[0][1].Day) {
+				this.ctxPairSpdDaily.KeyLastDay = giSpdRs.GetDateStrByDateTime(Times[0][1]);
+				CtxPairSpd ctxps = this.ctxPairSpdDaily.GetDayCtx(this.ctxPairSpdDaily.KeyLastDay);
+				CapRatio2 = 1;
+				CapRatio1 = ctxps==null? Closes[1][0]/Closes[0][0] : ctxps.PairATRRatio;
+			}
 		}
 		
 		#region Properties
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="RocPeriod", Description="Rate of change period", Order=0, GroupName=GPS_CUSTOM_PARAMS)]
-		public int RocPeriod
+		[Display(Name="MAPeriod", Description="MA or StdDev period", Order=0, GroupName=GPS_CUSTOM_PARAMS)]
+		public int MAPeriod
 		{ 	get{
-				return rocPeriod;
+				return maPeriod;
 			}
 			set{
-				rocPeriod = value;
+				maPeriod = value;
 			}
 		}
-
+		
+		[NinjaScriptProperty]
+		[Range(1, int.MaxValue)]
+		[Display(Name="ATRPeriod", Description="ATR period", Order=1, GroupName=GPS_CUSTOM_PARAMS)]
+		public int ATRPeriod
+		{ 	get{
+				return atrPeriod;
+			}
+			set{
+				atrPeriod = value;
+			}
+		}
+		
 		[NinjaScriptProperty]		
-		[Display(Name="SecondSymbol", Description="The second symbol of the pair", Order=1, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="SecondSymbol", Description="The second symbol of the pair", Order=2, GroupName=GPS_CUSTOM_PARAMS)]
 		public string SecondSymbol
 		{ 	get{
 				return secondSymbol;
@@ -316,8 +362,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		[NinjaScriptProperty]
-		[Range(1, int.MaxValue)]
-		[Display(Name="ChartMinutes", Description="Minutes for the chart", Order=2, GroupName=GPS_CUSTOM_PARAMS)]
+		[Range(-1, int.MaxValue)]
+		[Display(Name="ChartMinutes", Description="Minutes for the chart", Order=3, GroupName=GPS_CUSTOM_PARAMS)]
 		public int ChartMinutes
 		{ 	get{
 				return chartMinutes;
@@ -328,42 +374,42 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUp", Order=3, GroupName = GPS_CUSTOM_PARAMS)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUp", Order=4, GroupName = GPS_CUSTOM_PARAMS)]
 		public double NumStdDevUp
 		{ get; set; }
 
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDown", Order=4, GroupName = GPS_CUSTOM_PARAMS)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDown", Order=5, GroupName = GPS_CUSTOM_PARAMS)]
 		public double NumStdDevDown
 		{ get; set; }
 		
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUpMin", Order=5, GroupName = GPS_CUSTOM_PARAMS)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUpMin", Order=6, GroupName = GPS_CUSTOM_PARAMS)]
 		public double NumStdDevUpMin
 		{ get; set; }
 
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDownMin", Order=6, GroupName = GPS_CUSTOM_PARAMS)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDownMin", Order=7, GroupName = GPS_CUSTOM_PARAMS)]
 		public double NumStdDevDownMin
 		{ get; set; }
 		
 		[NinjaScriptProperty]
 		//[Range(1, double.MaxValue)]
-		[Display(Name="MktPosition1", Description="Long or short for the leg1 entry", Order=7, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="MktPosition1", Description="Long or short for the leg1 entry", Order=8, GroupName=GPS_CUSTOM_PARAMS)]
 		public MarketPosition MktPosition1
 		{ 	get; set;
 		}
 		
 		[NinjaScriptProperty]
 		//[Range(1, double.MaxValue)]
-		[Display(Name="MktPosition2", Description="Long or short for the leg2 entry", Order=8, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="MktPosition2", Description="Long or short for the leg2 entry", Order=9, GroupName=GPS_CUSTOM_PARAMS)]
 		public MarketPosition MktPosition2
 		{ 	get; set;
 		}
 		
 		[NinjaScriptProperty]
 		[Range(1, double.MaxValue)]
-		[Display(Name="CapRatio1", Description="CapRatio of first leg", Order=9, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="CapRatio1", Description="CapRatio of first leg", Order=10, GroupName=GPS_CUSTOM_PARAMS)]
 		public double CapRatio1
 		{ 	get{
 				return capRatio1;
@@ -375,7 +421,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[NinjaScriptProperty]
 		[Range(1, double.MaxValue)]
-		[Display(Name="CapRatio2", Description="CapRatio of 2nd leg", Order=10, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="CapRatio2", Description="CapRatio of 2nd leg", Order=11, GroupName=GPS_CUSTOM_PARAMS)]
 		public double CapRatio2
 		{ 	get{
 				return capRatio2;
@@ -387,7 +433,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[NinjaScriptProperty]
 		[Range(double.MinValue, double.MaxValue)]
-		[Display(Name="PctChgSpdThresholdEn", Description="PctChgSpd Threshold to entry", Order=11, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="PctChgSpdThresholdEn", Description="PctChgSpd Threshold to entry", Order=12, GroupName=GPS_CUSTOM_PARAMS)]
 		public double PctChgSpdThresholdEn
 		{ 	get{
 				return pctChgSpdThresholdEn;
@@ -399,7 +445,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[NinjaScriptProperty]
 		[Range(double.MinValue, double.MaxValue)]
-		[Display(Name="PctChgSpdThresholdEx", Description="PctChgSpd Threshold to exit", Order=12, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="PctChgSpdThresholdEx", Description="PctChgSpd Threshold to exit", Order=13, GroupName=GPS_CUSTOM_PARAMS)]
 		public double PctChgSpdThresholdEx
 		{ 	get{
 				return pctChgSpdThresholdEx;
@@ -439,7 +485,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#endregion
 		
 		#region Pre Defined parameters
-		private int rocPeriod = 20;
+		private int maPeriod = 5;
+		private int atrPeriod = 10;
 		private double capRatio1 = 1;//1.25;
 		private double capRatio2 = 1;
 		private double pctChgSpdThresholdEn = -2.3;

@@ -106,21 +106,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 			try{				
 				if(CurrentBars[bip] < BarsArray[bip].Count - 2)
 				{
-					return -1;		
+					return -1;
 				}
 				else {
 //					Print("IsLastBarOnChart called:(CurBar,Count, Bars.Count)=");
 //						+ CurrentBar);// + "," + Count + "," + Bars.Count);
 					Print(string.Format("IsLastBarOnChart: CurrentBar={0}, Count={1}, Bars.Count={2}",
-						CurrentBars[bip], Count, BarsArray[bip].Count ));
-					return BarsArray[bip].Count ;
-				}
-		
+						CurrentBars[bip], Count, BarsArray[bip].Count));
+					return BarsArray[bip].Count;
+				}		
 			} catch(Exception ex){
 				Print(string.Format("IsLastBarOnChart error: CurrentBar={0}, Count={1}, Bars.Count={2}, {3}",
-					CurrentBars[bip], Count, BarsArray[bip].Count, ex.Message));				
-			}
-			return -1;
+					CurrentBars[bip], Count, BarsArray[bip].Count, ex.Message));
+				return -1;
+			}			
 		}
 		
 		public bool IsLiveTrading() {

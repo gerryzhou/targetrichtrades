@@ -1,5 +1,9 @@
 #region Using declarations
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+//using System.ComponentModel.DataAnnotations;
+using System.Xml.Serialization;
 #endregion
 
 //This namespace holds Add ons in this folder and is required. Do not change it. 
@@ -12,7 +16,33 @@ namespace NinjaTrader.NinjaScript.Strategies
     }
 	
 	public class CtxPairSpdDaily {
-		public List<CtxPairSpd> CtxDaily{get;set;}
+		public CtxPairSpdDaily() {
+			DictCtxPairSpd = new Dictionary<string, List<CtxPairSpd>>();
+		}
+		
+		public void AddDayCtx(string key, List<CtxPairSpd> list) {
+			if(DictCtxPairSpd.ContainsKey(key))
+				DictCtxPairSpd.Remove(key);
+			DictCtxPairSpd.Add(key, list);
+		}
+		
+		public CtxPairSpd GetDayCtx(string key) {
+			List<CtxPairSpd> list;
+			DictCtxPairSpd.TryGetValue(key, out list);
+			if(list != null && list.Count > 0)
+				return list[0];
+			else return null;
+		}
+		
+		//public List<CtxPairSpd> CtxDaily{get;set;}
+		[Browsable(false), XmlIgnore()]
+		public Dictionary<string, List<CtxPairSpd>> DictCtxPairSpd {
+			get; set;
+		}
+		
+		[Browsable(false), XmlIgnore()]
+		public string KeyLastDay
+		{ get; set; }
 	}
 	
 	public class CtxPairSpd {
@@ -28,6 +58,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public string PositionInBand{get;set;}
 		public string TradingStyle{get;set;}
 		public string TradingDirection{get;set;}
+		
+		public double PairATRRatio{get;set;}
 		
 		public int BarsLookback{get;set;}
 		public int DaysLookback{get;set;}
