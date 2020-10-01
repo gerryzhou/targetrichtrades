@@ -39,6 +39,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 	{
 		private SMA		sma;
 		private StdDev	stdDev;
+		//private GIATRRatio giAtrRatio;
 
 		protected override void OnStateChange()
 		{
@@ -53,7 +54,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				NumStdDevDown				= 1.6;
 				NumStdDevUpMin				= 0.5;
 				NumStdDevDownMin			= 0.5;
-				Period						= 20;
+				MAPeriod						= 20;
 				TM_OpenStartH								= 8;
 				TM_OpenStartM								= 0;
 				TM_OpenEndH									= 8;
@@ -78,9 +79,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 					AddDataSeries(SecondSymbol, BarsPeriodType.Day, 1, MarketDataType.Last);
 				
 				//Spread[0] = Closes[0][0] - Closes[1][0];
-				sma		= SMA(Spread, Period);
-				stdDev	= StdDev(Spread, Period);
-				
+				sma		= SMA(Spread, MAPeriod);
+				stdDev	= StdDev(Spread, MAPeriod);
+				PairATRRatio = GIATRRatio(ATRPeriod, SecondSymbol, ChartMinutes);
 			}
 			else if (State == State.DataLoaded)
 			{
@@ -91,8 +92,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
-			if(CurrentBars[0] > Math.Max(BarsRequiredToPlot,Period) 
-				&& CurrentBars[1] > Math.Max(BarsRequiredToPlot,Period) && BarsInProgress > 0) {
+			int barsRequired = Math.Max(BarsRequiredToPlot,MAPeriod);
+			PairATRRatio.Update();
+			if(CurrentBars[0] > barsRequired
+				&& CurrentBars[1] > barsRequired && BarsInProgress > 0) {
 //				Print(string.Format("CurrentBars[BarsInProgress]={0}, BarsInProgress={1}, Closes[0][0]={2}, Closes[1][0]=3",
 //					CurrentBars[BarsInProgress], BarsInProgress, Closes[0][0]));//, Closes[1][0]));
 				Spread[0]		= Closes[0][0] - Closes[1][0];
@@ -286,55 +289,66 @@ namespace NinjaTrader.NinjaScript.Indicators
 			get; set;
 		}
 		
-		[Browsable(false)]
-		[XmlIgnore()]
+		[Browsable(false), XmlIgnore()]
 		public Series<double> LowerMin
 		{
 			get; set;
 		}
 		
+		[Browsable(false), XmlIgnore()]
+		public GIATRRatio PairATRRatio
+		{
+			get; set;
+		}
+		
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUp", GroupName = "NinjaScriptParameters", Order = 0)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUp", GroupName="NinjaScriptParameters", Order = 0)]
 		public double NumStdDevUp
 		{ get; set; }
 
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDown", GroupName = "NinjaScriptParameters", Order = 1)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDown", GroupName="NinjaScriptParameters", Order = 1)]
 		public double NumStdDevDown
 		{ get; set; }
 		
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUpMin", GroupName = "NinjaScriptParameters", Order = 2)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUpMin", GroupName="NinjaScriptParameters", Order = 2)]
 		public double NumStdDevUpMin
 		{ get; set; }
 
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDownMin", GroupName = "NinjaScriptParameters", Order = 3)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDownMin", GroupName="NinjaScriptParameters", Order = 3)]
 		public double NumStdDevDownMin
 		{ get; set; }
 
 		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "Period", GroupName = "NinjaScriptParameters", Order = 4)]
-		public int Period
+		[Display(ResourceType = typeof(Custom.Resource), Name = "MAPeriod", GroupName="NinjaScriptParameters", Order = 4)]
+		public int MAPeriod
 		{ get; set; }
 		
 		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name="SecondSymbol", Description="The second symbol of the pair", GroupName="NinjaScriptParameters", Order=5)]
+		[Range(1, int.MaxValue)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="ATRPeriod", Description="ATR period", GroupName="NinjaScriptParameters", Order=5)]
+		public int ATRPeriod
+		{ get; set; }
+		
+		[NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name="SecondSymbol", Description="The second symbol of the pair", GroupName="NinjaScriptParameters", Order=6)]
 		public string SecondSymbol
 		{ 	get{ return secondSymbol; }
 			set{ secondSymbol = value; }
 		}
 		
 		[Range(-1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name="ChartMinutes", Description="Minutes for the chart", GroupName="NinjaScriptParameters", Order=6)]
+		[Display(ResourceType = typeof(Custom.Resource), Name="ChartMinutes", Description="Minutes for the chart", GroupName="NinjaScriptParameters", Order=7)]
 		public int ChartMinutes
 		{ 	get{ return chartMinutes; }
 			set{ chartMinutes = value; }
 		}
+
 		#endregion
 		
 		#region Pre Defined parameters
-		private int rocPeriod = 8;
 		private double capRatio1 = 1.25;
 		private double capRatio2 = 1;		
 		private string secondSymbol = "QQQ";
@@ -352,18 +366,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GISpdRS[] cacheGISpdRS;
-		public GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
+		public GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
 		{
-			return GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, period, secondSymbol, chartMinutes);
+			return GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, mAPeriod, aTRPeriod, secondSymbol, chartMinutes);
 		}
 
-		public GISpdRS GISpdRS(ISeries<double> input, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
+		public GISpdRS GISpdRS(ISeries<double> input, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
 		{
 			if (cacheGISpdRS != null)
 				for (int idx = 0; idx < cacheGISpdRS.Length; idx++)
-					if (cacheGISpdRS[idx] != null && cacheGISpdRS[idx].NumStdDevUp == numStdDevUp && cacheGISpdRS[idx].NumStdDevDown == numStdDevDown && cacheGISpdRS[idx].NumStdDevUpMin == numStdDevUpMin && cacheGISpdRS[idx].NumStdDevDownMin == numStdDevDownMin && cacheGISpdRS[idx].Period == period && cacheGISpdRS[idx].SecondSymbol == secondSymbol && cacheGISpdRS[idx].ChartMinutes == chartMinutes && cacheGISpdRS[idx].EqualsInput(input))
+					if (cacheGISpdRS[idx] != null && cacheGISpdRS[idx].NumStdDevUp == numStdDevUp && cacheGISpdRS[idx].NumStdDevDown == numStdDevDown && cacheGISpdRS[idx].NumStdDevUpMin == numStdDevUpMin && cacheGISpdRS[idx].NumStdDevDownMin == numStdDevDownMin && cacheGISpdRS[idx].MAPeriod == mAPeriod && cacheGISpdRS[idx].ATRPeriod == aTRPeriod && cacheGISpdRS[idx].SecondSymbol == secondSymbol && cacheGISpdRS[idx].ChartMinutes == chartMinutes && cacheGISpdRS[idx].EqualsInput(input))
 						return cacheGISpdRS[idx];
-			return CacheIndicator<GISpdRS>(new GISpdRS(){ NumStdDevUp = numStdDevUp, NumStdDevDown = numStdDevDown, NumStdDevUpMin = numStdDevUpMin, NumStdDevDownMin = numStdDevDownMin, Period = period, SecondSymbol = secondSymbol, ChartMinutes = chartMinutes }, input, ref cacheGISpdRS);
+			return CacheIndicator<GISpdRS>(new GISpdRS(){ NumStdDevUp = numStdDevUp, NumStdDevDown = numStdDevDown, NumStdDevUpMin = numStdDevUpMin, NumStdDevDownMin = numStdDevDownMin, MAPeriod = mAPeriod, ATRPeriod = aTRPeriod, SecondSymbol = secondSymbol, ChartMinutes = chartMinutes }, input, ref cacheGISpdRS);
 		}
 	}
 }
@@ -372,14 +386,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
+		public Indicators.GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
 		{
-			return indicator.GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, period, secondSymbol, chartMinutes);
+			return indicator.GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, mAPeriod, aTRPeriod, secondSymbol, chartMinutes);
 		}
 
-		public Indicators.GISpdRS GISpdRS(ISeries<double> input , double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
+		public Indicators.GISpdRS GISpdRS(ISeries<double> input , double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
 		{
-			return indicator.GISpdRS(input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, period, secondSymbol, chartMinutes);
+			return indicator.GISpdRS(input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, mAPeriod, aTRPeriod, secondSymbol, chartMinutes);
 		}
 	}
 }
@@ -388,14 +402,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
+		public Indicators.GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
 		{
-			return indicator.GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, period, secondSymbol, chartMinutes);
+			return indicator.GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, mAPeriod, aTRPeriod, secondSymbol, chartMinutes);
 		}
 
-		public Indicators.GISpdRS GISpdRS(ISeries<double> input , double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int period, string secondSymbol, int chartMinutes)
+		public Indicators.GISpdRS GISpdRS(ISeries<double> input , double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
 		{
-			return indicator.GISpdRS(input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, period, secondSymbol, chartMinutes);
+			return indicator.GISpdRS(input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, mAPeriod, aTRPeriod, secondSymbol, chartMinutes);
 		}
 	}
 }

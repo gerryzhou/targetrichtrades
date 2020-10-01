@@ -1,7 +1,3 @@
-// 
-// Copyright (C) 2015, NinjaTrader LLC <www.ninjatrader.com>.
-// NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
-//
 #region Using declarations
 using System;
 using System.Collections.Generic;
@@ -18,143 +14,255 @@ using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Chart;
 using NinjaTrader.Gui.SuperDom;
+using NinjaTrader.Gui.Tools;
 using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
-using NinjaTrader.Gui.Tools;
 using NinjaTrader.NinjaScript.AddOns;
 using NinjaTrader.NinjaScript.AddOns.PriceActions;
 #endregion
 
-// This namespace holds indicators in this folder and is required. Do not change it.
+//This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.Indicators
 {
 	/// <summary>
-	/// Bollinger Bands are plotted at standard deviation levels above and below a moving average. 
-	/// Since standard deviation is a measure of volatility, the bands are self-adjusting: 
-	/// widening during volatile markets and contracting during calmer periods.
+	/// Pair pct spread
+	/// Pct spread of the pair from last day: for intraday trading
 	/// </summary>
-	public class GISpdRS : GIndicatorBase
+	public class GIPairPctSpd : GIndicatorBase
 	{
-		private SMA		sma;
-		private StdDev	stdDev;
-		//private GIATRRatio giAtrRatio;
-
+		private Series<double> PctChg1;
+		private Series<double> PctChg2;
+		private Series<double> PctSpd;
+		private Series<double> RocChg;
+		private PriorDayOHLC lastDayOHLC;
+		private double[] PctChgArr = new double[]{-101, -101};
+		private double PctChgSpdMin, PctChgSpdMax;
+		
+		//PctChgSpdWideCount = PctChgSpdEnCount  +PctChgSpdExCount
+		//PctChgSpdNarrowCount = PctChgSpdCount - PctChgSpdWideCount
+		//En<0, Ex>0
+		private double PctChgSpdCount = 0, PctChgSpdEnCount = 0, PctChgSpdExCount = 0;
+		private double PctChgSpdEnSum, PctChgSpdExSum;
+		//int PctChgMaxBip=-1, PctChgMinBip=-1;
+		private StdDev stdDev;
+		private SMA	smaClose1;
+		private SMA	smaClose2;
+		private SMA	smaPctChgRatio;
+		
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
 			{
-				Description					= "Pair spread by points or ratio";
-				Name						= "GISpdRS";
-				IsOverlay					= false;
-				IsSuspendedWhileInactive	= true;
-				Calculate					= Calculate.OnPriceChange;
-				NumStdDevUp					= 1.6;
-				NumStdDevDown				= 1.6;
-				NumStdDevUpMin				= 0.5;
-				NumStdDevDownMin			= 0.5;
-				MAPeriod						= 20;
+				Description									= @"Calculate %chg spread for the underlining pair";
+				Name										= "GIPairPctSpd";
+				Calculate									= Calculate.OnPriceChange;
+				IsOverlay									= false;
+				DisplayInDataBox							= true;
+				DrawOnPricePanel							= false;
+				DrawHorizontalGridLines						= true;
+				DrawVerticalGridLines						= false;
+				PaintPriceMarkers							= true;
+				ScaleJustification							= NinjaTrader.Gui.Chart.ScaleJustification.Right;
+				//Disable this property if your indicator requires custom values that cumulate with each new market data event. 
+				//See Help Guide for additional information.
+				IsSuspendedWhileInactive					= true;
+				RocPeriod									= 8;
 				TM_OpenStartH								= 8;
 				TM_OpenStartM								= 0;
-				TM_OpenEndH									= 8;
-				TM_OpenEndM									= 34;
+				TM_OpenEndH									= 9;
+				TM_OpenEndM									= 2;
 				TM_ClosingH									= 10;
 				TM_ClosingM									= 45;
-
+				PctChgMaxBip								= -1;
+				PctChgMinBip								= -1;
 				BarsRequiredToPlot							= 128;
 				MaximumBarsLookBack							= MaximumBarsLookBack.Infinite;
-
-				AddPlot(new Stroke(Brushes.Blue), PlotStyle.Dot, "Spread");
-				AddPlot(new Stroke(Brushes.Gold), PlotStyle.Dot, "Mean");
-				AddPlot(Brushes.Red, "Upper band");
-				//AddPlot(Brushes.Orange, "Middle band");
-				AddPlot(Brushes.Green, "Lower band");
+				AddPlot(Brushes.Red, "PlotPctSpd");
+				AddPlot(Brushes.Orange, "PlotRocSpd");
+				AddLine(Brushes.Blue, 0, "LineZero");
 			}
 			else if (State == State.Configure)
 			{
-				if(ChartMinutes > 0)
-					AddDataSeries(SecondSymbol, BarsPeriodType.Minute, ChartMinutes, MarketDataType.Last);
-				else 
-					AddDataSeries(SecondSymbol, BarsPeriodType.Day, 1, MarketDataType.Last);
-				
-				//Spread[0] = Closes[0][0] - Closes[1][0];
-				sma		= SMA(Spread, MAPeriod);
-				stdDev	= StdDev(Spread, MAPeriod);
-				PairATRRatio = GIATRRatio(ATRPeriod, SecondSymbol, ChartMinutes);
+				//AddDataSeries("NQ 06-20", Data.BarsPeriodType.Minute, 13, Data.MarketDataType.Last);
+				//AddDataSeries("RTY 06-20", Data.BarsPeriodType.Minute, 13, Data.MarketDataType.Last);
+				//AddDataSeries("NRGU", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
+				AddDataSeries(SecondSymbol, Data.BarsPeriodType.Minute, ChartMinutes, Data.MarketDataType.Last);
 			}
 			else if (State == State.DataLoaded)
 			{
-				UpperMin = new Series<double>(this);
-				LowerMin = new Series<double>(this);
+				PctChg1 = new Series<double>(this);
+				PctChg2 = new Series<double>(this);
+				PctSpd = new Series<double>(this);
+				RocChg = new Series<double>(this);			
+				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", 
+					this.GetType().Name, BarsArray.Length));
+				smaClose1 = SMA(Closes[0], 5);
+				smaClose2 = SMA(Closes[1], 5);
+				smaPctChgRatio = SMA(RocChg, 50);
+				stdDev = StdDev(PlotPctSpd, 7);
+				//AddChartIndicator(stdDev);
 			}
 		}
 
 		protected override void OnBarUpdate()
 		{
-			int barsRequired = Math.Max(BarsRequiredToPlot,MAPeriod);
-			PairATRRatio.Update();
-			if(CurrentBars[0] > barsRequired
-				&& CurrentBars[1] > barsRequired && BarsInProgress > 0) {
-//				Print(string.Format("CurrentBars[BarsInProgress]={0}, BarsInProgress={1}, Closes[0][0]={2}, Closes[1][0]=3",
-//					CurrentBars[BarsInProgress], BarsInProgress, Closes[0][0]));//, Closes[1][0]));
-				Spread[0]		= Closes[0][0] - Closes[1][0];
-				double sma0		= sma[0];
-				double stdDev0	= stdDev[0];
-				Upper[0]		= sma0 + NumStdDevUp * stdDev0;
-				UpperMin[0]		= sma0 + NumStdDevUpMin * stdDev0;
-				Middle[0]		= sma0;
-				Lower[0]		= sma0 - NumStdDevDown * stdDev0;
-				LowerMin[0]		= sma0 - NumStdDevDownMin * stdDev0;
-				CheckTradeEvent();
+			//Print(String.Format("{0}:[{1}] BarsRequiredToPlot={2},", CurrentBars[BarsInProgress], BarsInProgress, BarsRequiredToPlot));
+			if(CurrentBars[BarsInProgress] < BarsRequiredToPlot)
+				return;
+//			if(IsCutoffTime(BarsInProgress, 10, 20)) {
+//				Print(String.Format("{0}:[{1}] PutTradeByPctSpd EnEx Bip{2}: PctSpd={3}, MaxBip={4}, MinBip={5}",
+//				CurrentBar, Times[BarsInProgress][0], BarsInProgress, PlotPctSpd[0], PctChgMaxBip, PctChgMinBip));
+//			}
+			PctChgArr[BarsInProgress] = GetPctChg(BarsInProgress);
+			SetPctChgSpread();
+			//if(PrintOut > 1)
+			//	PrintPctChgSpd();
+		}
+		
+		private double GetPctChg(int bip) {
+			double chg = -101, lcl = 0;
+			if(bip < 0)
+				return chg;
+			
+			//lastDayOHLC = PriorDayOHLC(BarsArray[bip]);
+			double cl = Closes[bip][0];
+			//double lcl = PriorDayOHLC(BarsArray[bip]).PriorClose[0];
+			if(bip == 0)
+				lcl = smaClose1[0];
+			if(bip == 1)
+				lcl = smaClose2[0];
+			if(lcl > 0 && cl > 0) {
+				chg = Math.Round(100*(cl-lcl)/lcl, 2);
+				//Print(string.Format("{0}: {1} Chg={2}, Time{0]={3}", 
+				//	CurrentBar, Instruments[BarsInProgress].FullName, chg.ToString(), Times[BarsInProgress][0]));
+				Print(string.Format("{0}: {1} Chg={2}, Time[0]={3}", 
+					CurrentBar, Instruments[bip].FullName, chg, Times[0][0]));
 			}
+			//else Print(string.Format("{0}:{1}, Close={2}, PriorClose={3}, Time={4}",
+			//	CurrentBar, Instruments[BarsInProgress].FullName, cl, lcl, Times[BarsInProgress][0]));
+			if(bip == 0)
+				PctChg1[0] = chg;
+			if(bip == 1)
+				PctChg2[0] = chg;
+			return chg;
+		}
+	
+		private void SetPctChgSpread() {
+			if(BarsInProgress == 0) return;
+			else {
+				if(PctChgArr[0] > -101 && PctChgArr[BarsInProgress] > -101) {
+					//PlotPctSpd[0] = Math.Round(CapRatio1*PctChgArr[0] + CapRatio2*PctChgArr[BarsInProgress], 2);
+					//PlotRocSpd[0] = stdDev[0];
+					PlotPctSpd[0] = Math.Round(CapRatio1*PctChgArr[0] + CapRatio2*PctChgArr[BarsInProgress], 2);
+					RocChg[0] = Closes[0][0]/Closes[1][0];
+					PlotRocSpd[0] = RocChg[0];// stdDev[0];
+					PctChgSpdMax = Math.Max(PctChgSpdMax, PlotPctSpd[0]);
+					PctChgSpdMin = Math.Min(PctChgSpdMin, PlotPctSpd[0]);
+					PctChgSpdCount++;
+					if(PlotPctSpd[0] <= PctChgSpdThresholdEn) {
+						PctChgSpdEnCount++;						
+						PctChgSpdEnSum = PctChgSpdEnSum + PlotPctSpd[0];
+						FireThresholdEvent(PlotPctSpd[0]);
+					}
+					else if (PlotPctSpd[0] >= PctChgSpdThresholdEx) {
+						PctChgSpdExCount++;						
+						PctChgSpdExSum = PctChgSpdExSum + PlotPctSpd[0];
+						FireThresholdEvent(PlotPctSpd[0]);
+					}
+					//PctChgSpdWideCount = PctChgSpdEnCount  +PctChgSpdExCount
+					//PctChgSpdNarrowCount = PctChgSpdCount - PctChgSpdWideCount
+					//else PctChgSpdNarrowCount++;
+				}
+				Print(string.Format("{0}: PctChg0={1}, PctChg1={2}, PlotPctSpd={3}, Time={4}",
+					CurrentBar, PctChgArr[0], PctChgArr[BarsInProgress], PlotPctSpd[0], Times[BarsInProgress][0]));
+				PctChgArr = new double[]{-101, -101};
+			}
+		}
+		
+		private void FireThresholdEvent(double spd) {
+			IndicatorSignal isig = new IndicatorSignal();
+			//if(CurrentBar < 300)
+				Print(String.Format("{0}:Close={1}, PctChgSpd={2}, PctChgSpdThresholdEn={3}, PctChgSpdThresholdEx={4}",
+				CurrentBar, Close[0], spd, PctChgSpdThresholdEn, PctChgSpdThresholdEx));
+			if(spd <= PctChgSpdThresholdEn) {
+				isig.BreakoutDir = BreakoutDirection.Down;
+				isig.SignalName = SignalName_BreakdownMV;
+			} else if(spd >= PctChgSpdThresholdEx) {
+				isig.BreakoutDir = BreakoutDirection.Up;
+				isig.SignalName = SignalName_BreakoutMV;
+			} else
+				return;
+			
+			isig.BarNo = CurrentBar;
+			isig.IndicatorSignalType = SignalType.SimplePriceAction;
+			IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckMeanV: ");
+			ievt.IndSignal = isig;
+			//FireEvent(ievt);
+			OnRaiseIndicatorEvent(ievt);
+		}
+		
+		private void PrintPctChgSpd() {
+			if(IsLastBarOnChart() > 0 && BarsInProgress == 0) {
+				for(int i=0; i < CurrentBar-BarsRequiredToPlot; i++) {
+					Print(string.Format("{0:0.00}	{1:0.00}	{2:0.00}	{3}	{4:yyyyMMdd_HHmm}",
+						PlotPctSpd[i], PctChg1[i], PctChg2[i], CurrentBar-i, Times[0][i]));
+				}
+				Print(string.Format("{0}: PctChgSpdMax={1}, PctChgSpdMin={2}, PctChgSpdThresholdEn={3}, PctChgSpdThresholdEx={4}",
+					CurrentBar, PctChgSpdMax, PctChgSpdMin, PctChgSpdThresholdEn, PctChgSpdThresholdEx));
+				double PctChgSpdWideCount = PctChgSpdWideCount = PctChgSpdEnCount  + PctChgSpdExCount;
+				double PctChgSpdNarrowCount = PctChgSpdCount - PctChgSpdWideCount;
+				Print(string.Format("{0}: PctChgSpdEnCount={1}, {2:0.00}%, PctChgSpdExCount={3}, {4:0.00}% PctChgSpdCount={5}",
+					CurrentBar, PctChgSpdEnCount, 100*PctChgSpdEnCount/PctChgSpdCount, PctChgSpdExCount, 100*PctChgSpdExCount/PctChgSpdCount, PctChgSpdCount));
+				Print(string.Format("{0}: PctChgSpdEnAvg={1}, PctChgSpdExAvg={2}",
+					CurrentBar, PctChgSpdEnSum/PctChgSpdEnCount, PctChgSpdExSum/PctChgSpdExCount));
+				Print(string.Format("{0}: PctChgSpdWideCount={1}, {2:0.00}%, PctChgSpdNarrowCount={3}, {4:0.00}% PctChgSpdCount={5}",
+					CurrentBar, PctChgSpdWideCount, 100*PctChgSpdWideCount/PctChgSpdCount, PctChgSpdNarrowCount, 100*PctChgSpdNarrowCount/PctChgSpdCount, PctChgSpdCount));
+			}
+		}
+		
+		private void DrawTextValue() {			
+			Draw.TextFixed(this, "NinjaScriptInfo", GetLongShortText(), TextPosition.TopLeft,
+				Brushes.LimeGreen, new SimpleFont("Arial", 18), Brushes.Transparent, Brushes.Transparent, 0);
+		}
+		
+		private string GetLongShortText() {
+			String txt = "N/A";
+			if(PlotPctSpd[0] != null && PctChgMaxBip >= 0 && PctChgMinBip >= 0) {
+				if(PlotPctSpd[0] > 0) {
+					txt = "L " + (PctChgMaxBip+1).ToString() + " : S " + (PctChgMinBip+1).ToString();
+				} else {
+					txt = "S " + (PctChgMaxBip+1).ToString() + " : L " + (PctChgMinBip+1).ToString();
+				}
+			}
+			return txt;
 		}
 		
 		public void CheckTradeEvent() {
 			int en_H = TM_OpenEndH, en_M = TM_OpenEndM, ex_H = TM_ClosingH, ex_M = TM_ClosingM;		
-//			Print(String.Format("{0}:CheckTradeEvent Bip{1}: en_H={2}, en_M={3}, ex_H={4}, ex_M={5}",
-//				CurrentBars[BarsInProgress], BarsInProgress, en_H, en_M, ex_H, ex_M));
-
-//			if(IsCutoffTime(BarsInProgress, ex_H, ex_M)) {
-//				Print(String.Format("{0}:CheckTradeEvent Ex Bip{1}: Spread={2}, Upper={3}, Lower={4}, Middle={5}",
-//				CurrentBars[BarsInProgress], BarsInProgress, Spread[0], Upper[0], Lower[0], Middle[0]));
-					
-//				IndicatorSignal isig = new IndicatorSignal();
-//				Direction dir = new Direction();
-
-//				dir.TrendDir = TrendDirection.UnKnown;
-//				isig.SignalName = SignalName_ExitForOpen;			
-//				isig.BarNo = CurrentBars[BarsInProgress];
-//				isig.TrendDir = dir;
-//				isig.IndicatorSignalType = SignalType.SimplePriceAction;
-//				IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckTradeEvent Ex: ");
-//				ievt.IndSignal = isig;				
-//				OnRaiseIndicatorEvent(ievt);
-//			}
-//			else 			//entry at 9:02 am ct, if(IsCutoffTime(BarsInProgress, en_H, en_M)) 
-//			{
-//				Print(String.Format("{0}:CheckTradeEvent En Bip{1}: Spread={2}, Upper={3}, Lower={4}, Middle={5}",
-//				CurrentBars[BarsInProgress], BarsInProgress, Spread[0], Upper[0], Lower[0], Middle[0]));
+			
+			//entry at 9:02 am ct
+			if(IsCutoffTime(BarsInProgress, en_H, en_M)) {
+				Print(String.Format("{0}:CheckTradeEvent En Bip{1}: PctSpd={2}, MaxBip={3}, MinBip={4}",
+				CurrentBars[BarsInProgress], BarsInProgress, PlotPctSpd[0], PctChgMaxBip, PctChgMinBip));
 					
 				IndicatorSignal isig = new IndicatorSignal();
 				Direction dir = new Direction();
+	//			Print(String.Format("{0}: [{1}] Non-CutoffTime {2}: MaxBip={3}, %Max={4}, MinBip={5}, %Min={6}, %Spd={7}", 
+	//				CurrentBar, Time[0], GetLongShortText(),
+	//				PctChgMaxBip, PctChgMax[0], PctChgMinBip, PctChgMin[0], PlotPctSpd[0]));
 
-				if(IsSpreadBreakdown()) {
-					dir.TrendDir = TrendDirection.Up;
-					isig.SignalName = SignalName_BelowStdDev;
-				}
-//				else if(Spread[0] <= LowerMin[0]) {
-//					dir.TrendDir = TrendDirection.Up;
-//					isig.SignalName = SignalName_BelowStdDevMin;
-//				}
-				else if(IsSpreadBreakout()) {
-					dir.TrendDir = TrendDirection.Down;
-					isig.SignalName = SignalName_AboveStdDev;
-				}
-//				else if(Spread[0] >= UpperMin[0]) {
-//					dir.TrendDir = TrendDirection.Down;
-//					isig.SignalName = SignalName_AboveStdDevMin;
-//				}
+				if(PctChgMaxBip != PctChgMinBip) {
+					if(PlotPctSpd[0] > 0) {
+						dir.TrendDir = TrendDirection.Up;
+						isig.SignalName = SignalName_EntryOnOpenLong;
+					} else if(PlotPctSpd[0] < 0) {
+						dir.TrendDir = TrendDirection.Down;
+						isig.SignalName = SignalName_EntryOnOpenShort;
+					}
+				} else
+					return;
 				
 				isig.BarNo = CurrentBars[BarsInProgress];
 				isig.TrendDir = dir;
@@ -163,199 +271,161 @@ namespace NinjaTrader.NinjaScript.Indicators
 				ievt.IndSignal = isig;
 				//FireEvent(ievt);
 				OnRaiseIndicatorEvent(ievt);
-//			}
-		}
-		
-		public bool IsSpreadFlat() {
-			bool isFlat = false;
-			if(IsSpreadMiddleUp() || IsSpreadMiddleDown())
-				isFlat = true;
-			return isFlat;
-		}
-		
-		public bool IsSpreadMiddleUp() {
-			bool isMu = false;
-			if(Spread[0] < UpperMin[0] && Spread[0] >= Middle[0])
-				isMu = true;
-			return isMu;
-		}
-
-		public bool IsSpreadMiddleDown() {
-			bool isMd = false;
-			if(Spread[0] > LowerMin[0] && Spread[0] <= Middle[0])
-				isMd = true;
-			return isMd;
-		}
-		
-		public bool IsSpreadUpBand() {
-			bool isUb = false;
-			if(Spread[0] >= UpperMin[0] && Spread[0] < Upper[0])
-				isUb = true;
-			return isUb;
-		}
-
-		public bool IsSpreadLowBand() {
-			bool isLb = false;
-			if(Spread[0] <= LowerMin[0] && Spread[0] > Lower[0])
-				isLb = true;
-			return isLb;
-		}
-				
-		public bool IsSpreadBreakout() {
-			bool isBk = false;
-			if(Spread[0] >= Upper[0])
-				isBk = true;
-			return isBk;
-		}
-		
-		public bool IsSpreadBreakdown() {
-			bool isBd = false;
-			if(Spread[0] <= Lower[0])
-				isBd = true;
-			return isBd;
-		}
-		
-		public PositionInBand GetSpreadPosInBand() {
-			PositionInBand pib = PositionInBand.UnKnown;
-			if(IsSpreadBreakout())
-				pib = PositionInBand.BreakoutUp;
-			else if(IsSpreadBreakdown())
-				pib = PositionInBand.BreakDown;
-			else if(IsSpreadUpBand())
-				pib = PositionInBand.Upper;
-			else if(IsSpreadLowBand())
-				pib = PositionInBand.Lower;
-			else if(IsSpreadMiddleUp())
-				pib = PositionInBand.MiddleUp;
-			else if(IsSpreadMiddleDown())
-				pib = PositionInBand.MiddleDn;
-			return pib;
-		}
-		
-		public TrendDirection GetSpreadTrend() {
-			TrendDirection trd = TrendDirection.UnKnown;
-			if(Spread[0] > Spread[1])
-				trd = TrendDirection.Up;
-			else if (Spread[0] < Spread[1])
-				trd = TrendDirection.Down;
-			return trd;
-		}
-		
-		private string GetLongShortText() {
-			String txt = "N/A";
-			if(Spread[0] != null) {
-				if(Spread[0] < Middle[0]) {
-					txt = "L " + Instrument.MasterInstrument.Name + " : S " + SecondSymbol;
-				} else {
-					txt = "S " + Instrument.MasterInstrument.Name + " : L " + SecondSymbol;
-				}
 			}
-			return txt;
+			else if(IsCutoffTime(BarsInProgress, ex_H, ex_M)) {
+				Print(String.Format("{0}:CheckTradeEvent Ex Bip{1}: PctSpd={2}, MaxBip={3}, MinBip={4}", 
+				CurrentBars[BarsInProgress], BarsInProgress, PlotPctSpd[0], PctChgMaxBip, PctChgMinBip));
+					
+				IndicatorSignal isig = new IndicatorSignal();
+				Direction dir = new Direction();
+	//			Print(String.Format("{0}: [{1}] Non-CutoffTime {2}: MaxBip={3}, %Max={4}, MinBip={5}, %Min={6}, %Spd={7}", 
+	//				CurrentBar, Time[0], GetLongShortText(),
+	//				PctChgMaxBip, PctChgMax[0], PctChgMinBip, PctChgMin[0], PlotPctSpd[0]));
+
+				dir.TrendDir = TrendDirection.UnKnown;
+				isig.SignalName = SignalName_ExitForOpen;
+//				if(PlotPctSpd[0] > 0) {
+//					dir.TrendDir = TrendDirection.Up;
+//					isig.SignalName = SignalName_ExitForOpen;
+//				} else if(PlotPctSpd[0] < 0) {
+//					dir.TrendDir = TrendDirection.Down;
+//					isig.SignalName = SignalName_ExitForOpen;
+//				} else
+//					return;
+				
+				isig.BarNo = CurrentBars[BarsInProgress];
+				isig.TrendDir = dir;
+				isig.IndicatorSignalType = SignalType.SimplePriceAction;
+				IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, " CheckTradeEvent Ex: ");
+				ievt.IndSignal = isig;
+				//FireEvent(ievt);
+				OnRaiseIndicatorEvent(ievt);
+			}
 		}
 		
 		#region Properties
+		[NinjaScriptProperty]
+		[Range(1, int.MaxValue)]
+		[Display(Name="RocPeriod", Description="Rate of chage period", Order=0, GroupName="Parameters")]
+		public int RocPeriod
+		{ 	get{
+				return rocPeriod;
+			}
+			set{
+				rocPeriod = value;
+			}
+		}
+
+		[NinjaScriptProperty]		
+		[Display(Name="SecondSymbol", Description="The second symbol of the pair", Order=1, GroupName="Parameters")]
+		public string SecondSymbol
+		{ 	get{
+				return secondSymbol;
+			}
+			set{
+				secondSymbol = value;
+			}
+		}
+		
+		[NinjaScriptProperty]
+		[Range(1, int.MaxValue)]
+		[Display(Name="ChartMinutes", Description="Minutes for the chart", Order=2, GroupName="Parameters")]
+		public int ChartMinutes
+		{ 	get{
+				return chartMinutes;
+			}
+			set{
+				chartMinutes = value;
+			}
+		}
+		
+		[NinjaScriptProperty]
+		[Range(1, double.MaxValue)]
+		[Display(Name="CapRatio1", Description="CapRatio of first instrument", Order=3, GroupName="Parameters")]
+		public double CapRatio1
+		{ 	get{
+				return capRatio1;
+			}
+			set{
+				capRatio1 = value;
+			}
+		}
+
+		[NinjaScriptProperty]
+		[Range(1, double.MaxValue)]
+		[Display(Name="CapRatio2", Description="CapRatio of 2nd instrument", Order=4, GroupName="Parameters")]
+		public double CapRatio2
+		{ 	get{
+				return capRatio2;
+			}
+			set{
+				capRatio2 = value;
+			}
+		}
+
+		[NinjaScriptProperty]
+		[Range(double.MinValue, double.MaxValue)]
+		[Display(Name="PctChgSpdThresholdEn", Description="PctChgSpd Threshold to entry", Order=5, GroupName="Parameters")]
+		public double PctChgSpdThresholdEn
+		{ 	get{
+				return pctChgSpdThresholdEn;
+			}
+			set{
+				pctChgSpdThresholdEn = value;
+			}
+		}
+		
+		[NinjaScriptProperty]
+		[Range(double.MinValue, double.MaxValue)]
+		[Display(Name="PctChgSpdThresholdEx", Description="PctChgSpd Threshold to exit", Order=6, GroupName="Parameters")]
+		public double PctChgSpdThresholdEx
+		{ 	get{
+				return pctChgSpdThresholdEx;
+			}
+			set{
+				pctChgSpdThresholdEx = value;
+			}
+		}
+
 		[Browsable(false)]
-		[XmlIgnore()]
-		public Series<double> Spread
+		[XmlIgnore]
+		public Series<double> PlotPctSpd
 		{
 			get { return Values[0]; }
 		}
 
 		[Browsable(false)]
-		[XmlIgnore()]
-		public Series<double> Middle
+		[XmlIgnore]
+		public Series<double> PlotRocSpd
 		{
-			get { return Values[1]; }
+			get { return Values[1];	}
 		}
-		
+
+		//The BarsInProgress for PctChgMax and PctChgMin
 		[Browsable(false)]
-		[XmlIgnore()]
-		public Series<double> Upper
+		[XmlIgnore]
+		public int PctChgMaxBip
 		{
-			get { return Values[2]; }
+			get;set;
 		}
-		
 		[Browsable(false)]
-		[XmlIgnore()]
-		public Series<double> Lower
+		[XmlIgnore]
+		public int PctChgMinBip
 		{
-			get { return Values[3]; }
+			get;set;
 		}
-
-		[Browsable(false)]
-		[XmlIgnore()]
-		public Series<double> UpperMin
-		{
-			get; set;
-		}
-		
-		[Browsable(false), XmlIgnore()]
-		public Series<double> LowerMin
-		{
-			get; set;
-		}
-		
-		[Browsable(false), XmlIgnore()]
-		public GIATRRatio PairATRRatio
-		{
-			get; set;
-		}
-		
-		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUp", GroupName="NinjaScriptParameters", Order = 0)]
-		public double NumStdDevUp
-		{ get; set; }
-
-		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDown", GroupName="NinjaScriptParameters", Order = 1)]
-		public double NumStdDevDown
-		{ get; set; }
-		
-		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUpMin", GroupName="NinjaScriptParameters", Order = 2)]
-		public double NumStdDevUpMin
-		{ get; set; }
-
-		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDownMin", GroupName="NinjaScriptParameters", Order = 3)]
-		public double NumStdDevDownMin
-		{ get; set; }
-
-		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "MAPeriod", GroupName="NinjaScriptParameters", Order = 4)]
-		public int MAPeriod
-		{ get; set; }
-		
-		[NinjaScriptProperty]
-		[Range(1, int.MaxValue)]
-		[Display(ResourceType = typeof(Custom.Resource), Name="ATRPeriod", Description="ATR period", GroupName="NinjaScriptParameters", Order=5)]
-		public int ATRPeriod
-		{ get; set; }
-		
-		[NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name="SecondSymbol", Description="The second symbol of the pair", GroupName="NinjaScriptParameters", Order=6)]
-		public string SecondSymbol
-		{ 	get{ return secondSymbol; }
-			set{ secondSymbol = value; }
-		}
-		
-		[Range(-1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name="ChartMinutes", Description="Minutes for the chart", GroupName="NinjaScriptParameters", Order=7)]
-		public int ChartMinutes
-		{ 	get{ return chartMinutes; }
-			set{ chartMinutes = value; }
-		}
-
 		#endregion
 		
 		#region Pre Defined parameters
+		private int rocPeriod = 8;
 		private double capRatio1 = 1.25;
 		private double capRatio2 = 1;		
-		private string secondSymbol = "QQQ";
+		private string secondSymbol = "SPY";
 		private int chartMinutes = 4;
 		private double pctChgSpdThresholdEn = -2.3;
 		private double pctChgSpdThresholdEx = 2.5;
 		#endregion
+
 	}
 }
 
@@ -365,19 +435,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
-		private GISpdRS[] cacheGISpdRS;
-		public GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
+		private GIPairPctSpd[] cacheGIPairPctSpd;
+		public GIPairPctSpd GIPairPctSpd(int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThresholdEn, double pctChgSpdThresholdEx)
 		{
-			return GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, mAPeriod, aTRPeriod, secondSymbol, chartMinutes);
+			return GIPairPctSpd(Input, rocPeriod, secondSymbol, chartMinutes, capRatio1, capRatio2, pctChgSpdThresholdEn, pctChgSpdThresholdEx);
 		}
 
-		public GISpdRS GISpdRS(ISeries<double> input, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
+		public GIPairPctSpd GIPairPctSpd(ISeries<double> input, int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThresholdEn, double pctChgSpdThresholdEx)
 		{
-			if (cacheGISpdRS != null)
-				for (int idx = 0; idx < cacheGISpdRS.Length; idx++)
-					if (cacheGISpdRS[idx] != null && cacheGISpdRS[idx].NumStdDevUp == numStdDevUp && cacheGISpdRS[idx].NumStdDevDown == numStdDevDown && cacheGISpdRS[idx].NumStdDevUpMin == numStdDevUpMin && cacheGISpdRS[idx].NumStdDevDownMin == numStdDevDownMin && cacheGISpdRS[idx].MAPeriod == mAPeriod && cacheGISpdRS[idx].ATRPeriod == aTRPeriod && cacheGISpdRS[idx].SecondSymbol == secondSymbol && cacheGISpdRS[idx].ChartMinutes == chartMinutes && cacheGISpdRS[idx].EqualsInput(input))
-						return cacheGISpdRS[idx];
-			return CacheIndicator<GISpdRS>(new GISpdRS(){ NumStdDevUp = numStdDevUp, NumStdDevDown = numStdDevDown, NumStdDevUpMin = numStdDevUpMin, NumStdDevDownMin = numStdDevDownMin, MAPeriod = mAPeriod, ATRPeriod = aTRPeriod, SecondSymbol = secondSymbol, ChartMinutes = chartMinutes }, input, ref cacheGISpdRS);
+			if (cacheGIPairPctSpd != null)
+				for (int idx = 0; idx < cacheGIPairPctSpd.Length; idx++)
+					if (cacheGIPairPctSpd[idx] != null && cacheGIPairPctSpd[idx].RocPeriod == rocPeriod && cacheGIPairPctSpd[idx].SecondSymbol == secondSymbol && cacheGIPairPctSpd[idx].ChartMinutes == chartMinutes && cacheGIPairPctSpd[idx].CapRatio1 == capRatio1 && cacheGIPairPctSpd[idx].CapRatio2 == capRatio2 && cacheGIPairPctSpd[idx].PctChgSpdThresholdEn == pctChgSpdThresholdEn && cacheGIPairPctSpd[idx].PctChgSpdThresholdEx == pctChgSpdThresholdEx && cacheGIPairPctSpd[idx].EqualsInput(input))
+						return cacheGIPairPctSpd[idx];
+			return CacheIndicator<GIPairPctSpd>(new GIPairPctSpd(){ RocPeriod = rocPeriod, SecondSymbol = secondSymbol, ChartMinutes = chartMinutes, CapRatio1 = capRatio1, CapRatio2 = capRatio2, PctChgSpdThresholdEn = pctChgSpdThresholdEn, PctChgSpdThresholdEx = pctChgSpdThresholdEx }, input, ref cacheGIPairPctSpd);
 		}
 	}
 }
@@ -386,14 +456,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
+		public Indicators.GIPairPctSpd GIPairPctSpd(int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThresholdEn, double pctChgSpdThresholdEx)
 		{
-			return indicator.GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, mAPeriod, aTRPeriod, secondSymbol, chartMinutes);
+			return indicator.GIPairPctSpd(Input, rocPeriod, secondSymbol, chartMinutes, capRatio1, capRatio2, pctChgSpdThresholdEn, pctChgSpdThresholdEx);
 		}
 
-		public Indicators.GISpdRS GISpdRS(ISeries<double> input , double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
+		public Indicators.GIPairPctSpd GIPairPctSpd(ISeries<double> input , int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThresholdEn, double pctChgSpdThresholdEx)
 		{
-			return indicator.GISpdRS(input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, mAPeriod, aTRPeriod, secondSymbol, chartMinutes);
+			return indicator.GIPairPctSpd(input, rocPeriod, secondSymbol, chartMinutes, capRatio1, capRatio2, pctChgSpdThresholdEn, pctChgSpdThresholdEx);
 		}
 	}
 }
@@ -402,14 +472,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GISpdRS GISpdRS(double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
+		public Indicators.GIPairPctSpd GIPairPctSpd(int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThresholdEn, double pctChgSpdThresholdEx)
 		{
-			return indicator.GISpdRS(Input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, mAPeriod, aTRPeriod, secondSymbol, chartMinutes);
+			return indicator.GIPairPctSpd(Input, rocPeriod, secondSymbol, chartMinutes, capRatio1, capRatio2, pctChgSpdThresholdEn, pctChgSpdThresholdEx);
 		}
 
-		public Indicators.GISpdRS GISpdRS(ISeries<double> input , double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int mAPeriod, int aTRPeriod, string secondSymbol, int chartMinutes)
+		public Indicators.GIPairPctSpd GIPairPctSpd(ISeries<double> input , int rocPeriod, string secondSymbol, int chartMinutes, double capRatio1, double capRatio2, double pctChgSpdThresholdEn, double pctChgSpdThresholdEx)
 		{
-			return indicator.GISpdRS(input, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, mAPeriod, aTRPeriod, secondSymbol, chartMinutes);
+			return indicator.GIPairPctSpd(input, rocPeriod, secondSymbol, chartMinutes, capRatio1, capRatio2, pctChgSpdThresholdEn, pctChgSpdThresholdEx);
 		}
 	}
 }
