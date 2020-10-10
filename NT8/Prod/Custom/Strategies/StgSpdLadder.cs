@@ -161,7 +161,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 			string sig = e.IndSignal.SignalName;
 			Print(String.Format("{0}:OnExitPositions quant1={1}, quant2={2}: Spread={3}, HiAllTime={4}, HiNear[0]={5}",
 				CurrentBars[BarsInProgress], quant1, quant2, giSpdLadder.Spread[0], giSpdLadder.HiAllTime, giSpdLadder.HiNear[0]));
-			if(BarsSinceEntryExecution(BarsInProgress, "", 0) < 9) return;
+			if(BarsSinceEntryExecution(BarsInProgress, "", 0) < 9) {
+				int quant = quant1 + quant2;
+				double pnl0 = Positions[0].GetUnrealizedProfitLoss(PerformanceUnit.Currency, Closes[0][0]);
+				double pnl1 = Positions[1].GetUnrealizedProfitLoss(PerformanceUnit.Currency, Closes[1][0]);
+				Print(String.Format("{0}:OnExitPositions Live Performance bip={1} quant1={2}, quant2={3}: GetUnrealizedProfitLoss={4}",
+				CurrentBars[BarsInProgress], BarsInProgress, quant1, quant2, 
+				PositionsAccount[0].GetUnrealizedProfitLoss(PerformanceUnit.Currency, Closes[0][0]) ));
+				
+				Print(String.Format("{0}:OnExitPositions Performance bip={1} quant1={2}, quant2={3}: UnrealizedPnL0={4}, UnrealizedPnL1={5}",
+				CurrentBars[BarsInProgress], BarsInProgress, quant1, quant2, pnl0, pnl1));
+				if(pnl0+pnl1 < 0.1*quant)
+					return;
+			}
 			//Exit positions for both legs
 //			if(sig == giSpdLadder.SignalName_AboveStdDev || sig == giSpdLadder.SignalName_AboveStdDevMin) {
 				if(GetMarketPosition(0) == MarketPosition.Long 
