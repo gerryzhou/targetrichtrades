@@ -97,6 +97,23 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <summary>
 		/// 
 		/// </summary>
+		/// <param name="barsAgo"></param>
+		/// <param name="includeCurBar"></param>
+		/// <returns></returns>
+		public double GetHighestPrice(int barsAgo, ISeries<double> data, bool includeCurBar) {			
+			double hiPrc = data[0];// includeCurBar? data[0] : data[1];
+			if(barsAgo > 0) {
+				hiPrc = Math.Max(hiPrc, data[HighestBar(data, barsAgo)]);
+			}
+			PrintLog(true, false, 
+				CurrentBar + ":hiPrc data=" + hiPrc 
+				+ ";barsAgo=" + barsAgo);
+			return hiPrc;
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		/// <param name="barsAgo">LowestBar(Low, Bars.BarsSinceNewTradingDay);</param>
 		/// <param name="includeCurBar"></param>
 		/// <returns></returns>
@@ -107,6 +124,23 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			PrintLog(true, false, 
 				CurrentBar + ":loPrc=" + loPrc
+				+ ";barsAgo=" + barsAgo);
+			return loPrc;
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="barsAgo">LowestBar(Low, Bars.BarsSinceNewTradingDay);</param>
+		/// <param name="includeCurBar"></param>
+		/// <returns></returns>
+		public double GetLowestPrice(int barsAgo, ISeries<double> data, bool includeCurBar) {
+			double loPrc = includeCurBar? data[0] : data[1];
+			if(barsAgo > 0) {
+				loPrc = Math.Min(loPrc, data[LowestBar(data, barsAgo)]);
+			}
+			PrintLog(true, false, 
+				CurrentBar + ":loPrc data=" + loPrc
 				+ ";barsAgo=" + barsAgo);
 			return loPrc;
 		}

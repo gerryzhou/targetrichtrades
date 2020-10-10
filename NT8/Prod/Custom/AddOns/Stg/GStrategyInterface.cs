@@ -9,6 +9,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.AddOns;
 using NinjaTrader.NinjaScript.AddOns.PriceActions;
+using NinjaTrader.NinjaScript.AddOns.MarketCtx;
 using NinjaTrader.NinjaScript.Strategies;
 #endregion
 

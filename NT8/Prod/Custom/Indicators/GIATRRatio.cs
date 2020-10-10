@@ -52,7 +52,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				IsSuspendedWhileInactive	= true;
 				Calculate					= Calculate.OnPriceChange;
 				
-				ATRPeriod						= 20;
+				ATRPeriod									= 5;
 				TM_OpenStartH								= 8;
 				TM_OpenStartM								= 0;
 				TM_OpenEndH									= 8;

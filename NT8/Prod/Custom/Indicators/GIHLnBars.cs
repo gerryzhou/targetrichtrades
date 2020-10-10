@@ -47,12 +47,16 @@ namespace NinjaTrader.NinjaScript.Indicators
 		protected override void OnBarUpdate()
 		{
 			if(CurrentBar > Period) {
+				Print(string.Format("CurrentBar={0}, LowestN[0]={1}, HighestN[0]={2}, Period={3}",
+					CurrentBar, LowestN[0], HighestN[0], Period));
 				LowestN[0] = CurrentBar < Period ? Low[0] : GetLowestPrice(Period, false);
 //				LowestN[0] = (CurrentBar < Period ? Low[0] : GetLowestPrice(Period, false));
 				HighestN[0] = CurrentBar < Period ? High[0] : GetHighestPrice(Period, false);
+				Print(string.Format("CurrentBar={0}, LowestN[0]={1}, HighestN[0]={2}, Period={3}",
+					CurrentBar, LowestN[0], HighestN[0], Period));
+				HiLoSpread[0] = HighestN[0] - LowestN[0];
 				CheckBreakoutNBarsHLEvent();
-				}
-
+			}
 		}
 
 		public double GetNBarsHLOffset(SupportResistanceType srt, double price) {
@@ -113,6 +117,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public Series<double> HighestN
 		{
 			get { return Values[1]; }
+		}
+		
+		[Browsable(false)]
+		[XmlIgnore]
+		public Series<double> HiLoSpread
+		{
+			get { return Values[2]; }
 		}
 		
 		/// <summary>

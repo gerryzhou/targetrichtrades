@@ -80,7 +80,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IsFillLimitOnTouch							= true;
 			MaximumBarsLookBack							= MaximumBarsLookBack.Infinite;
 			OrderFillResolution							= OrderFillResolution.Standard;
-			Slippage									= 0;
+			Slippage									= 0.1;
 			StartBehavior								= StartBehavior.WaitUntilFlatSynchronizeAccount;
 			IncludeCommission							= true;
 			TimeInForce									= TimeInForce.Day;

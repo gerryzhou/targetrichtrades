@@ -1,8 +1,9 @@
 #region Using declarations
+using NinjaTrader.NinjaScript.AddOns.PriceActions;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.AddOns.PriceActions
+namespace NinjaTrader.NinjaScript.AddOns.MarketCtx
 {
     public class MarketContext
 	{

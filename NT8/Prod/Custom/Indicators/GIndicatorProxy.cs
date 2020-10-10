@@ -11,6 +11,8 @@ using log4net.Config;
 using NinjaTrader.Cbi;
 using NinjaTrader.NinjaScript.Addons.Patterns;
 using NinjaTrader.NinjaScript.AddOns.PriceActions;
+using NinjaTrader.NinjaScript.AddOns.MarketCtx;
+using NinjaTrader.NinjaScript.AddOns.MarketCtx;
 using NinjaTrader.NinjaScript.Strategies;
 using NinjaTrader.NinjaScript.AddOns;
 #endregion
@@ -43,24 +45,26 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//See Help Guide for additional information.
 				IsSuspendedWhileInactive					= true;
 				CustInput					= 1;
-				AddPlot(Brushes.Orange, "CustPlot");
+				//AddPlot(Brushes.Orange, "CustPlot");
 			}
 			else if (State == State.Configure)
 			{
-				string cmdPathRoot = GConfig.GetConfigItem(GConfig.MainConfigFile, "CmdPathRoot");
-				string log_config_file = GConfig.GetLogConfigFilePath();
-				Print(String.Format("{0}:GLogger.GetLogConfigFilePath={1}, CmdPathRoot={2}",
-				this.Name, log_config_file, cmdPathRoot));
-				XmlConfigurator.Configure(new FileInfo(@log_config_file));////"C:\\www\\log\\log4net.config"));
-				//GZLogger.ConfigureFileAppender( "C:\\www\\log\\log_test.txt" );
-				GLogger.Initialize(GConfig.GetLogDir());
+				/*if(!GSZTrader.IsInStrategyAnalyzer) {
+					string cmdPathRoot = GConfig.GetConfigItem(GConfig.MainConfigFile, "CmdPathRoot");
+					string log_config_file = GConfig.GetLogConfigFilePath();
+					Print(String.Format("{0}:GLogger.GetLogConfigFilePath={1}, CmdPathRoot={2}",
+					this.Name, log_config_file, cmdPathRoot));
+					XmlConfigurator.Configure(new FileInfo(@log_config_file));////"C:\\www\\log\\log4net.config"));
+					//GZLogger.ConfigureFileAppender( "C:\\www\\log\\log_test.txt" );
+					GLogger.Initialize(GConfig.GetLogDir());
+				}*/
 			}
 			else if (State == State.DataLoaded)
 			{				
-				CustData = new Series<double>(this);				
+//				CustData = new Series<double>(this);				
 				//SetLogFile(GetFileNameByDateTime(DateTime.Now, @"C:\www\log\", GSZTrader.AccName, GetSymbol(), "log"));
 				//BackTest = GSZTrader.BackTest;
-				dailyPattern = LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
+//				dailyPattern = LoadSpvPRList(SpvDailyPatternES.spvPRDayES);
 			}
 		}
 
@@ -73,8 +77,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			//Add your custom indicator logic here.
 			PrintTo = PrintTo.OutputTab2;
-			if(IsLastBarOnChart() > 0)
-				PrintLog(true, false, "dailyPattern=" + DailyPattern.Count);
+//			if(IsLastBarOnChart() > 0)
+//				PrintLog(true, false, "dailyPattern=" + DailyPattern.Count);
 		}
 			
 		#region Properties

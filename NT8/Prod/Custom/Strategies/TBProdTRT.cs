@@ -823,7 +823,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public override void ReadCtxParaObj() {
 			//ReadRestfulJson();
-			List<JsonStgTRT> paraDict = GConfig.LoadJson2Obj<List<JsonStgTRT>>(GetCTXFilePath());
+			List<JsonStgTRT> paraDict = GConfig.LoadJson2Obj<List<JsonStgTRT>>(GConfig.GetCTXFilePath());
 			Print(String.Format("ReadCtxTRT paraDict={0}, paraDict.Count={1}", paraDict, paraDict.Count));
 			if(paraDict != null && paraDict.Count > 0) {
 				this.ctxTRT = paraDict[0];

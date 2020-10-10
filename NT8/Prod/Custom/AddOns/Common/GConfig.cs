@@ -26,6 +26,7 @@ using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.Gui.Tools;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.AddOns.PriceActions;
+using NinjaTrader.NinjaScript.AddOns.MarketCtx;
 using NinjaTrader.NinjaScript.Strategies;
 #endregion
 
@@ -76,6 +77,36 @@ namespace NinjaTrader.NinjaScript.AddOns
 			string log_dir = NinjaTrader.Core.Globals.UserDataDir
 				+ "log" + Path.DirectorySeparatorChar;
 			return log_dir;
+		}
+		
+		public static string GetCmdDir() {
+			List<string> names = new List<string>(){"CmdPathRoot"};
+			Dictionary<string,object> dic =	GetConfigItems(MainConfigFile, names);
+			object dir = null;
+			dic.TryGetValue("CmdPathRoot", out dir);
+			return GetTemplatesDir() + dir.ToString() + Path.DirectorySeparatorChar;
+		}
+		
+		public static string GetCTXFilePath() {
+			List<string> names = new List<string>(){"CTXFileName","MenuFileName"};
+			Dictionary<string,object> dic =	GetConfigItems(MainConfigFile, names);
+			object name = null;
+			//dic.TryGetValue("CmdPathRoot", out dir);
+			dic.TryGetValue("CTXFileName", out name);
+			string path = GetCmdDir() + name.ToString();
+			//Print("GetCTXFilePath=" + path);
+			return path;
+		}
+		
+		public static string GetCTXOutputFilePath() {
+			List<string> names = new List<string>(){"CTXFileName","CTXOutputFile"};
+			Dictionary<string,object> dic =	GetConfigItems(MainConfigFile, names);
+			object name = null;
+			//dic.TryGetValue("CmdPathRoot", out dir);
+			dic.TryGetValue("CTXOutputFile", out name);
+			string path = GetCmdDir() + name.ToString();
+			//Print("GetCTXOutputFilePath=" + path);
+			return path;
 		}
 		
 		public static string GetConfigItem(string config_file, string item_name) {
@@ -193,6 +224,7 @@ namespace NinjaTrader.NinjaScript.AddOns
 			string json = File.ReadAllText(json_path);
             //DataContractJsonSerializer ser = new DataContractJsonSerializer();
             JavaScriptSerializer serializer = new JavaScriptSerializer();
+			serializer.MaxJsonLength = int.MaxValue;
             T dict = serializer.Deserialize<T>(json);
 			return dict;
 		}

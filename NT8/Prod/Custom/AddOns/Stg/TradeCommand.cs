@@ -52,47 +52,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		
-		public string GetCmdDir() {
-			List<string> names = new List<string>(){"CmdPathRoot"};
-			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
-			object dir = null;
-			dic.TryGetValue("CmdPathRoot", out dir);
-			return GConfig.GetTemplatesDir() + dir.ToString() + Path.DirectorySeparatorChar;
-		}
-		
 		public string GetCmdFilePath() {
 			List<string> names = new List<string>(){"CmdFileName","CTXFileName"};
 			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
 			object name = null;
 //			dic.TryGetValue("CmdPathRoot", out dir);
 			dic.TryGetValue("CmdFileName", out name);
-			string path = GetCmdDir() + name.ToString();
+			string path = GConfig.GetCmdDir() + name.ToString();
 			Print("GetCmdFilePath=" + path);
 			return path;
 		}
 		
-		public string GetCTXFilePath() {
-			List<string> names = new List<string>(){"CTXFileName","MenuFileName"};
-			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
-			object name = null;
-			//dic.TryGetValue("CmdPathRoot", out dir);
-			dic.TryGetValue("CTXFileName", out name);
-			string path = GetCmdDir() + name.ToString();
-			Print("GetCTXFilePath=" + path);
-			return path;
-		}
-		
-		public string GetCTXOutputFilePath() {
-			List<string> names = new List<string>(){"CTXFileName","CTXOutputFile"};
-			Dictionary<string,object> dic =	GConfig.GetConfigItems(GConfig.MainConfigFile, names);
-			object name = null;
-			//dic.TryGetValue("CmdPathRoot", out dir);
-			dic.TryGetValue("CTXOutputFile", out name);
-			string path = GetCmdDir() + name.ToString();
-			Print("GetCTXOutputFilePath=" + path);
-			return path;
-		}
-		
+	
 		public FileInfo[] GetCmdFile(string srcDir) {
 			Print("GetCmdFile src: " + srcDir);
 		    DirectoryInfo DirInfo = new DirectoryInfo(srcDir);
@@ -192,7 +163,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// <returns></returns>
 		public T ReadCmdParaObj<T>() {
 			ReadRestfulJson();
-			T paraDict = GConfig.LoadJson2Obj<T>(GetCTXFilePath());
+			T paraDict = GConfig.LoadJson2Obj<T>(GConfig.GetCTXFilePath());
 			Print(String.Format("ele.Key={0}, ele.Value.ToString()={1}", paraDict, paraDict.GetType().Name));
 			GUtils.DisplayProperties<T>(paraDict, IndicatorProxy);
 //			foreach(DateCtx ele in paraDict.MktCtxDaily) {

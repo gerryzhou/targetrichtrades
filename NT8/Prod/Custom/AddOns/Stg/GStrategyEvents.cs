@@ -108,11 +108,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int quantity, int filled, double averageFillPrice, 
 			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
 		{
-			if(BarsInProgress !=0) return;
+			//if(BarsInProgress !=0) return;
 			IndicatorProxy.Log2Disk = true;
 
 			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
-				CurrentBar + ":OnOrderUpdate IsUnmanaged=" + IsUnmanaged);
+				CurrentBars[BarsInProgress] + "[" + BarsInProgress + "]:OnOrderUpdate IsUnmanaged=" + IsUnmanaged);
 			
 			//The logic is implemented in the method below
 			CurrentTrade.OnCurOrderUpdate(order, limitPrice, stopPrice, quantity, filled, averageFillPrice, 

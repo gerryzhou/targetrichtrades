@@ -7,13 +7,13 @@ using System.Xml.Serialization;
 #endregion
 
 //This namespace holds Add ons in this folder and is required. Do not change it. 
-namespace NinjaTrader.NinjaScript.Strategies
+namespace NinjaTrader.NinjaScript.AddOns.MarketCtx
 {
-    public class JsonStgPairSpd
-    {
-		public string Date{get;set;}
-		public IList<CtxPairSpd> CtxDaily{get;set;}
-    }
+//    public class JsonStgPairSpd
+//    {
+//		public string Date{get;set;}
+//		public IList<CtxPairSpd> CtxDaily{get;set;}
+//    }
 	
 	public class CtxPairSpdDaily {
 		public CtxPairSpdDaily() {
@@ -52,6 +52,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public int TimeClose{get;set;}
 		public int TimeStart{get;set;}
 		public int TimeEnd{get;set;}
+		public int TimeSpdLow{get;set;}
+		public int TimeSpdHigh{get;set;}
 		
 		public string ChannelType{get;set;}
 		public string TrendDirection{get;set;}
@@ -60,6 +62,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public string TradingDirection{get;set;}
 		
 		public double PairATRRatio{get;set;}
+		public double PairSpdLow{get;set;}
+		public double PairSpdHigh{get;set;}
 		
 		public int BarsLookback{get;set;}
 		public int DaysLookback{get;set;}

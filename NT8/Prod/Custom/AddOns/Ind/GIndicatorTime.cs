@@ -190,8 +190,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// </summary>
 		/// <param name="dt"></param>
 		/// <returns></returns>
-		public int GetTimeByDateTime(DateTime dt) {
-			return ToTime(dt);
+		public int GetTimeByDateTime(DateTime dt, bool withSecond) {
+			if(withSecond)
+				return ToTime(dt);
+			else
+				return ToTime(dt)/100;
 		}
 		
 		//time=10000*H + 100*M + S

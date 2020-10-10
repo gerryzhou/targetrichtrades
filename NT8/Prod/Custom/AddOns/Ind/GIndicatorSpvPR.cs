@@ -22,6 +22,7 @@ using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Addons.Patterns;
 using NinjaTrader.NinjaScript.AddOns.PriceActions;
+using NinjaTrader.NinjaScript.AddOns.MarketCtx;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
