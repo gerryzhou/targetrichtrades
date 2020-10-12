@@ -171,7 +171,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if(this.PrintOut > 1)
 				Print(String.Format("{0}:OnExitPositions quant1={1}, quant2={2}: Spread={3}, HiAllTime={4}, HiNear[0]={5}",
 				CurrentBars[BarsInProgress], quant1, quant2, giSpdLadder.Spread[0], giSpdLadder.HiAllTime, giSpdLadder.HiNear[0]));
-			if(!IsInStrategyAnalyzer)
+			if(PrintOut > 1 && !IsInStrategyAnalyzer)
 				Print(string.Format("{0}: EntryLongLeg1={1}, EntrySTLeg1={2}, En1={3}, EntryLongLeg2={4}, EntrySTLeg2={5}, En2={6}", CurrentBars[BarsInProgress],
 				BarsSinceEntryExecution(0, giSpdLadder.SignalName_EntryLongLeg1, 0),
 				BarsSinceEntryExecution(0, giSpdLadder.SignalName_EntryShortLeg1, 0),

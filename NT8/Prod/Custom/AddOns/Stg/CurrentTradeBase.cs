@@ -251,7 +251,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
 		{
 			if(!this.InstStrategy.IsInStrategyAnalyzer)
-			InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+				InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
 				String.Format("{0}:OnCurOrderUpdate, limitPrice={1}, stopPrice={2}, quantity={3},\t\n filled={4}, averageFillPrice={5}, orderState={6}",
 				InstStrategy.CurrentBar, limitPrice, stopPrice, quantity, filled, averageFillPrice, orderState));
 			try {

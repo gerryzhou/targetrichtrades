@@ -20,7 +20,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		protected override void OnBarUpdate()
 		{
-			if(!IsInStrategyAnalyzer) {
+			if(PrintOut > 1 && !IsInStrategyAnalyzer) {
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				String.Format("{0}:===========OnBarUpdate======HasPosition={1}, IsLiveTrading={2}",
 				CurrentBar, HasPosition(), IsLiveTrading()));
@@ -33,28 +33,28 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			SetPrintOut(-1);
 			//Print(CurrentBar + ":" + this.Name + " OnBarUpdate, BarsSinceExit, BarsSinceEntry=" + bsx + "," + bse);
-			if(!IsInStrategyAnalyzer)
+			if(PrintOut > 1 && !IsInStrategyAnalyzer)
 				IndicatorProxy.TraceMessage(this.Name, PrintOut);
 			IndicatorProxy.Update();
-			if(!IsInStrategyAnalyzer)
+			if(PrintOut > 1 && !IsInStrategyAnalyzer)
 				IndicatorProxy.TraceMessage(this.Name, PrintOut);
 			CheckCmd(); //Command trigger
 			
 			switch(AlgoMode) {
 				case AlgoModeType.Liquidate: //liquidate
-					if(!IsInStrategyAnalyzer)
+					if(PrintOut > 1 && !IsInStrategyAnalyzer)
 						IndicatorProxy.TraceMessage(this.Name, PrintOut);
 					CloseAllPositions();
 					break;
 				case AlgoModeType.CancelOrders: //cancel order
-					if(!IsInStrategyAnalyzer)
+					if(PrintOut > 1 && !IsInStrategyAnalyzer)
 						IndicatorProxy.TraceMessage(this.Name, PrintOut);
 					CancelAllOrders();
 					break;
 				case AlgoModeType.StopTrading: // -2=stop trading(no entry/exit, liquidate positions and cancel all entry/exit orders);
 					CancelAllOrders();
 					CloseAllPositions();
-					if(!IsInStrategyAnalyzer) {
+					if(PrintOut > 1 && !IsInStrategyAnalyzer) {
 						IndicatorProxy.TraceMessage(this.Name, PrintOut);
 						IndicatorProxy.PrintLog(true, IsLiveTrading(), CurrentBar + "- Stop trading cmd:" + IndicatorProxy.Get24HDateTime(Time[0]));
 					}
@@ -66,7 +66,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					//SetTradeAction(); called from CheckExitTrade() or CheckNewEntryTrade();
 					//CheckIndicatorSignals(); called from SetTradeAction(); save trade signals into the trade action;
 					//PutTrade(); first GetTradeAction() and then put exit or entry trade;
-					if(!IsInStrategyAnalyzer)
+					if(PrintOut > 1 && !IsInStrategyAnalyzer)
 						IndicatorProxy.TraceMessage(this.Name, PrintOut);
 					//CheckPerformance(); //Performance/Rule trigger					
 					//SetTradeAction();
@@ -92,7 +92,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					break;
 			}
 
-			if(!IsInStrategyAnalyzer)
+			if(PrintOut > 1 && !IsInStrategyAnalyzer)
 				IndicatorProxy.TraceMessage(this.Name, PrintOut);
 		}		
 		#endregion
@@ -121,7 +121,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//if(BarsInProgress !=0) return;
 			IndicatorProxy.Log2Disk = true;
 
-			if(!IsInStrategyAnalyzer)
+			if(PrintOut > 1 && !IsInStrategyAnalyzer)
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				CurrentBars[BarsInProgress] + "[" + BarsInProgress + "]:OnOrderUpdate IsUnmanaged=" + IsUnmanaged);
 			
@@ -146,7 +146,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if(BarsInProgress !=0) return;
 			IndicatorProxy.Log2Disk = true;
-			if(!IsInStrategyAnalyzer)
+			if(PrintOut > 1 && !IsInStrategyAnalyzer)
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				CurrentBar + ":OnExecutionUpdate"
 				+ ";IsUnmanaged=" + IsUnmanaged
@@ -184,7 +184,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (account == null || accountItem == null || IndicatorProxy == null) 
 				return;
 			
-			if(accountItem == AccountItem.UnrealizedProfitLoss && !IsInStrategyAnalyzer)
+			if(accountItem == AccountItem.UnrealizedProfitLoss && PrintOut > 1 && !IsInStrategyAnalyzer)
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), //":OnAccountItemUpdate"
 					CurrentBar + ":OnAccountItemUpdate"
 					+ ";Name=" + account.DisplayName
