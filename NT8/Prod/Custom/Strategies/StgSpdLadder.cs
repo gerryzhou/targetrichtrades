@@ -24,6 +24,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	/// <summary>
 	/// Trade by the spread: diff or ratio between the two symbols
+	/// Factors impact the performance:
+	/// Price, volatility, slippage
+	/// MA(90), ATR(20); Slippage=0.04% Price or MA
 	/// </summary>
 	public class StgSpdLadder : GStrategyBase
 	{
@@ -44,7 +47,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Description	= "Pair Trading by Spread Ladders";
 				Name		= "StgSpdLadder";
 				//Account.Name								= "Sim102";
-				Slippage									= 0.5;
+				SlippageRate								= 0.04; //percent of the price/100
 				Calculate									= Calculate.OnPriceChange;
 				IsFillLimitOnTouch							= false;
 				TraceOrders									= false;
@@ -52,7 +55,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				IsUnmanaged									= false;
 				IncludeCommission							= true;
 				OrderFillResolution							= OrderFillResolution.Standard;
-				EntriesPerDirection							= 2;
+				EntriesPerDirection							= 1;
 				EntryHandling								= EntryHandling.AllEntries;
 				DefaultQuantity								= 100;
 				StopTargetHandling							= StopTargetHandling.PerEntryExecution;
@@ -64,12 +67,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				TG_TradeEndM								= 45;
 				TG_OpenStartH								= 8;
 				TG_OpenStartM								= 30;
+				PeriodNear									= 10;
+				PeriodMiddle								= 30;
+				PeriodFar									= 90;
 				MktPosition1								= MarketPosition.Flat;
 				MktPosition2								= MarketPosition.Flat;
-				NumStdDevUp									= 1.6;
-				NumStdDevDown								= 1.6;
-				NumStdDevUpMin								= 0.2;
-				NumStdDevDownMin							= 0.2;
+				SPKLineThresholdLow							= 3;
+				SPKLineThresholdMid							= 50;
+				SPKLineThresholdHigh						= 96;
+				TradeCostRate								= 0.03;
+				DaysToHoldPos								= 9;
+				PrintOut									= 1;
 //				IsInstantiatedOnEachOptimizationIteration = false;
 			}
 			else if (State == State.Configure)
@@ -87,14 +95,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{				
-				giSpdLadder = GISpdLadder(NumStdDevUp, NumStdDevDown, NumStdDevUpMin, NumStdDevDownMin, MAPeriod, SecondSymbol, ChartMinutes);// CapRatio1, CapRatio2, PctChgSpdThresholdEn, PctChgSpdThresholdEx);
+				giSpdLadder = GISpdLadder(SecondSymbol, ChartMinutes, PeriodNear, PeriodMiddle, PeriodFar, SPKLineThresholdLow, SPKLineThresholdMid, SPKLineThresholdHigh, 1);// CapRatio1, CapRatio2, PctChgSpdThresholdEn, PctChgSpdThresholdEx);
 				AddChartIndicator(giSpdLadder);
 				
 				giSpdLadder.RaiseIndicatorEvent += OnTradeBySpdLadder;
 //				giPctSpd.RaiseIndicatorEvent += OnTradeByPctSpd;
 //				giPctSpd.TM_ClosingH = TG_TradeEndH;
 //				giPctSpd.TM_ClosingM = TG_TradeEndM;
-				SetPrintOut(1);
+				SetPrintOut(-1);
 				CapRatio2 = 1;
 				CapRatio1 = Closes[1][0]/Closes[0][0];
 				Print(String.Format("{0}: IsUnmanaged={1}", this.GetType().Name, IsUnmanaged));
@@ -147,8 +155,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         void OnTradeBySpdLadder(object sender, IndicatorEventArgs e) {
 			IndicatorSignal isig = e.IndSignal;
-			Print(String.Format("{0}:OnTradeBySpdLadder triggerred {1} Bip{2}: Spread={3}, HiAllTime={4}",
-			CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, giSpdLadder.Spread[0], giSpdLadder.HiAllTime));
+			if(this.PrintOut > 1)
+				Print(String.Format("{0}:OnTradeBySpdLadder triggerred {1} Bip{2}: Spread={3}, HiAllTime={4}",
+				CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, giSpdLadder.Spread[0], giSpdLadder.HiAllTime));
 			if(e.IndSignal.SignalName != null && HasPairPosition())
 				OnExitPositions(e);
 			else if(e.IndSignal.SignalName != null && IsTradingTime(IndicatorProxy.GetTimeByHM(TG_OpenStartH, TG_OpenStartM, true)))
@@ -156,43 +165,52 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 				
 		void OnExitPositions(IndicatorEventArgs e) {
-			int quant1 = base.GetTradeQuantity(0, CapRatio1);
-			int quant2 = base.GetTradeQuantity(1, CapRatio2);
+			int quant1 = DefaultQuantity;//base.GetTradeQuantity(0, CapRatio1);
+			int quant2 = DefaultQuantity;//base.GetTradeQuantity(1, CapRatio2);
 			string sig = e.IndSignal.SignalName;
-			Print(String.Format("{0}:OnExitPositions quant1={1}, quant2={2}: Spread={3}, HiAllTime={4}, HiNear[0]={5}",
+			if(this.PrintOut > 1)
+				Print(String.Format("{0}:OnExitPositions quant1={1}, quant2={2}: Spread={3}, HiAllTime={4}, HiNear[0]={5}",
 				CurrentBars[BarsInProgress], quant1, quant2, giSpdLadder.Spread[0], giSpdLadder.HiAllTime, giSpdLadder.HiNear[0]));
-			if(BarsSinceEntryExecution(BarsInProgress, "", 0) < 9) {
+			if(!IsInStrategyAnalyzer)
+				Print(string.Format("{0}: EntryLongLeg1={1}, EntrySTLeg1={2}, En1={3}, EntryLongLeg2={4}, EntrySTLeg2={5}, En2={6}", CurrentBars[BarsInProgress],
+				BarsSinceEntryExecution(0, giSpdLadder.SignalName_EntryLongLeg1, 0),
+				BarsSinceEntryExecution(0, giSpdLadder.SignalName_EntryShortLeg1, 0),
+				BarsSinceEntryExecution(0, "", 0),
+				BarsSinceEntryExecution(1, giSpdLadder.SignalName_EntryLongLeg2, 0),
+				BarsSinceEntryExecution(1, giSpdLadder.SignalName_EntryShortLeg2, 0),
+				BarsSinceEntryExecution(1, "", 0)));
+			if(BarsSinceEntryExecution(0, "", 0) < DaysToHoldPos &&				
+				BarsSinceEntryExecution(1, "", 0) < DaysToHoldPos) {
 				int quant = quant1 + quant2;
-				double pnl0 = Positions[0].GetUnrealizedProfitLoss(PerformanceUnit.Currency, Closes[0][0]);
-				double pnl1 = Positions[1].GetUnrealizedProfitLoss(PerformanceUnit.Currency, Closes[1][0]);
-				Print(String.Format("{0}:OnExitPositions Live Performance bip={1} quant1={2}, quant2={3}: GetUnrealizedProfitLoss={4}",
-				CurrentBars[BarsInProgress], BarsInProgress, quant1, quant2, 
-				PositionsAccount[0].GetUnrealizedProfitLoss(PerformanceUnit.Currency, Closes[0][0]) ));
-				
-				Print(String.Format("{0}:OnExitPositions Performance bip={1} quant1={2}, quant2={3}: UnrealizedPnL0={4}, UnrealizedPnL1={5}",
-				CurrentBars[BarsInProgress], BarsInProgress, quant1, quant2, pnl0, pnl1));
-				if(pnl0+pnl1 < 0.1*quant)
+				double pnl = GetPairUnrealizedPnL(PerformanceUnit.Currency);
+//				double pnl0 = Positions[0].GetUnrealizedProfitLoss(PerformanceUnit.Currency, Closes[0][0]);
+//				double pnl1 = Positions[1].GetUnrealizedProfitLoss(PerformanceUnit.Currency, Closes[1][0]);
+				if(this.PrintOut > 1)
+					Print(String.Format("{0}:OnExitPositions Performance bip={1} quant1={2}, quant2={3}: UnrealizedPnL={4}",
+					CurrentBars[BarsInProgress], BarsInProgress, quant1, quant2, pnl));
+				if(pnl < TradeCostRate*quant)
 					return;
 			}
 			//Exit positions for both legs
 //			if(sig == giSpdLadder.SignalName_AboveStdDev || sig == giSpdLadder.SignalName_AboveStdDevMin) {
-				if(GetMarketPosition(0) == MarketPosition.Long 
-					&& GetMarketPosition(1) == MarketPosition.Short){
-					ExitLong(0, quant1, "", giSpdLadder.SignalName_EntryLongLeg1);			
+				if(GetMarketPosition(0) == MarketPosition.Long) 
+					ExitLong(0, quant1, "", giSpdLadder.SignalName_EntryLongLeg1);
+				if(GetMarketPosition(1) == MarketPosition.Short) {								
 					ExitShort(1, quant2, "", giSpdLadder.SignalName_EntryShortLeg2);
 				}
 //			}
 //			else if(sig == giSpdLadder.SignalName_BelowStdDev || sig == giSpdLadder.SignalName_BelowStdDevMin) {
-				if(GetMarketPosition(1) == MarketPosition.Long 
-					&& GetMarketPosition(0) == MarketPosition.Short){
+				if(GetMarketPosition(1) == MarketPosition.Long) 
 					ExitLong(1, quant2, "", giSpdLadder.SignalName_EntryLongLeg2);
+				if(GetMarketPosition(0) == MarketPosition.Short){					
 					ExitShort(0, quant1, "", giSpdLadder.SignalName_EntryShortLeg1);
 				}
-//			}
+//			}			
 		}
 		
 		void OnEntryPositions(IndicatorEventArgs e) {
-			Print(string.Format("OnEntryPositions CurrentBars={0}, BarsInProgress={1}, Times[][0]={2}",
+			if(this.PrintOut > 1)
+				Print(string.Format("OnEntryPositions CurrentBars={0}, BarsInProgress={1}, Times[][0]={2}",
 				CurrentBars[BarsInProgress], BarsInProgress, Times[BarsInProgress][0]));
 			//New entry with no poistions for both legs
 			if(HasPosition(0) <= 0 && HasPosition(1) <= 0) {
@@ -205,11 +223,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				CtxPairSpd ctxps = ctxPairSpdDaily.GetDayCtx(key);
 //				if(ctxps == null) return;
 //				else {
-					int quant1 = base.GetTradeQuantity(0, CapRatio1);
-					int quant2 = base.GetTradeQuantity(1, CapRatio2);
+					int quant1 = DefaultQuantity;//base.GetTradeQuantity(0, CapRatio1);
+					int quant2 = DefaultQuantity;//base.GetTradeQuantity(1, CapRatio2);
+					Slippage = Math.Round(SlippageRate*Closes[0][0], 4);
 					string sig = e.IndSignal.SignalName;
-					Print(String.Format("{0}:OnEntryPositions quant1={1}, quant2={2}: Spread={3}, HiNear[0]={4}, LowNear[0]={5}",
-					CurrentBars[BarsInProgress], quant1, quant2, giSpdLadder.Spread[0], giSpdLadder.HiNear[0], giSpdLadder.LowNear[0]));
+					if(this.PrintOut > 1)
+						Print(String.Format("{0}:OnEntryPositions quant1={1}, quant2={2}: Spread={3}, HiNear[0]={4}, LowNear[0]={5}",
+						CurrentBars[BarsInProgress], quant1, quant2, giSpdLadder.Spread[0], giSpdLadder.HiNear[0], giSpdLadder.LowNear[0]));
 					if(sig == giSpdLadder.SignalName_AboveStdDev) {
 //						if(MktPosition1 != MarketPosition.Long && MktPosition2 != MarketPosition.Short) {
 							EnterShort(0, quant1, giSpdLadder.SignalName_EntryShortLeg1);
@@ -275,7 +295,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			ctxPairSpdDaily.DictCtxPairSpd = GConfig.LoadJson2Obj<Dictionary<string, List<CtxPairSpd>>>(GConfig.GetCTXFilePath());
 			//Dictionary<string, object> paraDict = GConfig.LoadJson2Dictionary(GetCTXFilePath());
 			//Dictionary<string, object> paraDict = GConfig.LoadJson2Obj<Dictionary<string, object>>(GetCTXFilePath());
-			Print(String.Format("ReadCtxPairSpd paraDict={0}, paraDict.Count={1}", ctxPairSpdDaily.DictCtxPairSpd, ctxPairSpdDaily.DictCtxPairSpd.Count));
+			if(this.PrintOut > 1)
+				Print(String.Format("ReadCtxPairSpd paraDict={0}, paraDict.Count={1}", ctxPairSpdDaily.DictCtxPairSpd, ctxPairSpdDaily.DictCtxPairSpd.Count));
 			//if(paraDict != null && paraDict.Count > 0) {
 				//this.ctxPairSpd = paraDict[0];
 				//GUtils.DisplayProperties<JsonStgPairSpd>(ctxPairSpd, IndicatorProxy);
@@ -314,33 +335,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 		
-		#region Properties
-		[NinjaScriptProperty]
-		[Range(1, int.MaxValue)]
-		[Display(Name="MAPeriod", Description="MA or StdDev period", Order=0, GroupName=GPS_CUSTOM_PARAMS)]
-		public int MAPeriod
-		{ 	get{
-				return maPeriod;
-			}
-			set{
-				maPeriod = value;
-			}
-		}
-		
-		[NinjaScriptProperty]
-		[Range(1, int.MaxValue)]
-		[Display(Name="ATRPeriod", Description="ATR period", Order=1, GroupName=GPS_CUSTOM_PARAMS)]
-		public int ATRPeriod
-		{ 	get{
-				return atrPeriod;
-			}
-			set{
-				atrPeriod = value;
-			}
-		}
-		
+		#region Properties	
 		[NinjaScriptProperty]		
-		[Display(Name="SecondSymbol", Description="The second symbol of the pair", Order=2, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="SecondSymbol", Description="The second symbol of the pair", Order=0, GroupName=GPS_CUSTOM_PARAMS)]
 		public string SecondSymbol
 		{ 	get{
 				return secondSymbol;
@@ -352,7 +349,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		
 		[NinjaScriptProperty]
 		[Range(-1, int.MaxValue)]
-		[Display(Name="ChartMinutes", Description="Minutes for the chart", Order=3, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="ChartMinutes", Description="Minutes for the chart", Order=1, GroupName=GPS_CUSTOM_PARAMS)]
 		public int ChartMinutes
 		{ 	get{
 				return chartMinutes;
@@ -361,44 +358,72 @@ namespace NinjaTrader.NinjaScript.Strategies
 				chartMinutes = value;
 			}
 		}
-		
-		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUp", Order=4, GroupName = GPS_CUSTOM_PARAMS)]
-		public double NumStdDevUp
-		{ get; set; }
 
-		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDown", Order=5, GroupName = GPS_CUSTOM_PARAMS)]
-		public double NumStdDevDown
+		[NinjaScriptProperty]
+		[Range(1, int.MaxValue)]
+		[Display(Name="PeriodNear", Description="Period Near", Order=2, GroupName=GPS_CUSTOM_PARAMS)]
+		public int PeriodNear
 		{ get; set; }
 		
-		[Range(-2, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUpMin", Order=6, GroupName = GPS_CUSTOM_PARAMS)]
-		public double NumStdDevUpMin
+		[NinjaScriptProperty]
+		[Range(1, int.MaxValue)]
+		[Display(Name="PeriodMiddle", Description="Period Middle", Order=3, GroupName=GPS_CUSTOM_PARAMS)]
+		public int PeriodMiddle
+		{ get; set; }
+		
+		[NinjaScriptProperty]
+		[Range(1, int.MaxValue)]
+		[Display(Name="PeriodFar", Description="Period Far", Order=4, GroupName=GPS_CUSTOM_PARAMS)]
+		public int PeriodFar
 		{ get; set; }
 
-		[Range(-2, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDownMin", Order=7, GroupName = GPS_CUSTOM_PARAMS)]
-		public double NumStdDevDownMin
+		[Range(0, 100), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SPKLineThresholdLow", Order=5, GroupName = GPS_CUSTOM_PARAMS)]
+		public double SPKLineThresholdLow
+		{ get; set; }
+
+		[Range(0, 100), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SPKLineThresholdMid", Order=6, GroupName = GPS_CUSTOM_PARAMS)]
+		public double SPKLineThresholdMid
+		{ get; set; }
+		
+		[Range(0, 100), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SPKLineThresholdHigh", Order=7, GroupName = GPS_CUSTOM_PARAMS)]
+		public double SPKLineThresholdHigh
+		{ get; set; }
+
+		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "TradeCostRate", Order=8, GroupName = GPS_CUSTOM_PARAMS)]
+		public double TradeCostRate
+		{ get; set; }
+		
+		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "DaysToHoldPos", Order=9, GroupName = GPS_CUSTOM_PARAMS)]
+		public int DaysToHoldPos
+		{ get; set; }
+
+		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SlippageRate", Order=10, GroupName = GPS_CUSTOM_PARAMS)]
+		public double SlippageRate
 		{ get; set; }
 		
 		[NinjaScriptProperty]
 		//[Range(1, double.MaxValue)]
-		[Display(Name="MktPosition1", Description="Long or short for the leg1 entry", Order=8, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="MktPosition1", Description="Long or short for the leg1 entry", Order=11, GroupName=GPS_CUSTOM_PARAMS)]
 		public MarketPosition MktPosition1
 		{ 	get; set;
 		}
 		
 		[NinjaScriptProperty]
 		//[Range(1, double.MaxValue)]
-		[Display(Name="MktPosition2", Description="Long or short for the leg2 entry", Order=9, GroupName=GPS_CUSTOM_PARAMS)]
+		[Display(Name="MktPosition2", Description="Long or short for the leg2 entry", Order=12, GroupName=GPS_CUSTOM_PARAMS)]
 		public MarketPosition MktPosition2
 		{ 	get; set;
 		}
 		
 		[NinjaScriptProperty]
-		[Range(1, double.MaxValue)]
-		[Display(Name="CapRatio1", Description="CapRatio of first leg", Order=10, GroupName=GPS_CUSTOM_PARAMS)]
+		[Range(0.001, double.MaxValue)]
+		[Display(Name="CapRatio1", Description="CapRatio of first leg", Order=13, GroupName=GPS_CUSTOM_PARAMS)]
 		public double CapRatio1
 		{ 	get{
 				return capRatio1;
@@ -409,38 +434,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		[NinjaScriptProperty]
-		[Range(1, double.MaxValue)]
-		[Display(Name="CapRatio2", Description="CapRatio of 2nd leg", Order=11, GroupName=GPS_CUSTOM_PARAMS)]
+		[Range(0.001, double.MaxValue)]
+		[Display(Name="CapRatio2", Description="CapRatio of 2nd leg", Order=14, GroupName=GPS_CUSTOM_PARAMS)]
 		public double CapRatio2
 		{ 	get{
 				return capRatio2;
 			}
 			set{
 				capRatio2 = value;
-			}
-		}
-		
-		[NinjaScriptProperty]
-		[Range(double.MinValue, double.MaxValue)]
-		[Display(Name="PctChgSpdThresholdEn", Description="PctChgSpd Threshold to entry", Order=12, GroupName=GPS_CUSTOM_PARAMS)]
-		public double PctChgSpdThresholdEn
-		{ 	get{
-				return pctChgSpdThresholdEn;
-			}
-			set{
-				pctChgSpdThresholdEn = value;
-			}
-		}
-		
-		[NinjaScriptProperty]
-		[Range(double.MinValue, double.MaxValue)]
-		[Display(Name="PctChgSpdThresholdEx", Description="PctChgSpd Threshold to exit", Order=13, GroupName=GPS_CUSTOM_PARAMS)]
-		public double PctChgSpdThresholdEx
-		{ 	get{
-				return pctChgSpdThresholdEx;
-			}
-			set{
-				pctChgSpdThresholdEx = value;
 			}
 		}
 
@@ -458,30 +459,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			get { return Values[1]; }
 		}
 
-		//The BarsInProgress for PctChgMax and PctChgMin
-		[Browsable(false)]
-		[XmlIgnore]
-		public int PctChgMaxBip
-		{
-			get;set;
-		}
-		[Browsable(false)]
-		[XmlIgnore]
-		public int PctChgMinBip
-		{
-			get;set;
-		}
 		#endregion
 		
 		#region Pre Defined parameters
-		private int maPeriod = 5;
-		private int atrPeriod = 5;
 		private double capRatio1 = 1;//1.25;
 		private double capRatio2 = 1;
-		private double pctChgSpdThresholdEn = -2.3;
-		private double pctChgSpdThresholdEx = 2.5;
 		private string secondSymbol = "CWENA";
-		private int chartMinutes = 34;
+		private int chartMinutes = 0;
 		#endregion
 	}
 }

@@ -250,6 +250,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int quantity, int filled, double averageFillPrice, 
 			Cbi.OrderState orderState, DateTime time, Cbi.ErrorCode error, string comment)
 		{
+			if(!this.InstStrategy.IsInStrategyAnalyzer)
 			InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
 				String.Format("{0}:OnCurOrderUpdate, limitPrice={1}, stopPrice={2}, quantity={3},\t\n filled={4}, averageFillPrice={5}, orderState={6}",
 				InstStrategy.CurrentBar, limitPrice, stopPrice, quantity, filled, averageFillPrice, orderState));
@@ -310,25 +311,28 @@ namespace NinjaTrader.NinjaScript.Strategies
 			double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
 		{
 			try {
-				InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(), 
-				InstStrategy.CurrentBar + ":OnCurExecutionUpdate"
-				+ ";executionId=" + executionId
-				+ ";orderId=" + orderId
-				+ ";execution.Order.Name=" + execution.Order.Name
-				+ ";marketPosition=" + marketPosition
-				+ ";quantity=" + quantity
-				+ ";price=" + price
-				);
+				if(!this.InstStrategy.IsInStrategyAnalyzer)
+					InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(), 
+					InstStrategy.CurrentBar + ":OnCurExecutionUpdate"
+					+ ";executionId=" + executionId
+					+ ";orderId=" + orderId
+					+ ";execution.Order.Name=" + execution.Order.Name
+					+ ";marketPosition=" + marketPosition
+					+ ";quantity=" + quantity
+					+ ";price=" + price
+					);
 				PositionStatus ps = InstStrategy.GetPositionStatus(PosQuantity);
 				switch(ps) {
 					case PositionStatus.NewEstablished://New position created, setup SL/PT
-						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
-						String.Format("{0}:OnCurExecutionUpdate PositionStatus.NewEstablished, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
-							InstStrategy.CurrentBar, MktPosition, PosQuantity, marketPosition, quantity));
+						if(!this.InstStrategy.IsInStrategyAnalyzer)
+							InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+							String.Format("{0}:OnCurExecutionUpdate PositionStatus.NewEstablished, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
+								InstStrategy.CurrentBar, MktPosition, PosQuantity, marketPosition, quantity));
 						break;
 					case PositionStatus.Liquidate://Positions were closed, trade is done, init a new trade;
-						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
-						String.Format("{0}:OnCurExecutionUpdate PositionStatus.Liquidate, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
+						if(!this.InstStrategy.IsInStrategyAnalyzer)
+							InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+							String.Format("{0}:OnCurExecutionUpdate PositionStatus.Liquidate, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
 							InstStrategy.CurrentBar, MktPosition, PosQuantity, marketPosition, quantity));
 						//InitNewTrade();
 						break;
@@ -363,15 +367,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int quantity, Cbi.MarketPosition marketPosition)
 		{
 			try	{
-				InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+				if(!this.InstStrategy.IsInStrategyAnalyzer)
+					InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
 					String.Format("{0}:OnCurPositionUpdate - AvgPrc: {1}, Quant={2}, MktPos={3}, marketPosition={4}, PnL={5}",
 						InstStrategy.CurrentBar, PosAvgPrice, PosQuantity, MktPosition, marketPosition, PosUnrealizedPnL));
 				//Position pos = position.MemberwiseClone();
 				PositionStatus ps = InstStrategy.GetPositionStatus(PosQuantity);
 				switch(ps) {
 					case PositionStatus.NewEstablished://New position created, setup SL/PT(the same bar)
-						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
-						String.Format("{0}:PositionStatus.NewEstablished, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
+						if(!this.InstStrategy.IsInStrategyAnalyzer)
+							InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+							String.Format("{0}:PositionStatus.NewEstablished, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
 							InstStrategy.CurrentBar, MktPosition, PosQuantity, marketPosition, quantity));
 						UpdateCurPos(position, averagePrice, quantity, marketPosition);
 						/*InstStrategy.CheckExitSignals();
@@ -379,14 +385,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 						InstStrategy.TakeTradeAction();*/
 						break;
 					case PositionStatus.Liquidate://Positions were closed, trade is done, init a new trade;
-						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
-						String.Format("{0}:PositionStatus.Liquidate, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
+						if(!this.InstStrategy.IsInStrategyAnalyzer)
+							InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+							String.Format("{0}:PositionStatus.Liquidate, MktPos={1}, PosQuantity={2}, marketPosition={3}, quantity={4}",
 							InstStrategy.CurrentBar, MktPosition, PosQuantity, marketPosition, quantity));
 						InitNewTrade();
 						break;
 					case PositionStatus.Hold://Position is held, change SL/PT by rule/performance, scale in/out occured;
 						//=> this case is replaced by CheckPerformance() from OnBarUpdate, it won't happen here, only scale in/out will happen
-						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+						if(!this.InstStrategy.IsInStrategyAnalyzer)
+							InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
 							String.Format("{0}:Position is Held, MktPos={1}, marketPosition={2}, PosQuant={3}, Quant={4}", 
 							InstStrategy.CurrentBar, MktPosition, marketPosition, PosQuantity, quantity));
 //						InstStrategy.CalProfitTargetAmt(PosAvgPrice, InstStrategy.MM_ProfitFactor);
@@ -396,12 +404,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 					case PositionStatus.Flat:
 						break;
 					case PositionStatus.ScaledIn:
-						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+						if(!this.InstStrategy.IsInStrategyAnalyzer)
+							InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
 							String.Format("{0}:PositionStatus.ScaledIn, MktPos={1}, marketPosition={2}, PosQuant={3}, Quant={4}", 
 							InstStrategy.CurrentBar, MktPosition, marketPosition, PosQuantity, quantity));
 						break;
 					case PositionStatus.ScaledOut:
-						InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
+						if(!this.InstStrategy.IsInStrategyAnalyzer)
+							InstStrategy.IndicatorProxy.PrintLog(true, InstStrategy.IsLiveTrading(),
 							String.Format("{0}:PositionStatus.ScaledOut, MktPos={1}, marketPosition={2}, PosQuant={3}, Quant={4}", 
 							InstStrategy.CurrentBar, MktPosition, marketPosition, PosQuantity, quantity));
 						break;

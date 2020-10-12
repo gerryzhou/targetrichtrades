@@ -44,7 +44,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//Disable this property if your indicator requires custom values that cumulate with each new market data event. 
 				//See Help Guide for additional information.
 				IsSuspendedWhileInactive					= true;
-				CustInput					= 1;
+				CustInput									= 1;
 				//AddPlot(Brushes.Orange, "CustPlot");
 			}
 			else if (State == State.Configure)
@@ -88,7 +88,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{ get; set; }
 		
 		//[NinjaScriptProperty]
-		[Range(1, int.MaxValue)]
+		[Range(0, int.MaxValue)]
 		//[Display(Name="CustInput", Description="CustInput for indicator proxy", Order=0, GroupName="Parameters")]
 		[Browsable(false), XmlIgnore]
 		public int CustInput

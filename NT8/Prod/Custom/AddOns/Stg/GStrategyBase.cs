@@ -111,7 +111,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				else {
 //					Print("IsLastBarOnChart called:(CurBar,Count, Bars.Count)=");
 //						+ CurrentBar);// + "," + Count + "," + Bars.Count);
-					Print(string.Format("IsLastBarOnChart: CurrentBar={0}, Count={1}, Bars.Count={2}",
+					if(!IsInStrategyAnalyzer)
+						Print(string.Format("IsLastBarOnChart: CurrentBar={0}, Count={1}, Bars.Count={2}",
 						CurrentBars[bip], Count, BarsArray[bip].Count));
 					return BarsArray[bip].Count;
 				}		

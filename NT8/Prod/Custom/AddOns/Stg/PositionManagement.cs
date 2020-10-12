@@ -16,7 +16,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 	{
 		#region Utils Functions
 		public int HasPosition() {
-			IndicatorProxy.TraceMessage(this.Name, 0);
+			if(!IsInStrategyAnalyzer)
+				IndicatorProxy.TraceMessage(this.Name, 0);
 			int pos = 0;
 			if(IsLiveTrading()) {
 				//if(PositionAccount != null)
@@ -28,7 +29,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public int HasPosition(int idx) {
-			IndicatorProxy.TraceMessage(this.Name, 0);
+			if(!IsInStrategyAnalyzer)
+				IndicatorProxy.TraceMessage(this.Name, 0);
 			if(idx < 0) return HasPosition();
 			int pos = 0;
 			if(IsLiveTrading()) {
@@ -41,7 +43,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		public bool HasPairPosition() {
-			IndicatorProxy.TraceMessage(this.Name, 0);
+			if(!IsInStrategyAnalyzer)
+				IndicatorProxy.TraceMessage(this.Name, 0);
 			bool pos = false;
 			if(GetMarketPosition(0) != MarketPosition.Flat 
 				&& GetMarketPosition(1) != MarketPosition.Flat) {
@@ -112,6 +115,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		#endregion
 		
+		#region Performance Functions
+		public virtual double GetPairUnrealizedPnL(PerformanceUnit unit) {
+			double pnl0, pnl1;
+			if(IsLiveTrading()) {
+				pnl0 = PositionsAccount[0].GetUnrealizedProfitLoss(unit, Closes[0][0]);
+				pnl1 = PositionsAccount[1].GetUnrealizedProfitLoss(unit, Closes[1][0]);				
+			}
+			else {
+				pnl0 = Positions[0].GetUnrealizedProfitLoss(unit, Closes[0][0]);
+				pnl1 = Positions[1].GetUnrealizedProfitLoss(unit, Closes[1][0]);
+			}
+			return pnl0 + pnl1;
+		}
+		
+		#endregion
 		#region Event Handlers
 		
 		protected override void OnPositionUpdate(Cbi.Position position, double averagePrice, 
@@ -121,7 +139,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int bsx = BarsSinceExitExecution(0, "", 0);
 			int bse = BarsSinceEntryExecution(0, "", 0);
 			
-			IndicatorProxy.PrintLog(true, IsLiveTrading(), 
+			if(!IsInStrategyAnalyzer)
+				IndicatorProxy.PrintLog(true, IsLiveTrading(), 
 				CurrentBar + ":OnPositionUpdate, CurrentTrade not updated -- "
 				+ ";BarsSinceExit, BarsSinceEntry="
 				+ bsx + "," + bse
@@ -139,8 +158,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			CurrentTrade.OnCurPositionUpdate(position, averagePrice, quantity, marketPosition);
 			if(CurrentTrade.MktPosition != null && CurrentTrade.PosAvgPrice != null
 				&& CurrentTrade.PosQuantity != null && CurrentTrade.PosUnrealizedPnL != null)
-			IndicatorProxy.PrintLog(true, IsLiveTrading(),			
-			String.Format("{0}: OnPositionUpdate, CurrentTrade updated -- CurrentTrade.PosAvgPrice: {1}, CurrentTrade.PosQuantit={2}, CurrentTrade.MktPosition={3}, PnL={4}",
+			if(!IsInStrategyAnalyzer)
+				IndicatorProxy.PrintLog(true, IsLiveTrading(),			
+				String.Format("{0}: OnPositionUpdate, CurrentTrade updated -- CurrentTrade.PosAvgPrice: {1}, CurrentTrade.PosQuantit={2}, CurrentTrade.MktPosition={3}, PnL={4}",
 					CurrentBar, CurrentTrade.PosAvgPrice, CurrentTrade.PosQuantity, CurrentTrade.MktPosition, CurrentTrade.PosUnrealizedPnL));
 		}
 		

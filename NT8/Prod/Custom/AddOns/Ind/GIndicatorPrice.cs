@@ -35,7 +35,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// Hold the indicator volume from the underlining indicator
 		/// 
 		/// </summary>
-
 		
 		#region Methods		
 		public double GetPriceByType(int barNo, PriceSubtype priceType) {
@@ -88,9 +87,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 //				}
 				hiPrc = Math.Max(hiPrc, High[HighestBar(High, barsAgo)]);
 			}
-			PrintLog(true, false, 
-				CurrentBar + ":hiPrc=" + hiPrc 
-				+ ";barsAgo=" + barsAgo);
+			if(PrintOut > 1)
+				PrintLog(true, false, 
+				string.Format("{0}: hiPrc={1}, barsAgo={1}", CurrentBar, hiPrc, barsAgo));
 			return hiPrc;
 		}
 
@@ -105,9 +104,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if(barsAgo > 0) {
 				hiPrc = Math.Max(hiPrc, data[HighestBar(data, barsAgo)]);
 			}
-			PrintLog(true, false, 
-				CurrentBar + ":hiPrc data=" + hiPrc 
-				+ ";barsAgo=" + barsAgo);
+			if(PrintOut > 1)
+				PrintLog(true, false, 
+				string.Format("{0}: hiPrc={1}, barsAgo={1}", CurrentBar, hiPrc, barsAgo));
 			return hiPrc;
 		}
 		
@@ -122,9 +121,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if(barsAgo > 0) {
 				loPrc = Math.Min(loPrc, Low[LowestBar(Low, barsAgo)]);
 			}
-			PrintLog(true, false, 
-				CurrentBar + ":loPrc=" + loPrc
-				+ ";barsAgo=" + barsAgo);
+			if(PrintOut > 1)
+				PrintLog(true, false, 
+				string.Format("{0}: loPrc={1}, barsAgo={1}", CurrentBar, loPrc, barsAgo));
 			return loPrc;
 		}
 		
@@ -139,9 +138,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if(barsAgo > 0) {
 				loPrc = Math.Min(loPrc, data[LowestBar(data, barsAgo)]);
 			}
-			PrintLog(true, false, 
-				CurrentBar + ":loPrc data=" + loPrc
-				+ ";barsAgo=" + barsAgo);
+			if(PrintOut > 1)
+				PrintLog(true, false, 
+				string.Format("{0}: loPrc={1}, barsAgo={1}", CurrentBar, loPrc, barsAgo));
 			return loPrc;
 		}
 		
