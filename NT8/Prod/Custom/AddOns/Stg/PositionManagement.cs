@@ -42,15 +42,31 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return pos;
 		}
 		
-		public bool HasPairPosition() {
+		public bool HasPairPosition(int startIndex) {
 			if(PrintOut > 1 && !IsInStrategyAnalyzer)
 				IndicatorProxy.TraceMessage(this.Name, 0);
 			bool pos = false;
-			if(GetMarketPosition(0) != MarketPosition.Flat 
-				&& GetMarketPosition(1) != MarketPosition.Flat) {
+			if(GetMarketPosition(startIndex) != MarketPosition.Flat 
+				&& GetMarketPosition(startIndex+1) != MarketPosition.Flat) {
 				pos = true;
 			}
 			return pos;
+		}
+		
+		public bool HasPairPosition() {
+			return HasPairPosition(0);
+		}
+		
+		public virtual bool HasPositions(int[] idxs, int posExp) {
+			int cnt = 0;
+			for(int i=0; i<idxs.Length; i++) {
+				if(GetMarketPosition(idxs[i]) != MarketPosition.Flat)
+					cnt ++;
+			}
+			if(cnt >= posExp)
+				return true;
+			else
+				return false;
 		}
 		
 		public double GetAvgPrice() {
@@ -129,7 +145,68 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return pnl0 + pnl1;
 		}
 		
+		public virtual double GetPairGrossPnL(PerformanceUnit unit) {
+			double pnl0;
+			if(IsLiveTrading()) {
+				pnl0 = SystemPerformance.RealTimeTrades.TradesPerformance.GrossLoss
+					+ SystemPerformance.RealTimeTrades.TradesPerformance.GrossProfit;
+			}
+			else {
+				pnl0 = SystemPerformance.AllTrades.TradesPerformance.GrossLoss
+					+ SystemPerformance.AllTrades.TradesPerformance.GrossProfit;
+			}
+			return pnl0;
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="unit">one tick for stock is $0.01, 
+		/// the total $$ amount will be 100*totalSlippage</param>
+		/// <returns></returns>
+		public virtual double GetPairTotalSlippage(PerformanceUnit unit) {
+			double sp0, sp1;
+			if(IsLiveTrading()) {
+				sp0 = SystemPerformance.RealTimeTrades.TradesPerformance.TotalSlippage;
+				//sp1 = PositionsAccount[1].GetUnrealizedProfitLoss(unit, Closes[1][0]);				
+			}
+			else {
+				sp0 = SystemPerformance.AllTrades.TradesPerformance.TotalSlippage;
+				//sp1 = SystemPerformance.AllTrades.ByDay
+			}
+			return sp0;
+		}		
+
+		public virtual double GetPairTotalCommission(PerformanceUnit unit) {
+			double com0, com1;
+			if(IsLiveTrading()) {
+				com0 = SystemPerformance.RealTimeTrades.TradesPerformance.TotalCommission;
+				//sp1 = PositionsAccount[1].GetUnrealizedProfitLoss(unit, Closes[1][0]);				
+			}
+			else {
+				com0 = SystemPerformance.AllTrades.TradesPerformance.TotalCommission;
+				//sp1 = SystemPerformance.AllTrades.ByDay
+			}
+			return com0;
+		}
+		
+		public virtual double GetTotalCapitalTraded(PerformanceUnit unit) {
+			double capTotal=0;
+			if(IsLiveTrading()) {
+				foreach(Trade td in SystemPerformance.RealTimeTrades) {
+					capTotal = capTotal + td.Entry.Price * td.Entry.Quantity;
+				}
+			}
+			else {
+				foreach(Trade td in SystemPerformance.AllTrades) {
+					capTotal = capTotal + td.Entry.Price * td.Entry.Quantity;
+				}
+				//sp1 = SystemPerformance.AllTrades.ByDay
+			}
+			return capTotal;
+		}
 		#endregion
+		
 		#region Event Handlers
 		
 		protected override void OnPositionUpdate(Cbi.Position position, double averagePrice, 

@@ -42,15 +42,3 @@ namespace NinjaTrader.NinjaScript.AddOns.PriceActions
 }
 	
 	
-
-
-
-
-
-
-
-
-
-
-
-

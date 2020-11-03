@@ -72,7 +72,3 @@ namespace NinjaTrader.NinjaScript.AddOns.PriceActions
 		#endregion
 	}
 }
-
-
-
-

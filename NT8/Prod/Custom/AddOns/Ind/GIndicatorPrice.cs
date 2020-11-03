@@ -185,6 +185,33 @@ namespace NinjaTrader.NinjaScript.Indicators
 			return amt;
 		}
 		
+		/// <summary>
+		/// Normalize the price to $100 base
+		/// </summary>
+		/// <param name="prc">the regular price</param>
+		/// <param name="basePrc">the base price</param>
+		/// <returns></returns>
+		public double GetNormalizedPrice(double prc, double basePrc, int fraction) {
+			if(basePrc > 0)
+				return Math.Round(100*prc/basePrc, fraction);
+			else return -1.1;
+		}
+
+		/// <summary>
+		/// Normalize the ROC price to $100 base
+		/// </summary>
+		/// <param name="prc">The regular price</param>
+		/// <param name="basePrc">The base price</param>
+		/// <param name="rocScale">The folds to enlarge the small roc</param>
+		/// <param name="fraction">The round digits</param>
+		/// <returns>Invalid is -1.1</returns>
+		public double GetNormalizedRocPrice(double prc, double basePrc, int rocScale, int fraction) {
+			if(basePrc > 0) {
+				double roc = rocScale*(prc - basePrc)/basePrc;
+				return GetNormalizedPrice(roc, basePrc, fraction);
+			}
+			else return -1.1;
+		}		
 		#endregion
 	}
 }

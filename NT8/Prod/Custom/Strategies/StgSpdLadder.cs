@@ -75,7 +75,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				SPKLineThresholdLow							= 3;
 				SPKLineThresholdMid							= 50;
 				SPKLineThresholdHigh						= 96;
-				TradeCostRate								= 0.03;
+				TradeCostRate								= 0.3;
 				DaysToHoldPos								= 9;
 				PrintOut									= 1;
 //				IsInstantiatedOnEachOptimizationIteration = false;
@@ -105,9 +105,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 				SetPrintOut(-1);
 				CapRatio2 = 1;
 				CapRatio1 = Closes[1][0]/Closes[0][0];
-				Print(String.Format("{0}: IsUnmanaged={1}", this.GetType().Name, IsUnmanaged));
-				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));		
-				
+				if(!IsInStrategyAnalyzer && PrintOut > 1) {
+					Print(String.Format("{0}: IsUnmanaged={1}", this.GetType().Name, IsUnmanaged));
+					Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));		
+				}
 				ctxPairSpdDaily = giSpdLadder.CtxPairSpreadDaily;
 //				if(BarsPeriod.BarsPeriodType == BarsPeriodType.Day) {
 //					//SetMarketContext();
@@ -123,6 +124,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (CurrentBars[0] < BarsRequiredToTrade || CurrentBars[1] < BarsRequiredToTrade)
 				return;
 			giSpdLadder.Update();
+			if(!IsInStrategyAnalyzer //&& PrintOut > 1 
+				&& BarsInProgress > 0
+				&& giSpdLadder.IsLastBarOnChart(BarsInProgress) > 0) {
+					CheckPerformance();
+			}
 //			Print(string.Format("CurrentBars[BarsInProgress]={0}, BarsInProgress={1}, BarsPeriod.BarsPeriodType={2}", 
 //				CurrentBars[BarsInProgress], BarsInProgress, BarsPeriod.BarsPeriodType));
 //			if(BarsPeriod.BarsPeriodType == BarsPeriodType.Day && BarsInProgress > 0){				
@@ -138,6 +144,33 @@ namespace NinjaTrader.NinjaScript.Strategies
 //			if(BarsPeriod.BarsPeriodType != BarsPeriodType.Day)
 //				GetPairSpdCtx();
 		}
+
+		#region Performance Functions
+		private void CheckPerformance() {
+			double totalCapital = GetTotalCapitalTraded(PerformanceUnit.Currency);			
+			double totalSlippage = 100*GetPairTotalSlippage(PerformanceUnit.Currency);
+			double totalCommission = GetPairTotalCommission(PerformanceUnit.Currency);
+			double totalCost = totalSlippage + totalCommission;
+			double grossPnL = GetPairGrossPnL(PerformanceUnit.Currency) + totalCost;
+			double costCapitalRate = totalCapital==0 ? 0 : totalCost/totalCapital;
+			double costPnLRate = grossPnL==0 ? 0 : totalCost/grossPnL;
+			double grossReturn = totalCapital==0 ? 0 : grossPnL/totalCapital;
+			double finalReturn = totalCapital==0 ? 0 : GetPairGrossPnL(PerformanceUnit.Currency)/totalCapital;
+			
+			Print("Symbol\tPrice\t"
+			+ "TradeCostRate\tDaysToHoldPos\tThresholdLoHi\t"
+			+ "TotalSlippage\tTotalCommission\tTotalCapital\tGrossPnL\t"
+			+ "CostCapitalRate\tCostPnLRate\tGrossReturn\tFinalReturn");
+			
+			Print(string.Format("{0}\t${1}:${2}\t{3}%\t{4}\t{5}%:{6}%\t{7}\t{8}\t{9}\t{10}\t{11}%\t{12}%\t{13}%\t{14}%", 
+				Instrument.MasterInstrument.Name, Closes[0][0], Closes[1][0], 
+				TradeCostRate, DaysToHoldPos, SPKLineThresholdLow, SPKLineThresholdHigh,
+				totalSlippage, totalCommission, totalCapital, Math.Round(grossPnL, 4),
+				Math.Round(100*costCapitalRate, 4), Math.Round(100*costPnLRate, 4),
+				Math.Round(100*grossReturn, 4), Math.Round(100*finalReturn, 4)));
+		}
+		
+		#endregion
 		
 		#region En/Ex signals
 		private bool CheckPnLByBarsSinceEn() { return false;
@@ -188,7 +221,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if(this.PrintOut > 1)
 					Print(String.Format("{0}:OnExitPositions Performance bip={1} quant1={2}, quant2={3}: UnrealizedPnL={4}",
 					CurrentBars[BarsInProgress], BarsInProgress, quant1, quant2, pnl));
-				if(pnl < TradeCostRate*quant)
+				if(200*pnl < TradeCostRate*quant*(Closes[0][0]+Closes[1][0]))
 					return;
 			}
 			//Exit positions for both legs
@@ -392,6 +425,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public double SPKLineThresholdHigh
 		{ get; set; }
 
+		/// <summary>
+		/// Percent of the traded capital
+		/// </summary>
 		[Range(0, double.MaxValue), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "TradeCostRate", Order=8, GroupName = GPS_CUSTOM_PARAMS)]
 		public double TradeCostRate

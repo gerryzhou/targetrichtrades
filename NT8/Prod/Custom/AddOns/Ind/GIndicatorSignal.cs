@@ -355,6 +355,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			get { return "EnStLeg2";}
 		}
+
+		[Browsable(false), XmlIgnore]
+		public string SignalName_EntrySQRSpread
+		{
+			get { return "EnSQRSpread";}
+		}
 		#endregion
 	}
 }

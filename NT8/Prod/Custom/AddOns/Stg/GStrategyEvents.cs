@@ -184,7 +184,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (account == null || accountItem == null || IndicatorProxy == null) 
 				return;
 			
-			if(accountItem == AccountItem.UnrealizedProfitLoss && PrintOut > 1 && !IsInStrategyAnalyzer)
+			if(accountItem == AccountItem.UnrealizedProfitLoss && PrintOut > 2 && !IsInStrategyAnalyzer)
 				IndicatorProxy.PrintLog(true, IsLiveTrading(), //":OnAccountItemUpdate"
 					CurrentBar + ":OnAccountItemUpdate"
 					+ ";Name=" + account.DisplayName

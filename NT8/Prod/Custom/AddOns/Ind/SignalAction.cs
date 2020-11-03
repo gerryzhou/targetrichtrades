@@ -1,4 +1,5 @@
 #region Using declarations
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
 using NinjaTrader.NinjaScript.AddOns.PriceActions;
@@ -19,16 +20,24 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <summary>
 		/// The type of the signal
 		/// </summary>		
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public SignalActionType SignalActionType
 		{
 			get; set;
 		}
+
+		//		[Browsable(false), XmlIgnore]
+//		public SupportResistanceRange<SupportResistanceBar> SnR {
+//			get; set;
+//		}
 		
-		[Browsable(false)]
-		[XmlIgnore]
+		[Browsable(false), XmlIgnore]
 		public SupportResistanceRange<double> SnR {
+			get; set;
+		}
+
+		[Browsable(false), XmlIgnore]
+		public List<PairSpread<int>> PairSpds {
 			get; set;
 		}
 		#endregion

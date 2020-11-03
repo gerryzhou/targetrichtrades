@@ -114,20 +114,3 @@ namespace NinjaTrader.NinjaScript.AddOns.PriceActions
 		{ get; set; }
 	}	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

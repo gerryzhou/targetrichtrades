@@ -18,12 +18,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public enum DivergenceType { Divergent=-1, Convergent=1, UnKnown=0 }
 	public enum SignalBarByType { ByTime=1, ByVolume=2, ByPrice=3, ByBarNo=4 } // Identify singal bar by time/vol/price/barNo
 
-	public enum SignalType { Direction, Volatility, SnR,
+	public enum SignalType { Direction, Volatility, SnR, Spread,
 					SimplePriceAction, CombinedPriceAction, ChartDraw, Unknown }
 	
 	public enum SignalActionType { TrendUp, TrendDn, BreakoutUp, BreakoutDn, PullbackUp, PullbackDn, ReversalUp, ReversalDn,
 					CrossAbove, CrossBelow, Divergence, Convergence, InflectionUp, InflectionDn,
-					Flat, BarToLeft, BarToRight, Unknown }
+					Flat, BarToLeft, BarToRight, PairSpread, Unknown }
 	
 	//The size of High-Low of the bar
 	public enum BarRangeType { Doji, Small, Large, Huge }
@@ -36,7 +36,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public enum ChannelType { UpTight=1, UpWide=2, DnTight=4, DnWide=8, RngTight=16, RngWide=32, UnKnown=64 }
 	
 	public enum PositionInBand { BreakoutUp=1, Upper=2, BreakDown=4, Lower=8, MiddleUp=16, MiddleDn=32, UnKnown=64 }
-		
+
+	public enum SpreadType { Max=1, Min=2, High=3, Low=4, Middle=5 }
+	
 	public enum MarketCycleType { //1-5 wave or ABC wave
 		W1Early, W1Middle, W1End,
 		W2Early, W2Middle, W2End,

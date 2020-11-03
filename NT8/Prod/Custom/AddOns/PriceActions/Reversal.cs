@@ -1,31 +1,28 @@
 #region Using declarations
 using System.ComponentModel;
 using System.Xml.Serialization;
+using NinjaTrader.Data;
 using NinjaTrader.NinjaScript.Indicators;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
 namespace NinjaTrader.NinjaScript.AddOns.PriceActions
 {
-    public class Direction
+    public class Reversal
 	{
-		private TrendDirection trendDir = TrendDirection.UnKnown;
+		private ReversalType reversalType = ReversalType.Percent;
+		private ReversalDirection reversalDir = ReversalDirection.UnKnown; 
 		
 		#region Properties		
 		/// <summary>
 		/// </summary>
 		[Browsable(false), XmlIgnore()]
-		public TrendDirection TrendDir
+		[DefaultValueAttribute(ReversalDirection.UnKnown)]
+		public ReversalDirection ReversalDir
 		{
-			get { return trendDir; }
-			set { trendDir = value; }
+			get { return reversalDir; }
+			set { reversalDir = value; }
 		}
 		#endregion
 	}
 }
-
-
-
-
-
-

@@ -31,6 +31,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 	/// Bollinger Bands are plotted at standard deviation levels above and below a moving average. 
 	/// Since standard deviation is a measure of volatility, the bands are self-adjusting: 
 	/// widening during volatile markets and contracting during calmer periods.
+	/// JohnCarter default: period 20, BB 2, KC 1.5; 
 	/// </summary>
 	public class GITTM : GIndicatorBase
 	{

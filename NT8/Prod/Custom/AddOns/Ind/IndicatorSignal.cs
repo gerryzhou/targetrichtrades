@@ -68,11 +68,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 		}
 		
 		[Browsable(false), XmlIgnore]
-		public SupportResistanceRange<SupportResistanceBar> SnR {
-			get; set;
-		}
-		
-		[Browsable(false), XmlIgnore]
 		public SignalAction SignalAction {
 			get; set;
 		}

@@ -210,12 +210,6 @@ namespace NinjaTrader.NinjaScript.Indicators
 				return 100*hour + min;
 		}
 				
-		public bool IsTimeInSpan(DateTime dt, int start, int end) {
-			int t = 100*dt.Hour + dt.Minute;
-			if(start <= t && t <= end) return true;
-			else return false;
-		}
-
 		public int GetTimeDiffByHM(int hour, int min, DateTime dt) {
 			int t = GetTimeByHM(hour, min, true);
 			int t0 = GetTimeByHM(dt.Hour, dt.Minute, true);
@@ -253,6 +247,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 //			}
 //			return isTime;
 //		}
+		
+		public bool IsTimeInSpan(DateTime dt, int start, int end) {
+			int t = 100*dt.Hour + dt.Minute;
+			if(start <= t && t <= end) return true;
+			else return false;
+		}
 		
 		/// <summary>
 		/// Check if now is the first bar pass the startTime
