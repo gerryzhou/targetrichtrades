@@ -155,11 +155,75 @@ namespace NinjaTrader.NinjaScript.Indicators
 			SetOpenPrice();
 			SetRoc();
 			GetRocHiLoMidBip();
+			SetLongShortBips();
 			CheckTradeEvent();
 //			PctChgArr[BarsInProgress] = GetPctChg(BarsInProgress);
 //			SetPctChgSpread();
 			//if(PrintOut > 1)
 			//	PrintPctChgSpd();
+		}
+		
+		/// <summary>
+		/// Set the Bip for long, short entrys 
+		/// </summary>
+		private void SetLongShortBips() {
+			if(BarsInProgress != BipIWM) return;
+			switch(RocHighBip) {
+				case BipSpy:
+					ShortBip = BipSpySt;
+					break;
+				case BipQQQ:
+					ShortBip = BipQQQSt;
+					break;
+				case BipIWM:
+					ShortBip = BipIWMSt;
+					break;
+				default:
+					ShortBip = -1;
+					break;
+			}
+			switch(RocLowBip) {
+				case BipSpy:
+					LongBip = BipSpyLn;
+					break;
+				case BipQQQ:
+					LongBip = BipQQQLn;
+					break;
+				case BipIWM:
+					LongBip = BipIWMLn;
+					break;
+				default:
+					LongBip = -1;
+					break;
+			}
+			switch(RocMidBip) {
+				case BipSpy:
+					MidLongBip = BipSpyLn;
+					MidShortBip = BipSpySt;
+					break;
+				case BipQQQ:
+					MidLongBip = BipQQQLn;
+					MidShortBip = BipQQQSt;
+					break;
+				case BipIWM:
+					MidLongBip = BipIWMLn;
+					MidShortBip = BipIWMSt;
+					break;
+				default:
+					MidLongBip = -1;
+					MidShortBip = -1;
+					break;
+			}
+			
+//			double mx = Math.Max(RocSpy[0], Math.Max(RocQQQ[0], RocIWM[0]));			
+//			double mi = Math.Min(RocSpy[0], Math.Min(RocQQQ[0], RocIWM[0]));
+//			RocHighBip = (mx==RocSpy[0])? BipSpy : ((mx==RocQQQ[0])? BipQQQ:BipIWM);
+//			RocLowBip = (mi==RocSpy[0])? BipSpy : ((mi==RocQQQ[0])? BipQQQ:BipIWM);
+//			RocMidBip = 3 - RocHighBip - RocLowBip;
+			Print(string.Format("{0}:SetLongShortBips bip={1}, LongBip={2}, ShortBip={3}, MidLongBip={4}, MidShortBip={5}, Time={6:yyyyMMdd-HHmm}", 
+					CurrentBars[BarsInProgress], BarsInProgress,
+					LongBip, ShortBip, MidLongBip, MidShortBip,
+					Times[BarsInProgress][0]));
 		}
 		
 		/// <summary>
@@ -323,8 +387,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 			//int en_H = TM_OpenEndH, en_M = TM_OpenEndM, ex_H = TM_ClosingH, ex_M = TM_ClosingM;		
 
 			//entry at 9:02 am ct
-			if(BarsInProgress == 2 
-				&& IsTradingTime(Times[2][0])
+			if(BarsInProgress == BipIWM 
+				&& IsTradingTime(Times[BipIWM][0])
 				&& SetRocSpreadHiLo()) {
 //				Print(String.Format("{0}:CheckTradeEvent En Bip{1}: PctSpd={2}, MaxBip={3}, MinBip={4}",
 //				CurrentBars[BarsInProgress], BarsInProgress, PlotPctSpd[0], PctChgMaxBip, PctChgMinBip));
@@ -336,13 +400,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 				PairSpread<int> prSpdLo = new PairSpread<int>();
 				prSpdHi.SpdType = SpreadType.High;
 				prSpdHi.SpreadValue = RocHighSpread;
-				prSpdHi.Symbol1 = RocHighBip;
-				prSpdHi.Symbol2 = RocMidBip;
+				prSpdHi.Symbol1 = ShortBip;
+				prSpdHi.Symbol2 = MidLongBip;
 				
 				prSpdLo.SpdType = SpreadType.Low;
 				prSpdLo.SpreadValue = RocLowSpread;
-				prSpdLo.Symbol1 = RocLowBip;
-				prSpdLo.Symbol2 = RocMidBip;
+				prSpdLo.Symbol1 = LongBip;
+				prSpdLo.Symbol2 = MidShortBip;
 				
 				List<PairSpread<int>> pspdList = new List<PairSpread<int>>();
 				pspdList.Add(prSpdHi);
@@ -367,6 +431,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				isig.TrendDir = dir;
 				isig.IndicatorSignalType = SignalType.Spread;
 				isig.SignalName = SignalName_EntrySQRSpread;
+				isig.SignalAction = sigAct;
 				IndicatorEventArgs ievt = new IndicatorEventArgs(this.GetType().Name, String.Format(" [{0}] {1}", Times[BarsInProgress][0], GetLongShortText()));
 				ievt.IndSignal = isig;
 				
@@ -608,6 +673,42 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		[Browsable(false), XmlIgnore]
 		public double RocLowSpread
+		{
+			get;set;
+		}
+
+		/// <summary>
+		/// The symbol bip to put short trade
+		/// </summary>
+		[Browsable(false), XmlIgnore]
+		public int ShortBip
+		{
+			get;set;
+		}
+		
+		/// <summary>
+		/// The symbol bip to put long trade
+		/// </summary>
+		[Browsable(false), XmlIgnore]
+		public int LongBip
+		{
+			get;set;
+		}
+		
+		/// <summary>
+		/// The symbol bip to put long trade as mid position
+		/// </summary>
+		[Browsable(false), XmlIgnore]
+		public int MidLongBip
+		{
+			get;set;
+		}
+		
+		/// <summary>
+		/// The symbol bip to put short trade as mid position
+		/// </summary>
+		[Browsable(false), XmlIgnore]
+		public int MidShortBip
 		{
 			get;set;
 		}

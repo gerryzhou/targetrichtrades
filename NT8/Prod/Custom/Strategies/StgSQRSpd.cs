@@ -15,6 +15,7 @@ using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.Gui.DrawingTools;
 using NinjaTrader.Gui.BasicEntry;
+using NinjaTrader.NinjaScript.AddOns.PriceActions;
 
 #endregion
 
@@ -203,11 +204,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 			IndicatorSignal isig = e.IndSignal;
 			Print(String.Format("{0}:OnTradeBySQRSpd triggerred {1} Bip={2}: RocHiBip={3}, RocLoBip={4}, RocMidBip={5}",
 			CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, giSQRSpd.RocHighBip, giSQRSpd.RocLowBip, giSQRSpd.RocMidBip));
-			int[] idxs = {BipSpyLn, BipSpySt, BipQQQLn, BipQQQSt, BipIWMLn, BipIWMSt};
-			if(e.IndSignal.SignalName != null && HasPositions(idxs, 4))
-				OnExitPositions(e);
-			else if(e.IndSignal.SignalName != null && giSQRSpd.IsTradingTime(Times[BarsInProgress][0]))
-				OnEntryPositions(e);
+			
+			SignalAction sa = e.IndSignal.SignalAction;
+			List<PairSpread<int>> ps = null;
+			if(sa != null)
+				ps = sa.PairSpds;	
+			if(ps != null) {
+				foreach(PairSpread<int> p in ps) {
+				Print(String.Format("{0}:OnTradeBySQRSpd Bip={1}, Symbol1={2}, Symbol2={3}, SpdType={4}, SpreadValue={5}",
+				CurrentBars[BarsInProgress], BarsInProgress,
+				p.Symbol1, p.Symbol2, p.SpdType, p.SpreadValue));
+				}
+			
+				int[] idxs = {giSQRSpd.ShortBip, giSQRSpd.MidLongBip, giSQRSpd.LongBip, giSQRSpd.MidShortBip};// {BipSpyLn, BipSpySt, BipQQQLn, BipQQQSt, BipIWMLn, BipIWMSt};
+				if(e.IndSignal.SignalName != null && HasPositions(idxs, 4))
+					OnExitPositions(e);
+				else if(e.IndSignal.SignalName != null && giSQRSpd.IsTradingTime(Times[BarsInProgress][0]))
+					OnEntryPositions(e);
+			}
 			return;
 			
 			int q_max = GetTradeQuantity(giPctSpd.PctChgMaxBip, this.MM_ProfitFactorMax);
@@ -236,16 +250,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 					EnterLong(giPctSpd.PctChgMinBip, q_min, "GIPctSpd");
 				}
 			}			
-		}
-
-		void OnTradeByChartTrader(object sender, IndicatorEventArgs e) {
-			this.Update();
-			IndicatorSignal isig = e.IndSignal;
-			Print(String.Format("{0}:OnTradeByChartTrader triggerred {1} Bip={2}, CurrentBar[0]={3}, DrawingTool.GetCurrentBar={4}, Time={5}, Time[0][0]={6}",
-			CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, CurrentBars[0], DrawingTool.GetCurrentBar(this), Times[BarsInProgress][0], Times[0][0]));
-			//Draw.ArrowUp(this, "tag1", true, 0, Lows[0][0] - TickSize, Brushes.Red);
-			Draw.Diamond(this, "tag1", true, 0, Lows[0][0] - TickSize, Brushes.Red);
-			
 		}
 		
 		void OnExitPositions(IndicatorEventArgs e) {
@@ -289,55 +293,63 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		void OnEntryPositions(IndicatorEventArgs e) {
-			int q_spyLn = GetTradeQuantity(BipSpyLn, SpyLnSymbolRatio);
-			int q_spySt = GetTradeQuantity(BipSpySt, SpyStSymbolRatio);
-			int q_qqqLn = GetTradeQuantity(BipQQQLn, QQQLnSymbolRatio);
-			int q_qqqSt = GetTradeQuantity(BipQQQSt, QQQStSymbolRatio);
-			int q_iwmLn = GetTradeQuantity(BipIWMLn, IWMLnSymbolRatio);
-			int q_iwmSt = GetTradeQuantity(BipIWMSt, IWMStSymbolRatio);
-			Print(String.Format("{0}:OnTradeBySQRSpd Entry Bip={1}: q_spyLn={2}, q_spySt={3}, q_qqqLn={4}, q_qqqSt={5}, q_iwmLn={6}, q_iwmSt={7}", 
+			int q_Ln = GetTradeQuantity(giSQRSpd.LongBip, -1);
+			int q_St = GetTradeQuantity(giSQRSpd.ShortBip, -1);
+			int q_midLn = GetTradeQuantity(giSQRSpd.MidLongBip, -1);
+			int q_midSt = GetTradeQuantity(giSQRSpd.MidShortBip, -1);
+			Print(String.Format("{0}:OnTradeBySQRSpd Entry Bip={1}: q_Ln={2}, q_St={3}, q_midLn={4}, q_midSt={5}", 
 				CurrentBars[BarsInProgress], BarsInProgress, 
-				q_spyLn, q_spySt, q_qqqLn, q_qqqSt, q_iwmLn, q_iwmSt));
-			EnterLong(BipSpyLn, q_spyLn, "GIEnSpyLn");
-			EnterLong(BipSpySt, q_spySt, "GIEnSpySt");
+				q_Ln, q_St, q_midLn, q_midSt));
+			EnterLong(giSQRSpd.LongBip, q_Ln, "GIEnLn");
+			EnterLong(giSQRSpd.ShortBip, q_St, "GIEnSt");
 			//EnterLong(BipQQQLn, q_qqqLn, "GIEnQQQLn");
-			EnterLong(BipQQQSt, q_qqqSt, "GIEnQQQSt");
-			EnterLong(BipIWMLn, q_iwmLn, "GIEnIWMLn");
+			EnterLong(giSQRSpd.MidLongBip, q_midLn, "GIEnMidLn");
+			EnterLong(giSQRSpd.MidShortBip, q_midSt, "GIEnMidSt");
 			//EnterLong(BipIWMSt, q_iwmSt, "GIEnIWMSt");
 		}
 
+		private int[] GetEntryIndexs() {
+			int[] idxs = new int[4];
+			return idxs;
+		}
 		/// <summary>
 		/// CapRatio: ES:RTY=1.7:1, NQ:RTY=2.1:1, NQ:ES=1.25:1
 		/// 
 		/// </summary>		
 		public override int GetTradeQuantity(int idx, double ratio) {
 			double openBase = GetBaseSymbolOpen();
-			double open = 0;
+			double open = 0, rt = 0;
 			int qnt = 0;
 			switch(idx) {
 				case BipSpyLn:
-					open = giSQRSpd.OpenLnSpy;					
+					open = giSQRSpd.OpenLnSpy;
+					rt = SpyLnSymbolRatio;
 					break;
 				case BipSpySt:
-					open = giSQRSpd.OpenStSpy;					
+					open = giSQRSpd.OpenStSpy;
+					rt = SpyStSymbolRatio;
 					break;
 				case BipQQQLn:
-					open = giSQRSpd.OpenLnQQQ;					
+					open = giSQRSpd.OpenLnQQQ;
+					rt = QQQLnSymbolRatio;
 					break;
 				case BipQQQSt:
-					open = giSQRSpd.OpenStQQQ;					
+					open = giSQRSpd.OpenStQQQ;
+					rt = QQQStSymbolRatio;
 					break;
 				case BipIWMLn:
-					open = giSQRSpd.OpenLnIWM;					
+					open = giSQRSpd.OpenLnIWM;
+					rt = IWMLnSymbolRatio;
 					break;
 				case BipIWMSt:
-					open = giSQRSpd.OpenStIWM;					
+					open = giSQRSpd.OpenStIWM;
+					rt = IWMStSymbolRatio;
 					break;
 			}
-			if(openBase > 0 && open >0)
-				qnt = (int)(DefaultQuantity*open/openBase);
-			Print(string.Format("{0}: bip={1}, openBase={2}, open={3}, qnt={4}, DefaultQuantity={5}",
-				CurrentBar, BarsInProgress, openBase, open, qnt, DefaultQuantity));
+			if(openBase > 0 && open > 0 && rt > 0)
+				qnt = (int)(DefaultQuantity*open/(openBase*rt));
+			Print(string.Format("{0}: bip={1}, openBase={2}, open={3}, qnt={4}, DefaultQuantity={5}, ratio={6}",
+				CurrentBar, BarsInProgress, openBase, open, qnt, DefaultQuantity, rt));
 			return qnt;
 		}
 		
