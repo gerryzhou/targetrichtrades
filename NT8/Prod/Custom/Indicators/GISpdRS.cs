@@ -171,6 +171,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 //			}
 		}
 		
+		#region Bollinger Band Functions
 		public bool IsSpreadFlat() {
 			bool isFlat = false;
 			if(IsSpreadMiddleUp() || IsSpreadMiddleDown())
@@ -236,6 +237,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				pib = PositionInBand.MiddleDn;
 			return pib;
 		}
+		#endregion
 		
 		public TrendDirection GetSpreadTrend() {
 			TrendDirection trd = TrendDirection.UnKnown;

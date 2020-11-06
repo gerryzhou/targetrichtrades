@@ -1,5 +1,6 @@
 #region Using declarations
 using System;
+using System.Collections.Generic;
 using NinjaTrader.Cbi;
 
 using NinjaTrader.Data;
@@ -145,6 +146,25 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return pnl0 + pnl1;
 		}
 		
+		public virtual double GetAllPositionsUnrealizedPnL(PerformanceUnit unit) {
+			double pnl=0;
+			if(IsLiveTrading()) {
+				for(int i=0; i<Positions.Length; i++) {
+					if(PositionsAccount[i].MarketPosition != MarketPosition.Flat) {
+						pnl = pnl + PositionsAccount[i].GetUnrealizedProfitLoss(unit, Closes[i][0]);
+					}
+				}
+			}
+			else {
+				for(int i=0; i<Positions.Length; i++) {
+					if(Positions[i].MarketPosition != MarketPosition.Flat) {
+						pnl = pnl + Positions[i].GetUnrealizedProfitLoss(unit, Closes[i][0]);
+					}
+				}
+			}
+			return pnl;
+		}
+		
 		public virtual double GetPairGrossPnL(PerformanceUnit unit) {
 			double pnl0;
 			if(IsLiveTrading()) {
@@ -204,6 +224,37 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//sp1 = SystemPerformance.AllTrades.ByDay
 			}
 			return capTotal;
+		}
+		
+		public virtual TradeCollection GetTradesToday(PerformanceUnit unit) {
+			TradeCollection tdtoday = null;
+			Dictionary<object, TradeCollection> dt;
+			DateTime now = Time[0].Date;
+			if(IsLiveTrading()) {
+//				foreach(Trade td in SystemPerformance.RealTimeTrades) {
+//					capTotal = capTotal + td.Entry.Price * td.Entry.Quantity;
+//				}
+				dt = SystemPerformance.RealTimeTrades.ByDay;
+//				foreach(var item in dt){
+//					Print(string.Format("ByDayRT: k={0}, v={1}", item.Key, item.Value));
+//				}
+			}
+			else {
+//				foreach(Trade td in SystemPerformance.AllTrades) {
+//					capTotal = capTotal + td.Entry.Price * td.Entry.Quantity;
+//				}
+				dt = SystemPerformance.AllTrades.ByDay;
+//				foreach(var item in dt){
+//					Print(string.Format("ByDay: k={0}, ktype={1}, v={2}, tdtoday={3}",
+//						item.Key, item.Key.GetType(), item.Value, tdtoday));
+//				}
+			}
+			if(dt != null)
+				dt.TryGetValue(now, out tdtoday);
+			if(tdtoday != null)
+				Print(string.Format("ByDay tdtoday: now={0}, tdtoday={1}, count={2}, TradesCount={3}",
+				now, tdtoday, tdtoday.Count, tdtoday.TradesCount));
+			return tdtoday;
 		}
 		#endregion
 		

@@ -81,8 +81,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 				EntriesPerDirection							= 4;
 				DefaultQuantity								= 100;
 				StopTargetHandling							= StopTargetHandling.PerEntryExecution;
-				RocPeriod									= 8;				
+				RocPeriod									= 10;				
 				RocScale									= 10000;
+				NumStdDevUp									= 1.6;
+				NumStdDevDown								= 1.6;
+				NumStdDevUpMin								= 0.5;
+				NumStdDevDownMin							= 0.5;
 				ChartMinutes								= 4;
 				MM_ProfitFactorMax							= 1;
 				MM_ProfitFactorMin							= 0;
@@ -134,7 +138,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				SpyLnSymbol, SpyLnSymbolRatio, SpyStSymbol, SpyStSymbolRatio,
 				QQQLnSymbol, QQQLnSymbolRatio, QQQStSymbol, QQQStSymbolRatio,
 				IWMLnSymbol, IWMLnSymbolRatio, IWMStSymbol, IWMStSymbolRatio,
-				TradeBaseSymbol, RocScale);
+				TradeBaseSymbol, RocScale,
+				NumStdDevUp, NumStdDevDown, NumStdDevUpMin, NumStdDevDownMin);
 				// Add RSI and ADX indicators to the chart for display
 				// This only displays the indicators for the primary Bars object (main instrument) on the chart
 				AddChartIndicator(giSQRSpd);
@@ -154,10 +159,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));
 				
 				//this.Dispatcher.Invoke(() =>
-				this.Dispatcher.BeginInvoke(new ThreadStart(() =>
-				{
-				    //be.Show();
-				}));
+//				this.Dispatcher.BeginInvoke(new ThreadStart(() =>
+//				{
+//				    //be.Show();
+//				}));
 				
 			}			
 		}
@@ -293,6 +298,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 		
 		void OnEntryPositions(IndicatorEventArgs e) {
+			TradeCollection tc = GetTradesToday(PerformanceUnit.Currency);
+			
+			if(tc != null && tc.TradesCount > 0) {
+				Print(string.Format("{0}:TotalQuantity={1}, NetProfit={2}", Time[0].Date, tc.TradesPerformance.TotalQuantity, tc.TradesPerformance.NetProfit));
+				return;
+			}
 			int q_Ln = GetTradeQuantity(giSQRSpd.LongBip, -1);
 			int q_St = GetTradeQuantity(giSQRSpd.ShortBip, -1);
 			int q_midLn = GetTradeQuantity(giSQRSpd.MidLongBip, -1);
@@ -300,18 +311,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 			Print(String.Format("{0}:OnTradeBySQRSpd Entry Bip={1}: q_Ln={2}, q_St={3}, q_midLn={4}, q_midSt={5}", 
 				CurrentBars[BarsInProgress], BarsInProgress, 
 				q_Ln, q_St, q_midLn, q_midSt));
-			EnterLong(giSQRSpd.LongBip, q_Ln, "GIEnLn");
-			EnterLong(giSQRSpd.ShortBip, q_St, "GIEnSt");
-			//EnterLong(BipQQQLn, q_qqqLn, "GIEnQQQLn");
-			EnterLong(giSQRSpd.MidLongBip, q_midLn, "GIEnMidLn");
-			EnterLong(giSQRSpd.MidShortBip, q_midSt, "GIEnMidSt");
+			if(giSQRSpd.LongBip >= 0 && giSQRSpd.LongBip < 8 
+				&& giSQRSpd.ShortBip >= 0 && giSQRSpd.ShortBip < 8 
+				&& giSQRSpd.MidLongBip >= 0 && giSQRSpd.MidLongBip < 8
+				&& giSQRSpd.MidShortBip >= 0 && giSQRSpd.MidShortBip < 8
+				&& q_Ln >0 && q_St >0 && q_midLn>0 && q_midSt>0) {
+				EnterLong(giSQRSpd.LongBip, q_Ln, "GIEnLn");
+				EnterLong(giSQRSpd.ShortBip, q_St, "GIEnSt");
+				//EnterLong(BipQQQLn, q_qqqLn, "GIEnQQQLn");
+				EnterLong(giSQRSpd.MidLongBip, q_midLn, "GIEnMidLn");
+				EnterLong(giSQRSpd.MidShortBip, q_midSt, "GIEnMidSt");
+			}
 			//EnterLong(BipIWMSt, q_iwmSt, "GIEnIWMSt");
 		}
 
-		private int[] GetEntryIndexs() {
-			int[] idxs = new int[4];
-			return idxs;
-		}
 		/// <summary>
 		/// CapRatio: ES:RTY=1.7:1, NQ:RTY=2.1:1, NQ:ES=1.25:1
 		/// 
@@ -484,6 +497,26 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Range(1, int.MaxValue)]
 		[Display(Name="RocScale", Description="Fold for Roc", Order=18, GroupName="Parameters")]
 		public int RocScale
+		{ get; set; }
+		
+		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUp", GroupName="Parameters", Order = 19)]
+		public double NumStdDevUp
+		{ get; set; }
+
+		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDown", GroupName="Parameters", Order = 20)]
+		public double NumStdDevDown
+		{ get; set; }
+		
+		[Range(-2, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUpMin", GroupName="Parameters", Order = 21)]
+		public double NumStdDevUpMin
+		{ get; set; }
+
+		[Range(-2, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDownMin", GroupName="Parameters", Order = 22)]
+		public double NumStdDevDownMin
 		{ get; set; }
 		#endregion
 	}
