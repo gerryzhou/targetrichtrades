@@ -109,7 +109,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				UpperMin[0]		= sma0 + NumStdDevUpMin * stdDev0;
 				Middle[0]		= sma0;
 				Lower[0]		= sma0 - NumStdDevDown * stdDev0;
-				LowerMin[0]		= sma0 - NumStdDevDownMin * stdDev0;				
+				LowerMin[0]		= sma0 - NumStdDevDownMin * stdDev0;
 				CheckContext();
 				CheckTradeEvent();
 			}

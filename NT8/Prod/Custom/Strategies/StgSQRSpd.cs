@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Windows.Media;
 using System.Threading;
+using System.Xml.Serialization;
 
 using NinjaTrader.Cbi;
 using NinjaTrader.NinjaScript.Indicators;
@@ -42,6 +43,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public const int BipIWM = 2;
 		public const int BipIWMLn = 7;
 		public const int BipIWMSt = 8;
+		
+		public const string SigName_EnLn = "GIEnLn";
+		public const string SigName_EnSt = "GIEnSt";
+		public const string SigName_EnMidLn = "GIEnMidLn";
+		public const string SigName_EnMidSt = "GIEnMidSt";
 		
 		private GIPctSpd giPctSpd;
 		private GISQRSpd giSQRSpd;
@@ -84,7 +90,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				RocPeriod									= 10;				
 				RocScale									= 10000;
 				NumStdDevUp									= 1.6;
-				NumStdDevDown								= 1.6;
+				NumStdDevDown								= 2.6;
 				NumStdDevUpMin								= 0.5;
 				NumStdDevDownMin							= 0.5;
 				ChartMinutes								= 4;
@@ -110,6 +116,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				IWMLnSymbolRatio							= 3;//"TNA";
 				IWMStSymbolRatio							= 3;//"TZA";
 				TradeBaseSymbol								= 4;
+				BarsToHoldPos								= 16;
+				PrintOut									= 1;
 				//IsInstantiatedOnEachOptimizationIteration = false;
 			}
 			else if (State == State.Configure)
@@ -131,7 +139,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				//SetTrailStop(CalculationMode.Ticks, 200);
 			}
 			else if (State == State.DataLoaded)
-			{				
+			{
 //				giPctSpd = GIPctSpd(8);
 //				giChartTrader = GIChartTrader(this.Input);
 				giSQRSpd = GISQRSpd(RocPeriod, ChartMinutes, SpySymbol, QQQSymbol, IWMSymbol, 
@@ -207,54 +215,56 @@ namespace NinjaTrader.NinjaScript.Strategies
         // Define what actions to take when the event is raised.
         void OnTradeBySQRSpd(object sender, IndicatorEventArgs e) {
 			IndicatorSignal isig = e.IndSignal;
-			Print(String.Format("{0}:OnTradeBySQRSpd triggerred {1} Bip={2}: RocHiBip={3}, RocLoBip={4}, RocMidBip={5}",
-			CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, giSQRSpd.RocHighBip, giSQRSpd.RocLowBip, giSQRSpd.RocMidBip));
+//			Print(String.Format("{0}:OnTradeBySQRSpd triggerred {1} Bip={2}: RocHiBip={3}, RocLoBip={4}, RocMidBip={5}",
+//			CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, giSQRSpd.RocHighBip, giSQRSpd.RocLowBip, giSQRSpd.RocMidBip));
 			
 			SignalAction sa = e.IndSignal.SignalAction;
 			List<PairSpread<int>> ps = null;
 			if(sa != null)
 				ps = sa.PairSpds;	
-			if(ps != null) {
-				foreach(PairSpread<int> p in ps) {
-				Print(String.Format("{0}:OnTradeBySQRSpd Bip={1}, Symbol1={2}, Symbol2={3}, SpdType={4}, SpreadValue={5}",
-				CurrentBars[BarsInProgress], BarsInProgress,
-				p.Symbol1, p.Symbol2, p.SpdType, p.SpreadValue));
-				}
-			
-				int[] idxs = {giSQRSpd.ShortBip, giSQRSpd.MidLongBip, giSQRSpd.LongBip, giSQRSpd.MidShortBip};// {BipSpyLn, BipSpySt, BipQQQLn, BipQQQSt, BipIWMLn, BipIWMSt};
-				if(e.IndSignal.SignalName != null && HasPositions(idxs, 4))
+			int[] idxs = {ShortBip, MidLongBip, LongBip, MidShortBip};// {BipSpyLn, BipSpySt, BipQQQLn, BipQQQSt, BipIWMLn, BipIWMSt};
+			if(e.IndSignal.SignalName != null && HasPositions(idxs, 2))
 					OnExitPositions(e);
-				else if(e.IndSignal.SignalName != null && giSQRSpd.IsTradingTime(Times[BarsInProgress][0]))
+			else if(e.IndSignal.SignalName != null
+				//&& BarsInProgress == BipIWM
+				&& giSQRSpd.IsTradingTime(Times[BipIWM][0])) {
+				if(ps != null) {
+//					foreach(PairSpread<int> p in ps) {
+//						Print(String.Format("{0}:OnTradeBySQRSpd Bip={1}, Symbol1={2}, Symbol2={3}, SpdType={4}, SpreadValue={5}",
+//						CurrentBars[BarsInProgress], BarsInProgress,
+//						p.Symbol1, p.Symbol2, p.SpdType, p.SpreadValue));
+//					}
 					OnEntryPositions(e);
+				}
 			}
 			return;
 			
-			int q_max = GetTradeQuantity(giPctSpd.PctChgMaxBip, this.MM_ProfitFactorMax);
-			int q_min = GetTradeQuantity(giPctSpd.PctChgMinBip, this.MM_ProfitFactorMin);
+//			int q_max = GetTradeQuantity(giPctSpd.PctChgMaxBip, this.MM_ProfitFactorMax);
+//			int q_min = GetTradeQuantity(giPctSpd.PctChgMinBip, this.MM_ProfitFactorMin);
 			
-			//exit at 9:40 am ct
-			if(isig.SignalName == giPctSpd.SignalName_ExitForOpen) {
-				Print(String.Format("{0}:OnTradeByPctSpd Ex Bip={1}: MaxBip={2}, PosMax={3},  MinBip={4}, PosMin={5}", 
-				CurrentBars[BarsInProgress], BarsInProgress, giPctSpd.PctChgMaxBip, Positions[giPctSpd.PctChgMaxBip], giPctSpd.PctChgMinBip, Positions[giPctSpd.PctChgMinBip]));
-				OnExitPositions(e);
-			} else { //entry at 9:02 am ct
-				Print(String.Format("{0}:OnTradeByPctSpd En Bip={1}: PctSpd={2}, MaxBip={3}, MinBip={4}", 
-				CurrentBar, BarsInProgress, giPctSpd.PlotPctSpd[0], giPctSpd.PctChgMaxBip, giPctSpd.PctChgMinBip));
-				if(isig.TrendDir.TrendDir == TrendDirection.Up) {
-					IndicatorProxy.PrintLog(true, IsLiveTrading(),String.Format("{0}:{1} Ln Bip={2}: PctSpd={3}, MaxBipQuant={4}, MinBipQuant={5}", 
-					CurrentBars[BarsInProgress], e.Message, BarsInProgress, giPctSpd.PlotPctSpd[0],
-					q_max, q_min));
-					EnterLong(giPctSpd.PctChgMaxBip, q_max, "GIPctSpd");
-					EnterShort(giPctSpd.PctChgMinBip, q_min, "GIPctSpd");
-				}
-				else if(isig.TrendDir.TrendDir == TrendDirection.Down) {
-					IndicatorProxy.PrintLog(true, IsLiveTrading(),String.Format("{0}:{1} St Bip={2}: PctSpd={3}, MaxBipQuant={4}, MinBipQuant={5}", 
-					CurrentBars[BarsInProgress], e.Message, BarsInProgress, giPctSpd.PlotPctSpd[0],
-					q_max, q_min));
-					EnterShort(giPctSpd.PctChgMaxBip, q_max, "GIPctSpd");
-					EnterLong(giPctSpd.PctChgMinBip, q_min, "GIPctSpd");
-				}
-			}			
+//			//exit at 9:40 am ct
+//			if(isig.SignalName == giPctSpd.SignalName_ExitForOpen) {
+//				Print(String.Format("{0}:OnTradeByPctSpd Ex Bip={1}: MaxBip={2}, PosMax={3},  MinBip={4}, PosMin={5}", 
+//				CurrentBars[BarsInProgress], BarsInProgress, giPctSpd.PctChgMaxBip, Positions[giPctSpd.PctChgMaxBip], giPctSpd.PctChgMinBip, Positions[giPctSpd.PctChgMinBip]));
+//				OnExitPositions(e);
+//			} else { //entry at 9:02 am ct
+//				Print(String.Format("{0}:OnTradeByPctSpd En Bip={1}: PctSpd={2}, MaxBip={3}, MinBip={4}", 
+//				CurrentBar, BarsInProgress, giPctSpd.PlotPctSpd[0], giPctSpd.PctChgMaxBip, giPctSpd.PctChgMinBip));
+//				if(isig.TrendDir.TrendDir == TrendDirection.Up) {
+//					IndicatorProxy.PrintLog(true, IsLiveTrading(),String.Format("{0}:{1} Ln Bip={2}: PctSpd={3}, MaxBipQuant={4}, MinBipQuant={5}", 
+//					CurrentBars[BarsInProgress], e.Message, BarsInProgress, giPctSpd.PlotPctSpd[0],
+//					q_max, q_min));
+//					EnterLong(giPctSpd.PctChgMaxBip, q_max, "GIPctSpd");
+//					EnterShort(giPctSpd.PctChgMinBip, q_min, "GIPctSpd");
+//				}
+//				else if(isig.TrendDir.TrendDir == TrendDirection.Down) {
+//					IndicatorProxy.PrintLog(true, IsLiveTrading(),String.Format("{0}:{1} St Bip={2}: PctSpd={3}, MaxBipQuant={4}, MinBipQuant={5}", 
+//					CurrentBars[BarsInProgress], e.Message, BarsInProgress, giPctSpd.PlotPctSpd[0],
+//					q_max, q_min));
+//					EnterShort(giPctSpd.PctChgMaxBip, q_max, "GIPctSpd");
+//					EnterLong(giPctSpd.PctChgMinBip, q_min, "GIPctSpd");
+//				}
+//			}			
 		}
 		
 		void OnExitPositions(IndicatorEventArgs e) {
@@ -264,63 +274,104 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int q_qqqSt = GetTradeQuantity(BipQQQSt, QQQStSymbolRatio);
 			int q_iwmLn = GetTradeQuantity(BipIWMLn, IWMLnSymbolRatio);
 			int q_iwmSt = GetTradeQuantity(BipIWMSt, IWMStSymbolRatio);
-			Print(String.Format("{0}:OnTradeBySQRSpd Exit Bip={1}: q_spyLn={2}, q_spySt={3}, q_qqqLn={4}, q_qqqSt={5}, q_iwmLn={6}, q_iwmSt={7}", 
-				CurrentBars[BarsInProgress], BarsInProgress, 
-				q_spyLn, q_spySt, q_qqqLn, q_qqqSt, q_iwmLn, q_iwmSt));
+//			Print(String.Format("{0}:OnTradeBySQRSpd Exit Bip={1}: q_spyLn={2}, q_spySt={3}, q_qqqLn={4}, q_qqqSt={5}, q_iwmLn={6}, q_iwmSt={7}", 
+//				CurrentBars[BarsInProgress], BarsInProgress, 
+//				q_spyLn, q_spySt, q_qqqLn, q_qqqSt, q_iwmLn, q_iwmSt));
 			
-			for(int i=0; i<Positions.Length; i++) {
-				if(Positions[i].MarketPosition == MarketPosition.Long) {
-					ExitLong(i, Positions[i].Quantity, "Ex", "");
-				}
+//			for(int i=0; i<Positions.Length; i++) {
+//				if(Positions[i].MarketPosition == MarketPosition.Long
+//					//&& (BarsSinceEntryExecution(i, "", 0) >= BarsToHoldPos
+//					&& !giSQRSpd.IsTradingTime(Times[BarsInProgress][0])) {
+//					ExitLong(i, Positions[i].Quantity, "Ex", "");
+//				}
+//			}
+			
+			int bseLn = BarsSinceEntryExecution(LongBip, SigName_EnLn, 0);
+			int bseSt = BarsSinceEntryExecution(ShortBip, SigName_EnSt, 0);
+			int bseMidLn = BarsSinceEntryExecution(MidLongBip, SigName_EnMidLn, 0);
+			int bseMidSt = BarsSinceEntryExecution(MidShortBip, SigName_EnMidSt, 0);
+//			int bse;
+//			Print(String.Format("{0}: BarsSinceEntryExecution bip={1} bseLn={2}, bseSt={3}, bseMidLn={4}, bseMidSt={5}",
+//			CurrentBars[BarsInProgress], BarsInProgress, bseLn, bseSt, bseMidLn, bseMidSt));
+//			if(bseLn <= 0 && bseSt > 0) {
+//				for(int i=0; i<=8; i++) {
+//					bse = BarsSinceEntryExecution(i, "", 0);
+//					if(bse > 0)
+//						Print(string.Format("BarsSinceEntryExecution i={0}, bse={1}", i, bse));
+//				}
+//			}
+			if(Positions[LongBip].MarketPosition == MarketPosition.Long
+				&& ((!giSQRSpd.IsTradingTime(Times[BarsInProgress][0])
+				|| bseLn >= BarsToHoldPos))) {
+				ExitLong(LongBip, Positions[LongBip].Quantity, "ExLn", SigName_EnLn);
+			}
+			if(Positions[ShortBip].MarketPosition == MarketPosition.Long
+				&& ((!giSQRSpd.IsTradingTime(Times[BarsInProgress][0])
+				|| bseSt >= BarsToHoldPos))) {
+				ExitLong(ShortBip, Positions[ShortBip].Quantity, "ExSt", SigName_EnSt);
+			}
+			if(Positions[MidLongBip].MarketPosition == MarketPosition.Long
+				&& ((!giSQRSpd.IsTradingTime(Times[BarsInProgress][0])
+				|| bseMidLn >= BarsToHoldPos))) {
+				ExitLong(MidLongBip, Positions[MidLongBip].Quantity, "ExMidLn", SigName_EnMidLn);
+			}
+			if(Positions[MidShortBip].MarketPosition == MarketPosition.Long
+				&& ((!giSQRSpd.IsTradingTime(Times[BarsInProgress][0])
+				|| bseMidSt >= BarsToHoldPos))) {
+				ExitLong(MidShortBip, Positions[MidShortBip].Quantity, "ExMidSt", SigName_EnMidSt);
 			}
 			return;
 			
-			int q_max = GetTradeQuantity(giPctSpd.PctChgMaxBip, this.MM_ProfitFactorMax);
-			int q_min = GetTradeQuantity(giPctSpd.PctChgMinBip, this.MM_ProfitFactorMin);
+//			int q_max = GetTradeQuantity(giPctSpd.PctChgMaxBip, this.MM_ProfitFactorMax);
+//			int q_min = GetTradeQuantity(giPctSpd.PctChgMinBip, this.MM_ProfitFactorMin);
 
-			if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Long) {
-				Print(String.Format("{0}:OnTradeByPctSpd ExLn Bip={1}: BarsSinceEntry={2}, UnrealizedPnL={3}, MaxBipQuant={4}, MinBipQuant={5}", 
-				CurrentBars[BarsInProgress], BarsInProgress, 
-				BarsSinceEntryExecution(giPctSpd.PctChgMaxBip, String.Empty, 0), CheckUnrealizedPnLBip(giPctSpd.PctChgMaxBip),
-				q_max, q_min));
-				ExitLong(giPctSpd.PctChgMaxBip, q_max, "GIExLn", String.Empty);
-				ExitShort(giPctSpd.PctChgMinBip, q_min, "GIExSt", String.Empty);
-			}
-			//else if(isig.TrendDir.TrendDir == TrendDirection.Down) {
-			else if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Short) {
-				Print(String.Format("{0}:OnTradeByPctSpd ExSt Bip={1}: BarsSinceEntry={2}, UnrealizedPnL={3}, MaxBipQuant={4}, MinBipQuant={5}", 
-				CurrentBars[BarsInProgress], BarsInProgress,
-				BarsSinceEntryExecution(giPctSpd.PctChgMaxBip, String.Empty, 0), CheckUnrealizedPnLBip(giPctSpd.PctChgMaxBip),
-				q_max, q_min));
-				ExitShort(giPctSpd.PctChgMaxBip, q_max, "GIExSt", String.Empty);
-				ExitLong(giPctSpd.PctChgMinBip, q_min, "GIExLn", String.Empty);
-			}			
+//			if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Long) {
+//				Print(String.Format("{0}:OnTradeByPctSpd ExLn Bip={1}: BarsSinceEntry={2}, UnrealizedPnL={3}, MaxBipQuant={4}, MinBipQuant={5}", 
+//				CurrentBars[BarsInProgress], BarsInProgress, 
+//				BarsSinceEntryExecution(giPctSpd.PctChgMaxBip, String.Empty, 0), CheckUnrealizedPnLBip(giPctSpd.PctChgMaxBip),
+//				q_max, q_min));
+//				ExitLong(giPctSpd.PctChgMaxBip, q_max, "GIExLn", String.Empty);
+//				ExitShort(giPctSpd.PctChgMinBip, q_min, "GIExSt", String.Empty);
+//			}
+//			//else if(isig.TrendDir.TrendDir == TrendDirection.Down) {
+//			else if(Positions[giPctSpd.PctChgMaxBip].MarketPosition == MarketPosition.Short) {
+//				Print(String.Format("{0}:OnTradeByPctSpd ExSt Bip={1}: BarsSinceEntry={2}, UnrealizedPnL={3}, MaxBipQuant={4}, MinBipQuant={5}", 
+//				CurrentBars[BarsInProgress], BarsInProgress,
+//				BarsSinceEntryExecution(giPctSpd.PctChgMaxBip, String.Empty, 0), CheckUnrealizedPnLBip(giPctSpd.PctChgMaxBip),
+//				q_max, q_min));
+//				ExitShort(giPctSpd.PctChgMaxBip, q_max, "GIExSt", String.Empty);
+//				ExitLong(giPctSpd.PctChgMinBip, q_min, "GIExLn", String.Empty);
+//			}			
 		}
 		
 		void OnEntryPositions(IndicatorEventArgs e) {
 			TradeCollection tc = GetTradesToday(PerformanceUnit.Currency);
 			
 			if(tc != null && tc.TradesCount > 0) {
-				Print(string.Format("{0}:TotalQuantity={1}, NetProfit={2}", Time[0].Date, tc.TradesPerformance.TotalQuantity, tc.TradesPerformance.NetProfit));
+//				Print(string.Format("{0}:TotalQuantity={1}, NetProfit={2}", Time[0].Date, tc.TradesPerformance.TotalQuantity, tc.TradesPerformance.NetProfit));
 				return;
 			}
-			int q_Ln = GetTradeQuantity(giSQRSpd.LongBip, -1);
-			int q_St = GetTradeQuantity(giSQRSpd.ShortBip, -1);
-			int q_midLn = GetTradeQuantity(giSQRSpd.MidLongBip, -1);
-			int q_midSt = GetTradeQuantity(giSQRSpd.MidShortBip, -1);
-			Print(String.Format("{0}:OnTradeBySQRSpd Entry Bip={1}: q_Ln={2}, q_St={3}, q_midLn={4}, q_midSt={5}", 
-				CurrentBars[BarsInProgress], BarsInProgress, 
-				q_Ln, q_St, q_midLn, q_midSt));
-			if(giSQRSpd.LongBip >= 0 && giSQRSpd.LongBip < 8 
-				&& giSQRSpd.ShortBip >= 0 && giSQRSpd.ShortBip < 8 
-				&& giSQRSpd.MidLongBip >= 0 && giSQRSpd.MidLongBip < 8
-				&& giSQRSpd.MidShortBip >= 0 && giSQRSpd.MidShortBip < 8
-				&& q_Ln >0 && q_St >0 && q_midLn>0 && q_midSt>0) {
-				EnterLong(giSQRSpd.LongBip, q_Ln, "GIEnLn");
-				EnterLong(giSQRSpd.ShortBip, q_St, "GIEnSt");
+			LongBip = giSQRSpd.LongBip;
+			ShortBip = giSQRSpd.ShortBip;
+			MidLongBip = giSQRSpd.MidLongBip;
+			MidShortBip = giSQRSpd.MidShortBip;
+			int q_Ln = GetTradeQuantity(LongBip, -1);
+			int q_St = GetTradeQuantity(ShortBip, -1);
+			int q_midLn = GetTradeQuantity(MidLongBip, -1);
+			int q_midSt = GetTradeQuantity(MidShortBip, -1);
+//			Print(String.Format("{0}:OnTradeBySQRSpd Entry Bip={1}: q_Ln={2}, q_St={3}, q_midLn={4}, q_midSt={5}", 
+//				CurrentBars[BarsInProgress], BarsInProgress, 
+//				q_Ln, q_St, q_midLn, q_midSt));
+			if(LongBip >= 0 && LongBip <= 8 
+				&& ShortBip >= 0 && ShortBip <= 8 
+				&& MidLongBip >= 0 && MidLongBip <= 8
+				&& MidShortBip >= 0 && MidShortBip <= 8
+				&& q_Ln > 0 && q_St > 0 && q_midLn > 0 && q_midSt > 0) {				
+				EnterLong(ShortBip, q_St, SigName_EnSt);
+				EnterLong(LongBip, q_Ln, SigName_EnLn);
 				//EnterLong(BipQQQLn, q_qqqLn, "GIEnQQQLn");
-				EnterLong(giSQRSpd.MidLongBip, q_midLn, "GIEnMidLn");
-				EnterLong(giSQRSpd.MidShortBip, q_midSt, "GIEnMidSt");
+				EnterLong(MidLongBip, q_midLn, SigName_EnMidLn);
+				EnterLong(MidShortBip, q_midSt, SigName_EnMidSt);
 			}
 			//EnterLong(BipIWMSt, q_iwmSt, "GIEnIWMSt");
 		}
@@ -361,8 +412,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			if(openBase > 0 && open > 0 && rt > 0)
 				qnt = (int)(DefaultQuantity*open/(openBase*rt));
-			Print(string.Format("{0}: bip={1}, openBase={2}, open={3}, qnt={4}, DefaultQuantity={5}, ratio={6}",
-				CurrentBar, BarsInProgress, openBase, open, qnt, DefaultQuantity, rt));
+//			Print(string.Format("{0}: bip={1}, openBase={2}, open={3}, qnt={4}, DefaultQuantity={5}, ratio={6}",
+//				CurrentBar, BarsInProgress, openBase, open, qnt, DefaultQuantity, rt));
 			return qnt;
 		}
 		
@@ -396,128 +447,169 @@ namespace NinjaTrader.NinjaScript.Strategies
 		#region Properties
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="RocPeriod", Description="Rate of chage period", Order=0, GroupName="Parameters")]
+		[Display(Name="RocPeriod", Description="Rate of chage period", Order=0, GroupName = GPS_CUSTOM_PARAMS)]
 		public int RocPeriod
 		{ get; set; }
 		
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="ChartMinutes", Description="Minutes for the chart", Order=1, GroupName="Parameters")]
+		[Display(Name="ChartMinutes", Description="Minutes for the chart", Order=1, GroupName = GPS_CUSTOM_PARAMS)]
 		public int ChartMinutes
 		{ get; set; }
 		
 		[NinjaScriptProperty]		
-		[Display(Name="SpySymbol", Description="The spy symbol", Order=2, GroupName="Parameters")]
+		[Display(Name="SpySymbol", Description="The spy symbol", Order=2, GroupName = GPS_CUSTOM_PARAMS)]
 		public string SpySymbol
 		{ get; set; }
 		
 		[NinjaScriptProperty]		
-		[Display(Name="QQQSymbol", Description="The qqq symbol", Order=3, GroupName="Parameters")]
+		[Display(Name="QQQSymbol", Description="The qqq symbol", Order=3, GroupName = GPS_CUSTOM_PARAMS)]
 		public string QQQSymbol
 		{ get; set; }
 		
 		[NinjaScriptProperty]		
-		[Display(Name="IWMSymbol", Description="The iwm symbol", Order=4, GroupName="Parameters")]
+		[Display(Name="IWMSymbol", Description="The iwm symbol", Order=4, GroupName = GPS_CUSTOM_PARAMS)]
 		public string IWMSymbol
 		{ get; set; }
 		
 		[NinjaScriptProperty]		
-		[Display(Name="SpyLnSymbol", Description="The long symbol of spy", Order=5, GroupName="Parameters")]
+		[Display(Name="SpyLnSymbol", Description="The long symbol of spy", Order=5, GroupName = GPS_CUSTOM_PARAMS)]
 		public string SpyLnSymbol
 		{ get; set; }
 		
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="SpyLnSymbolRatio", Description="x ratio of the symbol", Order=6, GroupName="Parameters")]
+		[Display(Name="SpyLnSymbolRatio", Description="x ratio of the symbol", Order=6, GroupName = GPS_CUSTOM_PARAMS)]
 		public int SpyLnSymbolRatio
 		{ get; set; }
 		
 		[NinjaScriptProperty]		
-		[Display(Name="SpyStSymbol", Description="The short symbol of spy", Order=7, GroupName="Parameters")]
+		[Display(Name="SpyStSymbol", Description="The short symbol of spy", Order=7, GroupName = GPS_CUSTOM_PARAMS)]
 		public string SpyStSymbol
 		{ get; set; }
 		
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="SpyStSymbolRatio", Description="x ratio of the symbol", Order=8, GroupName="Parameters")]
+		[Display(Name="SpyStSymbolRatio", Description="x ratio of the symbol", Order=8, GroupName = GPS_CUSTOM_PARAMS)]
 		public int SpyStSymbolRatio
 		{ get; set; }
 		
 		[NinjaScriptProperty]		
-		[Display(Name="QQQLnSymbol", Description="The long symbol of qqq", Order=9, GroupName="Parameters")]
+		[Display(Name="QQQLnSymbol", Description="The long symbol of qqq", Order=9, GroupName = GPS_CUSTOM_PARAMS)]
 		public string QQQLnSymbol
 		{ get; set; }
 		
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="QQQLnSymbolRatio", Description="x ratio of the symbol", Order=10, GroupName="Parameters")]
+		[Display(Name="QQQLnSymbolRatio", Description="x ratio of the symbol", Order=10, GroupName = GPS_CUSTOM_PARAMS)]
 		public int QQQLnSymbolRatio
 		{ get; set; }
 		
 		[NinjaScriptProperty]		
-		[Display(Name="QQQStSymbol", Description="The short symbol of qqq", Order=11, GroupName="Parameters")]
+		[Display(Name="QQQStSymbol", Description="The short symbol of qqq", Order=11, GroupName = GPS_CUSTOM_PARAMS)]
 		public string QQQStSymbol
 		{ get; set; }
 		
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="QQQStSymbolRatio", Description="x ratio of the symbol", Order=12, GroupName="Parameters")]
+		[Display(Name="QQQStSymbolRatio", Description="x ratio of the symbol", Order=12, GroupName = GPS_CUSTOM_PARAMS)]
 		public int QQQStSymbolRatio
 		{ get; set; }
 		
 		[NinjaScriptProperty]		
-		[Display(Name="IWMLnSymbol", Description="The long symbol of iwm", Order=13, GroupName="Parameters")]
+		[Display(Name="IWMLnSymbol", Description="The long symbol of iwm", Order=13, GroupName = GPS_CUSTOM_PARAMS)]
 		public string IWMLnSymbol
 		{ get; set; }
 		
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="IWMLnSymbolRatio", Description="x ratio of the symbol", Order=14, GroupName="Parameters")]
+		[Display(Name="IWMLnSymbolRatio", Description="x ratio of the symbol", Order=14, GroupName = GPS_CUSTOM_PARAMS)]
 		public int IWMLnSymbolRatio
 		{ get; set; }
 		
 		[NinjaScriptProperty]		
-		[Display(Name="IWMStSymbol", Description="The short symbol of iwm", Order=15, GroupName="Parameters")]
+		[Display(Name="IWMStSymbol", Description="The short symbol of iwm", Order=15, GroupName = GPS_CUSTOM_PARAMS)]
 		public string IWMStSymbol
 		{ get; set; }
 		
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="IWMStSymbolRatio", Description="x ratio of the symbol", Order=16, GroupName="Parameters")]
+		[Display(Name="IWMStSymbolRatio", Description="x ratio of the symbol", Order=16, GroupName = GPS_CUSTOM_PARAMS)]
 		public int IWMStSymbolRatio
 		{ get; set; }
 		
 		[NinjaScriptProperty]
 		[Range(0, int.MaxValue)]
-		[Display(Name="TradeBaseSymbol", Description="The base symbol for calculating size", Order=17, GroupName="Parameters")]
+		[Display(Name="TradeBaseSymbol", Description="The base symbol for calculating size", Order=17, GroupName = GPS_CUSTOM_PARAMS)]
 		public int TradeBaseSymbol
 		{ get; set; }
 		
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
-		[Display(Name="RocScale", Description="Fold for Roc", Order=18, GroupName="Parameters")]
+		[Display(Name="RocScale", Description="Fold for Roc", Order=18, GroupName = GPS_CUSTOM_PARAMS)]
 		public int RocScale
 		{ get; set; }
 		
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUp", GroupName="Parameters", Order = 19)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUp", GroupName = GPS_CUSTOM_PARAMS, Order = 19)]
 		public double NumStdDevUp
 		{ get; set; }
 
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDown", GroupName="Parameters", Order = 20)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDown", GroupName = GPS_CUSTOM_PARAMS, Order = 20)]
 		public double NumStdDevDown
 		{ get; set; }
 		
 		[Range(-2, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUpMin", GroupName="Parameters", Order = 21)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUpMin", GroupName = GPS_CUSTOM_PARAMS, Order = 21)]
 		public double NumStdDevUpMin
 		{ get; set; }
 
 		[Range(-2, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDownMin", GroupName="Parameters", Order = 22)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDownMin", GroupName = GPS_CUSTOM_PARAMS, Order = 22)]
 		public double NumStdDevDownMin
 		{ get; set; }
+		
+		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsToHoldPos", GroupName = GPS_CUSTOM_PARAMS, Order=23)]
+		public int BarsToHoldPos
+		{ get; set; }
+
+		/// <summary>
+		/// The symbol bip to put short trade
+		/// </summary>
+		[Browsable(false), XmlIgnore]
+		public int ShortBip
+		{
+			get;set;
+		}
+		
+		/// <summary>
+		/// The symbol bip to put long trade
+		/// </summary>
+		[Browsable(false), XmlIgnore]
+		public int LongBip
+		{
+			get;set;
+		}
+		
+		/// <summary>
+		/// The symbol bip to put long trade as mid position
+		/// </summary>
+		[Browsable(false), XmlIgnore]
+		public int MidLongBip
+		{
+			get;set;
+		}
+		
+		/// <summary>
+		/// The symbol bip to put short trade as mid position
+		/// </summary>
+		[Browsable(false), XmlIgnore]
+		public int MidShortBip
+		{
+			get;set;
+		}
 		#endregion
 	}
 }

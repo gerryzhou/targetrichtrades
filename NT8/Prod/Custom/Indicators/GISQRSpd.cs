@@ -91,7 +91,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				RocMidBip									= -1;
 				RocLowBip									= -1;
 				NumStdDevUp									= 1.6;
-				NumStdDevDown								= 1.6;
+				NumStdDevDown								= 2.6;
 				NumStdDevUpMin								= 0.5;
 				NumStdDevDownMin							= 0.5;
 				ChartMinutes								= 4;
@@ -167,8 +167,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
-			Print(String.Format("{0}:[{1}] GISQRSpd called BarsRequiredToPlot={2},", 
-			CurrentBars[BarsInProgress], BarsInProgress, BarsRequiredToPlot));
+//			Print(String.Format("{0}:[{1}] GISQRSpd called BarsRequiredToPlot={2},", 
+//			CurrentBars[BarsInProgress], BarsInProgress, BarsRequiredToPlot));
 			if(CurrentBars[BarsInProgress] < BarsRequiredToPlot)
 				return;
 			//double openSpy=0, openQQQ=0, openIWM=0;
@@ -242,10 +242,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 //			RocHighBip = (mx==RocSpy[0])? BipSpy : ((mx==RocQQQ[0])? BipQQQ:BipIWM);
 //			RocLowBip = (mi==RocSpy[0])? BipSpy : ((mi==RocQQQ[0])? BipQQQ:BipIWM);
 //			RocMidBip = 3 - RocHighBip - RocLowBip;
-			Print(string.Format("{0}:SetLongShortBips bip={1}, LongBip={2}, ShortBip={3}, MidLongBip={4}, MidShortBip={5}, Time={6:yyyyMMdd-HHmm}", 
-					CurrentBars[BarsInProgress], BarsInProgress,
-					LongBip, ShortBip, MidLongBip, MidShortBip,
-					Times[BarsInProgress][0]));
+//			Print(string.Format("{0}:SetLongShortBips bip={1}, LongBip={2}, ShortBip={3}, MidLongBip={4}, MidShortBip={5}, Time={6:yyyyMMdd-HHmm}", 
+//					CurrentBars[BarsInProgress], BarsInProgress,
+//					LongBip, ShortBip, MidLongBip, MidShortBip,
+//					Times[BarsInProgress][0]));
 		}
 		
 		/// <summary>
@@ -259,11 +259,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 			RocHighBip = (mx==RocSpy[0])? BipSpy : ((mx==RocQQQ[0])? BipQQQ:BipIWM);
 			RocLowBip = (mi==RocSpy[0])? BipSpy : ((mi==RocQQQ[0])? BipQQQ:BipIWM);
 			RocMidBip = 3 - RocHighBip - RocLowBip;
-			Print(string.Format("{0}: bip={1}, RocHighBip={2}, RocLowBip={3}, RocMidBip={4}, RocSpy={5}, RocQQQ={6}, RocIWM={7}, Time={8:yyyyMMdd-HHmm}", 
-					CurrentBars[BarsInProgress], BarsInProgress,
-					RocHighBip, RocLowBip, RocMidBip,
-					RocSpy[0], RocQQQ[0], RocIWM[0],
-					Times[BarsInProgress][0]));
+//			Print(string.Format("{0}: bip={1}, RocHighBip={2}, RocLowBip={3}, RocMidBip={4}, RocSpy={5}, RocQQQ={6}, RocIWM={7}, Time={8:yyyyMMdd-HHmm}", 
+//					CurrentBars[BarsInProgress], BarsInProgress,
+//					RocHighBip, RocLowBip, RocMidBip,
+//					RocSpy[0], RocQQQ[0], RocIWM[0],
+//					Times[BarsInProgress][0]));
 		}
 		
 		private void SetOpenPrice() {
@@ -340,12 +340,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 				MiddleBB[0]		= sma0;
 				LowerBB[0]		= sma0 - NumStdDevDown * stdDev0;
 					
-				Print(string.Format("{0}: bip={1}, RocHighBip={2}, RocLowBip={3}, RocMidBip={4}, RocHighSpread={5}, RocLowSpread={6},RocMxMiSpread[0]={7}, sma0={8}, stdDev0={9}, Time={10:yyyyMMdd-HHmm}", 
-					CurrentBars[BarsInProgress], BarsInProgress,
-					RocHighBip, RocLowBip, RocMidBip,
-					RocHighSpread, RocLowSpread, RocMxMiSpread[0],
-					sma0, stdDev0,
-					Times[BarsInProgress][0]));
+//				Print(string.Format("{0}: bip={1}, RocHighBip={2}, RocLowBip={3}, RocMidBip={4}, RocHighSpread={5}, RocLowSpread={6},RocMxMiSpread[0]={7}, sma0={8}, stdDev0={9}, Time={10:yyyyMMdd-HHmm}", 
+//					CurrentBars[BarsInProgress], BarsInProgress,
+//					RocHighBip, RocLowBip, RocMidBip,
+//					RocHighSpread, RocLowSpread, RocMxMiSpread[0],
+//					sma0, stdDev0,
+//					Times[BarsInProgress][0]));
 				return true;
 			}
 			else return false;
@@ -491,8 +491,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			//int en_H = TM_OpenEndH, en_M = TM_OpenEndM, ex_H = TM_ClosingH, ex_M = TM_ClosingM;		
 
 			//entry at 9:02 am ct
-			if(BarsInProgress == BipIWM 
-				&& IsTradingTime(Times[BipIWM][0])) {
+			if(BarsInProgress == BipIWM) {
 				//&& SetRocSpreadHiLo()) {
 //				Print(String.Format("{0}:CheckTradeEvent En Bip{1}: PctSpd={2}, MaxBip={3}, MinBip={4}",
 //				CurrentBars[BarsInProgress], BarsInProgress, PlotPctSpd[0], PctChgMaxBip, PctChgMinBip));
