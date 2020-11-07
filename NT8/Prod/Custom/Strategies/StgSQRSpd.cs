@@ -411,7 +411,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					break;
 			}
 			if(openBase > 0 && open > 0 && rt > 0)
-				qnt = (int)(DefaultQuantity*open/(openBase*rt));
+				qnt = (int)(DefaultQuantity*openBase/(open*rt));
 //			Print(string.Format("{0}: bip={1}, openBase={2}, open={3}, qnt={4}, DefaultQuantity={5}, ratio={6}",
 //				CurrentBar, BarsInProgress, openBase, open, qnt, DefaultQuantity, rt));
 			return qnt;
