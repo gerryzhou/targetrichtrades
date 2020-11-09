@@ -25,6 +25,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	/// <summary>
 	/// Hedge by itself: one trend following, the other is counter trend;
+	/// Idea 1: find cross or squeeze to entry, stop at 1x, and take profits at 3x or more;
+	/// or exit at n bars after entry to check if profits>0 or not; 
+	/// noon time is shinking, not the time for reversal; it's time for range expansion;
+	/// 9:04-9:30 am is the time for reversal or new trend establishment;
 	/// </summary>
 	public class StgSQRSpd : GStrategyBase
 	{
@@ -91,8 +95,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 				RocScale									= 10000;
 				NumStdDevUp									= 1.6;
 				NumStdDevDown								= 2.6;
-				NumStdDevUpMin								= 0.5;
-				NumStdDevDownMin							= 0.5;
+				PTStdDev									= 0.5;
+				SLStdDev									= 0.5;
+				PTRatio										= 0.2;
+				SLRatio										= 0.1;
 				ChartMinutes								= 4;
 				MM_ProfitFactorMax							= 1;
 				MM_ProfitFactorMin							= 0;
@@ -117,7 +123,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				IWMStSymbolRatio							= 3;//"TZA";
 				TradeBaseSymbol								= 4;
 				BarsToHoldPos								= 16;
-				PrintOut									= 1;
+				Slippage									= 0.02;
+				PrintOut									= 0;
 				//IsInstantiatedOnEachOptimizationIteration = false;
 			}
 			else if (State == State.Configure)
@@ -147,7 +154,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				QQQLnSymbol, QQQLnSymbolRatio, QQQStSymbol, QQQStSymbolRatio,
 				IWMLnSymbol, IWMLnSymbolRatio, IWMStSymbol, IWMStSymbolRatio,
 				TradeBaseSymbol, RocScale,
-				NumStdDevUp, NumStdDevDown, NumStdDevUpMin, NumStdDevDownMin);
+				NumStdDevUp, NumStdDevDown, PTStdDev, SLStdDev);
 				// Add RSI and ADX indicators to the chart for display
 				// This only displays the indicators for the primary Bars object (main instrument) on the chart
 				AddChartIndicator(giSQRSpd);
@@ -162,8 +169,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 //				giPctSpd.TM_ClosingH = TG_TradeEndH;
 //				giPctSpd.TM_ClosingM = TG_TradeEndM;
 //				giChartTrader.RaiseIndicatorEvent += OnTradeByChartTrader;
-				SetPrintOut(1);
-				Print(String.Format("{0}: IsUnmanaged={1}", this.GetType().Name, IsUnmanaged));
+				SetPrintOut(0);
+				Print(String.Format("{0}: IsUnmanaged={1}, PrintOut={2}", this.GetType().Name, IsUnmanaged, PrintOut));
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));
 				
 				//this.Dispatcher.Invoke(() =>
@@ -300,24 +307,28 @@ namespace NinjaTrader.NinjaScript.Strategies
 //						Print(string.Format("BarsSinceEntryExecution i={0}, bse={1}", i, bse));
 //				}
 //			}
+
+			double pnl = GetAllPositionsUnrealizedPnL(PerformanceUnit.Currency);
+			
+			if(!HitStopLoss(pnl, SLRatio*EnSQRSpdMA) 
+				&& !HitProfitTarget(pnl, PTRatio*EnSQRSpdMA)
+				&& (bseLn+bseSt+bseMidLn+bseMidSt <= 4*BarsToHoldPos)) 
+				return;
+			
 			if(Positions[LongBip].MarketPosition == MarketPosition.Long
-				&& ((!giSQRSpd.IsTradingTime(Times[BarsInProgress][0])
-				|| bseLn >= BarsToHoldPos))) {
+				&& (!giSQRSpd.IsTradingTime(Times[BarsInProgress][0]))) {
 				ExitLong(LongBip, Positions[LongBip].Quantity, "ExLn", SigName_EnLn);
 			}
 			if(Positions[ShortBip].MarketPosition == MarketPosition.Long
-				&& ((!giSQRSpd.IsTradingTime(Times[BarsInProgress][0])
-				|| bseSt >= BarsToHoldPos))) {
+				&& (!giSQRSpd.IsTradingTime(Times[BarsInProgress][0]))) {
 				ExitLong(ShortBip, Positions[ShortBip].Quantity, "ExSt", SigName_EnSt);
 			}
 			if(Positions[MidLongBip].MarketPosition == MarketPosition.Long
-				&& ((!giSQRSpd.IsTradingTime(Times[BarsInProgress][0])
-				|| bseMidLn >= BarsToHoldPos))) {
+				&& (!giSQRSpd.IsTradingTime(Times[BarsInProgress][0]))) {
 				ExitLong(MidLongBip, Positions[MidLongBip].Quantity, "ExMidLn", SigName_EnMidLn);
 			}
 			if(Positions[MidShortBip].MarketPosition == MarketPosition.Long
-				&& ((!giSQRSpd.IsTradingTime(Times[BarsInProgress][0])
-				|| bseMidSt >= BarsToHoldPos))) {
+				&& (!giSQRSpd.IsTradingTime(Times[BarsInProgress][0]))) {
 				ExitLong(MidShortBip, Positions[MidShortBip].Quantity, "ExMidSt", SigName_EnMidSt);
 			}
 			return;
@@ -366,7 +377,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				&& ShortBip >= 0 && ShortBip <= 8 
 				&& MidLongBip >= 0 && MidLongBip <= 8
 				&& MidShortBip >= 0 && MidShortBip <= 8
-				&& q_Ln > 0 && q_St > 0 && q_midLn > 0 && q_midSt > 0) {				
+				&& q_Ln > 0 && q_St > 0 && q_midLn > 0 && q_midSt > 0) {
+				EnSQRSpdMA = giSQRSpd.MiddleBB[0];
 				EnterLong(ShortBip, q_St, SigName_EnSt);
 				EnterLong(LongBip, q_Ln, SigName_EnLn);
 				//EnterLong(BipQQQLn, q_qqqLn, "GIEnQQQLn");
@@ -376,6 +388,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 			//EnterLong(BipIWMSt, q_iwmSt, "GIEnIWMSt");
 		}
 
+		private bool HitStopLoss(double pnl, double sl) {
+			bool hit = false;
+				if(pnl < 0 && Math.Abs(pnl) >= sl)
+					hit = true;
+			return hit;
+		}
+		
+		private bool HitProfitTarget(double pnl, double pt) {
+			bool hit = false;
+				if(pnl >= pt)
+					hit = true;
+			return hit;
+		}
+		
 		/// <summary>
 		/// CapRatio: ES:RTY=1.7:1, NQ:RTY=2.1:1, NQ:ES=1.25:1
 		/// 
@@ -550,28 +576,50 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public int RocScale
 		{ get; set; }
 		
-		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Range(0, double.MaxValue), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUp", GroupName = GPS_CUSTOM_PARAMS, Order = 19)]
 		public double NumStdDevUp
 		{ get; set; }
 
-		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Range(0, double.MaxValue), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDown", GroupName = GPS_CUSTOM_PARAMS, Order = 20)]
 		public double NumStdDevDown
 		{ get; set; }
 		
-		[Range(-2, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevUpMin", GroupName = GPS_CUSTOM_PARAMS, Order = 21)]
-		public double NumStdDevUpMin
+		/// <summary>
+		/// Profit target StdDev
+		/// </summary>
+		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PTStdDev", GroupName = GPS_CUSTOM_PARAMS, Order = 21)]
+		public double PTStdDev
 		{ get; set; }
 
-		[Range(-2, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDevDownMin", GroupName = GPS_CUSTOM_PARAMS, Order = 22)]
-		public double NumStdDevDownMin
+		/// <summary>
+		/// Stop Loss StdDev
+		/// </summary>
+		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SLStdDev", GroupName = GPS_CUSTOM_PARAMS, Order = 22)]
+		public double SLStdDev
+		{ get; set; }
+		
+		/// <summary>
+		/// Profit target ratio of SQRSpdMean
+		/// </summary>
+		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "PTRatio", GroupName = GPS_CUSTOM_PARAMS, Order = 23)]
+		public double PTRatio
+		{ get; set; }
+
+		/// <summary>
+		/// Stop Loss ratio of SQRSpdMean
+		/// </summary>
+		[Range(0, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "SLRatio", GroupName = GPS_CUSTOM_PARAMS, Order = 24)]
+		public double SLRatio
 		{ get; set; }
 		
 		[Range(0, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsToHoldPos", GroupName = GPS_CUSTOM_PARAMS, Order=23)]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BarsToHoldPos", GroupName = GPS_CUSTOM_PARAMS, Order=25)]
 		public int BarsToHoldPos
 		{ get; set; }
 
@@ -607,6 +655,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 		/// </summary>
 		[Browsable(false), XmlIgnore]
 		public int MidShortBip
+		{
+			get;set;
+		}
+		
+		/// <summary>
+		/// The mean of SQR spread at entry
+		/// use it to measure the PT/SL for exit
+		/// </summary>
+		[Browsable(false), XmlIgnore]
+		public double EnSQRSpdMA
 		{
 			get;set;
 		}
