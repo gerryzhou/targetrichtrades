@@ -88,9 +88,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 				IsSuspendedWhileInactive					= true;
 				RocPeriod									= 10;				
 				RocScale									= 10000;
-				RocHighBip									= -1;
-				RocMidBip									= -1;
-				RocLowBip									= -1;
+//				RocHighBip									= -1;
+//				RocMidBip									= -1;
+//				RocLowBip									= -1;
 				NumStdDevUp									= 1.6;
 				NumStdDevDown								= 2.6;
 				NumStdDevUpMin								= 0.5;
@@ -151,6 +151,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 				sma		= SMA(RocHiLoSpread, RocPeriod);
 				stdDev	= StdDev(RocHiLoSpread, RocPeriod);
+				RocHighBip = new Series<int>(this);
+				RocMidBip = new Series<int>(this);
+				RocLowBip = new Series<int>(this);
 				//bol		= Bollinger(RocHiLoSpread, 1.6, RocPeriod);
 			}
 			else if (State == State.DataLoaded)
@@ -160,6 +163,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 					this.GetType().Name, BarsArray.Length));
 				RocHiLoSpdMaxMin = new DailyMaxMin();
 				listRocHiLoMaxMin = new List<DailyMaxMin>();
+				DailyRocHiLoMidCross = new DailyCross<int>();
 //				RocHiLoSpreadMax = double.MinValue;
 //				RocHiLoSpreadMin = double.MaxValue;
 //				smaClose1 = SMA(Closes[0], 5);
@@ -186,8 +190,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 //			SetPctChgSpread();
 			//if(PrintOut > 1)
 			//	PrintPctChgSpd();
-			if(IsLastBarOnChart(BipIWM) > 0) {
+			if(IsLastBarOnChart(BipIWM) > 0 && BarsInProgress == BipIWM) {
 				PrintDailyMaxMinList(this.listRocHiLoMaxMin);
+				DailyRocHiLoMidCross.PrintCrosses();
 			}
 		}
 		
@@ -196,7 +201,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// </summary>
 		private void SetLongShortBips(bool reversal) {
 			if(BarsInProgress != BipIWM) return;
-			switch(RocHighBip) {
+			switch(RocHighBip[0]) {
 				case BipSpy:
 					ShortBip = reversal ? BipSpySt : BipSpyLn;
 					break;
@@ -211,7 +216,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 					else LongBip = -1;
 					break;
 			}
-			switch(RocLowBip) {
+			switch(RocLowBip[0]) {
 				case BipSpy:
 					LongBip = reversal ? BipSpyLn : BipSpySt;
 					break;
@@ -226,7 +231,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 					else ShortBip = -1;
 					break;
 			}
-			switch(RocMidBip) {
+			switch(RocMidBip[0]) {
 				case BipSpy:
 					MidLongBip = reversal ? BipSpyLn : BipSpySt;
 					MidShortBip = reversal ? BipSpySt : BipSpyLn;
@@ -264,9 +269,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 			
 			double mx = Math.Max(RocSpy[0], Math.Max(RocQQQ[0], RocIWM[0]));			
 			double mi = Math.Min(RocSpy[0], Math.Min(RocQQQ[0], RocIWM[0]));
-			RocHighBip = (mx==RocSpy[0])? BipSpy : ((mx==RocQQQ[0])? BipQQQ:BipIWM);
-			RocLowBip = (mi==RocSpy[0])? BipSpy : ((mi==RocQQQ[0])? BipQQQ:BipIWM);
-			RocMidBip = 3 - RocHighBip - RocLowBip;
+			RocHighBip[0] = (mx==RocSpy[0])? BipSpy : ((mx==RocQQQ[0])? BipQQQ:BipIWM);
+			RocLowBip[0] = (mi==RocSpy[0])? BipSpy : ((mi==RocQQQ[0])? BipQQQ:BipIWM);
+			RocMidBip[0] = 3 - RocHighBip[0] - RocLowBip[0];
 //			Print(string.Format("{0}: bip={1}, RocHighBip={2}, RocLowBip={3}, RocMidBip={4}, RocSpy={5}, RocQQQ={6}, RocIWM={7}, Time={8:yyyyMMdd-HHmm}", 
 //					CurrentBars[BarsInProgress], BarsInProgress,
 //					RocHighBip, RocLowBip, RocMidBip,
@@ -339,12 +344,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private bool SetRocSpreadHiLo() {
 			if(BarsInProgress != BipIWM) return false;
 			
-			if(RocHighBip >= 0 && RocHighBip < 3 
-				&& RocLowBip >= 0 && RocLowBip < 3 
-				&& RocMidBip >= 0 && RocMidBip < 3) {
-				double mx = (RocHighBip == 0) ? RocSpy[0] : ((RocHighBip == 1) ? RocQQQ[0] : RocIWM[0]);
-				double mi = (RocLowBip == 0) ? RocSpy[0] : ((RocLowBip == 1) ? RocQQQ[0] : RocIWM[0]);
-				double md = (RocMidBip == 0) ? RocSpy[0] : ((RocMidBip == 1) ? RocQQQ[0] : RocIWM[0]);
+			if(RocHighBip[0] >= 0 && RocHighBip[0] < 3 
+				&& RocLowBip[0] >= 0 && RocLowBip[0] < 3 
+				&& RocMidBip[0] >= 0 && RocMidBip[0] < 3) {
+				double mx = GetRocByBip(RocHighBip[0]);
+				double mi = GetRocByBip(RocLowBip[0]);
+				double md = GetRocByBip(RocMidBip[0]);
 				RocHighSpread = mx - md;
 				RocLowSpread = mi - md;
 				RocHiLoSpread[0] = mx - mi;
@@ -353,14 +358,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				UpperBB[0]		= sma0 + NumStdDevUp * stdDev0;
 				MiddleBB[0]		= sma0;
 				LowerBB[0]		= sma0 - NumStdDevDown * stdDev0;
-				if(RocHiLoSpread[0] > RocHiLoSpdMaxMin.DailyMax) {
-					RocHiLoSpdMaxMin.DailyMax = RocHiLoSpread[0];
-					RocHiLoSpdMaxMin.DailyMaxTime = Times[BarsInProgress][0];
-				}
-				if(RocHiLoSpread[0] < RocHiLoSpdMaxMin.DailyMin) {
-					RocHiLoSpdMaxMin.DailyMin = RocHiLoSpread[0];
-					RocHiLoSpdMaxMin.DailyMinTime = Times[BarsInProgress][0];
-				}
+				CheckRocHiLoSpdMaxMin();
+				CheckRocHiLoMidCross();
 //				Print(string.Format("{0}: bip={1}, RocHighBip={2}, RocLowBip={3}, RocMidBip={4}, RocHighSpread={5}, RocLowSpread={6},RocHiLoSpread[0]={7}, sma0={8}, stdDev0={9}, Time={10:yyyyMMdd-HHmm}", 
 //					CurrentBars[BarsInProgress], BarsInProgress,
 //					RocHighBip, RocLowBip, RocMidBip,
@@ -370,6 +369,58 @@ namespace NinjaTrader.NinjaScript.Indicators
 				return true;
 			}
 			else return false;
+		}
+		
+		private double GetRocByBip(int bip) {
+			double roc = (bip == BipSpy) ? RocSpy[0] : ((bip == BipQQQ) ? RocQQQ[0] : RocIWM[0]);
+			return roc;
+		}
+		
+		private void CheckRocHiLoSpdMaxMin() {
+			if(RocHiLoSpread[0] > RocHiLoSpdMaxMin.DailyMax) {
+				RocHiLoSpdMaxMin.DailyMax = RocHiLoSpread[0];
+				RocHiLoSpdMaxMin.DailyMaxTime = Times[BarsInProgress][0];
+			}
+			if(RocHiLoSpread[0] < RocHiLoSpdMaxMin.DailyMin) {
+				RocHiLoSpdMaxMin.DailyMin = RocHiLoSpread[0];
+				RocHiLoSpdMaxMin.DailyMinTime = Times[BarsInProgress][0];
+			}
+		}
+		
+		private void CheckRocHiLoMidCross() {
+			if(RocHighBip[0] >= 0 && RocHighBip[0] < 3 
+				&& RocLowBip[0] >= 0 && RocLowBip[0] < 3 
+				&& RocMidBip[0] >= 0 && RocMidBip[0] < 3
+				&& RocHighBip[1] >= 0 && RocHighBip[1] < 3 
+				&& RocLowBip[1] >= 0 && RocLowBip[1] < 3 
+				&& RocMidBip[1] >= 0 && RocMidBip[1] < 3) {
+					//Corss over detected
+					if(RocLowBip[0] != RocLowBip[1]) {
+						Cross<int> crs = new Cross<int>(RocLowBip[1], -1);
+						if(RocLowBip[1] == RocMidBip[0]) { //Cross over mid
+							crs.CrossType = 1;
+							crs.CrossTime = Times[RocLowBip[1]][0];
+						}
+						else if(RocLowBip[1] == RocHighBip[0]) { //Cross over high
+							crs.CrossType = 2;
+							crs.CrossTime = Times[RocLowBip[1]][0];
+						}
+						DailyRocHiLoMidCross.AddCross(crs);
+					}
+					//Corss below detected
+					if(RocHighBip[0] != RocHighBip[1]) {
+						Cross<int> crs = new Cross<int>(RocHighBip[1], -1);
+						if(RocHighBip[1] == RocMidBip[0]) { //Cross below mid
+							crs.CrossType = -1;
+							crs.CrossTime = Times[RocHighBip[1]][0];
+						}
+						else if(RocHighBip[1] == RocLowBip[0]) { //Cross blow low
+							crs.CrossType = -2;
+							crs.CrossTime = Times[RocHighBip[1]][0];
+						}
+						DailyRocHiLoMidCross.AddCross(crs);
+					}
+				}
 		}
 		
 		#region Bollinger Band Functions
@@ -838,21 +889,24 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			get;set;
 		}
-		//The BarsInProgress for PctChgMax and PctChgMin
+		
+		/// <summary>
+		/// The bip of highest Roc
+		/// </summary>
 		[Browsable(false), XmlIgnore]
-		public int RocHighBip
+		public Series<int> RocHighBip
 		{
 			get;set;
 		}
 		
 		[Browsable(false), XmlIgnore]
-		public int RocMidBip
+		public Series<int> RocMidBip
 		{
 			get;set;
 		}
 
 		[Browsable(false), XmlIgnore]
-		public int RocLowBip
+		public Series<int> RocLowBip
 		{
 			get;set;
 		}
@@ -880,6 +934,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// </summary>
 		[Browsable(false), XmlIgnore]
 		public DailyMaxMin RocHiLoSpdMaxMin
+		{
+			get;set;
+		}
+		
+		/// <summary>
+		/// The daily cross from Roc High/Low to Roc Mid
+		/// </summary>
+		[Browsable(false), XmlIgnore]
+		public DailyCross<int> DailyRocHiLoMidCross
 		{
 			get;set;
 		}
