@@ -99,7 +99,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				SLStdDev									= 0.5;
 				PTRatio										= 0.2;
 				SLRatio										= 0.1;
-				ChartMinutes								= 4;
+				ChartMinutes								= 8;
 				MM_ProfitFactorMax							= 1;
 				MM_ProfitFactorMin							= 0;
 				TG_TradeStartH								= 11;

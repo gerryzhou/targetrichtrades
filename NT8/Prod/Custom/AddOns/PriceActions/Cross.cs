@@ -69,12 +69,11 @@ namespace NinjaTrader.NinjaScript.AddOns.PriceActions
 			string date = string.Format("{0:yyyyMMdd}", cross.CrossTime);
 			List<Cross<T>> crosslist = GetCrossesByDate(date);
 			if(crosslist == null) {
-				crosslist = new List<Cross<T>>();
-				crosslist.Add(cross);
-				DailyCrosses.Add(date, crosslist);
+				crosslist = new List<Cross<T>>();				
 			}
-			else
-				DailyCrosses[date] = crosslist;
+			crosslist.Add(cross);
+			//DailyCrosses.Add(date, crosslist);
+			DailyCrosses[date] = crosslist;
 		}
 		
 		public List<Cross<T>> GetCrossesByDate(string date) {

@@ -211,7 +211,23 @@ namespace NinjaTrader.NinjaScript.Indicators
 				return GetNormalizedPrice(roc, basePrc, fraction);
 			}
 			else return -1.1;
-		}		
+		}
+		
+		/// <summary>
+		/// Get the covariance by Mean/StdDev
+		/// </summary>
+		/// <param name="prc">the regular price</param>
+		/// <param name="basePrc">the base price</param>
+		/// <returns></returns>
+		public double GetCoVar(double mean, double stdDev, int scale, int fraction) {
+			if(mean == 0)
+				return double.MinValue;
+			else if(scale <= 0) {
+				return Math.Round(stdDev/mean, fraction);
+			}
+			else
+				return Math.Round(scale*stdDev/mean, fraction);
+		}
 		#endregion
 	}
 }
