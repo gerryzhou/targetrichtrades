@@ -34,12 +34,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public class GISQRSpd : GIndicatorBase
 	{
 		public const int BipSpy = 0;
-		public const int BipSpyLn = 3;
-		public const int BipSpySt = 4;
 		public const int BipQQQ = 1;
-		public const int BipQQQLn = 5;
-		public const int BipQQQSt = 6;
 		public const int BipIWM = 2;
+		
+		public const int BipSpyLn = 3;		
+		public const int BipSpySt = 4;
+		public const int BipQQQLn = 5;
+		public const int BipQQQSt = 6;		
 		public const int BipIWMLn = 7;
 		public const int BipIWMSt = 8;
 		
@@ -58,7 +59,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 //		private double PctChgSpdEnSum, PctChgSpdExSum;
 		//int PctChgMaxBip=-1, PctChgMinBip=-1;
 		private SMA		sma;
-		private StdDev	stdDev;
+		private StdDev	stdDev;		
 //		private Series<double> sumSeries;
 //		private Series<double> smaSeries;
 //		private Series<double> stdDevSeries;
@@ -88,6 +89,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				IsSuspendedWhileInactive					= true;
 				RocPeriod									= 10;				
 				RocScale									= 10000;
+				BasePriceType								= 0;
 //				RocHighBip									= -1;
 //				RocMidBip									= -1;
 //				RocLowBip									= -1;
@@ -130,6 +132,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				AddPlot(Brushes.Gray, "Mean");
 				AddPlot(Brushes.Red, "UpperBB");
 				AddPlot(Brushes.Green, "LowerBB");
+				
+				AddPlot(Brushes.Blue, "SpdCoVar");
 				//AddLine(Brushes.Blue, 0, "IWM");
 			}
 			else if (State == State.Configure)
@@ -148,9 +152,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				
 				AddDataSeries(IWMLnSymbol, Data.BarsPeriodType.Minute, ChartMinutes, Data.MarketDataType.Last);
 				AddDataSeries(IWMStSymbol, Data.BarsPeriodType.Minute, ChartMinutes, Data.MarketDataType.Last);
-
-				sma		= SMA(RocHiLoSpread, RocPeriod);
-				stdDev	= StdDev(RocHiLoSpread, RocPeriod);
+				
 				RocHighBip = new Series<int>(this);
 				RocMidBip = new Series<int>(this);
 				RocLowBip = new Series<int>(this);
@@ -161,6 +163,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 //				RocChg = new Series<double>(this);			
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", 
 					this.GetType().Name, BarsArray.Length));
+				SmaSpy = SMA(BarsArray[BipSpy], RocPeriod);
+				SmaQQQ = SMA(BarsArray[BipQQQ], RocPeriod);
+				SmaIWM = SMA(BarsArray[BipIWM], RocPeriod);
+				
+				sma		= SMA(RocHiLoSpread, RocPeriod);
+				stdDev	= StdDev(RocHiLoSpread, RocPeriod);
+//				GI_BBSqz = GIBBSqz(RocHiLoSpread, 2, 20, 10, 4);
+				
 				RocHiLoSpdMaxMin = new DailyMaxMin();
 				listRocHiLoMaxMin = new List<DailyMaxMin>();
 				DailyRocHiLoMidCross = new DailyCross<int>();
@@ -180,11 +190,16 @@ namespace NinjaTrader.NinjaScript.Indicators
 //			CurrentBars[BarsInProgress], BarsInProgress, BarsRequiredToPlot));
 			if(CurrentBars[BarsInProgress] < BarsRequiredToPlot)
 				return;
-			//double openSpy=0, openQQQ=0, openIWM=0;
-			SetOpenPrice();
+			//double BaseSpy=0, BaseQQQ=0, BaseIWM=0;
+
+			SetBasePrice();
 			SetRoc();
 			GetRocHiLoMidBip();
 			SetRocSpreadHiLo();
+//			GI_BBSqz.Update();
+//			MiddleBB[0] = GI_BBSqz.SmaVal[0];
+//			UpperBB[0] = GI_BBSqz.UpperBB[0];
+//			LowerBB[0] = GI_BBSqz.LowerBB[0];
 			CheckTradeEvent();
 //			PctChgArr[BarsInProgress] = GetPctChg(BarsInProgress);
 //			SetPctChgSpread();
@@ -279,7 +294,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 //					Times[BarsInProgress][0]));
 		}
 		
-		private void SetOpenPrice() {
+		private void SetBasePrice() {
 			if(BarsArray[BarsInProgress].IsFirstBarOfSession) {				
 //				RocHiLoSpreadMax = double.MinValue;
 //				RocHiLoSpreadMin = double.MaxValue;
@@ -289,31 +304,31 @@ namespace NinjaTrader.NinjaScript.Indicators
 				}
 				switch(BarsInProgress) {
 					case BipSpy:
-						OpenSpy = Opens[BarsInProgress][0]; 
+						BaseSpy = BasePriceType==1? Opens[BarsInProgress][0] : SmaSpy[0];
 						break;
 					case BipQQQ:
-						OpenQQQ = Opens[BarsInProgress][0]; 
+						BaseQQQ = BasePriceType==1? Opens[BarsInProgress][0] : SmaQQQ[0]; 
 						break;
 					case BipIWM:
-						OpenIWM = Opens[BarsInProgress][0]; 
+						BaseIWM = BasePriceType==1? Opens[BarsInProgress][0] : SmaIWM[0]; 
 						break;
-					case BipSpyLn:
-						OpenLnSpy = Opens[BarsInProgress][0]; 
+					case BipSpyLn: //Can only use open for quantity calculation, so en=ex for quantity;
+						BaseLnSpy = Opens[BarsInProgress][0]; 
 						break;
 					case BipSpySt:
-						OpenStSpy = Opens[BarsInProgress][0]; 
+						BaseStSpy = Opens[BarsInProgress][0]; 
 						break;
 					case BipQQQLn:
-						OpenLnQQQ = Opens[BarsInProgress][0]; 
+						BaseLnQQQ = Opens[BarsInProgress][0]; 
 						break;
 					case BipQQQSt:
-						OpenStQQQ = Opens[BarsInProgress][0]; 
+						BaseStQQQ = Opens[BarsInProgress][0]; 
 						break;
 					case BipIWMLn:
-						OpenLnIWM = Opens[BarsInProgress][0]; 
+						BaseLnIWM = Opens[BarsInProgress][0]; 
 						break;
 					case BipIWMSt:
-						OpenStIWM = Opens[BarsInProgress][0];
+						BaseStIWM = Opens[BarsInProgress][0];
 						break;
 					default:
 						break;
@@ -324,14 +339,14 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private void SetRoc() {
 			switch(BarsInProgress) {
 				case BipSpy:
-					RocSpy[0] = GetNormalizedRocPrice(Closes[BarsInProgress][0], OpenSpy, RocScale, RocFraction);
+					RocSpy[0] = GetNormalizedRocPrice(Closes[BarsInProgress][0], BaseSpy, RocScale, RocFraction);
 					break;
 				case BipQQQ:
-					RocQQQ[0] = GetNormalizedRocPrice(Closes[BarsInProgress][0], OpenQQQ, RocScale, RocFraction);
+					RocQQQ[0] = GetNormalizedRocPrice(Closes[BarsInProgress][0], BaseQQQ, RocScale, RocFraction);
 					break;
 				case BipIWM:
-					RocIWM[0] = GetNormalizedRocPrice(Closes[BarsInProgress][0], OpenIWM, RocScale, RocFraction);					
-					break;					
+					RocIWM[0] = GetNormalizedRocPrice(Closes[BarsInProgress][0], BaseIWM, RocScale, RocFraction);					
+					break;
 				default:
 					break;
 			}			
@@ -358,6 +373,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 				UpperBB[0]		= sma0 + NumStdDevUp * stdDev0;
 				MiddleBB[0]		= sma0;
 				LowerBB[0]		= sma0 - NumStdDevDown * stdDev0;
+				//use CHOP to try the bandWidth % value over MaxBand
+				SpdCoVar[0]		= 10*(UpperBB[0]-LowerBB[0])/RocHiLoSpread[0];
 				CheckRocHiLoSpdMaxMin();
 				CheckRocHiLoMidCross();
 //				Print(string.Format("{0}: bip={1}, RocHighBip={2}, RocLowBip={3}, RocMidBip={4}, RocHighSpread={5}, RocLowSpread={6},RocHiLoSpread[0]={7}, sma0={8}, stdDev0={9}, Time={10:yyyyMMdd-HHmm}", 
@@ -436,46 +453,46 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public bool IsSpreadMiddleUp() {
 			bool isMu = false;
 			//if(RocHiLoSpread[0] < UpperMin[0] && RocHiLoSpread[0] >= MiddleBB[0])
-			if(RocHiLoSpread[0] < UpperBB[0] && RocHiLoSpread[0] >= MiddleBB[0])
-				isMu = true;
+//			if(RocHiLoSpread[0] < UpperBB[0] && RocHiLoSpread[0] >= MiddleBB[0])
+//				isMu = true;
 			return isMu;
 		}
 
 		public bool IsSpreadMiddleDown() {
 			bool isMd = false;
 //			if(RocHiLoSpread[0] > LowerMin[0] && RocHiLoSpread[0] <= MiddleBB[0])
-			if(RocHiLoSpread[0] > LowerBB[0] && RocHiLoSpread[0] <= MiddleBB[0])
-				isMd = true;
+//			if(RocHiLoSpread[0] > LowerBB[0] && RocHiLoSpread[0] <= MiddleBB[0])
+//				isMd = true;
 			return isMd;
 		}
 		
 		public bool IsSpreadUpBand() {
 			bool isUb = false;
 //			if(RocHiLoSpread[0] >= UpperMin[0] && RocHiLoSpread[0] < UpperBB[0])
-			if(RocHiLoSpread[0] >= MiddleBB[0] && RocHiLoSpread[0] < UpperBB[0])
-				isUb = true;
+//			if(RocHiLoSpread[0] >= MiddleBB[0] && RocHiLoSpread[0] < UpperBB[0])
+//				isUb = true;
 			return isUb;
 		}
 
 		public bool IsSpreadLowBand() {
 			bool isLb = false;
 //			if(RocHiLoSpread[0] <= LowerMin[0] && RocHiLoSpread[0] > LowerBB[0])
-			if(RocHiLoSpread[0] <= MiddleBB[0] && RocHiLoSpread[0] > LowerBB[0])
-				isLb = true;
+//			if(RocHiLoSpread[0] <= MiddleBB[0] && RocHiLoSpread[0] > LowerBB[0])
+//				isLb = true;
 			return isLb;
 		}
 				
 		public bool IsSpreadBreakout() {
 			bool isBk = false;
-			if(RocHiLoSpread[0] >= UpperBB[0])
-				isBk = true;
+//			if(RocHiLoSpread[0] >= UpperBB[0])
+//				isBk = true;
 			return isBk;
 		}
 		
 		public bool IsSpreadBreakdown() {
 			bool isBd = false;
-			if(RocHiLoSpread[0] <= LowerBB[0])
-				isBd = true;
+//			if(RocHiLoSpread[0] <= LowerBB[0])
+//				isBd = true;
 			return isBd;
 		}
 		
@@ -713,6 +730,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 			get { return Values[6]; }
 		}
 		
+		[Browsable(false), XmlIgnore()]
+		public Series<double> SpdCoVar
+		{
+			get { return Values[7]; }
+		}
+		
 		[NinjaScriptProperty]
 		[Range(1, int.MaxValue)]
 		[Display(Name="RocPeriod", Description="Rate of chage period", Order=0, GroupName="Parameters")]
@@ -838,56 +861,86 @@ namespace NinjaTrader.NinjaScript.Indicators
 		public double NumStdDevDownMin
 		{ get; set; }
 		
+		/// <summary>
+		/// Base Price using SMA or Open
+		/// 0=SMA, 1=Open
+		/// </summary>
+		[Range(0, 1), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BasePriceType", GroupName="Parameters", Order = 22)]
+		public int BasePriceType
+		{ get; set; }
+		
 		[Browsable(false), XmlIgnore]
-		public double OpenSpy
+		public double BaseSpy
 		{
 			get;set;
 		}
 		
 		[Browsable(false), XmlIgnore]
-		public double OpenLnSpy
+		public double BaseLnSpy
 		{
 			get;set;
 		}
 		
 		[Browsable(false), XmlIgnore]
-		public double OpenStSpy
+		public double BaseStSpy
 		{
 			get;set;
 		}
 		
 		[Browsable(false), XmlIgnore]
-		public double OpenQQQ
+		public double BaseQQQ
 		{
 			get;set;
 		}
 		
 		[Browsable(false), XmlIgnore]
-		public double OpenLnQQQ
+		public double BaseLnQQQ
 		{
 			get;set;
 		}
 		
 		[Browsable(false), XmlIgnore]
-		public double OpenStQQQ
+		public double BaseStQQQ
 		{
 			get;set;
 		}
 		
 		[Browsable(false), XmlIgnore]
-		public double OpenIWM
+		public double BaseIWM
 		{
 			get;set;
 		}
 		
 		[Browsable(false), XmlIgnore]
-		public double OpenLnIWM
+		public double BaseLnIWM
 		{
 			get;set;
 		}
 		
 		[Browsable(false), XmlIgnore]
-		public double OpenStIWM
+		public double BaseStIWM
+		{
+			get;set;
+		}
+		
+		
+		[Browsable(false), XmlIgnore]
+		public SMA SmaSpy
+		{
+			get;set;
+		}
+		
+		
+		[Browsable(false), XmlIgnore]
+		public SMA SmaQQQ
+		{
+			get;set;
+		}
+		
+		
+		[Browsable(false), XmlIgnore]
+		public SMA SmaIWM
 		{
 			get;set;
 		}
@@ -930,6 +983,12 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			get;set;
 		}
+		
+//		[Browsable(false), XmlIgnore]
+//		public GIBBSqz GI_BBSqz
+//		{
+//			get;set;
+//		}
 		
 		/// <summary>
 		/// The daily max/min values of RocHiLoSpread
@@ -1022,18 +1081,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GISQRSpd[] cacheGISQRSpd;
-		public GISQRSpd GISQRSpd(int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin)
+		public GISQRSpd GISQRSpd(int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int basePriceType)
 		{
-			return GISQRSpd(Input, rocPeriod, chartMinutes, spySymbol, qQQSymbol, iWMSymbol, spyLnSymbol, spyLnSymbolRatio, spyStSymbol, spyStSymbolRatio, qQQLnSymbol, qQQLnSymbolRatio, qQQStSymbol, qQQStSymbolRatio, iWMLnSymbol, iWMLnSymbolRatio, iWMStSymbol, iWMStSymbolRatio, tradeBaseSymbol, rocScale, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin);
+			return GISQRSpd(Input, rocPeriod, chartMinutes, spySymbol, qQQSymbol, iWMSymbol, spyLnSymbol, spyLnSymbolRatio, spyStSymbol, spyStSymbolRatio, qQQLnSymbol, qQQLnSymbolRatio, qQQStSymbol, qQQStSymbolRatio, iWMLnSymbol, iWMLnSymbolRatio, iWMStSymbol, iWMStSymbolRatio, tradeBaseSymbol, rocScale, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, basePriceType);
 		}
 
-		public GISQRSpd GISQRSpd(ISeries<double> input, int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin)
+		public GISQRSpd GISQRSpd(ISeries<double> input, int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int basePriceType)
 		{
 			if (cacheGISQRSpd != null)
 				for (int idx = 0; idx < cacheGISQRSpd.Length; idx++)
-					if (cacheGISQRSpd[idx] != null && cacheGISQRSpd[idx].RocPeriod == rocPeriod && cacheGISQRSpd[idx].ChartMinutes == chartMinutes && cacheGISQRSpd[idx].SpySymbol == spySymbol && cacheGISQRSpd[idx].QQQSymbol == qQQSymbol && cacheGISQRSpd[idx].IWMSymbol == iWMSymbol && cacheGISQRSpd[idx].SpyLnSymbol == spyLnSymbol && cacheGISQRSpd[idx].SpyLnSymbolRatio == spyLnSymbolRatio && cacheGISQRSpd[idx].SpyStSymbol == spyStSymbol && cacheGISQRSpd[idx].SpyStSymbolRatio == spyStSymbolRatio && cacheGISQRSpd[idx].QQQLnSymbol == qQQLnSymbol && cacheGISQRSpd[idx].QQQLnSymbolRatio == qQQLnSymbolRatio && cacheGISQRSpd[idx].QQQStSymbol == qQQStSymbol && cacheGISQRSpd[idx].QQQStSymbolRatio == qQQStSymbolRatio && cacheGISQRSpd[idx].IWMLnSymbol == iWMLnSymbol && cacheGISQRSpd[idx].IWMLnSymbolRatio == iWMLnSymbolRatio && cacheGISQRSpd[idx].IWMStSymbol == iWMStSymbol && cacheGISQRSpd[idx].IWMStSymbolRatio == iWMStSymbolRatio && cacheGISQRSpd[idx].TradeBaseSymbol == tradeBaseSymbol && cacheGISQRSpd[idx].RocScale == rocScale && cacheGISQRSpd[idx].NumStdDevUp == numStdDevUp && cacheGISQRSpd[idx].NumStdDevDown == numStdDevDown && cacheGISQRSpd[idx].NumStdDevUpMin == numStdDevUpMin && cacheGISQRSpd[idx].NumStdDevDownMin == numStdDevDownMin && cacheGISQRSpd[idx].EqualsInput(input))
+					if (cacheGISQRSpd[idx] != null && cacheGISQRSpd[idx].RocPeriod == rocPeriod && cacheGISQRSpd[idx].ChartMinutes == chartMinutes && cacheGISQRSpd[idx].SpySymbol == spySymbol && cacheGISQRSpd[idx].QQQSymbol == qQQSymbol && cacheGISQRSpd[idx].IWMSymbol == iWMSymbol && cacheGISQRSpd[idx].SpyLnSymbol == spyLnSymbol && cacheGISQRSpd[idx].SpyLnSymbolRatio == spyLnSymbolRatio && cacheGISQRSpd[idx].SpyStSymbol == spyStSymbol && cacheGISQRSpd[idx].SpyStSymbolRatio == spyStSymbolRatio && cacheGISQRSpd[idx].QQQLnSymbol == qQQLnSymbol && cacheGISQRSpd[idx].QQQLnSymbolRatio == qQQLnSymbolRatio && cacheGISQRSpd[idx].QQQStSymbol == qQQStSymbol && cacheGISQRSpd[idx].QQQStSymbolRatio == qQQStSymbolRatio && cacheGISQRSpd[idx].IWMLnSymbol == iWMLnSymbol && cacheGISQRSpd[idx].IWMLnSymbolRatio == iWMLnSymbolRatio && cacheGISQRSpd[idx].IWMStSymbol == iWMStSymbol && cacheGISQRSpd[idx].IWMStSymbolRatio == iWMStSymbolRatio && cacheGISQRSpd[idx].TradeBaseSymbol == tradeBaseSymbol && cacheGISQRSpd[idx].RocScale == rocScale && cacheGISQRSpd[idx].NumStdDevUp == numStdDevUp && cacheGISQRSpd[idx].NumStdDevDown == numStdDevDown && cacheGISQRSpd[idx].NumStdDevUpMin == numStdDevUpMin && cacheGISQRSpd[idx].NumStdDevDownMin == numStdDevDownMin && cacheGISQRSpd[idx].BasePriceType == basePriceType && cacheGISQRSpd[idx].EqualsInput(input))
 						return cacheGISQRSpd[idx];
-			return CacheIndicator<GISQRSpd>(new GISQRSpd(){ RocPeriod = rocPeriod, ChartMinutes = chartMinutes, SpySymbol = spySymbol, QQQSymbol = qQQSymbol, IWMSymbol = iWMSymbol, SpyLnSymbol = spyLnSymbol, SpyLnSymbolRatio = spyLnSymbolRatio, SpyStSymbol = spyStSymbol, SpyStSymbolRatio = spyStSymbolRatio, QQQLnSymbol = qQQLnSymbol, QQQLnSymbolRatio = qQQLnSymbolRatio, QQQStSymbol = qQQStSymbol, QQQStSymbolRatio = qQQStSymbolRatio, IWMLnSymbol = iWMLnSymbol, IWMLnSymbolRatio = iWMLnSymbolRatio, IWMStSymbol = iWMStSymbol, IWMStSymbolRatio = iWMStSymbolRatio, TradeBaseSymbol = tradeBaseSymbol, RocScale = rocScale, NumStdDevUp = numStdDevUp, NumStdDevDown = numStdDevDown, NumStdDevUpMin = numStdDevUpMin, NumStdDevDownMin = numStdDevDownMin }, input, ref cacheGISQRSpd);
+			return CacheIndicator<GISQRSpd>(new GISQRSpd(){ RocPeriod = rocPeriod, ChartMinutes = chartMinutes, SpySymbol = spySymbol, QQQSymbol = qQQSymbol, IWMSymbol = iWMSymbol, SpyLnSymbol = spyLnSymbol, SpyLnSymbolRatio = spyLnSymbolRatio, SpyStSymbol = spyStSymbol, SpyStSymbolRatio = spyStSymbolRatio, QQQLnSymbol = qQQLnSymbol, QQQLnSymbolRatio = qQQLnSymbolRatio, QQQStSymbol = qQQStSymbol, QQQStSymbolRatio = qQQStSymbolRatio, IWMLnSymbol = iWMLnSymbol, IWMLnSymbolRatio = iWMLnSymbolRatio, IWMStSymbol = iWMStSymbol, IWMStSymbolRatio = iWMStSymbolRatio, TradeBaseSymbol = tradeBaseSymbol, RocScale = rocScale, NumStdDevUp = numStdDevUp, NumStdDevDown = numStdDevDown, NumStdDevUpMin = numStdDevUpMin, NumStdDevDownMin = numStdDevDownMin, BasePriceType = basePriceType }, input, ref cacheGISQRSpd);
 		}
 	}
 }
@@ -1042,14 +1101,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GISQRSpd GISQRSpd(int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin)
+		public Indicators.GISQRSpd GISQRSpd(int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int basePriceType)
 		{
-			return indicator.GISQRSpd(Input, rocPeriod, chartMinutes, spySymbol, qQQSymbol, iWMSymbol, spyLnSymbol, spyLnSymbolRatio, spyStSymbol, spyStSymbolRatio, qQQLnSymbol, qQQLnSymbolRatio, qQQStSymbol, qQQStSymbolRatio, iWMLnSymbol, iWMLnSymbolRatio, iWMStSymbol, iWMStSymbolRatio, tradeBaseSymbol, rocScale, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin);
+			return indicator.GISQRSpd(Input, rocPeriod, chartMinutes, spySymbol, qQQSymbol, iWMSymbol, spyLnSymbol, spyLnSymbolRatio, spyStSymbol, spyStSymbolRatio, qQQLnSymbol, qQQLnSymbolRatio, qQQStSymbol, qQQStSymbolRatio, iWMLnSymbol, iWMLnSymbolRatio, iWMStSymbol, iWMStSymbolRatio, tradeBaseSymbol, rocScale, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, basePriceType);
 		}
 
-		public Indicators.GISQRSpd GISQRSpd(ISeries<double> input , int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin)
+		public Indicators.GISQRSpd GISQRSpd(ISeries<double> input , int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int basePriceType)
 		{
-			return indicator.GISQRSpd(input, rocPeriod, chartMinutes, spySymbol, qQQSymbol, iWMSymbol, spyLnSymbol, spyLnSymbolRatio, spyStSymbol, spyStSymbolRatio, qQQLnSymbol, qQQLnSymbolRatio, qQQStSymbol, qQQStSymbolRatio, iWMLnSymbol, iWMLnSymbolRatio, iWMStSymbol, iWMStSymbolRatio, tradeBaseSymbol, rocScale, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin);
+			return indicator.GISQRSpd(input, rocPeriod, chartMinutes, spySymbol, qQQSymbol, iWMSymbol, spyLnSymbol, spyLnSymbolRatio, spyStSymbol, spyStSymbolRatio, qQQLnSymbol, qQQLnSymbolRatio, qQQStSymbol, qQQStSymbolRatio, iWMLnSymbol, iWMLnSymbolRatio, iWMStSymbol, iWMStSymbolRatio, tradeBaseSymbol, rocScale, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, basePriceType);
 		}
 	}
 }
@@ -1058,14 +1117,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GISQRSpd GISQRSpd(int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin)
+		public Indicators.GISQRSpd GISQRSpd(int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int basePriceType)
 		{
-			return indicator.GISQRSpd(Input, rocPeriod, chartMinutes, spySymbol, qQQSymbol, iWMSymbol, spyLnSymbol, spyLnSymbolRatio, spyStSymbol, spyStSymbolRatio, qQQLnSymbol, qQQLnSymbolRatio, qQQStSymbol, qQQStSymbolRatio, iWMLnSymbol, iWMLnSymbolRatio, iWMStSymbol, iWMStSymbolRatio, tradeBaseSymbol, rocScale, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin);
+			return indicator.GISQRSpd(Input, rocPeriod, chartMinutes, spySymbol, qQQSymbol, iWMSymbol, spyLnSymbol, spyLnSymbolRatio, spyStSymbol, spyStSymbolRatio, qQQLnSymbol, qQQLnSymbolRatio, qQQStSymbol, qQQStSymbolRatio, iWMLnSymbol, iWMLnSymbolRatio, iWMStSymbol, iWMStSymbolRatio, tradeBaseSymbol, rocScale, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, basePriceType);
 		}
 
-		public Indicators.GISQRSpd GISQRSpd(ISeries<double> input , int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin)
+		public Indicators.GISQRSpd GISQRSpd(ISeries<double> input , int rocPeriod, int chartMinutes, string spySymbol, string qQQSymbol, string iWMSymbol, string spyLnSymbol, int spyLnSymbolRatio, string spyStSymbol, int spyStSymbolRatio, string qQQLnSymbol, int qQQLnSymbolRatio, string qQQStSymbol, int qQQStSymbolRatio, string iWMLnSymbol, int iWMLnSymbolRatio, string iWMStSymbol, int iWMStSymbolRatio, int tradeBaseSymbol, int rocScale, double numStdDevUp, double numStdDevDown, double numStdDevUpMin, double numStdDevDownMin, int basePriceType)
 		{
-			return indicator.GISQRSpd(input, rocPeriod, chartMinutes, spySymbol, qQQSymbol, iWMSymbol, spyLnSymbol, spyLnSymbolRatio, spyStSymbol, spyStSymbolRatio, qQQLnSymbol, qQQLnSymbolRatio, qQQStSymbol, qQQStSymbolRatio, iWMLnSymbol, iWMLnSymbolRatio, iWMStSymbol, iWMStSymbolRatio, tradeBaseSymbol, rocScale, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin);
+			return indicator.GISQRSpd(input, rocPeriod, chartMinutes, spySymbol, qQQSymbol, iWMSymbol, spyLnSymbol, spyLnSymbolRatio, spyStSymbol, spyStSymbolRatio, qQQLnSymbol, qQQLnSymbolRatio, qQQStSymbol, qQQStSymbolRatio, iWMLnSymbol, iWMLnSymbolRatio, iWMStSymbol, iWMStSymbolRatio, tradeBaseSymbol, rocScale, numStdDevUp, numStdDevDown, numStdDevUpMin, numStdDevDownMin, basePriceType);
 		}
 	}
 }

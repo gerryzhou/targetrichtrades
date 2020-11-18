@@ -123,6 +123,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				IWMStSymbolRatio							= 3;//"TZA";
 				TradeBaseSymbol								= 4;
 				BarsToHoldPos								= 16;
+				BasePriceType								= 0;
 				Slippage									= 0.02;
 				PrintOut									= 0;
 				//IsInstantiatedOnEachOptimizationIteration = false;
@@ -154,7 +155,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				QQQLnSymbol, QQQLnSymbolRatio, QQQStSymbol, QQQStSymbolRatio,
 				IWMLnSymbol, IWMLnSymbolRatio, IWMStSymbol, IWMStSymbolRatio,
 				TradeBaseSymbol, RocScale,
-				NumStdDevUp, NumStdDevDown, PTStdDev, SLStdDev);
+				NumStdDevUp, NumStdDevDown, PTStdDev, SLStdDev, BasePriceType);
 				// Add RSI and ADX indicators to the chart for display
 				// This only displays the indicators for the primary Bars object (main instrument) on the chart
 				AddChartIndicator(giSQRSpd);
@@ -381,9 +382,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				EnSQRSpdMA = giSQRSpd.MiddleBB[0];
 				EnterLong(ShortBip, q_St, SigName_EnSt);
 				EnterLong(LongBip, q_Ln, SigName_EnLn);
-				//EnterLong(BipQQQLn, q_qqqLn, "GIEnQQQLn");
-				EnterLong(MidLongBip, q_midLn, SigName_EnMidLn);
-				EnterLong(MidShortBip, q_midSt, SigName_EnMidSt);
+				
+				//EnterLong(MidLongBip, q_midLn, SigName_EnMidLn);
+				//EnterLong(MidShortBip, q_midSt, SigName_EnMidSt);
 			}
 			//EnterLong(BipIWMSt, q_iwmSt, "GIEnIWMSt");
 		}
@@ -412,27 +413,27 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int qnt = 0;
 			switch(idx) {
 				case BipSpyLn:
-					open = giSQRSpd.OpenLnSpy;
+					open = giSQRSpd.BaseLnSpy;
 					rt = SpyLnSymbolRatio;
 					break;
 				case BipSpySt:
-					open = giSQRSpd.OpenStSpy;
+					open = giSQRSpd.BaseStSpy;
 					rt = SpyStSymbolRatio;
 					break;
 				case BipQQQLn:
-					open = giSQRSpd.OpenLnQQQ;
+					open = giSQRSpd.BaseLnQQQ;
 					rt = QQQLnSymbolRatio;
 					break;
 				case BipQQQSt:
-					open = giSQRSpd.OpenStQQQ;
+					open = giSQRSpd.BaseStQQQ;
 					rt = QQQStSymbolRatio;
 					break;
 				case BipIWMLn:
-					open = giSQRSpd.OpenLnIWM;
+					open = giSQRSpd.BaseLnIWM;
 					rt = IWMLnSymbolRatio;
 					break;
 				case BipIWMSt:
-					open = giSQRSpd.OpenStIWM;
+					open = giSQRSpd.BaseStIWM;
 					rt = IWMStSymbolRatio;
 					break;
 			}
@@ -446,23 +447,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private double GetBaseSymbolOpen() {
 			switch(TradeBaseSymbol) {
 				case BipSpy:
-					return giSQRSpd.OpenSpy;
+					return giSQRSpd.BaseSpy;
 				case BipQQQ:
-					return giSQRSpd.OpenQQQ;
+					return giSQRSpd.BaseQQQ;
 				case BipIWM:
-					return giSQRSpd.OpenIWM;
+					return giSQRSpd.BaseIWM;
 				case BipSpyLn:
-					return giSQRSpd.OpenLnSpy;
+					return giSQRSpd.BaseLnSpy;
 				case BipSpySt:
-					return giSQRSpd.OpenStSpy;
+					return giSQRSpd.BaseStSpy;
 				case BipQQQLn:
-					return giSQRSpd.OpenLnQQQ;
+					return giSQRSpd.BaseLnQQQ;
 				case BipQQQSt:
-					return giSQRSpd.OpenStQQQ;
+					return giSQRSpd.BaseStQQQ;
 				case BipIWMLn:
-					return giSQRSpd.OpenLnIWM;
+					return giSQRSpd.BaseLnIWM;
 				case BipIWMSt:
-					return giSQRSpd.OpenStIWM;
+					return giSQRSpd.BaseStIWM;
 				default:
 					return -1;
 			}
@@ -623,6 +624,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public int BarsToHoldPos
 		{ get; set; }
 
+		/// <summary>
+		/// Base Price using SMA or Open
+		/// 0=SMA, 1=Open
+		/// </summary>
+		[Range(0, 1), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "BasePriceType", GroupName= GPS_CUSTOM_PARAMS, Order = 26)]
+		public int BasePriceType
+		{ get; set; }
+		
 		/// <summary>
 		/// The symbol bip to put short trade
 		/// </summary>

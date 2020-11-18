@@ -33,7 +33,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 	/// widening during volatile markets and contracting during calmer periods.
 	/// JohnCarter default: period 20, BB 2, KC 1.5; 
 	/// </summary>
-	public class GITTM : GIndicatorBase
+	public class GIBBSqz : GIndicatorBase
 	{
 		/// <summary>
 		/// BB params
@@ -44,9 +44,9 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <summary>
 		/// KC params
 		/// </summary>
-		private Series<double>		hilo_diff;
-		private	SMA					smaDiff;
-		private	SMA					smaTypical;
+//		private Series<double>		bb_width;
+//		private	SMA					smaDiff;
+//		private	SMA					smaTypical;
 		
 		/// <summary>
 		/// TTM params
@@ -57,8 +57,8 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			if (State == State.SetDefaults)
 			{
-				Description					= "TTM = Bollinger+Keltner Channels";
-				Name						= "GITTM";
+				Description					= "Bollinger Band + CoVar as Squeeze";
+				Name						= "GIBBSqz";
 				IsOverlay					= true;
 				IsSuspendedWhileInactive	= true;
 
@@ -69,23 +69,22 @@ namespace NinjaTrader.NinjaScript.Indicators
 				//AddPlot(Brushes.LightGray, "Middle band");
 				AddPlot(Brushes.Magenta, "LowerBB");
 
-				//KC
-				Period_KC					= 10;
-				KCOffset					= 1.5;
+				//CoVar
+				CoVarBk						= 10;
+				CoVarSqz					= 4;
 				//AddPlot(Brushes.DarkGray,	"Midline");
-				AddPlot(Brushes.Blue,		"UpperKC");
-				AddPlot(Brushes.Blue,		"LowerKC");
+				AddPlot(Brushes.Blue,		"CoVarBB");
 			}
 			else if (State == State.Configure)
 			{
 				//BB
-				SmaVal		= SMA(Period_BB);
+				SmaVal	= SMA(Period_BB);
 				stdDev	= StdDev(Period_BB);
 				
 				//KC
-				hilo_diff			= new Series<double>(this);
-				smaDiff				= SMA(hilo_diff, Period_KC);
-				smaTypical			= SMA(Typical, Period_KC);
+//				bb_width			= new Series<double>(this);
+//				smaDiff				= SMA(bb_width, Period_KC);
+//				smaTypical			= SMA(Typical, Period_KC);
 				
 				//TTM
 				BarsSinceSqueeze	= new Series<int>(this);
@@ -96,24 +95,27 @@ namespace NinjaTrader.NinjaScript.Indicators
 		{
 			//BB
 			double sma0		= SmaVal[0];
-			double stdDev0	= stdDev[0];
+			//double stdDev0	= stdDev[0];
+			double stdDev_width = NumStdDev * stdDev[0];
 
-			UpperBB[0]		= sma0 + NumStdDev * stdDev0;
+			UpperBB[0]		= sma0 + stdDev_width;
 			//Middle[0]		= sma0;
-			LowerBB[0]		= sma0 - NumStdDev * stdDev0;
+			LowerBB[0]		= sma0 - stdDev_width;
 			
-			//KC
-			hilo_diff[0]			= High[0] - Low[0];
+			//BB width
+			double bb_width	= 2*stdDev_width;
+			
+			CoVar[0]		= 100*bb_width/sma0;
 
-			double middle	= smaTypical[0];
-			double kc_offset	= smaDiff[0] * KCOffset;
+//			double middle	= smaTypical[0];
+//			double kc_offset	= smaDiff[0] * KCOffset;
 
-			double kc_upper	= middle + kc_offset;
-			double kc_lower	= middle - kc_offset;
+//			double kc_upper	= middle + kc_offset;
+//			double kc_lower	= middle - kc_offset;
 
 			//Midline[0]		= middle;
-			UpperKC[0]		= kc_upper;
-			LowerKC[0]		= kc_lower;
+//			UpperKC[0]		= kc_upper;
+//			LowerKC[0]		= kc_lower;
 			
 			if(IsSqueezed()) {
 				Print(String.Format("{0}: true BarsSinceSqueeze={1}", CurrentBar, BarsSinceSqueeze[0]));
@@ -123,10 +125,11 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		public bool IsSqueezed() {
 			bool isSz = false;
-			if(UpperBB[0] < UpperKC[0] && LowerBB[0] > LowerKC[0]) {
-				isSz = true;
+			if(CoVar[0] > CoVarSqz) {
+				isSz = false;
 				BarsSinceSqueeze[0] = 0;
 			} else {
+				isSz = true;
 				BarsSinceSqueeze[0] = BarsSinceSqueeze[1] + 1;
 			}
 			return isSz;
@@ -136,7 +139,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		/// <summary>
 		/// BB params
 		/// </summary>
-		[Range(0, int.MaxValue), NinjaScriptProperty]
+		[Range(0, double.MaxValue), NinjaScriptProperty]
 		[Display(ResourceType = typeof(Custom.Resource), Name = "NumStdDev", GroupName = "NinjaScriptParameters", Order = 0)]
 		public double NumStdDev
 		{ get; set; }
@@ -166,29 +169,29 @@ namespace NinjaTrader.NinjaScript.Indicators
 		} */
 		
 		/// <summary>
-		/// KC params
+		/// CoVar breakout or squeeze
 		/// </summary>
-		[Range(0.01, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "KCOffset", GroupName = "NinjaScriptParameters", Order = 2)]
-		public double KCOffset
+		[Range(0.01, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "CoVarBk", GroupName = "NinjaScriptParameters", Order = 2)]
+		public double CoVarBk
 		{ get; set; }
 
-		[Range(1, int.MaxValue), NinjaScriptProperty]
-		[Display(ResourceType = typeof(Custom.Resource), Name = "Period_KC", GroupName = "NinjaScriptParameters", Order = 3)]
-		public int Period_KC
+		[Range(0.01, double.MaxValue), NinjaScriptProperty]
+		[Display(ResourceType = typeof(Custom.Resource), Name = "CoVarSqz", GroupName = "NinjaScriptParameters", Order = 3)]
+		public double CoVarSqz
 		{ get; set; }
 		
 		[Browsable(false), XmlIgnore()]
-		public Series<double> UpperKC
+		public Series<double> CoVar
 		{
 			get { return Values[2]; }
 		}
 		
-		[Browsable(false), XmlIgnore()]
-		public Series<double> LowerKC
-		{
-			get { return Values[3]; }
-		}
+//		[Browsable(false), XmlIgnore()]
+//		public Series<double> LowerKC
+//		{
+//			get { return Values[3]; }
+//		}
 
 		/*
 		[Browsable(false)]
@@ -219,19 +222,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 {
 	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
-		private GITTM[] cacheGITTM;
-		public GITTM GITTM(double numStdDev, int period_BB, double kCOffset, int period_KC)
+		private GIBBSqz[] cacheGIBBSqz;
+		public GIBBSqz GIBBSqz(double numStdDev, int period_BB, double coVarBk, double coVarSqz)
 		{
-			return GITTM(Input, numStdDev, period_BB, kCOffset, period_KC);
+			return GIBBSqz(Input, numStdDev, period_BB, coVarBk, coVarSqz);
 		}
 
-		public GITTM GITTM(ISeries<double> input, double numStdDev, int period_BB, double kCOffset, int period_KC)
+		public GIBBSqz GIBBSqz(ISeries<double> input, double numStdDev, int period_BB, double coVarBk, double coVarSqz)
 		{
-			if (cacheGITTM != null)
-				for (int idx = 0; idx < cacheGITTM.Length; idx++)
-					if (cacheGITTM[idx] != null && cacheGITTM[idx].NumStdDev == numStdDev && cacheGITTM[idx].Period_BB == period_BB && cacheGITTM[idx].KCOffset == kCOffset && cacheGITTM[idx].Period_KC == period_KC && cacheGITTM[idx].EqualsInput(input))
-						return cacheGITTM[idx];
-			return CacheIndicator<GITTM>(new GITTM(){ NumStdDev = numStdDev, Period_BB = period_BB, KCOffset = kCOffset, Period_KC = period_KC }, input, ref cacheGITTM);
+			if (cacheGIBBSqz != null)
+				for (int idx = 0; idx < cacheGIBBSqz.Length; idx++)
+					if (cacheGIBBSqz[idx] != null && cacheGIBBSqz[idx].NumStdDev == numStdDev && cacheGIBBSqz[idx].Period_BB == period_BB && cacheGIBBSqz[idx].CoVarBk == coVarBk && cacheGIBBSqz[idx].CoVarSqz == coVarSqz && cacheGIBBSqz[idx].EqualsInput(input))
+						return cacheGIBBSqz[idx];
+			return CacheIndicator<GIBBSqz>(new GIBBSqz(){ NumStdDev = numStdDev, Period_BB = period_BB, CoVarBk = coVarBk, CoVarSqz = coVarSqz }, input, ref cacheGIBBSqz);
 		}
 	}
 }
@@ -240,14 +243,14 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
 	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
-		public Indicators.GITTM GITTM(double numStdDev, int period_BB, double kCOffset, int period_KC)
+		public Indicators.GIBBSqz GIBBSqz(double numStdDev, int period_BB, double coVarBk, double coVarSqz)
 		{
-			return indicator.GITTM(Input, numStdDev, period_BB, kCOffset, period_KC);
+			return indicator.GIBBSqz(Input, numStdDev, period_BB, coVarBk, coVarSqz);
 		}
 
-		public Indicators.GITTM GITTM(ISeries<double> input , double numStdDev, int period_BB, double kCOffset, int period_KC)
+		public Indicators.GIBBSqz GIBBSqz(ISeries<double> input , double numStdDev, int period_BB, double coVarBk, double coVarSqz)
 		{
-			return indicator.GITTM(input, numStdDev, period_BB, kCOffset, period_KC);
+			return indicator.GIBBSqz(input, numStdDev, period_BB, coVarBk, coVarSqz);
 		}
 	}
 }
@@ -256,14 +259,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
-		public Indicators.GITTM GITTM(double numStdDev, int period_BB, double kCOffset, int period_KC)
+		public Indicators.GIBBSqz GIBBSqz(double numStdDev, int period_BB, double coVarBk, double coVarSqz)
 		{
-			return indicator.GITTM(Input, numStdDev, period_BB, kCOffset, period_KC);
+			return indicator.GIBBSqz(Input, numStdDev, period_BB, coVarBk, coVarSqz);
 		}
 
-		public Indicators.GITTM GITTM(ISeries<double> input , double numStdDev, int period_BB, double kCOffset, int period_KC)
+		public Indicators.GIBBSqz GIBBSqz(ISeries<double> input , double numStdDev, int period_BB, double coVarBk, double coVarSqz)
 		{
-			return indicator.GITTM(input, numStdDev, period_BB, kCOffset, period_KC);
+			return indicator.GIBBSqz(input, numStdDev, period_BB, coVarBk, coVarSqz);
 		}
 	}
 }

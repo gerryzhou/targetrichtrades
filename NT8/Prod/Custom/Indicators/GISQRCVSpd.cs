@@ -98,7 +98,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				NumStdDevDown								= 2.6;
 				NumStdDevUpMin								= 0.5;
 				NumStdDevDownMin							= 0.5;
-				ChartMinutes								= 8;
+				ChartMinutes								= 4;
 				TM_OpenStartH								= 11;
 				TM_OpenStartM								= 15;
 				TM_OpenEndH									= 12;
