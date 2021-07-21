@@ -129,6 +129,12 @@
   <data name="ADLAD" xml:space="preserve">
     <value>AD</value>
   </data>
+  <data name="AlertOnBreak" xml:space="preserve">
+    <value>中断时发出警报</value>
+  </data>
+  <data name="AlertOnBreakSound" xml:space="preserve">
+    <value>断时声发出警报</value>
+  </data>
   <data name="AndrewsPitchforkCalculationMethod_ModifiedSchiff" xml:space="preserve">
     <value>修改后的希夫</value>
   </data>
@@ -311,6 +317,30 @@
   </data>
   <data name="ConstantLines4" xml:space="preserve">
     <value>第 4 行</value>
+  </data>
+  <data name="COT1" xml:space="preserve">
+    <value>婴儿床 1</value>
+  </data>
+  <data name="COT2" xml:space="preserve">
+    <value>婴儿床 2</value>
+  </data>
+  <data name="COT3" xml:space="preserve">
+    <value>婴儿床 3</value>
+  </data>
+  <data name="COT4" xml:space="preserve">
+    <value>婴儿床 4</value>
+  </data>
+  <data name="COT5" xml:space="preserve">
+    <value>婴儿床 5</value>
+  </data>
+  <data name="CotDataError" xml:space="preserve">
+    <value>此仪器不支持 COT 数据</value>
+  </data>
+  <data name="CotDataStillDownloading" xml:space="preserve">
+    <value>COT 数据仍在下载中。请稍后刷新指示器.</value>
+  </data>
+  <data name="CotDataWarning" xml:space="preserve">
+    <value>您必须启用"启动时下载 COT 数据"才能接收最新的 COT 数据</value>
   </data>
   <data name="CountDown" xml:space="preserve">
     <value>倒计时</value>
@@ -627,6 +657,9 @@
   <data name="MailServicePort" xml:space="preserve">
     <value>连接的端口</value>
   </data>
+  <data name="MailServiceSenderDisplayName" xml:space="preserve">
+    <value>从名称</value>
+  </data>
   <data name="MailServiceServer" xml:space="preserve">
     <value>连接服务器</value>
   </data>
@@ -755,6 +788,9 @@
   </data>
   <data name="NinjaScriptBarsTypeWeek" xml:space="preserve">
     <value>周</value>
+  </data>
+  <data name="NinjaScriptBorder" xml:space="preserve">
+    <value>边境</value>
   </data>
   <data name="NinjaScriptChartStyleBarWidth" xml:space="preserve">
     <value>k线宽度</value>
@@ -890,6 +926,9 @@
   </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchforkDescription" xml:space="preserve">
     <value>安德鲁音叉描述</value>
+  </data>
+  <data name="NinjaScriptDrawingToolAndrewsPitchforkExtendLinesBack" xml:space="preserve">
+    <value>将线条延伸回来</value>
   </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchforkExtensionStroke" xml:space="preserve">
     <value>延长线描边</value>
@@ -1347,6 +1386,12 @@
   <data name="NinjaScriptIndicatorDescriptionConstantLines" xml:space="preserve">
     <value>在用户定义值的情节线。</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionCorrelation" xml:space="preserve">
+    <value>相关指标将绘制数据系列与所需工具的相关性。值接近 1 表示在同一方向上移动。值接近 -1 表示方向相反。值接近 0 表示没有关联.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionCOT" xml:space="preserve">
+    <value>交易者的承诺</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionCurrentDayOHL" xml:space="preserve">
     <value>绘制在当前的第一天的会议中开放，高和低的值。</value>
   </data>
@@ -1379,6 +1424,9 @@
   </data>
   <data name="NinjaScriptIndicatorDescriptionEMA" xml:space="preserve">
     <value>指数移动平均线是一个标记，表明证券价格的平均价值在一段时间。当计算移动平均趋势线，均线适用于最近价格比 SMA 更多的重量。</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionFibonacciPivots" xml:space="preserve">
+    <value>斐波那契枢轴也是价格分析，通过将先前范围与斐波那契值相乘，然后从先前高点、最低价和收盘价的平均值中加法或减法，生成潜在的支撑和阻力水平.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionFisherTransform" xml:space="preserve">
     <value>Fisher 变换有锋利和独特的转折点发生在及时。由此产生的峰值波动用来确定价格的反转。</value>
@@ -1546,7 +1594,7 @@
     <value>TMA （三角形即移动平均） 是加权移动平均。相比为 WMA 的最新的价格栏上投入更多的重量，TMA 放更多的重量在指定期期间数据。</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionTrendLines" xml:space="preserve">
-    <value>趋势线通过连接高点后跟较低的高点自动绘制最近的趋势, 以形成高趋势并连接低点, 然后是较低的低点。</value>
+    <value>当高摆动后跟较低的高摆动时，趋势线高将自动绘制。当低摆动后跟较高的低摆动时，趋势线低将自动绘制.</value>
   </data>
   <data name="NinjaScriptIndicatorDescriptionTRIX" xml:space="preserve">
     <value>TRIX （三重指数平均） 显示的百分比率的变化 (ROC) 的三重均线。Trix 振荡的上方和下方的零值。指标应用三重平滑，企图消除微不足道的价格变动中你想要隔离的趋势。</value>
@@ -1691,6 +1739,12 @@
   </data>
   <data name="NinjaScriptIndicatorNameConstantLines" xml:space="preserve">
     <value>Constant lines</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCorrelation" xml:space="preserve">
+    <value>相关</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCOT" xml:space="preserve">
+    <value>交易者的承诺</value>
   </data>
   <data name="NinjaScriptIndicatorNameCurrentDayOHL" xml:space="preserve">
     <value>Current day OHL</value>
@@ -2517,6 +2571,9 @@
   <data name="NinjaScriptStrategyGenerator" xml:space="preserve">
     <value>策略生成器</value>
   </data>
+  <data name="NinjaScriptStrategyGeneratorCandleStickPatternPrompt" xml:space="preserve">
+    <value>1 烛棒图案*{0}烛台图案*添加烛台图案...配置烛台图案...配置烛台图案.</value>
+  </data>
   <data name="NinjaScriptStrategyGeneratorEntries" xml:space="preserve">
     <value>入学条件</value>
   </data>
@@ -2595,6 +2652,12 @@
   <data name="NinjaScriptTileError" xml:space="preserve">
     <value>加载绘图工具 {0} 时出错: {1}</value>
   </data>
+  <data name="NinjaScriptYOffset" xml:space="preserve">
+    <value>Y 像素偏移</value>
+  </data>
+  <data name="NumberOfCotPlots" xml:space="preserve">
+    <value>COT 图数</value>
+  </data>
   <data name="NumberOfTrendLines" xml:space="preserve">
     <value>趋势线的数量</value>
   </data>
@@ -2603,6 +2666,9 @@
   </data>
   <data name="OffsetMultiplier" xml:space="preserve">
     <value>偏移量的乘数</value>
+  </data>
+  <data name="OldTrendsOpacity" xml:space="preserve">
+    <value>旧趋势不透明</value>
   </data>
   <data name="Opacity" xml:space="preserve">
     <value>透明度</value>
@@ -3059,6 +3125,12 @@
   </data>
   <data name="TickCounterTicksRemaining" xml:space="preserve">
     <value>Ticks剩余 = </value>
+  </data>
+  <data name="TrendLinesCurrentTrendLine" xml:space="preserve">
+    <value>当前趋势线</value>
+  </data>
+  <data name="TrendLinesTrendLineBroken" xml:space="preserve">
+    <value>{0}破碎</value>
   </data>
   <data name="TrendLinesTrendLineHigh" xml:space="preserve">
     <value>趋势线高</value>

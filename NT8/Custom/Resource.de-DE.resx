@@ -318,6 +318,30 @@
   <data name="ConstantLines4" xml:space="preserve">
     <value>Linie 4</value>
   </data>
+  <data name="COT1" xml:space="preserve">
+    <value>COT 1</value>
+  </data>
+  <data name="COT2" xml:space="preserve">
+    <value>COT 2</value>
+  </data>
+  <data name="COT3" xml:space="preserve">
+    <value>COT 3</value>
+  </data>
+  <data name="COT4" xml:space="preserve">
+    <value>COT 4</value>
+  </data>
+  <data name="COT5" xml:space="preserve">
+    <value>COT 5</value>
+  </data>
+  <data name="CotDataError" xml:space="preserve">
+    <value>COT-Daten werden für dieses Instrument nicht unterstützt</value>
+  </data>
+  <data name="CotDataStillDownloading" xml:space="preserve">
+    <value>COT-Daten werden noch heruntergeladen. Bitte aktualisieren Sie den Indikator in wenigen Augenblicken.</value>
+  </data>
+  <data name="CotDataWarning" xml:space="preserve">
+    <value>müssen "COT-Daten beim Start herunterladen" aktivieren, um die neuesten COT-Daten</value>
+  </data>
   <data name="CountDown" xml:space="preserve">
     <value>Count Down</value>
   </data>
@@ -376,13 +400,13 @@
     <value>{0} Renko</value>
   </data>
   <data name="DataBarsTypeSecond" xml:space="preserve">
-    <value>{0} Sekunde</value>
+    <value>Sekunde</value>
   </data>
   <data name="DataBarsTypeTick" xml:space="preserve">
     <value>{0} Tick{1}</value>
   </data>
   <data name="DataBarsTypeVolume" xml:space="preserve">
-    <value>{0} Volumen{1}</value>
+    <value>{0} Volumen {1}</value>
   </data>
   <data name="DataBarsTypeWeek" xml:space="preserve">
     <value>{0} Woche</value>
@@ -903,6 +927,9 @@
   <data name="NinjaScriptDrawingToolAndrewsPitchforkDescription" xml:space="preserve">
     <value>Beschreibung Andrews Pitchfork </value>
   </data>
+  <data name="NinjaScriptDrawingToolAndrewsPitchforkExtendLinesBack" xml:space="preserve">
+    <value>Zeilen zurück verlängern</value>
+  </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchforkExtensionStroke" xml:space="preserve">
     <value>Extension Linie - Stroke</value>
   </data>
@@ -1359,6 +1386,12 @@
   <data name="NinjaScriptIndicatorDescriptionConstantLines" xml:space="preserve">
     <value>Zeichnet Linien an benutzerdefinierten Werten ein</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionCorrelation" xml:space="preserve">
+    <value>Der Korrelationsindikator wird die Korrelation der Datenreihen zu einem gewünschten Instrument darstellen. Werte nahe 1 zeigen Bewegung in die gleiche Richtung an. Werte nahe -1 zeigen Bewegung in entgegengesetzte Richtungen an. Werte nahe 0 deuten auf keine Korrelation hin.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionCOT" xml:space="preserve">
+    <value>Engagement der Händler</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionCurrentDayOHL" xml:space="preserve">
     <value>Stellt die Eröffnung, sowie die Hochs und Tiefs der aktuellen Handelssitzung dar.</value>
   </data>
@@ -1709,6 +1742,9 @@
   </data>
   <data name="NinjaScriptIndicatorNameCorrelation" xml:space="preserve">
     <value>Korrelation</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCOT" xml:space="preserve">
+    <value>Engagement der Händler</value>
   </data>
   <data name="NinjaScriptIndicatorNameCurrentDayOHL" xml:space="preserve">
     <value>Aktueller Tages OHL</value>
@@ -2618,6 +2654,9 @@
   </data>
   <data name="NinjaScriptYOffset" xml:space="preserve">
     <value>Y-Pixel-Offset</value>
+  </data>
+  <data name="NumberOfCotPlots" xml:space="preserve">
+    <value>Anzahl cot-Plots</value>
   </data>
   <data name="NumberOfTrendLines" xml:space="preserve">
     <value>Anzahl der Trendlinien</value>

@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Windows.Media;
 using System.Xml.Serialization;
 using NinjaTrader.Data;
-using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -114,7 +113,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 namespace NinjaTrader.NinjaScript.Indicators
 {
-    public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
+	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GIVWAP[] cacheGIVWAP;
 		public GIVWAP GIVWAP()
@@ -135,7 +134,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
-    public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
+	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
 		public Indicators.GIVWAP GIVWAP()
 		{
@@ -151,7 +150,7 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-    public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
+	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
 		public Indicators.GIVWAP GIVWAP()
 		{

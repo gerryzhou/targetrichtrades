@@ -5,11 +5,14 @@
 #region Using declarations
 using System;
 using System.Windows.Media;
+using System.Threading;
 
 using NinjaTrader.Cbi;
 using NinjaTrader.NinjaScript.Indicators;
-using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
 using NinjaTrader.NinjaScript.DrawingTools;
+using NinjaTrader.Gui.DrawingTools;
+using NinjaTrader.Gui.BasicEntry;
+
 #endregion
 
 //This namespace holds strategies in this folder and is required. Do not change it.
@@ -28,7 +31,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private ADX adx2;
 
 		private GIPctSpd giPctSpd;
-
+		
+		public BasicEntry be;
+		
+		public GIChartTrader giChartTrader;
+		
+		public StgEQRHedger () {
+			//VendorLicense("TheTradingBook", "StgEQRHedger", "thetradingbook.com", "support@tradingbook.com",null);
+			//be = new BasicEntry(this.Instrument);			
+//				Thread thread = new Thread(() => {
+//				    //int retVal = MyClass.DoX("abc", "def");
+//				    // do something with retVal
+//					//if(!be.IsVisible)
+//					be.Show();//Dialog();
+//				});
+//				thread.SetApartmentState(ApartmentState.STA);
+//				thread.Start();
+		}
+		
 		protected override void OnStateChange()
 		{
 			base.OnStateChange();
@@ -57,8 +77,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				// Add an MSFT 1 minute Bars object to the strategy
 				//AddDataSeries("NQ 06-20", Data.BarsPeriodType.Minute, 13);
-				AddDataSeries("NQ 06-20", Data.BarsPeriodType.Minute, 13);
-				AddDataSeries("RTY 06-20", Data.BarsPeriodType.Minute, 13);
+				AddDataSeries("NQ 09-20", Data.BarsPeriodType.Minute, 4);
+				AddDataSeries("RTY 09-20", Data.BarsPeriodType.Minute, 4);
 				SetOrderQuantity = SetOrderQuantity.Strategy; // calculate orders based off default size
 				// Sets a 20 tick trailing stop for an open position
 				//SetTrailStop(CalculationMode.Ticks, 200);
@@ -73,18 +93,28 @@ namespace NinjaTrader.NinjaScript.Strategies
 				adx2 = ADX(BarsArray[2], 14);
 				
 				giPctSpd = GIPctSpd(8);
+				giChartTrader = GIChartTrader(this.Input);
 				// Add RSI and ADX indicators to the chart for display
 				// This only displays the indicators for the primary Bars object (main instrument) on the chart
 				AddChartIndicator(rsi);
 				AddChartIndicator(adx);
 				AddChartIndicator(giPctSpd);
+				AddChartIndicator(giChartTrader);
 				
 				giPctSpd.RaiseIndicatorEvent += OnTradeByPctSpd;
 				giPctSpd.TM_ClosingH = TG_TradeEndH;
 				giPctSpd.TM_ClosingM = TG_TradeEndM;
+				giChartTrader.RaiseIndicatorEvent += OnTradeByChartTrader;
 				SetPrintOut(1);
 				Print(String.Format("{0}: IsUnmanaged={1}", this.GetType().Name, IsUnmanaged));
 				Print(String.Format("{0}: DataLoaded...BarsArray.Length={1}", this.GetType().Name, BarsArray.Length));
+				
+				//this.Dispatcher.Invoke(() =>
+				this.Dispatcher.BeginInvoke(new ThreadStart(() =>
+				{
+				    //be.Show();
+				}));
+				
 			}			
 		}
 
@@ -181,7 +211,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 					EnterShort(giPctSpd.PctChgMaxBip, q_max, "GIPctSpd");
 					EnterLong(giPctSpd.PctChgMinBip, q_min, "GIPctSpd");
 				}
-			}
+			}			
+		}
+
+		void OnTradeByChartTrader(object sender, IndicatorEventArgs e) {
+			this.Update();
+			IndicatorSignal isig = e.IndSignal;
+			Print(String.Format("{0}:OnTradeByChartTrader triggerred {1} Bip={2}, CurrentBar[0]={3}, DrawingTool.GetCurrentBar={4}, Time={5}, Time[0][0]={6}",
+			CurrentBars[BarsInProgress], isig.SignalName, BarsInProgress, CurrentBars[0], DrawingTool.GetCurrentBar(this), Times[BarsInProgress][0], Times[0][0]));
+			//Draw.ArrowUp(this, "tag1", true, 0, Lows[0][0] - TickSize, Brushes.Red);
+			Draw.Diamond(this, "tag1", true, 0, Lows[0][0] - TickSize, Brushes.Red);
 			
 		}
 		

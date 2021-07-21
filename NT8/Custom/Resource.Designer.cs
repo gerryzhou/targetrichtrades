@@ -19,7 +19,7 @@ namespace NinjaTrader.Custom {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resource {
@@ -660,6 +660,78 @@ namespace NinjaTrader.Custom {
         public static string ConstantLines4 {
             get {
                 return ResourceManager.GetString("ConstantLines4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to COT 1.
+        /// </summary>
+        public static string COT1 {
+            get {
+                return ResourceManager.GetString("COT1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to COT 2.
+        /// </summary>
+        public static string COT2 {
+            get {
+                return ResourceManager.GetString("COT2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to COT 3.
+        /// </summary>
+        public static string COT3 {
+            get {
+                return ResourceManager.GetString("COT3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to COT 4.
+        /// </summary>
+        public static string COT4 {
+            get {
+                return ResourceManager.GetString("COT4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to COT 5.
+        /// </summary>
+        public static string COT5 {
+            get {
+                return ResourceManager.GetString("COT5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to COT data is not supported for this instrument.
+        /// </summary>
+        public static string CotDataError {
+            get {
+                return ResourceManager.GetString("CotDataError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to COT data is still being downloaded. Please refresh the indicator in few moments..
+        /// </summary>
+        public static string CotDataStillDownloading {
+            get {
+                return ResourceManager.GetString("CotDataStillDownloading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;Download COT data at startup&quot; must be enabled in Options to receive the latest data.
+        /// </summary>
+        public static string CotDataWarning {
+            get {
+                return ResourceManager.GetString("CotDataWarning", resourceCulture);
             }
         }
         
@@ -2419,6 +2491,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Extend lines back.
+        /// </summary>
+        public static string NinjaScriptDrawingToolAndrewsPitchforkExtendLinesBack {
+            get {
+                return ResourceManager.GetString("NinjaScriptDrawingToolAndrewsPitchforkExtendLinesBack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Extension Line Stroke.
         /// </summary>
         public static string NinjaScriptDrawingToolAndrewsPitchforkExtensionStroke {
@@ -3796,6 +3877,15 @@ namespace NinjaTrader.Custom {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The COT indicator plots weekly data from the Commitment Of Traders report, indicating holdings of different participants in the U.S. futures market..
+        /// </summary>
+        public static string NinjaScriptIndicatorDescriptionCOT {
+            get {
+                return ResourceManager.GetString("NinjaScriptIndicatorDescriptionCOT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Plots the open, high, and low values from the session starting on the current day..
         /// </summary>
         public static string NinjaScriptIndicatorDescriptionCurrentDayOHL {
@@ -4845,6 +4935,15 @@ namespace NinjaTrader.Custom {
         public static string NinjaScriptIndicatorNameCorrelation {
             get {
                 return ResourceManager.GetString("NinjaScriptIndicatorNameCorrelation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to COT.
+        /// </summary>
+        public static string NinjaScriptIndicatorNameCOT {
+            get {
+                return ResourceManager.GetString("NinjaScriptIndicatorNameCOT", resourceCulture);
             }
         }
         
@@ -7572,6 +7671,15 @@ namespace NinjaTrader.Custom {
         public static string NinjaScriptYOffset {
             get {
                 return ResourceManager.GetString("NinjaScriptYOffset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number of COT plots.
+        /// </summary>
+        public static string NumberOfCotPlots {
+            get {
+                return ResourceManager.GetString("NumberOfCotPlots", resourceCulture);
             }
         }
         

@@ -318,6 +318,30 @@
   <data name="ConstantLines4" xml:space="preserve">
     <value>Ligne 4</value>
   </data>
+  <data name="COT1" xml:space="preserve">
+    <value>COT 1</value>
+  </data>
+  <data name="COT2" xml:space="preserve">
+    <value>COT 2 (en)</value>
+  </data>
+  <data name="COT3" xml:space="preserve">
+    <value>COT 3</value>
+  </data>
+  <data name="COT4" xml:space="preserve">
+    <value>COT 4</value>
+  </data>
+  <data name="COT5" xml:space="preserve">
+    <value>COT 5 (EN)</value>
+  </data>
+  <data name="CotDataError" xml:space="preserve">
+    <value>Les données COT ne sont pas prises en charge pour cet instrument</value>
+  </data>
+  <data name="CotDataStillDownloading" xml:space="preserve">
+    <value>Les données COT sont toujours en cours de téléchargement. S’il vous plaît rafraîchir l’indicateur en quelques instants.</value>
+  </data>
+  <data name="CotDataWarning" xml:space="preserve">
+    <value>ou doit activer "Télécharger les données COT au démarrage" pour recevoir les données LES plus récentes de COT</value>
+  </data>
   <data name="CountDown" xml:space="preserve">
     <value>Compte à rebours</value>
   </data>
@@ -633,6 +657,9 @@
   <data name="MailServicePort" xml:space="preserve">
     <value>Connexion - Port</value>
   </data>
+  <data name="MailServiceSenderDisplayName" xml:space="preserve">
+    <value>De nom</value>
+  </data>
   <data name="MailServiceServer" xml:space="preserve">
     <value>Connexion - serveur</value>
   </data>
@@ -761,6 +788,9 @@
   </data>
   <data name="NinjaScriptBarsTypeWeek" xml:space="preserve">
     <value>Semaine</value>
+  </data>
+  <data name="NinjaScriptBorder" xml:space="preserve">
+    <value>Frontière</value>
   </data>
   <data name="NinjaScriptChartStyleBarWidth" xml:space="preserve">
     <value>Largeur de barre</value>
@@ -896,6 +926,9 @@
   </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchforkDescription" xml:space="preserve">
     <value>Description fourchette d'Andrews</value>
+  </data>
+  <data name="NinjaScriptDrawingToolAndrewsPitchforkExtendLinesBack" xml:space="preserve">
+    <value>Prolonger les lignes en arrière</value>
   </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchforkExtensionStroke" xml:space="preserve">
     <value>Extension ligne AVC</value>
@@ -1353,6 +1386,12 @@
   <data name="NinjaScriptIndicatorDescriptionConstantLines" xml:space="preserve">
     <value>Lignes affichées à des valeurs définies par l’utilisateur.</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionCorrelation" xml:space="preserve">
+    <value>L’indicateur de corrélation tracera la corrélation de la série de données à un instrument désiré. Des valeurs proches de 1 indiquent un mouvement dans la même direction. Les valeurs proches de -1 indiquent un mouvement dans des directions opposées. Les valeurs proches de 0 n’indiquent aucune corrélation.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionCOT" xml:space="preserve">
+    <value>Engagement des commerçants</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionCurrentDayOHL" xml:space="preserve">
     <value>Trace les valeurs d'ouvertures, hautes et basses de la session en commençant le jour courant.</value>
   </data>
@@ -1700,6 +1739,12 @@
   </data>
   <data name="NinjaScriptIndicatorNameConstantLines" xml:space="preserve">
     <value>Lignes de constantes</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCorrelation" xml:space="preserve">
+    <value>Corrélation</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCOT" xml:space="preserve">
+    <value>Engagement des commerçants</value>
   </data>
   <data name="NinjaScriptIndicatorNameCurrentDayOHL" xml:space="preserve">
     <value>Date du jour OHL</value>
@@ -2609,6 +2654,9 @@
   </data>
   <data name="NinjaScriptYOffset" xml:space="preserve">
     <value>Décalage Y pixels</value>
+  </data>
+  <data name="NumberOfCotPlots" xml:space="preserve">
+    <value>Nombre de parcelles COT</value>
   </data>
   <data name="NumberOfTrendLines" xml:space="preserve">
     <value>Nombre de lignes de tendance</value>

@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2021, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -227,29 +227,38 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 			public new void Enqueue(TrendRay trend)
 			{
-				string rayName	= string.Format("{0}_{1}", trend.IsHigh ? NinjaTrader.Custom.Resource.TrendLinesTrendLineHigh : NinjaTrader.Custom.Resource.TrendLinesTrendLineLow, trend.StartBar);
-				trend.Ray		= Draw.Ray(instance,
-											rayName,
-											false,
-											instance.CurrentBar - trend.StartBar - instance.Displacement,
-											trend.StartPrice,
-											instance.CurrentBar - trend.EndBar - instance.Displacement,
-											trend.EndPrice,
-											trend.IsHigh ? instance.TrendLineHighStroke.Brush : instance.TrendLineLowStroke.Brush,
-											trend.IsHigh ? instance.TrendLineHighStroke.DashStyleHelper : instance.TrendLineLowStroke.DashStyleHelper,
-											(int)(trend.IsHigh ? instance.TrendLineHighStroke.Width : instance.TrendLineLowStroke.Width));
+				if (instance.ChartControl != null)
+				{
+					string rayName	= string.Format("{0}_{1}", trend.IsHigh ? NinjaTrader.Custom.Resource.TrendLinesTrendLineHigh : NinjaTrader.Custom.Resource.TrendLinesTrendLineLow, trend.StartBar);
+					trend.Ray		= Draw.Ray(instance,
+												rayName,
+												false,
+												instance.CurrentBar - trend.StartBar - instance.Displacement,
+												trend.StartPrice,
+												instance.CurrentBar - trend.EndBar - instance.Displacement,
+												trend.EndPrice,
+												trend.IsHigh ? instance.TrendLineHighStroke.Brush : instance.TrendLineLowStroke.Brush,
+												trend.IsHigh ? instance.TrendLineHighStroke.DashStyleHelper : instance.TrendLineLowStroke.DashStyleHelper,
+												(int)(trend.IsHigh ? instance.TrendLineHighStroke.Width : instance.TrendLineLowStroke.Width));
 
-				trend.Ray.Stroke.Opacity = trend.IsHigh ? instance.TrendLineHighStroke.Opacity : instance.TrendLineLowStroke.Opacity;
+					trend.Ray.Stroke.Opacity = trend.IsHigh ? instance.TrendLineHighStroke.Opacity : instance.TrendLineLowStroke.Opacity;
 
-				if (lastTrend != null)
-					lastTrend.Ray.Stroke.Opacity = instance.OldTrendsOpacity;
+					if (lastTrend != null)
+						lastTrend.Ray.Stroke.Opacity = instance.OldTrendsOpacity;
+				}
 
 				lastTrend = trend;
 				base.Enqueue(trend);
 
 				// Make it into a circular buffer
 				if (Count > instance.NumberOfTrendLines)
-					instance.RemoveDrawObject(base.Dequeue().Ray.Tag);
+				{
+					TrendRay toRemove = base.Dequeue();
+
+					// Ray will be null if no ChartControl
+					if (toRemove.Ray != null)
+						instance.RemoveDrawObject(toRemove.Ray.Tag);
+				}
 			}
 
 			public TrendQueue(TrendLines instance, int capacity) : base(capacity)

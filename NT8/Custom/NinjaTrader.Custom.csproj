@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NinjaTrader.Custom</RootNamespace>
     <AssemblyName>NinjaTrader.Custom</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -27,6 +27,7 @@
     <DocumentationFile>bin\Debug\NinjaTrader.Custom.XML</DocumentationFile>
     <NoWarn>1591</NoWarn>
     <LangVersion>5</LangVersion>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -85,11 +86,14 @@
     <Reference Include="SharpDX.Direct2D1">
       <HintPath>C:\Program Files (x86)\NinjaTrader 8\bin64\SharpDX.Direct2D1.dll</HintPath>
     </Reference>
-    <Reference Include="NinjaTrader.Vendor">
-      <HintPath>C:\Users\GerryZhou\Documents\NinjaTrader 8\bin\Custom\NinjaTrader.Vendor.dll</HintPath>
+    <Reference Include="VendorLicensing">
+      <HintPath>C:\Users\GerryZhou\Documents\NinjaTrader 8\bin\Custom\VendorLicensing.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
       <HintPath>C:\Program Files (x86)\NinjaTrader 8\bin64\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="NinjaTrader.Vendor">
+      <HintPath>C:\Users\GerryZhou\Documents\NinjaTrader 8\bin\Custom\NinjaTrader.Vendor.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +147,7 @@
     <Compile Include="Indicators\%40CamarillaPivots.cs" />
     <Compile Include="Indicators\%40CandleStickPattern.cs" />
     <Compile Include="Indicators\%40ChoppinessIndex.cs" />
+    <Compile Include="Indicators\%40COT.cs" />
     <Compile Include="Indicators\%40Darvas.cs" />
     <Compile Include="Indicators\%40DisparityIndex.cs" />
     <Compile Include="Indicators\%40FibonacciPivots.cs" />
@@ -375,82 +380,103 @@
     <Compile Include="SuperDomColumns\%40Notes.cs" />
     <Compile Include="SuperDomColumns\%40ProfitLoss.cs" />
     <Compile Include="SuperDomColumns\%40Volume.cs" />
-    <Compile Include="AddOns\ZTraderAO\ZTAddon.cs" />
-    <Compile Include="AddOns\ZTraderAO\ZTFileIO.cs" />
-    <Compile Include="AddOns\GEnum.cs" />
-    <Compile Include="AddOns\GIMethods.cs" />
-    <Compile Include="AddOns\GIndicatorBase.cs" />
-    <Compile Include="AddOns\GIndicatorInterface.cs" />
-    <Compile Include="AddOns\GIndicatorParams.cs" />
-    <Compile Include="AddOns\GIndicatorSignal.cs" />
-    <Compile Include="AddOns\GIndicatorSnR.cs" />
-    <Compile Include="AddOns\GIndicatorSpvPR.cs" />
-    <Compile Include="AddOns\GIndicatorTime.cs" />
-    <Compile Include="AddOns\GIndicatorVol.cs" />
-    <Compile Include="AddOns\GLastIndexRecorder.cs" />
-    <Compile Include="Indicators\PriceAction\Direction.cs" />
-    <Compile Include="Indicators\PriceAction\MarketContext.cs" />
-    <Compile Include="Indicators\PriceAction\MarketCycle.cs" />
-    <Compile Include="Indicators\PriceAction\Period.cs" />
-    <Compile Include="Indicators\PriceAction\PriceAction.cs" />
-    <Compile Include="Indicators\PriceAction\Ratios.cs" />
-    <Compile Include="Indicators\PriceAction\Reversal.cs" />
-    <Compile Include="Indicators\PriceAction\SnR.cs" />
-    <Compile Include="Indicators\PriceAction\Vol.cs" />
-    <Compile Include="Indicators\PriceAction\Volatility.cs" />
-    <Compile Include="Indicators\PriceActionSwing\PriceActionSwing.cs" />
-    <Compile Include="Indicators\PriceActionSwing\PriceActionSwingOscillator.cs" />
-    <Compile Include="Indicators\PriceActionSwing\PriceActionSwingPro.cs" />
-    <Compile Include="Indicators\ZTraderInd\CustomClasses.cs" />
-    <Compile Include="Indicators\ZTraderInd\EnumsInd.cs" />
-    <Compile Include="Indicators\ZTraderInd\GIndicatorProxy.cs" />
-    <Compile Include="Indicators\ZTraderInd\IndicatorSignal.cs" />
-    <Compile Include="Indicators\ZTraderInd\SignalAction.cs" />
-    <Compile Include="Indicators\ZTraderPattern\SpvDailyPattern.cs" />
-    <Compile Include="Indicators\ZTraderPattern\SpvDailyPatternES.cs" />
-    <Compile Include="Indicators\GIAwesomeOscillator.cs" />
+    <Compile Include="AddOns\Common\GAlert.cs" />
+    <Compile Include="AddOns\Common\GConfig.cs" />
+    <Compile Include="AddOns\Common\GEnum.cs" />
+    <Compile Include="AddOns\Common\GLogger.cs" />
+    <Compile Include="AddOns\Common\GUtils.cs" />
+    <Compile Include="AddOns\Ind\EnumsInd.cs" />
+    <Compile Include="AddOns\Ind\GIndicatorBase.cs" />
+    <Compile Include="AddOns\Ind\GIndicatorEvent.cs" />
+    <Compile Include="AddOns\Ind\GIndicatorParams.cs" />
+    <Compile Include="AddOns\Ind\GIndicatorPrice.cs" />
+    <Compile Include="AddOns\Ind\GIndicatorSignal.cs" />
+    <Compile Include="AddOns\Ind\GIndicatorSnR.cs" />
+    <Compile Include="AddOns\Ind\GIndicatorSpvPR.cs" />
+    <Compile Include="AddOns\Ind\GIndicatorTime.cs" />
+    <Compile Include="AddOns\Ind\IndicatorSignal.cs" />
+    <Compile Include="AddOns\Ind\SignalAction.cs" />
+    <Compile Include="AddOns\MarketCtx\JsonCtxPairSpd.cs" />
+    <Compile Include="AddOns\MarketCtx\MarketContext.cs" />
+    <Compile Include="AddOns\Patterns\SpvDailyPattern.cs" />
+    <Compile Include="AddOns\Patterns\SpvDailyPatternES.cs" />
+    <Compile Include="AddOns\PriceActions\Cross.cs" />
+    <Compile Include="AddOns\PriceActions\DailyMaxMin.cs" />
+    <Compile Include="AddOns\PriceActions\Direction.cs" />
+    <Compile Include="AddOns\PriceActions\MarketCycle.cs" />
+    <Compile Include="AddOns\PriceActions\PairSpread.cs" />
+    <Compile Include="AddOns\PriceActions\Period.cs" />
+    <Compile Include="AddOns\PriceActions\PriceAction.cs" />
+    <Compile Include="AddOns\PriceActions\Ratios.cs" />
+    <Compile Include="AddOns\PriceActions\Reversal.cs" />
+    <Compile Include="AddOns\PriceActions\SnR.cs" />
+    <Compile Include="AddOns\PriceActions\Vol.cs" />
+    <Compile Include="AddOns\PriceActions\Volatility.cs" />
+    <Compile Include="AddOns\Stg\BracketOrderBase.cs" />
+    <Compile Include="AddOns\Stg\CmdBase.cs" />
+    <Compile Include="AddOns\Stg\CurrentTradeBase.cs" />
+    <Compile Include="AddOns\Stg\EnumsStg.cs" />
+    <Compile Include="AddOns\Stg\GStrategyAction.cs" />
+    <Compile Include="AddOns\Stg\GStrategyBase.cs" />
+    <Compile Include="AddOns\Stg\GStrategyEvents.cs" />
+    <Compile Include="AddOns\Stg\GStrategyInterface.cs" />
+    <Compile Include="AddOns\Stg\GStrategyParams.cs" />
+    <Compile Include="AddOns\Stg\GStrategySignal.cs" />
+    <Compile Include="AddOns\Stg\JsonStgTRT.cs" />
+    <Compile Include="AddOns\Stg\MoneyManagement.cs" />
+    <Compile Include="AddOns\Stg\OCOBase.cs" />
+    <Compile Include="AddOns\Stg\PositionManagement.cs" />
+    <Compile Include="AddOns\Stg\TradeAction.cs" />
+    <Compile Include="AddOns\Stg\TradeCommand.cs" />
+    <Compile Include="AddOns\Stg\TradeManagement.cs" />
+    <Compile Include="AddOns\Stg\TradeSignal.cs" />
+    <Compile Include="AddOns\Stg\TrailingSLOrderBase.cs" />
+    <Compile Include="AddOns\Stg\Trigger.cs" />
+    <Compile Include="AddOns\SuperDomButtons.cs" />
+    <Compile Include="Indicators\ChartCustomSidePanelExample.cs" />
+    <Compile Include="Indicators\ChartTraderCustomButtonsExample.cs" />
+    <Compile Include="Indicators\ChartTraderModifyExistingButtonsExample.cs" />
+    <Compile Include="Indicators\GIATRRatio.cs" />
+    <Compile Include="Indicators\GIBBSqz.cs" />
+    <Compile Include="Indicators\GIChartTrader.cs" />
+    <Compile Include="Indicators\GIEMA.cs" />
     <Compile Include="Indicators\GIFibonacci.cs" />
-    <Compile Include="Indicators\GIGetHighLowByPeriod.cs" />
     <Compile Include="Indicators\GIGetHighLowByTimeRange.cs" />
-    <Compile Include="Indicators\GIKAMA.cs" />
+    <Compile Include="Indicators\GIHLnBars.cs" />
     <Compile Include="Indicators\GIKeyReversal.cs" />
-    <Compile Include="Indicators\GINBarsUpDn.cs" />
-    <Compile Include="Indicators\GIPbSAR.cs" />
-    <Compile Include="Indicators\GISMI.cs" />
+    <Compile Include="Indicators\GIMACross.cs" />
+    <Compile Include="Indicators\GIndicatorProxy.cs" />
+    <Compile Include="Indicators\GIPairPctSpd.cs" />
+    <Compile Include="Indicators\GIPctSpd.cs" />
+    <Compile Include="Indicators\GIRocHedger.cs" />
     <Compile Include="Indicators\GISnR.cs" />
-    <Compile Include="Indicators\GIVOL.cs" />
-    <Compile Include="Indicators\SMI.cs" />
-    <Compile Include="Strategies\ZTraderStg\BracketOrderBase.cs" />
-    <Compile Include="Strategies\ZTraderStg\CmdBase.cs" />
-    <Compile Include="Strategies\ZTraderStg\CurrentTradeBase.cs" />
-    <Compile Include="Strategies\ZTraderStg\EnumsStg.cs" />
-    <Compile Include="Strategies\ZTraderStg\OCOBase.cs" />
-    <Compile Include="Strategies\ZTraderStg\TradeAction.cs" />
-    <Compile Include="Strategies\ZTraderStg\TradeSignal.cs" />
-    <Compile Include="Strategies\ZTraderStg\TrailingSLOrderBase.cs" />
-    <Compile Include="Strategies\GStrategyAction.cs" />
-    <Compile Include="Strategies\GStrategyBase.cs" />
-    <Compile Include="Strategies\GStrategyEvents.cs" />
-    <Compile Include="Strategies\GStrategyInterface.cs" />
-    <Compile Include="Strategies\GStrategyParams.cs" />
-    <Compile Include="Strategies\GStrategySignal.cs" />
-    <Compile Include="Strategies\MoneyManagement.cs" />
-    <Compile Include="Strategies\PositionManagement.cs" />
-    <Compile Include="Strategies\StgSample01.cs" />
-    <Compile Include="Strategies\StgSample02.cs" />
-    <Compile Include="Strategies\StgSample03.cs" />
-    <Compile Include="Strategies\StgSampleOBK.cs" />
-    <Compile Include="Strategies\StgSampleTRT.cs" />
-    <Compile Include="Strategies\StgSnR.cs" />
-    <Compile Include="Strategies\StgTRT.cs" />
-    <Compile Include="Strategies\TradeCommand.cs" />
-    <Compile Include="Strategies\TradeManagement.cs" />
-    <Compile Include="Strategies\Trigger.cs" />
-    <Compile Include="AddOns\GLogger.cs" />
-    <Compile Include="AddOns\GUtils.cs" />
+    <Compile Include="Indicators\GISpdLadder.cs" />
+    <Compile Include="Indicators\GISpdRS.cs" />
+    <Compile Include="Indicators\GISQRCVSpd.cs" />
+    <Compile Include="Indicators\GISQRSpd.cs" />
+    <Compile Include="Indicators\GITTM.cs" />
+    <Compile Include="Indicators\GIVWAP.cs" />
+    <Compile Include="Indicators\TTM.TTMS.cs" />
+    <Compile Include="Indicators\TTM.TTMWave.cs" />
+    <Compile Include="Strategies\SampleHighLowCross.cs" />
+    <Compile Include="Strategies\StgChartTrader.cs" />
+    <Compile Include="Strategies\StgEQRHedger.cs" />
+    <Compile Include="Strategies\StgFreeSample.cs" />
+    <Compile Include="Strategies\StgPairSimple.cs" />
+    <Compile Include="Strategies\StgPairSpdRS.cs" />
+    <Compile Include="Strategies\StgSelfHedger.cs" />
+    <Compile Include="Strategies\StgSpdLadder.cs" />
+    <Compile Include="Strategies\StgSQRSpd.cs" />
+    <Compile Include="Strategies\TBProdTRT.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
+    <Compile Include="obj\Release\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
+    <Compile Include="obj\Release\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
+    <Compile Include="obj\Release\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
+    <Compile Include="VendorLicensing.cs" />
+    <Compile Include="Indicators\GISpdLadder - Copy.cs" />
+    <Compile Include="Strategies\StgSpdLadder - Copy.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resource.resx">

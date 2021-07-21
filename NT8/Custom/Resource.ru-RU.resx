@@ -318,6 +318,30 @@
   <data name="ConstantLines4" xml:space="preserve">
     <value>Линия 4</value>
   </data>
+  <data name="COT1" xml:space="preserve">
+    <value>КОТ 1</value>
+  </data>
+  <data name="COT2" xml:space="preserve">
+    <value>КОТ 2</value>
+  </data>
+  <data name="COT3" xml:space="preserve">
+    <value>КОТ 3</value>
+  </data>
+  <data name="COT4" xml:space="preserve">
+    <value>COT 4</value>
+  </data>
+  <data name="COT5" xml:space="preserve">
+    <value>КОТ 5</value>
+  </data>
+  <data name="CotDataError" xml:space="preserve">
+    <value>Данные COT не поддерживаются для этого инструмента</value>
+  </data>
+  <data name="CotDataStillDownloading" xml:space="preserve">
+    <value>Данные COT все еще загружаются. Пожалуйста, обновите индикатор в считанные мгновения.</value>
+  </data>
+  <data name="CotDataWarning" xml:space="preserve">
+    <value>вы должны позволить "Загрузить данные COT при запуске" для получения самых последних данных COT</value>
+  </data>
   <data name="CountDown" xml:space="preserve">
     <value>Обратный отсчет</value>
   </data>
@@ -633,6 +657,9 @@
   <data name="MailServicePort" xml:space="preserve">
     <value>Соединение - Порт</value>
   </data>
+  <data name="MailServiceSenderDisplayName" xml:space="preserve">
+    <value>От имени</value>
+  </data>
   <data name="MailServiceServer" xml:space="preserve">
     <value>Соединение - Сервер</value>
   </data>
@@ -899,6 +926,9 @@
   </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchforkDescription" xml:space="preserve">
     <value>Описание Andrews Pitchfork</value>
+  </data>
+  <data name="NinjaScriptDrawingToolAndrewsPitchforkExtendLinesBack" xml:space="preserve">
+    <value>Расширить линии назад</value>
   </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchforkExtensionStroke" xml:space="preserve">
     <value>Расширение линии хода</value>
@@ -1356,6 +1386,12 @@
   <data name="NinjaScriptIndicatorDescriptionConstantLines" xml:space="preserve">
     <value>Построители линий на значениях определенных пользователем.</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionCorrelation" xml:space="preserve">
+    <value>Индикатор корреляции будет спланировать корреляцию серии данных с желаемым инструментом. Значения, близкие к 1, указывают на движение в одном направлении. Значения, близкие к -1, указывают на движение в противоположных направлениях. Значения около 0 указывают на отсутствие корреляции.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionCOT" xml:space="preserve">
+    <value>Обязательство трейдеров</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionCurrentDayOHL" xml:space="preserve">
     <value>Наносит значения сессии в текущем дне: открытие, high, low</value>
   </data>
@@ -1703,6 +1739,12 @@
   </data>
   <data name="NinjaScriptIndicatorNameConstantLines" xml:space="preserve">
     <value>Constant lines</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCorrelation" xml:space="preserve">
+    <value>Correlation</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCOT" xml:space="preserve">
+    <value>COT</value>
   </data>
   <data name="NinjaScriptIndicatorNameCurrentDayOHL" xml:space="preserve">
     <value>Current day OHL</value>
@@ -2612,6 +2654,9 @@
   </data>
   <data name="NinjaScriptYOffset" xml:space="preserve">
     <value>Y pixel offset</value>
+  </data>
+  <data name="NumberOfCotPlots" xml:space="preserve">
+    <value>Количество участков COT</value>
   </data>
   <data name="NumberOfTrendLines" xml:space="preserve">
     <value>Количество линий тренда</value>

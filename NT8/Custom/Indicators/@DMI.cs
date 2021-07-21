@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2021, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -28,9 +28,9 @@ using NinjaTrader.NinjaScript.DrawingTools;
 namespace NinjaTrader.NinjaScript.Indicators
 {
 	/// <summary>
-	/// Directional Movement Index. Directional Movement Index is quite similiar
-	/// to Welles Wilder's Relative Strength Index. The difference is the DMI
-	/// uses variable time periods (from 3 to 30) vs. the RSI's fixed periods.
+	/// Directional Movement Index. 
+	/// An indicator developed by J. Welles Wilder for identifying when a definable trend is present in an instrument. 
+	/// That is, the DMI tells whether an instrument is trending or not.
 	/// </summary>
 	public class DMI : Indicator
 	{

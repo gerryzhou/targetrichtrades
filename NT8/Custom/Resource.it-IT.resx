@@ -129,6 +129,12 @@
   <data name="ADLAD" xml:space="preserve">
     <value>ANNUNCIO</value>
   </data>
+  <data name="AlertOnBreak" xml:space="preserve">
+    <value>Avviso in pausa</value>
+  </data>
+  <data name="AlertOnBreakSound" xml:space="preserve">
+    <value>Avviso sul suono di interruzione</value>
+  </data>
   <data name="AndrewsPitchforkCalculationMethod_ModifiedSchiff" xml:space="preserve">
     <value>Schiff modificate</value>
   </data>
@@ -190,7 +196,7 @@
     <value>Secondo</value>
   </data>
   <data name="BarsPeriodTypeNameTick" xml:space="preserve">
-    <value>Segno di spunta</value>
+    <value>Tick</value>
   </data>
   <data name="BarsPeriodTypeNameVolume" xml:space="preserve">
     <value>Volume</value>
@@ -311,6 +317,30 @@
   </data>
   <data name="ConstantLines4" xml:space="preserve">
     <value>Linea 4</value>
+  </data>
+  <data name="COT1" xml:space="preserve">
+    <value>COT 1</value>
+  </data>
+  <data name="COT2" xml:space="preserve">
+    <value>COT 2</value>
+  </data>
+  <data name="COT3" xml:space="preserve">
+    <value>COT 3</value>
+  </data>
+  <data name="COT4" xml:space="preserve">
+    <value>COT 4</value>
+  </data>
+  <data name="COT5" xml:space="preserve">
+    <value>COT 5</value>
+  </data>
+  <data name="CotDataError" xml:space="preserve">
+    <value>I dati COT non sono supportati per questo strumento</value>
+  </data>
+  <data name="CotDataStillDownloading" xml:space="preserve">
+    <value>I dati COT sono ancora in fase di download. Si prega di aggiornare l'indicatore in pochi istanti.</value>
+  </data>
+  <data name="CotDataWarning" xml:space="preserve">
+    <value>ou deve abilitare "Scarica dati COT all'avvio" per ricevere i dati COT più recenti</value>
   </data>
   <data name="CountDown" xml:space="preserve">
     <value>Conto alla rovescia</value>
@@ -627,6 +657,9 @@
   <data name="MailServicePort" xml:space="preserve">
     <value>Connessione - porta</value>
   </data>
+  <data name="MailServiceSenderDisplayName" xml:space="preserve">
+    <value>Da nome</value>
+  </data>
   <data name="MailServiceServer" xml:space="preserve">
     <value>Connessione - Server</value>
   </data>
@@ -699,6 +732,9 @@
   <data name="NetChangePosition_TopRight" xml:space="preserve">
     <value>In alto a destra</value>
   </data>
+  <data name="NinjaScriptBackground" xml:space="preserve">
+    <value>Priorità bassa</value>
+  </data>
   <data name="NinjaScriptBarsTypeDay" xml:space="preserve">
     <value>Giorno</value>
   </data>
@@ -745,13 +781,16 @@
     <value>Secondo</value>
   </data>
   <data name="NinjaScriptBarsTypeTick" xml:space="preserve">
-    <value>Segno di spunta</value>
+    <value>Tick</value>
   </data>
   <data name="NinjaScriptBarsTypeVolume" xml:space="preserve">
     <value>Volume</value>
   </data>
   <data name="NinjaScriptBarsTypeWeek" xml:space="preserve">
     <value>Settimana</value>
+  </data>
+  <data name="NinjaScriptBorder" xml:space="preserve">
+    <value>confine</value>
   </data>
   <data name="NinjaScriptChartStyleBarWidth" xml:space="preserve">
     <value>Lunghezza barra</value>
@@ -887,6 +926,9 @@
   </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchforkDescription" xml:space="preserve">
     <value>Andrews pitchfork Descrizione</value>
+  </data>
+  <data name="NinjaScriptDrawingToolAndrewsPitchforkExtendLinesBack" xml:space="preserve">
+    <value>Estendere le linee indietro</value>
   </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchforkExtensionStroke" xml:space="preserve">
     <value>Estensione linea corsa</value>
@@ -1344,6 +1386,12 @@
   <data name="NinjaScriptIndicatorDescriptionConstantLines" xml:space="preserve">
     <value>Linee di appezzamenti a valori definiti dall'utente.</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionCorrelation" xml:space="preserve">
+    <value>L'indicatore di correlazione traccia la correlazione della serie di dati con lo strumento desiderato. I valori vicini a 1 indicano un movimento nella stessa direzione. I valori vicini a -1 indicano il movimento in direzioni opposte. I valori vicino a 0 indicano alcuna correlazione.</value>
+  </data>
+  <data name="NinjaScriptIndicatorDescriptionCOT" xml:space="preserve">
+    <value>Impegno dei commercianti</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionCurrentDayOHL" xml:space="preserve">
     <value>Vengono tracciati i valori aperti, alti e bassi della sessione a partire dal giorno corrente.</value>
   </data>
@@ -1691,6 +1739,12 @@
   </data>
   <data name="NinjaScriptIndicatorNameConstantLines" xml:space="preserve">
     <value>Linee di costante</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCorrelation" xml:space="preserve">
+    <value>Correlazione</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCOT" xml:space="preserve">
+    <value>Impegno dei commercianti</value>
   </data>
   <data name="NinjaScriptIndicatorNameCurrentDayOHL" xml:space="preserve">
     <value>Giorno corrente OHL</value>
@@ -2517,6 +2571,9 @@
   <data name="NinjaScriptStrategyGenerator" xml:space="preserve">
     <value>Generatore di strategia</value>
   </data>
+  <data name="NinjaScriptStrategyGeneratorCandleStickPatternPrompt" xml:space="preserve">
+    <value>1 candela stick modello {0} a bastone di candela Aggiungi il modello di candela stick... Configurare il modello candela bastone... Configurare i modelli di candela stick.</value>
+  </data>
   <data name="NinjaScriptStrategyGeneratorEntries" xml:space="preserve">
     <value>Condizioni di ingresso</value>
   </data>
@@ -2595,6 +2652,12 @@
   <data name="NinjaScriptTileError" xml:space="preserve">
     <value>Errore durante il caricamento di disegno strumento {0}: {1}</value>
   </data>
+  <data name="NinjaScriptYOffset" xml:space="preserve">
+    <value>Scostamento pixel Y</value>
+  </data>
+  <data name="NumberOfCotPlots" xml:space="preserve">
+    <value>Numero di trame COT</value>
+  </data>
   <data name="NumberOfTrendLines" xml:space="preserve">
     <value>Numero di linee di tendenza</value>
   </data>
@@ -2603,6 +2666,9 @@
   </data>
   <data name="OffsetMultiplier" xml:space="preserve">
     <value>Moltiplicatore di offset</value>
+  </data>
+  <data name="OldTrendsOpacity" xml:space="preserve">
+    <value>Opacità delle vecchie tendenze</value>
   </data>
   <data name="Opacity" xml:space="preserve">
     <value>Opacità</value>
@@ -3059,6 +3125,12 @@
   </data>
   <data name="TickCounterTicksRemaining" xml:space="preserve">
     <value>Le zecche restanti = </value>
+  </data>
+  <data name="TrendLinesCurrentTrendLine" xml:space="preserve">
+    <value>Linea di tendenza attuale</value>
+  </data>
+  <data name="TrendLinesTrendLineBroken" xml:space="preserve">
+    <value>{0} rotte</value>
   </data>
   <data name="TrendLinesTrendLineHigh" xml:space="preserve">
     <value>Alto della linea di tendenza</value>

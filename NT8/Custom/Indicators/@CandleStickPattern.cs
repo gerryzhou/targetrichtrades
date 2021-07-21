@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2021, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -89,157 +89,154 @@ namespace NinjaTrader.NinjaScript.Indicators
 			
 			if (PatternFound[0] == 1)
 			{
-				if (ChartBars != null)
+				bool 	isBearish 	= false;
+				string 	text 		= string.Empty;
+				
+				switch (Pattern)
 				{
-					bool 	isBearish 	= false;
-					string 	text 		= string.Empty;
-					
-					switch (Pattern)
-					{
-						case ChartPattern.BearishBeltHold: 		text = "Bearish Belt Hold"; 	isBearish = true; 	break;
-						case ChartPattern.BearishEngulfing: 	text = "Bearish Engulfing"; 	isBearish = true; 	break;
-						case ChartPattern.BearishHarami: 		text = "Bearish Harami"; 		isBearish = true; 	break;
-						case ChartPattern.BearishHaramiCross: 	text = "Bearish Harami Cross"; 	isBearish = true; 	break;
-						case ChartPattern.BullishBeltHold: 		text = "Bullish Belt Hold"; 						break;
-						case ChartPattern.BullishEngulfing: 	text = "Bullish Engulfing"; 						break;
-						case ChartPattern.BullishHarami: 		text = "Bullish Harami"; 							break;
-						case ChartPattern.BullishHaramiCross: 	text = "Bullish Harami Cross"; 						break;
-					}
-					
-					if (!string.IsNullOrEmpty(text))
-					{
-						BarBrushes[1] 			= isBearish 								? upBrush 	: downBrush;
-						BarBrushes[0] 			= isBearish 								? downBrush : upBrush;
-						CandleOutlineBrushes[1] = Pattern == ChartPattern.BearishBeltHold 	? downBrush : CandleOutlineBrushes[1];
-						CandleOutlineBrushes[0] = !isBearish 								? downBrush : CandleOutlineBrushes[0];
-						DrawText(text, 0, isBearish ? Math.Max(High[0], High[1]) : Math.Min(Low[0], Low[1]), isBearish ? 40 : 10);
-					}
-					
-					switch (Pattern)
-					{
-						case ChartPattern.DarkCloudCover:
-							BarBrushes[1] 			= upBrush;
-							BarBrushes[0] 			= downBrush;
-							CandleOutlineBrushes[1] = downBrush;
-							DrawText("Dark Cloud Cover", 1, Math.Max(High[0], High[1]), 50);
-							break;
-						case ChartPattern.Doji:
-							BarBrushes[0] 			= upBrush;
-							CandleOutlineBrushes[0] = downBrush;
-							int yOffset 			= Close[0] > Close[Math.Min(1, CurrentBar)] ? 20 : -20;
-							DrawText("Doji", 0, (yOffset > 0 ? High[0] : Low[0]), yOffset);
-							break;
-						case ChartPattern.DownsideTasukiGap:
-							BarBrushes[2] 			= downBrush;
-							BarBrushes[1] 			= downBrush;
-							BarBrushes[0] 			= upBrush;
-							CandleOutlineBrushes[0] = downBrush;
-							DrawText("Downside Tasuki Gap", 1, MAX(High, 3)[0], 10);
-							break;
-						case ChartPattern.EveningStar:
-							BarBrushes[2] 			= Close[2] > Open[2] ? upBrush : downBrush;
-							BarBrushes[1] 			= Close[1] > Open[1] ? upBrush : downBrush;
-							BarBrushes[0] 			= Close[0] > Open[0] ? upBrush : downBrush;
-							CandleOutlineBrushes[2] = Close[2] > Open[2] ? downBrush : CandleOutlineBrushes[2];
-							CandleOutlineBrushes[1] = Close[1] > Open[1] ? downBrush : CandleOutlineBrushes[1];
-							CandleOutlineBrushes[0] = Close[0] > Open[0] ? downBrush : CandleOutlineBrushes[0];
-							DrawText("Evening Star", 1, MAX(High, 3)[0], 40);
-							break;
-						case ChartPattern.FallingThreeMethods:
-							BarBrushes[4] = downBrush;
-							BarBrushes[0] = downBrush;
-							for (int i = 1; i < 4; i++)
-							{
-								BarBrushes[i] 			= Close[i] > Open[i] ? upBrush : downBrush;
-								CandleOutlineBrushes[i] = Close[i] > Open[i] ? downBrush : CandleOutlineBrushes[i];
-							}
-							DrawText("Falling Three Methods", 2, Math.Max(High[0], High[4]), 40);
-							break;
-						case ChartPattern.Hammer:
-							BarBrushes[0] 			= Close[0] > Open[0] ? upBrush : downBrush;
-							CandleOutlineBrushes[0] = Close[0] > Open[0] ? downBrush : CandleOutlineBrushes[0];
-							DrawText("Hammer", 0, Low[0], -20);
-							break;
-						case ChartPattern.HangingMan:
-							BarBrushes[0] 			= Close[0] > Open[0] ? upBrush : downBrush;
-							CandleOutlineBrushes[0] = Close[0] > Open[0] ? downBrush : CandleOutlineBrushes[0];
-							DrawText("Hanging Man", 0, Low[0], -20);
-							break;
-						case ChartPattern.InvertedHammer:
-							BarBrushes[0] 			= Close[0] > Open[0] ? upBrush : downBrush;
-							CandleOutlineBrushes[0] = Close[0] > Open[0] ? downBrush : CandleOutlineBrushes[0];
-							DrawText("Inverted Hammer", 0, Low[0] - 2 * TickSize, 20);
-							break;
-						case ChartPattern.MorningStar:
-							BarBrushes[2] 			= Close[2] > Open[2] ? upBrush : downBrush;
-							BarBrushes[1] 			= Close[1] > Open[1] ? upBrush : downBrush;
-							BarBrushes[0] 			= Close[0] > Open[0] ? upBrush : downBrush;
-							CandleOutlineBrushes[2] = Close[2] > Open[2] ? downBrush : CandleOutlineBrushes[2];
-							CandleOutlineBrushes[1] = Close[1] > Open[1] ? downBrush : CandleOutlineBrushes[1];
-							CandleOutlineBrushes[0] = Close[0] > Open[0] ? downBrush : CandleOutlineBrushes[0];
-							DrawText("Morning Star", 1, MIN(Low, 3)[0], -20);
-							break;
-						case ChartPattern.PiercingLine:
-							BarBrushes[1] 			= upBrush;
-							BarBrushes[0] 			= downBrush;
-							CandleOutlineBrushes[1] = downBrush;
-							DrawText("Piercing Line", 1, Low[0], -10);
-							break;
-						case ChartPattern.RisingThreeMethods:
-							BarBrushes[4] 			= upBrush;
-							BarBrushes[0] 			= upBrush;
-							CandleOutlineBrushes[4] = downBrush;
-							CandleOutlineBrushes[0] = downBrush;
-							for (int i = 1; i < 4; i++)
-							{
-								BarBrushes[i] 			= Close[i] > Open[i] ? upBrush : downBrush;
-								CandleOutlineBrushes[i] = Close[i] > Open[i] ? downBrush : CandleOutlineBrushes[i];
-							}
-							DrawText("Rising Three Methods", 2, MIN(Low, 5)[0], -10);
-							break;
-						case ChartPattern.ShootingStar:
-							BarBrushes[0] = downBrush;
-							DrawText("Shooting Star", 0, High[0], 30);
-							break;
-						case ChartPattern.StickSandwich:
-							BarBrushes[2] 			= downBrush;
-							BarBrushes[1] 			= upBrush;
-							BarBrushes[0] 			= downBrush;
-							CandleOutlineBrushes[1] = downBrush;
-							DrawText("Stick Sandwich", 1, MAX(High, 3)[0], 50);
-							break;
-						case ChartPattern.ThreeBlackCrows:
-							BarBrushes[2] 			= downBrush;
-							BarBrushes[1] 			= downBrush;
-							BarBrushes[0] 			= downBrush;
-							DrawText("Three Black Crows", 1, MAX(High, 3)[0], 50);
-							break;
-						case ChartPattern.ThreeWhiteSoldiers:
-							BarBrushes[2] 			= upBrush;
-							BarBrushes[1] 			= upBrush;
-							BarBrushes[0] 			= upBrush;
-							CandleOutlineBrushes[2] = downBrush;
-							CandleOutlineBrushes[1] = downBrush;
-							CandleOutlineBrushes[0] = downBrush;
-							DrawText("Three White Soldiers", 1, Low[2], -10);
-							break;
-						case ChartPattern.UpsideGapTwoCrows:
-							BarBrushes[2] 			= upBrush;
-							BarBrushes[1] 			= downBrush;
-							BarBrushes[0] 			= downBrush;
-							CandleOutlineBrushes[2] = downBrush;
-							DrawText("Upside Gap Two Crows", 1, Math.Max(High[0], High[1]), 10);
-							break;
-						case ChartPattern.UpsideTasukiGap:
-							BarBrushes[2] 			= upBrush;
-							BarBrushes[1] 			= upBrush;
-							BarBrushes[0] 			= downBrush;
-							CandleOutlineBrushes[2] = downBrush;
-							CandleOutlineBrushes[1] = downBrush;
-							DrawText("Upide Tasuki Gap", 1, MIN(Low, 3)[0], -20);
-							break;
-					}
+					case ChartPattern.BearishBeltHold: 		text = "Bearish Belt Hold"; 	isBearish = true; 	break;
+					case ChartPattern.BearishEngulfing: 	text = "Bearish Engulfing"; 	isBearish = true; 	break;
+					case ChartPattern.BearishHarami: 		text = "Bearish Harami"; 		isBearish = true; 	break;
+					case ChartPattern.BearishHaramiCross: 	text = "Bearish Harami Cross"; 	isBearish = true; 	break;
+					case ChartPattern.BullishBeltHold: 		text = "Bullish Belt Hold"; 						break;
+					case ChartPattern.BullishEngulfing: 	text = "Bullish Engulfing"; 						break;
+					case ChartPattern.BullishHarami: 		text = "Bullish Harami"; 							break;
+					case ChartPattern.BullishHaramiCross: 	text = "Bullish Harami Cross"; 						break;
 				}
+				
+				if (!string.IsNullOrEmpty(text))
+				{
+					BarBrushes[1] 			= isBearish 								? upBrush 	: downBrush;
+					BarBrushes[0] 			= isBearish 								? downBrush : upBrush;
+					CandleOutlineBrushes[1] = Pattern == ChartPattern.BearishBeltHold 	? downBrush : CandleOutlineBrushes[1];
+					CandleOutlineBrushes[0] = !isBearish 								? downBrush : CandleOutlineBrushes[0];
+					DrawText(text, 0, isBearish ? Math.Max(High[0], High[1]) : Math.Min(Low[0], Low[1]), isBearish ? 40 : 10);
+				}
+				
+				switch (Pattern)
+				{
+					case ChartPattern.DarkCloudCover:
+						BarBrushes[1] 			= upBrush;
+						BarBrushes[0] 			= downBrush;
+						CandleOutlineBrushes[1] = downBrush;
+						DrawText("Dark Cloud Cover", 1, Math.Max(High[0], High[1]), 50);
+						break;
+					case ChartPattern.Doji:
+						BarBrushes[0] 			= upBrush;
+						CandleOutlineBrushes[0] = downBrush;
+						int yOffset 			= Close[0] > Close[Math.Min(1, CurrentBar)] ? 20 : -20;
+						DrawText("Doji", 0, (yOffset > 0 ? High[0] : Low[0]), yOffset);
+						break;
+					case ChartPattern.DownsideTasukiGap:
+						BarBrushes[2] 			= downBrush;
+						BarBrushes[1] 			= downBrush;
+						BarBrushes[0] 			= upBrush;
+						CandleOutlineBrushes[0] = downBrush;
+						DrawText("Downside Tasuki Gap", 1, MAX(High, 3)[0], 10);
+						break;
+					case ChartPattern.EveningStar:
+						BarBrushes[2] 			= Close[2] > Open[2] ? upBrush : downBrush;
+						BarBrushes[1] 			= Close[1] > Open[1] ? upBrush : downBrush;
+						BarBrushes[0] 			= Close[0] > Open[0] ? upBrush : downBrush;
+						CandleOutlineBrushes[2] = Close[2] > Open[2] ? downBrush : CandleOutlineBrushes[2];
+						CandleOutlineBrushes[1] = Close[1] > Open[1] ? downBrush : CandleOutlineBrushes[1];
+						CandleOutlineBrushes[0] = Close[0] > Open[0] ? downBrush : CandleOutlineBrushes[0];
+						DrawText("Evening Star", 1, MAX(High, 3)[0], 40);
+						break;
+					case ChartPattern.FallingThreeMethods:
+						BarBrushes[4] = downBrush;
+						BarBrushes[0] = downBrush;
+						for (int i = 1; i < 4; i++)
+						{
+							BarBrushes[i] 			= Close[i] > Open[i] ? upBrush : downBrush;
+							CandleOutlineBrushes[i] = Close[i] > Open[i] ? downBrush : CandleOutlineBrushes[i];
+						}
+						DrawText("Falling Three Methods", 2, Math.Max(High[0], High[4]), 40);
+						break;
+					case ChartPattern.Hammer:
+						BarBrushes[0] 			= Close[0] > Open[0] ? upBrush : downBrush;
+						CandleOutlineBrushes[0] = Close[0] > Open[0] ? downBrush : CandleOutlineBrushes[0];
+						DrawText("Hammer", 0, Low[0], -20);
+						break;
+					case ChartPattern.HangingMan:
+						BarBrushes[0] 			= Close[0] > Open[0] ? upBrush : downBrush;
+						CandleOutlineBrushes[0] = Close[0] > Open[0] ? downBrush : CandleOutlineBrushes[0];
+						DrawText("Hanging Man", 0, Low[0], -20);
+						break;
+					case ChartPattern.InvertedHammer:
+						BarBrushes[0] 			= Close[0] > Open[0] ? upBrush : downBrush;
+						CandleOutlineBrushes[0] = Close[0] > Open[0] ? downBrush : CandleOutlineBrushes[0];
+						DrawText("Inverted Hammer", 0, Low[0] - 2 * TickSize, 20);
+						break;
+					case ChartPattern.MorningStar:
+						BarBrushes[2] 			= Close[2] > Open[2] ? upBrush : downBrush;
+						BarBrushes[1] 			= Close[1] > Open[1] ? upBrush : downBrush;
+						BarBrushes[0] 			= Close[0] > Open[0] ? upBrush : downBrush;
+						CandleOutlineBrushes[2] = Close[2] > Open[2] ? downBrush : CandleOutlineBrushes[2];
+						CandleOutlineBrushes[1] = Close[1] > Open[1] ? downBrush : CandleOutlineBrushes[1];
+						CandleOutlineBrushes[0] = Close[0] > Open[0] ? downBrush : CandleOutlineBrushes[0];
+						DrawText("Morning Star", 1, MIN(Low, 3)[0], -20);
+						break;
+					case ChartPattern.PiercingLine:
+						BarBrushes[1] 			= upBrush;
+						BarBrushes[0] 			= downBrush;
+						CandleOutlineBrushes[1] = downBrush;
+						DrawText("Piercing Line", 1, Low[0], -10);
+						break;
+					case ChartPattern.RisingThreeMethods:
+						BarBrushes[4] 			= upBrush;
+						BarBrushes[0] 			= upBrush;
+						CandleOutlineBrushes[4] = downBrush;
+						CandleOutlineBrushes[0] = downBrush;
+						for (int i = 1; i < 4; i++)
+						{
+							BarBrushes[i] 			= Close[i] > Open[i] ? upBrush : downBrush;
+							CandleOutlineBrushes[i] = Close[i] > Open[i] ? downBrush : CandleOutlineBrushes[i];
+						}
+						DrawText("Rising Three Methods", 2, MIN(Low, 5)[0], -10);
+						break;
+					case ChartPattern.ShootingStar:
+						BarBrushes[0] = downBrush;
+						DrawText("Shooting Star", 0, High[0], 30);
+						break;
+					case ChartPattern.StickSandwich:
+						BarBrushes[2] 			= downBrush;
+						BarBrushes[1] 			= upBrush;
+						BarBrushes[0] 			= downBrush;
+						CandleOutlineBrushes[1] = downBrush;
+						DrawText("Stick Sandwich", 1, MAX(High, 3)[0], 50);
+						break;
+					case ChartPattern.ThreeBlackCrows:
+						BarBrushes[2] 			= downBrush;
+						BarBrushes[1] 			= downBrush;
+						BarBrushes[0] 			= downBrush;
+						DrawText("Three Black Crows", 1, MAX(High, 3)[0], 50);
+						break;
+					case ChartPattern.ThreeWhiteSoldiers:
+						BarBrushes[2] 			= upBrush;
+						BarBrushes[1] 			= upBrush;
+						BarBrushes[0] 			= upBrush;
+						CandleOutlineBrushes[2] = downBrush;
+						CandleOutlineBrushes[1] = downBrush;
+						CandleOutlineBrushes[0] = downBrush;
+						DrawText("Three White Soldiers", 1, Low[2], -10);
+						break;
+					case ChartPattern.UpsideGapTwoCrows:
+						BarBrushes[2] 			= upBrush;
+						BarBrushes[1] 			= downBrush;
+						BarBrushes[0] 			= downBrush;
+						CandleOutlineBrushes[2] = downBrush;
+						DrawText("Upside Gap Two Crows", 1, Math.Max(High[0], High[1]), 10);
+						break;
+					case ChartPattern.UpsideTasukiGap:
+						BarBrushes[2] 			= upBrush;
+						BarBrushes[1] 			= upBrush;
+						BarBrushes[0] 			= downBrush;
+						CandleOutlineBrushes[2] = downBrush;
+						CandleOutlineBrushes[1] = downBrush;
+						DrawText("Upide Tasuki Gap", 1, MIN(Low, 3)[0], -20);
+						break;
+					}
 				
 				if (ShowAlerts)
 					Alert("myAlert", Priority.Low, string.Format("Pattern(s) found: {0} {1} on {2} {3} {4} Chart", numPatternsFound, Pattern, 
@@ -312,7 +309,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if (ninjaScript.CurrentBar < trendStrength || ninjaScript.CurrentBar < 2)
 				return false;
 
-			if (max == null && trendStrength > 0 && (pattern == ChartPattern.HangingMan || pattern == ChartPattern.InvertedHammer))
+			if (max == null && trendStrength > 0 && pattern == ChartPattern.HangingMan)
 			{
 				max = new Indicators.MAX();
 				max.Period = trendStrength;
@@ -344,7 +341,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				}
 			}
 
-			if (min == null && trendStrength > 0 && pattern == ChartPattern.Hammer)
+			if (min == null && trendStrength > 0 && (pattern == ChartPattern.Hammer || pattern == ChartPattern.InvertedHammer))
 			{
 				min = new MIN();
 				min.Period = trendStrength;
@@ -459,18 +456,18 @@ namespace NinjaTrader.NinjaScript.Indicators
 
                     if (upTrendStartBarsAgo > 0 && upTrendEndBarsAgo > 0 && upTrendStartBarsAgo < downTrendStartBarsAgo)
                     {
-                        isInDownTrend = false;
-                        isInUpTrend = true;
+                        isInDownTrend 	= false;
+                        isInUpTrend 	= true;
                     }
                     else if (downTrendStartBarsAgo > 0 && downTrendEndBarsAgo > 0 && upTrendStartBarsAgo > downTrendStartBarsAgo)
                     {
-                        isInDownTrend = true;
-                        isInUpTrend = false;
+                        isInDownTrend 	= true;
+                        isInUpTrend 	= false;
                     }
                     else
                     {
-                        isInDownTrend = false;
-                        isInUpTrend = false;
+                        isInDownTrend 	= false;
+                        isInUpTrend 	= false;
                     }
                 }
             }
@@ -501,7 +498,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 																	&& Math.Abs(n.Open[0] - n.Close[0]) < (0.10 * (n.High[0] - n.Low[0])) && (n.High[0] - n.Close[0]) < (0.25 * (n.High[0] - n.Low[0])); break;
 					case ChartPattern.HangingMan:			found = isInUpTrend && (max == null ? true : max[0] == n.High[0]) && n.Low[0] < n.Open[0] - 5 * n.TickSize 
 																	&& Math.Abs(n.Open[0] - n.Close[0]) < (0.10 * (n.High[0] - n.Low[0])) && (n.High[0] - n.Close[0]) < (0.25 * (n.High[0] - n.Low[0])); break;
-					case ChartPattern.InvertedHammer:		found = isInUpTrend && (max == null ? true : max[0] == n.High[0]) && n.High[0] > n.Open[0] + 5 * n.TickSize 
+					case ChartPattern.InvertedHammer:		found = isInDownTrend && (min == null ? true : min[0] == n.Low[0]) && n.High[0] > n.Open[0] + 5 * n.TickSize 
 																	&& Math.Abs(n.Open[0] - n.Close[0]) < (0.10 * (n.High[0] - n.Low[0])) && (n.Close[0] - n.Low[0]) < (0.25 * (n.High[0] - n.Low[0])); break;
 					case ChartPattern.MorningStar:			found = n.Close[2] < n.Open[2] && n.Close[1] < n.Close[2] && n.Open[0] > (Math.Abs((n.Close[1] - n.Open[1]) / 2) + n.Open[1]) && n.Close[0] > n.Open[0]; break;
 					case ChartPattern.PiercingLine:			found = isInDownTrend && n.Open[0] < n.Low[1] && n.Close[1] < n.Open[1] && n.Close[0] > n.Open[0] && n.Close[0] >= n.Close[1] + (n.Open[1] - n.Close[1]) / 2 && n.Close[0] <= n.Open[1]; break;

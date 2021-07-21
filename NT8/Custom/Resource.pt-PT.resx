@@ -318,6 +318,30 @@
   <data name="ConstantLines4" xml:space="preserve">
     <value>Linha 4</value>
   </data>
+  <data name="COT1" xml:space="preserve">
+    <value>COT 1</value>
+  </data>
+  <data name="COT2" xml:space="preserve">
+    <value>COT 2</value>
+  </data>
+  <data name="COT3" xml:space="preserve">
+    <value>COT 3</value>
+  </data>
+  <data name="COT4" xml:space="preserve">
+    <value>COT 4</value>
+  </data>
+  <data name="COT5" xml:space="preserve">
+    <value>COT 5</value>
+  </data>
+  <data name="CotDataError" xml:space="preserve">
+    <value>Os dados do COT não são suportados para este instrumento</value>
+  </data>
+  <data name="CotDataStillDownloading" xml:space="preserve">
+    <value>Os dados do COT ainda estão sendo baixados. Por favor, atualize o indicador em poucos momentos.</value>
+  </data>
+  <data name="CotDataWarning" xml:space="preserve">
+    <value>ou deve habilitar "Baixar dados cot na inicialização" para receber os dados cot mais recentes</value>
+  </data>
   <data name="CountDown" xml:space="preserve">
     <value>Contagem regressiva</value>
   </data>
@@ -903,6 +927,9 @@
   <data name="NinjaScriptDrawingToolAndrewsPitchforkDescription" xml:space="preserve">
     <value>Descrição Andrews pitchfork</value>
   </data>
+  <data name="NinjaScriptDrawingToolAndrewsPitchforkExtendLinesBack" xml:space="preserve">
+    <value>Estender linhas para trás</value>
+  </data>
   <data name="NinjaScriptDrawingToolAndrewsPitchforkExtensionStroke" xml:space="preserve">
     <value>Curso de extensão linha</value>
   </data>
@@ -1362,6 +1389,9 @@
   <data name="NinjaScriptIndicatorDescriptionCorrelation" xml:space="preserve">
     <value>O indicador de correlação irá representar a correlação da série de dados com um instrumento desejado. Valores próximos de 1 indicam movimento na mesma direção. Valores próximos de -1 indicam movimento em direções opostas. Valores próximos de 0 indicam ausência de correlação.</value>
   </data>
+  <data name="NinjaScriptIndicatorDescriptionCOT" xml:space="preserve">
+    <value>Compromisso dos comerciantes</value>
+  </data>
   <data name="NinjaScriptIndicatorDescriptionCurrentDayOHL" xml:space="preserve">
     <value>Plota os valores abertos, máximas e mínimas da sessão começando no dia atual.</value>
   </data>
@@ -1712,6 +1742,9 @@
   </data>
   <data name="NinjaScriptIndicatorNameCorrelation" xml:space="preserve">
     <value>Correlation</value>
+  </data>
+  <data name="NinjaScriptIndicatorNameCOT" xml:space="preserve">
+    <value>Compromisso dos comerciantes</value>
   </data>
   <data name="NinjaScriptIndicatorNameCurrentDayOHL" xml:space="preserve">
     <value>Current day OHL</value>
@@ -2621,6 +2654,9 @@
   </data>
   <data name="NinjaScriptYOffset" xml:space="preserve">
     <value>Deslocamento do pixel Y</value>
+  </data>
+  <data name="NumberOfCotPlots" xml:space="preserve">
+    <value>Número de parcelas cot</value>
   </data>
   <data name="NumberOfTrendLines" xml:space="preserve">
     <value>Número de linhas de tendência</value>

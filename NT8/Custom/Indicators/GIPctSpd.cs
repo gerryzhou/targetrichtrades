@@ -20,8 +20,7 @@ using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.AddOns;
-using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
-using NinjaTrader.NinjaScript.Indicators.PriceActions;
+using NinjaTrader.NinjaScript.AddOns.PriceActions;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 
@@ -71,8 +70,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 			}
 			else if (State == State.Configure)
 			{
-				AddDataSeries("NQ 06-20", Data.BarsPeriodType.Minute, 13, Data.MarketDataType.Last);
-				AddDataSeries("RTY 06-20", Data.BarsPeriodType.Minute, 13, Data.MarketDataType.Last);
+				//AddDataSeries("NQ 06-20", Data.BarsPeriodType.Minute, 13, Data.MarketDataType.Last);
+				AddDataSeries("RTY 09-20", Data.BarsPeriodType.Minute, 4, Data.MarketDataType.Last);
+				//AddDataSeries("NRGU", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
+				//AddDataSeries("SCO", Data.BarsPeriodType.Minute, 1, Data.MarketDataType.Last);
 			}
 			else if (State == State.DataLoaded)
 			{				
@@ -86,6 +87,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		protected override void OnBarUpdate()
 		{
+			Print(String.Format("{0}:[{1}] BarsRequiredToPlot={2},", CurrentBars[BarsInProgress], BarsInProgress, BarsRequiredToPlot));
 			if(CurrentBars[BarsInProgress] < BarsRequiredToPlot)
 				return;
 //			if(IsCutoffTime(BarsInProgress, 10, 20)) {
@@ -105,7 +107,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 						CurrentBar, this.GetType().Name, BarsInProgress,
 						chg, PctChgMaxBip, PctChgMinBip));
 				}
-				else {
+				else { //return;
 					if(chg >= PctChgMax[0]) {
 							PctChgMax[0] = chg;
 							PctChgMaxBip = BarsInProgress;
@@ -126,6 +128,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				}
 			}//end of cutoff time
 			else{ //Not the cutoff time
+				
 				if(BarsInProgress == PctChgMaxBip)
 					PctChgMax[0] = GetPctChg(PctChgMaxBip);
 				if(BarsInProgress == PctChgMinBip)
@@ -175,14 +178,19 @@ namespace NinjaTrader.NinjaScript.Indicators
 		
 		private double GetPctChg(int bip) {
 			double chg = -101;
+			if(bip < 0)
+				return chg;
+			
 			lastDayOHLC = PriorDayOHLC(BarsArray[BarsInProgress]);
 			double cl = Closes[BarsInProgress][0];
 			double lcl = PriorDayOHLC(BarsArray[BarsInProgress]).PriorClose[0];
 			if(lcl > 0) {
 				chg = Math.Round(100*(cl-lcl)/lcl, 2);
-				Print(Instruments[BarsInProgress].FullName + " Chg=" + chg.ToString() + ", Time[0]=" + Time[0]);
+				Print(string.Format("{0}:{1} Chg={2}, Time[0]={3}",
+					CurrentBar, Instruments[BarsInProgress].FullName, chg.ToString(), Time[0]));
 			}
-			else Print(Instruments[BarsInProgress].FullName + " PriorClose=0, Time[0]=" + Time[0]);
+			else Print(string.Format("{0}:{1} PriorClose=0, Time[0]={2}",
+				CurrentBar, Instruments[BarsInProgress].FullName, Time[0]));
 			return chg;
 		}
 		
@@ -302,25 +310,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			get;set;
 		}
 		#endregion
-		
-		#region Pre-defined signal name
-		[Browsable(false), XmlIgnore]
-		public string SignalName_EntryOnOpenLong
-		{
-			get { return "EntryOnOpenLong";}
-		}
 
-		public string SignalName_EntryOnOpenShort
-		{
-			get { return "EntryOnOpenShort";}
-		}
-
-		[Browsable(false), XmlIgnore]
-		public string SignalName_ExitForOpen
-		{
-			get { return "ExitForOpen";}
-		}
-		#endregion
 	}
 }
 

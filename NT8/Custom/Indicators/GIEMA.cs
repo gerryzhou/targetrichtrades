@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+using NinjaTrader.NinjaScript.Indicators;
 #endregion
 
 // This namespace holds indicators in this folder and is required. Do not change it.
@@ -29,7 +29,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 			if (State == State.SetDefaults)
 			{
 				Description					= NinjaTrader.Custom.Resource.NinjaScriptIndicatorDescriptionEMA;
-				Name						= NinjaTrader.Custom.Resource.NinjaScriptIndicatorNameEMA;
+				Name						= "GIEMA";
 				IsOverlay					= true;
 				IsSuspendedWhileInactive	= true;
 				Period						= 14;
@@ -66,7 +66,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 		public void CheckBreakoutEmaTicsEvent() {
 			IndicatorSignal isig = new IndicatorSignal();
-			//if(CurrentBar < 300)
+			if(CurrentBar < 300)
 				Print(String.Format("{0}:Close={1},EMA={2},OffsetTicks={3}",
 				CurrentBar, Close[0], Value[0], OffsetTicks));
 			if(Close[0] < Value[1] - GetPriceByTicks(OffsetTicks)) {
@@ -118,7 +118,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 namespace NinjaTrader.NinjaScript.Indicators
 {
-    public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
+	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GIEMA[] cacheGIEMA;
 		public GIEMA GIEMA(int period, int offsetTicks)
@@ -139,7 +139,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
-    public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
+	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
 		public Indicators.GIEMA GIEMA(int period, int offsetTicks)
 		{
@@ -155,7 +155,7 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-    public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
+	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
 		public Indicators.GIEMA GIEMA(int period, int offsetTicks)
 		{

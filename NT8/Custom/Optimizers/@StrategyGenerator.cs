@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>.
+// Copyright (C) 2021, NinjaTrader LLC <www.ninjatrader.com>.
 // NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release.
 //
 #region Using declarations
@@ -125,7 +125,7 @@ namespace NinjaTrader.NinjaScript.Optimizers
 		private List<Cbi.SystemPerformance> GetUniqueResults()
 		{
 			// remove long/short conditions in case they did not contribute to the trades
-			// however, make sure there is at least a long or short trades (for consistency reasons)
+			// however, make sure there is at least one long trade or short trade (for consistency reasons)
 			foreach (Cbi.SystemPerformance result in Results)
 			{
 				if (result.ParameterValues == null)
@@ -154,7 +154,7 @@ namespace NinjaTrader.NinjaScript.Optimizers
 
 			// filter duplicate results and keep the ones with the least # of nodes
 			// note: filtering is not 100% inline with the logic to mutate/crossover/... the next generation, since it could remove redundant individuals
-			// however it does not matter at the long run, as long as on starting the new generation there still are .GenerationSize individuals in the population
+			// however, it does not matter at the long run, as long as on starting the new generation there still are .GenerationSize individuals in the population
 			List<Cbi.SystemPerformance> uniqueResults = new List<Cbi.SystemPerformance>();
 			foreach (Cbi.SystemPerformance result in Results)
 			{
@@ -187,6 +187,7 @@ namespace NinjaTrader.NinjaScript.Optimizers
 				UseCandleStickPatternForEntries		= true;
 				UseCandleStickPatternForExits		= true;
 				UseDayOfWeekForEntries				= false;
+				UseDayOfWeekForExits				= false;
 				UseIndicatorsForEntries				= true;
 				UseIndicatorsForExits				= true;
 				UseParabolicStopForExits			= true;
@@ -486,7 +487,7 @@ namespace NinjaTrader.NinjaScript.Optimizers
 
 		public bool OptimizeExits
 		{
-			get { return UseCandleStickPatternForExits || UseIndicatorsForExits || UseParabolicStopForExits || UseSessionTimeForExits || UseStopTargetsForExits || UseSessionCloseForExits ; }
+			get { return UseCandleStickPatternForExits || UseDayOfWeekForExits || UseIndicatorsForExits || UseParabolicStopForExits || UseSessionTimeForExits || UseStopTargetsForExits || UseSessionCloseForExits ; }
 		}
 
 		[Gui.PropertyEditor("NinjaTrader.Gui.Tools.AvailableCandleStickPatternListEditor")]
@@ -541,6 +542,10 @@ namespace NinjaTrader.NinjaScript.Optimizers
 
 		[Display(ResourceType = typeof(Resource), GroupName = "NinjaScriptStrategyGeneratorEntries", Name = "NinjaScriptStrategyGeneratorDayOfWeek", Order = 20)]
 		public bool UseDayOfWeekForEntries
+		{ get; set; }
+
+		[Display(ResourceType = typeof(Resource), GroupName = "NinjaScriptStrategyGeneratorExits", Name = "NinjaScriptStrategyGeneratorDayOfWeek", Order = 2)]
+		public bool UseDayOfWeekForExits
 		{ get; set; }
 
 		[Browsable(false)]
@@ -1051,7 +1056,10 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 							value	= value + (r2 == 0 ? 1 : -1);
 						}
 						else
+						{
+							maximum	= 50.000;							// some 'random' limitation
 							value	= value * (r2 == 0 ? 1.25 : 0.75);
+						}
 
 						try
 						{
@@ -1406,6 +1414,7 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 									EnterShortCondition					= (EnterShortCondition	== null ? null : (IExpression) EnterShortCondition.Clone()),
 									ExitLongCondition					= (ExitLongCondition	== null ? null : (IExpression) ExitLongCondition.Clone()),
 									ExitShortCondition					= (ExitShortCondition	== null ? null : (IExpression) ExitShortCondition.Clone()),
+									ExitOnDayOfWeek						= ExitOnDayOfWeek,
 									ExitOnSessionClose					= ExitOnSessionClose,
 									Id									= Id,
 									ParabolicStopPercent				= ParabolicStopPercent,
@@ -1444,6 +1453,9 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 		internal IExpression ExitLongCondition
 		{ get; set; }
 
+		public bool[] ExitOnDayOfWeek
+		{ get; set; }
+
 		internal IExpression ExitShortCondition
 		{ get; set; }
 
@@ -1470,6 +1482,13 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 				EnterOnDayOfWeek				= new bool[daysOfWeekCount];
 				for (int i = 0; i < element.Element("EnterOnDayOfWeek").Value.Length; i++)
 					EnterOnDayOfWeek[i]			= (element.Element("EnterOnDayOfWeek").Value[i] == '1');
+			}
+
+			if (element.Element("ExitOnDayOfWeek") != null)
+			{
+				ExitOnDayOfWeek					= new bool[daysOfWeekCount];
+				for (int i = 0; i < element.Element("ExitOnDayOfWeek").Value.Length; i++)
+					ExitOnDayOfWeek[i]			= (element.Element("ExitOnDayOfWeek").Value[i] == '1');
 			}
 
 			if (element.Element("ExitOnSessionClose") != null)
@@ -1553,6 +1572,7 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 								EnterOnDayOfWeek					= (r == 0 ? fitter.EnterOnDayOfWeek						: EnterOnDayOfWeek),
 								ExitLongCondition					= (r == 1 ? (fitter.ExitLongCondition	!= null			? fitter.ExitLongCondition.Clone() as IExpression	: null)	: (ExitLongCondition	!= null ? ExitLongCondition.Clone() as IExpression		: null)),
 								ExitShortCondition					= (r == 1 ? (fitter.ExitShortCondition	!= null			? fitter.ExitShortCondition.Clone() as IExpression	: null)	: (ExitShortCondition	!= null ? ExitShortCondition.Clone() as IExpression		: null)),
+								ExitOnDayOfWeek						= (r == 1 ? fitter.ExitOnDayOfWeek						: ExitOnDayOfWeek),
 								ExitOnSessionClose					= (r == 1 ? fitter.ExitOnSessionClose					: ExitOnSessionClose),
 								ParabolicStopPercent				= (r == 1 ? fitter.ParabolicStopPercent					: ParabolicStopPercent),
 								ProfitTargetPercent					= (r == 1 ? fitter.ProfitTargetPercent					: ProfitTargetPercent),
@@ -1580,13 +1600,17 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 		{
 			if (!TryLinearMutation)
 			{
+				// dependent on the actual entry/exit conditions enabled, this might not create a new mutation.
+				// however, this is irrelevant, since the caller tries N times
+				//
 				// 0: entry
 				// 1: exit
 				// 2: trend strength
 				// 3: exit on session close
 				// 4: enter on day of week
-				// 5: session time
-				r0								= random.Next(3 + (StrategyGenerator.UseSessionTimeForEntries || StrategyGenerator.UseSessionTimeForExits ? 1: 0));
+				// 5: exit on day of week
+				// 6: session time
+				r0								= random.Next(7);
 
 				// 0: long
 				// 1: short
@@ -1694,7 +1718,16 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 			else
 				ret.EnterOnDayOfWeek			= EnterOnDayOfWeek;
 
-			if (r0 == 5)
+			if (r0 == 4 && StrategyGenerator.UseDayOfWeekForExits)
+			{
+				int r							= random.Next(daysOfWeekCount);
+				ret.ExitOnDayOfWeek				= ExitOnDayOfWeek.ToArray();
+				ret.ExitOnDayOfWeek[r]			= !ExitOnDayOfWeek[r];
+			}
+			else
+				ret.ExitOnDayOfWeek				= ExitOnDayOfWeek;
+
+			if (r0 == 6)
 			{
 				if (!ret.TryLinearMutation)
 					r3							= random.Next(4);
@@ -1776,6 +1809,7 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 							EnterOnDayOfWeek					= (StrategyGenerator.UseDayOfWeekForEntries			? new bool[daysOfWeekCount]				: null),
 							ExitLongCondition					= ((r == 0 || r == 1) && r2 == 0					? RandomExpression(random, false)		: null),
 							ExitShortCondition					= ((r == 0 || r == 2) && r2 == 0					? RandomExpression(random, false)		: null),
+							ExitOnDayOfWeek						= (StrategyGenerator.UseDayOfWeekForExits			? new bool[daysOfWeekCount]				: null),
 							ExitOnSessionClose					= (StrategyGenerator.UseSessionCloseForExits		? new bool?(random.Next(2) == 0)		: new bool?()),
 							ParabolicStopPercent				= (r2 == 1											? initialStopTargetPercent				: double.NaN),
 							ProfitTargetPercent					= (r2 != 0 && r2 != 1								? 2 * initialStopTargetPercent			: double.NaN),
@@ -1796,6 +1830,10 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 			if (ret.EnterOnDayOfWeek != null)
 				for (int i = 1; i < ret.EnterOnDayOfWeek.Length; i++)
 					ret.EnterOnDayOfWeek[i] = (random.Next(2) == 0);
+
+			if (ret.ExitOnDayOfWeek != null)
+				for (int i = 1; i < ret.ExitOnDayOfWeek.Length; i++)
+					ret.ExitOnDayOfWeek[i] = (random.Next(2) == 0);
 
 			if (!ret.IsConsistent)
 				throw new InvalidOperationException("NewRandom");
@@ -1910,7 +1948,8 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 			
 			if ((ExitLongCondition != null || SessionMinutesOffsetForLongExits >= 0)
 					&& (ExitLongCondition == null || ExitLongCondition.Evaluate(this, strategy) == true)
-					&& (SessionMinutesOffsetForLongExits == -1 || (startTimeForLongExits < strategy.Times[0][0] && strategy.Times[0][0] <= endTimeForLongExits)))
+					&& (SessionMinutesOffsetForLongExits == -1 || (startTimeForLongExits < strategy.Times[0][0] && strategy.Times[0][0] <= endTimeForLongExits))
+					&& (ExitOnDayOfWeek == null || ExitOnDayOfWeek[(int) strategy.Times[0][0].DayOfWeek] == true))
 				order = (strategy is IGeneratedStrategy ? (strategy as IGeneratedStrategy).OnExitLong() : strategy.ExitLong());
 
 			if ((EnterShortCondition != null || SessionMinutesOffsetForShortEntries >= 0)
@@ -1921,7 +1960,8 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 			
 			if ((ExitShortCondition != null || SessionMinutesOffsetForShortExits >= 0)
 					&& (ExitShortCondition == null || ExitShortCondition.Evaluate(this, strategy) == true)
-					&& (SessionMinutesOffsetForShortExits == -1 || (startTimeForShortExits < strategy.Times[0][0] && strategy.Times[0][0] <= endTimeForShortExits)))
+					&& (SessionMinutesOffsetForShortExits == -1 || (startTimeForShortExits < strategy.Times[0][0] && strategy.Times[0][0] <= endTimeForShortExits))
+					&& (ExitOnDayOfWeek == null || ExitOnDayOfWeek[(int) strategy.Times[0][0].DayOfWeek] == true))
 				order = (strategy is IGeneratedStrategy ? (strategy as IGeneratedStrategy).OnExitShort() : strategy.ExitShort());
 		}
 
@@ -2097,7 +2137,7 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 			
 			s = new StringBuilder();
 			s.Append("//" + Environment.NewLine);
-			s.Append("// Copyright (C) 2019, NinjaTrader LLC <www.ninjatrader.com>." + Environment.NewLine);
+			s.Append("// Copyright (C) 2021, NinjaTrader LLC <www.ninjatrader.com>." + Environment.NewLine);
 			s.Append("// NinjaTrader reserves the right to modify or overwrite this NinjaScript component with each release." + Environment.NewLine);
 			s.Append("//" + Environment.NewLine);
 			s.Append("#region Using declarations" + Environment.NewLine);
@@ -2299,12 +2339,12 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 					}
 					s.Append("startTimeForLongExits < Times[0][0] && Times[0][0] <= endTimeForLongExits");
 				}
-				if (EnterOnDayOfWeek != null)
+				if (ExitOnDayOfWeek != null)
 				{
 					bool isFirst = true;
-					for (int i = 0; i < EnterOnDayOfWeek.Length; i++)
+					for (int i = 0; i < ExitOnDayOfWeek.Length; i++)
 					{
-						if (EnterOnDayOfWeek[i] == true)
+						if (ExitOnDayOfWeek[i] == true)
 						{
 							if (isFirst)
 							{
@@ -2397,12 +2437,12 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 					}
 					s.Append("startTimeForShortExits < Times[0][0] && Times[0][0] <= endTimeForShortExits");
 				}
-				if (EnterOnDayOfWeek != null)
+				if (ExitOnDayOfWeek != null)
 				{
 					bool isFirst = true;
-					for (int i = 0; i < EnterOnDayOfWeek.Length; i++)
+					for (int i = 0; i < ExitOnDayOfWeek.Length; i++)
 					{
-						if (EnterOnDayOfWeek[i] == true)
+						if (ExitOnDayOfWeek[i] == true)
 						{
 							if (isFirst)
 							{
@@ -2453,6 +2493,9 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 			if (EnterOnDayOfWeek != null)
 				ret.Add(new XElement("EnterOnDayOfWeek",				EnterOnDayOfWeek.Select(e => e ? "1" : "0")));
 
+			if (ExitOnDayOfWeek != null)
+				ret.Add(new XElement("ExitOnDayOfWeek",					ExitOnDayOfWeek.Select(e => e ? "1" : "0")));
+
 			if (ExitOnSessionClose.HasValue)
 				ret.Add(new XElement("ExitOnSessionClose",				ExitOnSessionClose.Value.ToString(CultureInfo.InvariantCulture)));
 
@@ -2488,6 +2531,7 @@ namespace NinjaTrader.NinjaScript.StrategyGenerator
 		{
 			ChartIndicators						= new List<string>();
 			EnterOnDayOfWeek					= null;
+			ExitOnDayOfWeek						= null;
 			ExitOnSessionClose					= new bool?();
 			Id									= Interlocked.Increment(ref lastId);
 			ParabolicStopPercent				= double.NaN;

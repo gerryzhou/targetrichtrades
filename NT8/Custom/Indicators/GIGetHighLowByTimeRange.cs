@@ -22,8 +22,7 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.DrawingTools;
-using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
-using NinjaTrader.NinjaScript.Indicators.PriceActions;
+using NinjaTrader.NinjaScript.AddOns.PriceActions;
 #endregion
 
 //This namespace holds Indicators in this folder and is required. Do not change it. 

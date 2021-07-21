@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using NinjaTrader.NinjaScript.Indicators.ZTraderInd;
+
 #endregion
 
 // This namespace holds indicators in this folder and is required. Do not change it.
@@ -47,12 +47,16 @@ namespace NinjaTrader.NinjaScript.Indicators
 		protected override void OnBarUpdate()
 		{
 			if(CurrentBar > Period) {
+				Print(string.Format("CurrentBar={0}, LowestN[0]={1}, HighestN[0]={2}, Period={3}",
+					CurrentBar, LowestN[0], HighestN[0], Period));
 				LowestN[0] = CurrentBar < Period ? Low[0] : GetLowestPrice(Period, false);
 //				LowestN[0] = (CurrentBar < Period ? Low[0] : GetLowestPrice(Period, false));
 				HighestN[0] = CurrentBar < Period ? High[0] : GetHighestPrice(Period, false);
+				Print(string.Format("CurrentBar={0}, LowestN[0]={1}, HighestN[0]={2}, Period={3}",
+					CurrentBar, LowestN[0], HighestN[0], Period));
+				HiLoSpread[0] = HighestN[0] - LowestN[0];
 				CheckBreakoutNBarsHLEvent();
-				}
-
+			}
 		}
 
 		public double GetNBarsHLOffset(SupportResistanceType srt, double price) {
@@ -74,6 +78,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				return;
 			IndicatorSignal isig = new IndicatorSignal();
 			//if(CurrentBar < 300)
+			if(PrintOut > 1)
 				Print(String.Format("{0}:Close={1},RefBarLowestN={2},RefBarLowestN={3},LowestN={4},HighestN={5}",
 				CurrentBar, Close[0], RefBarLowestN, RefBarHighestN,
 				LowestN[CurrentBar-RefBarLowestN], HighestN[CurrentBar-RefBarHighestN]));
@@ -114,6 +119,13 @@ namespace NinjaTrader.NinjaScript.Indicators
 			get { return Values[1]; }
 		}
 		
+		[Browsable(false)]
+		[XmlIgnore]
+		public Series<double> HiLoSpread
+		{
+			get { return Values[2]; }
+		}
+		
 		/// <summary>
 		/// The bar NO for the prior LowestN as reference
 		/// Used to locate LowestN for entry bar 
@@ -149,7 +161,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 namespace NinjaTrader.NinjaScript.Indicators
 {
-    public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
+	public partial class Indicator : NinjaTrader.Gui.NinjaScript.IndicatorRenderBase
 	{
 		private GIHLnBars[] cacheGIHLnBars;
 		public GIHLnBars GIHLnBars(int period)
@@ -170,7 +182,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 {
-    public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
+	public partial class MarketAnalyzerColumn : MarketAnalyzerColumnBase
 	{
 		public Indicators.GIHLnBars GIHLnBars(int period)
 		{
@@ -186,7 +198,7 @@ namespace NinjaTrader.NinjaScript.MarketAnalyzerColumns
 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-    public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
+	public partial class Strategy : NinjaTrader.Gui.NinjaScript.StrategyRenderBase
 	{
 		public Indicators.GIHLnBars GIHLnBars(int period)
 		{
